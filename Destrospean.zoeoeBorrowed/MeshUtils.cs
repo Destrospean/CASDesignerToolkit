@@ -160,9 +160,9 @@ namespace Destrospean.zoeoeBorrowed
             var meshGroups = new List<MeshGroupData>();
             foreach (var meshGroup in mlodChunk.Meshes)
             {
-                var indexBuffer = (IBUF)outerResource.ChunkEntries[meshGroup.IndexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
-                var vertexBuffer = (VBUF)outerResource.ChunkEntries[meshGroup.VertexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
-                var vertexFormat = (VRTF)outerResource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
+                var indexBuffer = outerResource.ChunkEntries[meshGroup.IndexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as IBUF;
+                var vertexBuffer = outerResource.ChunkEntries[meshGroup.VertexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as VBUF;
+                var vertexFormat = outerResource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as VRTF;
                 var materialIndex = meshGroup.MaterialIndex.TGIBlockIndex;
                 var materialIndexBlock = outerResource.ChunkEntries[materialIndex + publicChunkCount].RCOLBlock;
                 var mtst = outerResource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as MTST;
@@ -183,7 +183,7 @@ namespace Destrospean.zoeoeBorrowed
                         }
                     }
                 }
-                meshGroups.Add(mtst == null ? new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, (MATD)materialIndexBlock, meshGroup.PrimitiveCount, uvScales) : new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, (MTST)materialIndexBlock, meshGroup.PrimitiveCount, uvScales));
+                meshGroups.Add(mtst == null ? new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, materialIndexBlock as MATD, meshGroup.PrimitiveCount, uvScales) : new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, materialIndexBlock as MTST, meshGroup.PrimitiveCount, uvScales));
             }
             return new LODData(LODId.HighDetail, meshGroups, outerResource);
         }
