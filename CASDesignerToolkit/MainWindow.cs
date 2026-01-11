@@ -105,12 +105,11 @@ public partial class MainWindow : RendererMainWindow
         GLWidget.Hide();
     }
 
-    void AddCASPartWidgets(CASPart casPart)
+    void AddCASTableObjectWidgets(CASTableObject castableObject)
     {
         try
         {
             GlobalState.Meshes.Clear();
-            Sim.CurrentCASPart = casPart;
             var flagNotebook = new Notebook
                 {
                     ShowTabs = false
@@ -133,12 +132,7 @@ public partial class MainWindow : RendererMainWindow
                 };
             GLWidget.SizeAllocated += mGLWidgetSizeAllocatedHandler;
             var flagPageVBox = new VBox(false, 0);
-            var flagTables = new Table[2];
-            for (var i = 0; i < flagTables.Length; i++)
-            {
-                flagTables[i] = new Table(2, 3, true);
-                flagNotebook.AppendPage(flagTables[i], new Label());
-            }
+            var flagTables = new List<Table>();
             flagPageVBox.PackStart(buttonHBox, false, false, 0);
             flagPageVBox.PackStart(flagNotebook, true, true, 0);
             Button addPresetButton = new Button(new Gtk.Image(Stock.Add, IconSize.SmallToolbar)),
@@ -164,7 +158,7 @@ public partial class MainWindow : RendererMainWindow
                     fileChooserDialog.AddFilter(fileFilter);
                     if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                     {
-                        casPart.AllPresets[mPresetNotebook.CurrentPage].Texture.Save(fileChooserDialog.Filename + (fileChooserDialog.Filename.ToLowerInvariant().EndsWith(".png") ? "" : ".png"), System.Drawing.Imaging.ImageFormat.Png);
+                        castableObject.AllPresets[mPresetNotebook.CurrentPage].Texture.Save(fileChooserDialog.Filename + (fileChooserDialog.Filename.ToLowerInvariant().EndsWith(".png") ? "" : ".png"), System.Drawing.Imaging.ImageFormat.Png);
                     }
                     fileChooserDialog.Destroy();
                 };
@@ -196,20 +190,52 @@ public partial class MainWindow : RendererMainWindow
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
-                    casPart.ClearCurrentRig();
+                    castableObject.ClearCurrentRig();
                     NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                 };
-            flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Category", additionalToggleAction, casPart.CASPartResource, "ClothingCategory"), 0, 1, 0, 2);
-            flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Type", additionalToggleAction, casPart.CASPartResource, "Clothing"), 1, 2, 0, 2);
-            flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Data Type", additionalToggleAction, casPart.CASPartResource, "DataType"), 2, 3, 0, 2);
-            flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Age", additionalToggleAction, casPart.CASPartResource.AgeGender, "Age"), 0, 1, 0, 2);
-            flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Gender", additionalToggleAction, casPart.CASPartResource.AgeGender, "Gender"), 1, 2, 0, 1);
-            flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Species", additionalToggleAction, casPart.CASPartResource.AgeGender, "Species"), 2, 3, 0, 2);
-            flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Handedness", additionalToggleAction, casPart.CASPartResource.AgeGender, "Handedness"), 1, 2, 1, 2);
-            flagTables[0].ShowAll();
-            flagTables[1].ShowAll();
+            var casPart = castableObject as CASPart;
+            if (casPart != null)
+            {
+                Sim.CurrentCASPart = casPart;
+                for (var i = 0; i < 2; i++)
+                {
+                    flagTables.Add(new Table(2, 3, true));
+                    flagNotebook.AppendPage(flagTables[i], new Label());
+                }
+                flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Category", additionalToggleAction, casPart.CASPartResource, "ClothingCategory"), 0, 1, 0, 2);
+                flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Type", additionalToggleAction, casPart.CASPartResource, "Clothing"), 1, 2, 0, 2);
+                flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Data Type", additionalToggleAction, casPart.CASPartResource, "DataType"), 2, 3, 0, 2);
+                flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Age", additionalToggleAction, casPart.CASPartResource.AgeGender, "Age"), 0, 1, 0, 2);
+                flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Gender", additionalToggleAction, casPart.CASPartResource.AgeGender, "Gender"), 1, 2, 0, 1);
+                flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Species", additionalToggleAction, casPart.CASPartResource.AgeGender, "Species"), 2, 3, 0, 2);
+                flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Handedness", additionalToggleAction, casPart.CASPartResource.AgeGender, "Handedness"), 1, 2, 1, 2);
+            }
+            var gameObject = castableObject as GameObject;
+            if (gameObject != null)
+            {
+                var frameCount = 3;
+                foreach (var property in gameObject.CatalogResource.GetType().GetProperties())
+                {
+                    if (frameCount == 3)
+                    {
+                        flagTables.Add(new Table(2, 3, true));
+                        flagNotebook.AppendPage(flagTables[flagTables.Count - 1], new Label());
+                        frameCount = 0;
+                    }
+                    if (property.Name.EndsWith("Flags"))
+                    {
+                        flagTables[flagTables.Count - 1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame(property.Name, additionalToggleAction, gameObject.CatalogResource, property.Name), (uint)frameCount, (uint)frameCount + 1, 0, 2);
+                        frameCount++;
+                    }
+                }
+                if (frameCount == 0)
+                {
+                    flagNotebook.RemovePage(flagNotebook.NPages - 1);
+                    flagTables.RemoveAt(flagTables.Count - 1);
+                }
+            }
             ResourcePropertyTable.Attach(flagPageVBox, 0, 1, 0, 1);
-            mPresetNotebook = PresetNotebook.CreateInstance(casPart, Image);
+            mPresetNotebook = PresetNotebook.CreateInstance(castableObject, Image);
             mPresetNotebook.Scrollable = true;
             mPresetNotebook.SwitchPage += (o, args) => NextState = NextStateOptions.UpdateModels;
             ResourcePropertyTable.Attach(mPresetNotebook, 1, 2, 0, 1);
@@ -227,6 +253,10 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
+            if (casPart == null)
+            {
+                return;
+            }
             if (mResourcePropertyNotebookSwitchPageHandler != null)
             {
                 ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
@@ -589,7 +619,11 @@ public partial class MainWindow : RendererMainWindow
                                 break;
                             case "CASP":
                                 GLWidget.Show();
-                                AddCASPartWidgets(PreloadedData.CASParts[key]);
+                                AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
+                                break;
+                            case "OBJD":
+                                GLWidget.Show();
+                                AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
                                 break;
                         }
                     }
@@ -618,6 +652,7 @@ public partial class MainWindow : RendererMainWindow
         mSaveAsPath = null;
         GlobalState.Meshes.Clear();
         PreloadedData.CASParts.Clear();
+        PreloadedData.GameObjects.Clear();
         PreloadedData.GEOMs.Clear();
         GlobalState.Materials.Clear();
         PreloadedData.VPXYs.Clear();
@@ -670,6 +705,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     case "_IMG":
                     case "CASP":
+                    case "OBJD":
                         ResourceListStore.AppendValues(tag, "0x" + resourceIndexEntry.ResourceType.ToString("X8"), "0x" + resourceIndexEntry.ResourceGroup.ToString("X8"), "0x" + resourceIndexEntry.Instance.ToString("X16"), resourceIndexEntry);
                         break;
                 }
@@ -695,6 +731,12 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.GEOMs[key] = new GEOM(new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)));
                         }
                         break;
+                    case "OBJD":
+                        if (!PreloadedData.GameObjects.ContainsKey(key) || missingResourceKeyIndex > -1)
+                        {
+                            PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry);
+                        }
+                        break;
                     case "VPXY":
                         if (!PreloadedData.VPXYs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -709,7 +751,11 @@ public partial class MainWindow : RendererMainWindow
             }
             foreach (var casPart in PreloadedData.CASParts.Values)
             {
-                AddCASPartWidgets(casPart);
+                AddCASTableObjectWidgets(casPart);
+            }
+            foreach (var gameObject in PreloadedData.GameObjects.Values)
+            {
+                AddCASTableObjectWidgets(gameObject);
             }
             ResourceTreeView.Selection.SelectPath(new TreePath("0"));
         }
@@ -772,6 +818,15 @@ public partial class MainWindow : RendererMainWindow
                 }
                 casPartKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
+            }
+            foreach (var gameObjectKvp in PreloadedData.GameObjects)
+            {
+                if (ResourceUtils.MissingResourceKeys.Exists(x => x.ToLowerInvariant() == gameObjectKvp.Key.ToLowerInvariant()))
+                {
+                    continue;
+                }
+                gameObjectKvp.Value.SavePresets();
+                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(gameObjectKvp.Key).ResourceIndexEntry, gameObjectKvp.Value.CatalogResource);
             }
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {

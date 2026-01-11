@@ -78,6 +78,10 @@
       <HintPath>..\libs\s3pi.ComplateResource.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="s3pi.MeshChunks">
+      <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,6 +111,11 @@
     <ProjectReference Include="..\Destrospean.S3PIExtensions\Destrospean.S3PIExtensions.csproj">
       <Project>{27A16A39-0FCB-4861-A86A-EE354EAE90F0}</Project>
       <Name>Destrospean.S3PIExtensions</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
+      <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
+      <Name>Destrospean.zoeoeBorrowed</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
