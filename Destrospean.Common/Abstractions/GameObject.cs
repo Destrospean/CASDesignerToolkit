@@ -50,7 +50,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry) : base(package, resourceIndexEntry)
+        public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
             CatalogResource = (CatalogResource.CatalogResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
             var propertyInfo = CatalogResource.GetType().GetProperty("Materials", typeof(CatalogResource.CatalogResource.MaterialList));
@@ -58,6 +58,7 @@ namespace Destrospean.Common.Abstractions
             {
                 Presets.AddRange(((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null)).ConvertAll(x => new Material(this, x.MaterialBlock) as IPreset));
             }
+            LoadLODs(mlodResources, modlResources, vpxyResources);
         }
 
         public void LoadLODs(Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)

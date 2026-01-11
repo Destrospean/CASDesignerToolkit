@@ -734,7 +734,7 @@ public partial class MainWindow : RendererMainWindow
                     case "OBJD":
                         if (!PreloadedData.GameObjects.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry);
+                            PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         }
                         break;
                     case "VPXY":
