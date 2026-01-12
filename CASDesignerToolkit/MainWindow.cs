@@ -41,7 +41,10 @@ public partial class MainWindow : RendererMainWindow
             {
                 GlobalState.Meshes.Clear();
                 Sim.LoadGEOMs(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
-                GlobalState.LoadMeshes(new List<GameObject>(PreloadedData.GameObjects.Values)[0], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, 0, GlobalState.LoadTexture);
+                if (PreloadedData.GameObjects.Count > 0)
+                {
+                    GlobalState.LoadMeshes(new List<GameObject>(PreloadedData.GameObjects.Values)[0], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, 0, GlobalState.LoadTexture);
+                }
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
             {
