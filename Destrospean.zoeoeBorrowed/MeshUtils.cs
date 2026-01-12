@@ -16,11 +16,14 @@ namespace Destrospean.zoeoeBorrowed
 
             public IResource MLODResource;
 
-            public LODData(LODId id, List<MeshGroupData> meshGroups, IResource mlodResource)
+            public string MLODResourceKey;
+
+            public LODData(LODId id, List<MeshGroupData> meshGroups, IResource mlodResource, string mlodResourceKey)
             {
                 ID = id;
                 MeshGroups = meshGroups;
                 MLODResource = mlodResource;
+                MLODResourceKey = mlodResourceKey;
             }
 
             public override string ToString()
@@ -37,141 +40,69 @@ namespace Destrospean.zoeoeBorrowed
 
             public MTST MaterialSet;
 
-            public int PrimitiveCount;
+            public MLOD.Mesh Mesh;
 
-            //public SKIN SkinController; //not implemented
+            public int PrimitiveCount
+            {
+                get
+                {
+                    return Mesh.PrimitiveCount;
+                }
+            }
+
+            public SKIN SkinController;
 
             public float UVScales;
 
             public VBUF VertexBuffer;
 
+            public int VertexCount
+            {
+                get
+                {
+                    return Mesh.VertexCount;
+                }
+            }
+
             public VRTF VertexFormat;
 
-            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, int primitiveCount, float uvScales)
+            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController, float uvScales)
             {
                 DirectMATD = directMATD;
                 IndexBuffer = indexBuffer;
                 MaterialSet = null;
-                PrimitiveCount = primitiveCount;
+                Mesh = mesh;
+                SkinController = skinController;
                 UVScales = uvScales;
                 VertexBuffer = vertexBuffer;
                 VertexFormat = vertexFormat;
             }
 
-            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, int primitiveCount, float uvScales)
+            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController, float uvScales)
             {
                 DirectMATD = null;
                 IndexBuffer = indexBuffer;
                 MaterialSet = materialSet;
-                PrimitiveCount = primitiveCount;
+                Mesh = mesh;
+                SkinController = skinController;
                 UVScales = uvScales;
                 VertexBuffer = vertexBuffer;
                 VertexFormat = vertexFormat;
             }
         }
 
-        static float[][] GetBlendWeightsColorsNormalsOrTangents(byte[] vertexBuffer, int stride, int offset)
-        {
-            var values = new List<float[]>();
-            for (var i = offset; i < vertexBuffer.Length; i += stride)
-            {
-                float scalar = byte.MaxValue - vertexBuffer[i + 3];
-                if (scalar == 0)
-                {
-                    scalar = offset == 20 ? 256 : 128;
-                }
-                var subtrahend = offset == 20 ? 0 : 128;
-                values.Add(new float[]
-                    {
-                        (vertexBuffer[i + 2] - subtrahend) / scalar,
-                        (vertexBuffer[i + 1] - subtrahend) / scalar,
-                        (vertexBuffer[i] - subtrahend) / scalar
-                    });
-            }
-            return values.ToArray();
-        }
-
-        public static float[][] GetBlendWeights(byte[] vertexBuffer, int stride)
-        {
-            return GetBlendWeightsColorsNormalsOrTangents(vertexBuffer, stride, 20); 
-        }
-
-        public static int[][] GetFaces(int[] indexBuffer, int stride)
-        {
-            var faces = new List<int[]>();
-            for (var i = 0; i < indexBuffer.Length; i += 3)
-            {
-                faces.Add(new int[]
-                    {
-                        indexBuffer[i] + 1,
-                        indexBuffer[i + 1] + 1,
-                        indexBuffer[i + 2] + 1
-                    });
-            }
-            return faces.ToArray();
-        }
-
-        public static float[][] GetNormals(byte[] vertexBuffer, int stride)
-        {
-            return GetBlendWeightsColorsNormalsOrTangents(vertexBuffer, stride, 8); 
-        }
-
-        public static float[][] GetTangents(byte[] vertexBuffer, int stride)
-        {
-            return GetBlendWeightsColorsNormalsOrTangents(vertexBuffer, stride, 24); 
-        }
-
-        public static float[][] GetTextureCoordinates(byte[] vertexBuffer, int stride, float uvScales)
-        {
-            var textureCoordinates = new List<float[]>();
-            for (var i = 12; i < vertexBuffer.Length; i += stride)
-            {
-                textureCoordinates.Add(uvScales == -1 ? new float[]
-                    {
-                        (float)BitConverter.ToInt16(vertexBuffer, i) / short.MaxValue,
-                        1 - (float)BitConverter.ToInt16(vertexBuffer, i + 2) / short.MaxValue
-                    } : new float[]
-                    {
-                        (float)BitConverter.ToInt16(vertexBuffer, i) * uvScales,
-                        1 - (float)BitConverter.ToInt16(vertexBuffer, i + 2) * uvScales
-                    });
-            }
-            return textureCoordinates.ToArray();
-        }
-
-        public static float[][] GetVertices(byte[] vertexBuffer, int stride)
-        {
-            var vertices = new List<float[]>();
-            for (var i = 0; i < vertexBuffer.Length; i += stride)
-            {
-                float scalar = BitConverter.ToUInt16(vertexBuffer, i + 6);
-                vertices.Add(new float[]
-                    {
-                        BitConverter.ToInt16(vertexBuffer, i) / scalar,
-                        BitConverter.ToInt16(vertexBuffer, i + 2) / scalar,
-                        BitConverter.ToInt16(vertexBuffer, i + 4) / scalar
-                    });
-            }
-            return vertices.ToArray();
-        }
-
-        public static LODData LoadMLODData(GenericRCOLResource outerResource, int publicChunkCount, MLOD mlodChunk)
+        public static LODData LoadMLODData(string outerResourceKey, GenericRCOLResource outerResource, int publicChunkCount, MLOD mlodChunk)
         {
             var meshGroups = new List<MeshGroupData>();
             foreach (var meshGroup in mlodChunk.Meshes)
             {
                 var indexBuffer = outerResource.ChunkEntries[meshGroup.IndexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as IBUF;
+                var skinController = outerResource.ChunkEntries[meshGroup.SkinControllerIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as SKIN;
                 var vertexBuffer = outerResource.ChunkEntries[meshGroup.VertexBufferIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as VBUF;
                 var vertexFormat = outerResource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as VRTF;
-                var materialIndex = meshGroup.MaterialIndex.TGIBlockIndex;
-                var materialIndexBlock = outerResource.ChunkEntries[materialIndex + publicChunkCount].RCOLBlock;
-                var mtst = outerResource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as MTST;
-                MATD matd = null;
-                if (mtst != null) 
-                {
-                    matd = outerResource.ChunkEntries[mtst.Entries[0].Index.TGIBlockIndex + publicChunkCount].RCOLBlock as MATD;
-                }
-                //uv scales - eventually not necessary
+                var materialIndexBlock = outerResource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
+                var mtst = materialIndexBlock as MTST;
+                var matd = mtst == null ? materialIndexBlock as MATD : outerResource.ChunkEntries[mtst.Entries[0].Index.TGIBlockIndex + publicChunkCount].RCOLBlock as MATD;
                 var uvScales = -1f;
                 if (matd != null)
                 {
@@ -183,9 +114,9 @@ namespace Destrospean.zoeoeBorrowed
                         }
                     }
                 }
-                meshGroups.Add(mtst == null ? new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, materialIndexBlock as MATD, meshGroup.PrimitiveCount, uvScales) : new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, materialIndexBlock as MTST, meshGroup.PrimitiveCount, uvScales));
+                meshGroups.Add(mtst == null ? new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, matd, meshGroup, skinController, uvScales) : new MeshGroupData(vertexFormat, vertexBuffer, indexBuffer, mtst, meshGroup, skinController, uvScales));
             }
-            return new LODData(LODId.HighDetail, meshGroups, outerResource);
+            return new LODData(LODId.HighDetail, meshGroups, outerResource, outerResourceKey);
         }
     }
 }

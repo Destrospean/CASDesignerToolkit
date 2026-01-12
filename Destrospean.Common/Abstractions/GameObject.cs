@@ -97,6 +97,7 @@ namespace Destrospean.Common.Abstractions
                         //outer resource that MLOD belongs to & public chunk count for it
                         GenericRCOLResource resourceWithMLOD = null;
                         MLOD mlodToLoad = null;
+                        var key = "";
                         if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public) //MLOD is internal, assuming for low LOD. Note: public means don't use public chunk count
                         {
                             resourceWithMLOD = modlResource;
@@ -105,7 +106,7 @@ namespace Destrospean.Common.Abstractions
                         else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed) //MLOD in external resource, assuming for shadows and high LOD
                         {
                             var mlodResourceIndexEntry = ParentPackage.GetResourceIndexEntry(modlResource.Resources[lodEntry.ModelLodIndex.TGIBlockIndex]);
-                            var mlodKey = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
+                            var mlodKey = key = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
                             GenericRCOLResource mlodResource;
                             if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
                             {
@@ -122,7 +123,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             return;
                         }
-                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(resourceWithMLOD, resourceWithMLOD.PublicChunks, mlodToLoad);
+                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(key, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlodToLoad);
                         lodData.ID = lodEntry.Id;
                         LODs.Add(lodData.ID, lodData);
                     }

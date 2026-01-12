@@ -143,6 +143,17 @@ namespace Destrospean.Common.Abstractions
 
         void PopulateVariablesForMaterialPatterns(object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
         {
+            System.Func<object, float> getFloatValue = (value) =>
+                {
+                    try
+                    {
+                        return ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                    }
+                    catch (System.InvalidCastException)
+                    {
+                        return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data);
+                    }
+                };
             foreach (var propertyKvp in mProperties)
             {
                 var key = propertyKvp.Key.ToLowerInvariant();
@@ -155,8 +166,7 @@ namespace Destrospean.Common.Abstractions
                     }
                     else
                     {
-
-                        channels.Add(((Material)Preset).MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey());
+                        channels.Add(((CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock).ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey());
                     }
                 }
                 else if (key.StartsWith("color"))
@@ -173,49 +183,58 @@ namespace Destrospean.Common.Abstractions
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseHueBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        baseHueBackground = getFloatValue(value);
                     }
                     else
                     {
-                        baseHues.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        baseHues.Add(getFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("base s"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseSaturationBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        baseSaturationBackground = getFloatValue(value);
                     }
                     else
                     {
-                        baseSaturations.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        baseSaturations.Add(getFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("base v"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseValueBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        baseValueBackground = getFloatValue(value);
                     }
                     else
                     {
-                        baseValues.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        baseValues.Add(getFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("h "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        hueBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        hueBackground = getFloatValue(value);
                     }
                     else
                     {
-                        hues.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        hues.Add(getFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("hsvshift"))
                 {
-                    var color = (CatalogResource.CatalogResource.TC06_XYZ)value;
+                    CatalogResource.CatalogResource.TC06_XYZ color;
+                    try
+                    {
+                        color = (CatalogResource.CatalogResource.TC06_XYZ)value;
+                    }
+                    catch (System.InvalidCastException)
+                    {
+                        var temp = ParseCommaSeparatedValues(((CatalogResource.CatalogResource.TC01_String)value).Data);
+                        color = new CatalogResource.CatalogResource.TC06_XYZ(0, null, 0, "", temp[0], temp[1], temp[2]);
+                    }
                     if (key.EndsWith("bg"))
                     {
                         hsvShiftBackground = new float[]
@@ -239,22 +258,22 @@ namespace Destrospean.Common.Abstractions
                 {
                     if (key.EndsWith("bg"))
                     {
-                        saturationBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        saturationBackground = getFloatValue(value);
                     }
                     else
                     {
-                        saturations.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        saturations.Add(getFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("v "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        valueBackground = ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+                        valueBackground = getFloatValue(value);
                     }
                     else
                     {
-                        values.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                        values.Add(getFloatValue(value));
                     }
                 }
                 else

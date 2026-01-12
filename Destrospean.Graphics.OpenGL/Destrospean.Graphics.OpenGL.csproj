@@ -54,6 +54,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="s3pi.MeshChunks">
+      <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,6 +84,11 @@
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
       <Project>{1DAE5711-35BA-4DF3-B392-68DAAAC3A5FD}</Project>
       <Name>Destrospean.CmarNYCBorrowed</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
+      <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
+      <Name>Destrospean.zoeoeBorrowed</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -434,7 +434,7 @@ namespace Destrospean.Common.Abstractions
                         var commaSeparatedValues = ParseCommaSeparatedValues(value);
                         return new CatalogResource.CatalogResource.TC06_XYZ(0, null, 0, name, commaSeparatedValues[0], commaSeparatedValues[1], commaSeparatedValues[2]);
                     }
-                    catch
+                    catch (System.InvalidCastException)
                     {
                         return new CatalogResource.CatalogResource.TC01_String(0, null, 0, name, value);
                     }
@@ -472,7 +472,14 @@ namespace Destrospean.Common.Abstractions
                             argb[3]
                         });
                 case "float":
-                    return ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1.ToString();
+                    try
+                    {
+                        return ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1.ToString();
+                    }
+                    catch (System.InvalidCastException)
+                    {
+                        return ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data;
+                    }
                 case "pattern":
                     return ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data;
                 case "string":
@@ -486,7 +493,7 @@ namespace Destrospean.Common.Abstractions
                                 complateElement.Unknown3.ToString()
                             });
                     }
-                    catch
+                    catch (System.InvalidCastException)
                     {
                         return ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data;
                     }
@@ -579,7 +586,14 @@ namespace Destrospean.Common.Abstractions
                     ((CatalogResource.CatalogResource.TC02_ARGB)properties[propertyName]).ARGB = ((uint)rgba[3] << 24) + ((uint)rgba[0] << 16) + ((uint)rgba[1] << 8) + rgba[2];
                     break;
                 case "float":
-                    ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1 = float.Parse(newValue);
+                    try
+                    {
+                        ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1 = float.Parse(newValue);
+                    }
+                    catch (System.InvalidCastException)
+                    {
+                        ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data = newValue;
+                    }
                     break;
                 case "pattern":
                     ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data = newValue;
@@ -593,7 +607,7 @@ namespace Destrospean.Common.Abstractions
                         complateElement.Unknown2 = commaSeparatedValues[1];
                         complateElement.Unknown3 = commaSeparatedValues[2];
                     }
-                    catch
+                    catch (System.InvalidCastException)
                     {
                         ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data = newValue;
                     }
