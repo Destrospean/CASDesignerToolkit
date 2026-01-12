@@ -391,16 +391,15 @@ namespace Destrospean.Graphics.OpenGL
             {
                 return;
             }
-            var lod = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
-            foreach (var meshGroup in gameObject.LODs[lod].MeshGroups)
+            var lodId = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
+            foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
             {
-                var mlodResource = (GenericRCOLResource)gameObject.LODs[lod].MLODResource;
                 List<Vector3> colors = new List<Vector3>(),
                 normals = new List<Vector3>(),
                 vertices = new List<Vector3>();
                 var faces = new List<int[]>();
-                var textureCoordinates = new List<Vector2>();
                 var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.Mesh);
+                var textureCoordinates = new List<Vector2>();
                 for (var i = 0; i < indices.Length; i += 3)
                 {
                     faces.Add(new int[]
@@ -429,14 +428,14 @@ namespace Destrospean.Graphics.OpenGL
                     }
                     vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
                 }
-                var key = gameObject.LODs[lod].MLODResourceKey;
                 Material material;
-                if (!GlobalState.Materials.TryGetValue(key, out material))
+                if (!GlobalState.Materials.TryGetValue(gameObject.LODs[lodId].MLODResourceKey, out material))
                 {
                     var materialColors = new Dictionary<FieldType, Vector3>();
                     var materialMaps = new Dictionary<FieldType, string>();
                     try
                     {
+                        var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
                         foreach (var element in (mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries[0].Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD ?? meshGroup.DirectMATD).Mtnf.SData)
                         {
                             var elementFloat3 = element as ElementFloat3;
@@ -469,7 +468,7 @@ namespace Destrospean.Graphics.OpenGL
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };
-                    GlobalState.Materials.Add(key, material);
+                    GlobalState.Materials.Add(gameObject.LODs[lodId].MLODResourceKey, material);
                 }
                 var currentPreset = gameObject.AllPresets[presetIndex];
                 GlobalState.Meshes.Add(new Volume
@@ -480,7 +479,7 @@ namespace Destrospean.Graphics.OpenGL
                         Normals = normals.ToArray(),
                         TextureCoordinates = textureCoordinates.ToArray(),
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        MainTextureID = loadTextureCallback(key, currentPreset.Texture),
+                        MainTextureID = loadTextureCallback(gameObject.LODs[lodId].MLODResourceKey, currentPreset.Texture),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
                         Vertices = vertices.ToArray()
                     });
