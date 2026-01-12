@@ -423,7 +423,10 @@ namespace Destrospean.Graphics.OpenGL
                 {
                     colors.Add(Vector3.One);
                     normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
-                    textureCoordinates.Add(new Vector2(vertex.UV[0][0], vertex.UV[0][1]));
+                    foreach (var uvSet in vertex.UV)
+                    {
+                        textureCoordinates.Add(new Vector2(uvSet[0], uvSet[1]));
+                    }
                     vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
                 }
                 var key = gameObject.LODs[lod].MLODResourceKey;
