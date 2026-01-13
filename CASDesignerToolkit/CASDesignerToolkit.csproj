@@ -64,7 +64,6 @@
     </Reference>
     <Reference Include="s3pi.ObjKeyResource">
       <HintPath>..\libs\s3pi.ObjKeyResource.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.Filetable">
       <HintPath>..\libs\s3pi.Filetable.dll</HintPath>
