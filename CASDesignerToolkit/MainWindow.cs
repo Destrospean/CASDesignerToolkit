@@ -263,7 +263,7 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void BuildLODNotebook(CASPart casPart, int startLODPageIndex = 0, int startGEOMPageIndex = 0)
+    void BuildLODNotebook(CASPart casPart, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
     {
         try
         {
@@ -283,7 +283,7 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in casPart.LODs)
             {
-                var geomNotebook = new Notebook
+                var meshGroupNotebook = new Notebook
                     {
                         ShowTabs = false
                     };
@@ -345,17 +345,17 @@ public partial class MainWindow : RendererMainWindow
                     {
                         Xalign = .5f
                     };
-                nextButton.Clicked += (sender, e) => geomNotebook.NextPage();
-                prevButton.Clicked += (sender, e) => geomNotebook.PrevPage();
+                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
+                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
                 Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
                 prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
                 nextButtonAlignment.Add(nextButton);
                 prevButtonAlignment.Add(prevButton);
-                geomNotebook.SwitchPage += (o, args) =>
+                meshGroupNotebook.SwitchPage += (o, args) =>
                     {
-                        pageIndexLabel.Text = geomNotebook.CurrentPage.ToString();
-                        nextButton.Sensitive = geomNotebook.CurrentPage < geomNotebook.NPages - 1;
-                        prevButton.Sensitive = geomNotebook.CurrentPage > 0;
+                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
+                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
                     };
                 Action<MeshFileType> exportMeshGroup = (meshFileType) =>
                     {
@@ -379,7 +379,7 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                casPart.ExportMeshGroup(lodKvp.Key, geomNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                casPart.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
                         }
@@ -410,7 +410,7 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                casPart.ImportMeshGroup(lodKvp.Key, geomNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
                         }
@@ -422,7 +422,7 @@ public partial class MainWindow : RendererMainWindow
                     };
                 addMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = geomNotebook.CurrentPage,
+                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
                         selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
                         casPart.AddMeshGroup(lodKvp.Key, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         casPart.LoadLODs(PreloadedData.GEOMs, PreloadedData.VPXYs);
@@ -435,7 +435,7 @@ public partial class MainWindow : RendererMainWindow
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = geomNotebook.CurrentPage,
+                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
                         selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
                         casPart.DeleteMeshGroup(lodKvp.Key, selectedGEOMIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         casPart.LoadLODs(PreloadedData.GEOMs, PreloadedData.VPXYs);
@@ -462,7 +462,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             try
                             {
-                                casPart.ImportMesh(lodKvp.Key, geomNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                casPart.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             catch (Exception ex)
                             {
@@ -531,30 +531,30 @@ public partial class MainWindow : RendererMainWindow
                         Sim.Special = (float)specialHScale.Value;
                         changeOtherSlidersAndUpdateModels();
                     };
-                var geomPageButtonHBox = new HBox(false, 0);
-                geomPageButtonHBox.PackEnd(menuBar, true, true, 4);
-                geomPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
-                geomPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
-                geomPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
+                var meshGroupPageButtonHBox = new HBox(false, 0);
+                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
+                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 var iconSize = WidgetUtils.SmallImageSize << 1;
-                geomPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize)), false, true, 4);
-                geomPageButtonHBox.PackStart(fatnessHScale, true, true, 4);
-                geomPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize)), false, true, 4);
-                geomPageButtonHBox.PackStart(fitnessHScale, true, true, 4);
-                geomPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize)), false, true, 4);
-                geomPageButtonHBox.PackStart(specialHScale, true, true, 4);
-                geomPageButtonHBox.ShowAll();
+                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(fatnessHScale, true, true, 4);
+                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(fitnessHScale, true, true, 4);
+                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(specialHScale, true, true, 4);
+                meshGroupPageButtonHBox.ShowAll();
                 var lodPageVBox = new VBox(false, 0);
-                lodPageVBox.PackStart(geomPageButtonHBox, false, true, 0);
-                lodPageVBox.PackStart(geomNotebook, true, true, 0);
+                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
+                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label("LOD " + lodKvp.Key.ToString()));
-                lodKvp.Value.ForEach(x => geomNotebook.AddProperties(CurrentPackage, x, Image));
+                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, Image));
                 if (lodKvp.Value == new List<List<GEOM>>(casPart.LODs.Values)[startLODPageIndex])
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
-                    geomNotebook.CurrentPage = startGEOMPageIndex;
+                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
                 }
             }
         }
