@@ -56,7 +56,7 @@ namespace Destrospean.Common.Abstractions
             var propertyInfo = CatalogResource.GetType().GetProperty("Materials", typeof(CatalogResource.CatalogResource.MaterialList));
             if (propertyInfo != null)
             {
-                Presets.AddRange(((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null)).ConvertAll(x => new Material(this, x.MaterialBlock) as IPreset));
+                Presets.AddRange(((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null)).ConvertAll(x => new GameObjectPreset(this, x.MaterialBlock) as Preset));
             }
             LoadLODs(mlodResources, modlResources, vpxyResources);
         }

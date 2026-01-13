@@ -48,7 +48,7 @@ namespace Destrospean.Common.Abstractions
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
             CASPartResource = (CASPartResource.CASPartResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
-            Presets.AddRange(CASPartResource.Presets.ConvertAll(x => new Preset(this, x.XmlFile) as IPreset));
+            Presets.AddRange(CASPartResource.Presets.ConvertAll(x => new CASPartPreset(this, x.XmlFile) as Preset));
             LoadLODs(geometryResources, vpxyResources);
         }
 
@@ -451,7 +451,7 @@ namespace Destrospean.Common.Abstractions
         public void SavePreset(int index)
         {
             CASPartResource.Presets[index].Unknown1 = (uint)index;
-            CASPartResource.Presets[index].XmlFile = ((Preset)Presets[index]).XmlFile;
+            CASPartResource.Presets[index].XmlFile = ((CASPartPreset)Presets[index]).XmlFile;
         }
 
         public override void SavePresets()

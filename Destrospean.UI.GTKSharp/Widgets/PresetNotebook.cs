@@ -136,7 +136,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     var choosePatternDialog = new ChoosePatternDialog(MainWindowBase.Singleton, complate.ParentPackage);
                                     if (choosePatternDialog.Run() == (int)ResponseType.Ok)
                                     {
-                                        ((IPreset)complate).ReplacePattern(propertyName, choosePatternDialog.ResourceKey);
+                                        ((Preset)complate).ReplacePattern(propertyName, choosePatternDialog.ResourceKey);
                                         complate[propertyName] = choosePatternDialog.PatternPath;
                                         for (var i = 0; i < (mIsSubNotebook ? this : (PresetNotebook)CurrentPageWidget).NPages; i++)
                                         {
@@ -146,7 +146,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                                 patternTable.Remove(child);
                                             }
                                             patternTable.NRows = 1;
-                                            AddPropertiesToTable(patternTable, i == 0 ? complate : ((IPreset)complate).Patterns[i - 1]);
+                                            AddPropertiesToTable(patternTable, i == 0 ? complate : ((Preset)complate).Patterns[i - 1]);
                                         }
                                     }
                                     choosePatternDialog.Destroy();
@@ -277,11 +277,11 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
         {
             if (CASTableObject is CASPart)
             {
-                CASTableObject.Presets.Add(new Preset(CASTableObject, ((Preset)CASTableObject.AllPresets[CurrentPage]).XmlFile));
+                CASTableObject.Presets.Add(new CASPartPreset(CASTableObject, ((CASPartPreset)CASTableObject.AllPresets[CurrentPage]).XmlFile));
             }
             else
             {
-                CASTableObject.Presets.Add(new Material(CASTableObject, ((Material)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+                CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
             }
             AddPreset(CASTableObject.AllPresets[CASTableObject.AllPresets.Count - 1]);
             CurrentPage = CASTableObject.AllPresets.Count - 1;
@@ -291,7 +291,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             MainWindowBase.Singleton.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
         }
 
-        public void AddPreset(IPreset preset, bool isDefault = false)
+        public void AddPreset(Preset preset, bool isDefault = false)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 }
                 var complates = new List<Complate>
                     {
-                        (Complate)preset
+                        preset
                     };
                 complates.AddRange(preset.Patterns);
                 foreach (var complate in complates)
@@ -314,7 +314,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             scrolledWindow.AddWithViewport(table);
                             subNotebook.InsertPage(scrolledWindow, new Label(label), index);
                         };
-                    var complateAsPreset = complate as IPreset;
+                    var complateAsPreset = complate as Preset;
                     var complateTable = new Table(1, 2, false)
                         {
                             ColumnSpacing = WidgetUtils.DefaultTableColumnSpacing

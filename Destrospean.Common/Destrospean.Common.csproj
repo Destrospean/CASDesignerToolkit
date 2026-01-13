@@ -89,7 +89,6 @@
     <Compile Include="Abstractions\CASTableObject.cs" />
     <Compile Include="Abstractions\Complate.cs" />
     <Compile Include="Abstractions\Pattern.cs" />
-    <Compile Include="Abstractions\Preset.cs" />
     <Compile Include="ApplicationSettings.cs" />
     <Compile Include="PreloadedData.cs" />
     <Compile Include="Platform.cs" />
@@ -98,8 +97,9 @@
     <Compile Include="MeshFileType.cs" />
     <Compile Include="ProgramUtils.cs" />
     <Compile Include="Abstractions\GameObject.cs" />
-    <Compile Include="Abstractions\Material.cs" />
-    <Compile Include="Abstractions\IPreset.cs" />
+    <Compile Include="Abstractions\CASPartPreset.cs" />
+    <Compile Include="Abstractions\GameObjectPreset.cs" />
+    <Compile Include="Abstractions\Preset.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

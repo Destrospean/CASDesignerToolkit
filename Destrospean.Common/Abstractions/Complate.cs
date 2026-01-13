@@ -10,7 +10,7 @@ namespace Destrospean.Common.Abstractions
 
         protected readonly IDictionary<string, XmlNode> mPropertiesXmlNodes;
 
-        protected readonly XmlDocument mXmlDocument;
+        protected readonly XmlDocument mXmlDocument = new XmlDocument();
 
         public abstract CASTableObject CASTableObject
         {
@@ -101,7 +101,6 @@ namespace Destrospean.Common.Abstractions
 
         public Complate()
         {
-            mXmlDocument = new XmlDocument();
             mPropertiesXmlNodes = new SortedDictionary<string, XmlNode>(new PropertyNameComparer());
             mPropertiesTyped = new SortedDictionary<string, PropertyMeta>(new PropertyNameComparer());
         }

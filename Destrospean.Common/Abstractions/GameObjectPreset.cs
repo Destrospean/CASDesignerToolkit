@@ -9,117 +9,23 @@ using s3pi.Interfaces;
 
 namespace Destrospean.Common.Abstractions
 {
-    public class Material : Complate, IPreset
+    public class GameObjectPreset : Preset
     {
-        protected readonly CASTableObject mCASTableObject;
-
-        protected readonly MaterialInternal mInternal;
-
-        public string AmbientMap
-        {
-            get
-            {
-                return mInternal.AmbientMap;
-            }
-        }
-
-        public override CASTableObject CASTableObject
-        {
-            get
-            {
-                return mCASTableObject;
-            }
-        }
-
         public CatalogResource.CatalogResource.MaterialBlock MaterialBlock
         {
             get
             {
-                return mInternal.MaterialBlock;
+                return ((PresetInternal)mInternal).MaterialBlock;
             }
         }
 
-        public override IPackage ParentPackage
-        {
-            get
-            {
-                return CASTableObject.ParentPackage;
-            }
-        }
-
-        public List<Pattern> Patterns
-        {
-            get
-            {
-                return mInternal.Patterns;
-            }
-        }
-
-        public string[] PatternSlotNames
-        {
-            get
-            {
-                return mInternal.PatternSlotNames;
-            }
-        }
-
-        public override IDictionary<string, PropertyMeta> PropertiesTyped
-        {
-            get
-            {
-                return mInternal.PropertiesTyped;
-            }
-        }
-
-        public override string[] PropertyNames
-        {
-            get
-            {
-                return mInternal.PropertyNames;
-            }
-        }
-
-        public string SpecularMap
-        {
-            get
-            {
-                return mInternal.SpecularMap;
-            }
-        }
-
-        public Bitmap Texture
-        {
-            get
-            {
-                return mInternal.Texture;
-            }
-        }
-
-        protected class MaterialInternal : Complate
+        protected class PresetInternal : PresetInternalBase
         {
             protected readonly IDictionary<string, object> mProperties = new SortedDictionary<string, object>(new PropertyNameComparer());
 
-            protected Bitmap mTexture;
-
-            public string AmbientMap
-            {
-                get;
-                private set;
-            }
-
-            public override CASTableObject CASTableObject
-            {
-                get
-                {
-                    return Material.CASTableObject;
-                }
-            }
-
-            public readonly Material Material;
-
             public CatalogResource.CatalogResource.MaterialBlock MaterialBlock;
 
-            public Bitmap NewTexture
+            public override Bitmap NewTexture
             {
                 get
                 {
@@ -139,7 +45,7 @@ namespace Destrospean.Common.Abstractions
                     foreach (var propertyTypedKvp in PropertiesTyped)
                     {
                         var key = propertyTypedKvp.Key.ToLowerInvariant();
-                        var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : Material.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
+                        var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
                         if (key.StartsWith("logo"))
                         {
                             if (key.EndsWith("enabled"))
@@ -254,24 +160,6 @@ namespace Destrospean.Common.Abstractions
                 }
             }
 
-            public override IPackage ParentPackage
-            {
-                get
-                {
-                    return Material.ParentPackage;
-                }
-            }
-
-            public readonly List<Pattern> Patterns;
-
-            public string[] PatternSlotNames
-            {
-                get
-                {
-                    return Patterns.ConvertAll(x => x.SlotName).ToArray();
-                }
-            }
-
             public IDictionary<string, object> Properties
             {
                 get
@@ -288,38 +176,16 @@ namespace Destrospean.Common.Abstractions
                 }
             }
 
-            public string SpecularMap
+            public PresetInternal(GameObjectPreset preset, CatalogResource.CatalogResource.MaterialBlock materialBlock) : base()
             {
-                get;
-                private set;
-            }
-
-            public Bitmap Texture
-            {
-                get
-                {
-                    if (mTexture == null)
-                    {
-                        mTexture = NewTexture;
-                    }
-                    return mTexture;
-                }
-                set
-                {
-                    mTexture = value;
-                }
-            }
-
-            public MaterialInternal(Material material, CatalogResource.CatalogResource.MaterialBlock materialBlock) : base()
-            {
-                Material = material;
+                Preset = preset;
                 MaterialBlock = materialBlock;
                 var evaluated = ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex].ReverseEvaluateResourceKey());
                 mXmlDocument.LoadXml(new StreamReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)).ReadToEnd());
                 Patterns = new List<Pattern>();
                 foreach (var patternMaterialBlock in MaterialBlock.MaterialBlocks)
                 {
-                    Patterns.Add(new Pattern(material, patternMaterialBlock, MaterialBlock));
+                    Patterns.Add(new Pattern(preset, patternMaterialBlock, MaterialBlock));
                 }
                 foreach (var complateElement in MaterialBlock.ComplateOverrides)
                 {
@@ -347,42 +213,27 @@ namespace Destrospean.Common.Abstractions
 
             public override string GetValue(string propertyName)
             {
-                return Material.GetValue(Material, propertyName, PropertiesTyped[propertyName].Type, Properties);
+                return GameObjectPreset.GetValue((GameObjectPreset)Preset, propertyName, PropertiesTyped[propertyName].Type, Properties);
             }
 
-            public void ReplaceMaterialComplate()
+            public override void ReplacePresetComplate()
             {
-                PropertiesTyped.Clear();
-                var evaluated = ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex]);
-                mXmlDocument.LoadXml(new StreamReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)).ReadToEnd());
-                foreach (XmlNode childNode in mXmlDocument.SelectSingleNode("complate").ChildNodes)
-                {
-                    if (childNode.Name == "variables")
-                    {
-                        foreach (XmlNode grandchildNode in childNode.ChildNodes)
-                        {
-                            if (grandchildNode.Name == "param")
-                            {
-                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
-                            }
-                        }
-                    }
-                }
+                ReplacePresetComplate(ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex]));
             }
 
             public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
             {
-                Material.SetValue(Material, MaterialBlock, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
+                GameObjectPreset.SetValue((GameObjectPreset)Preset, MaterialBlock, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
             }
         }
 
-        public Material(CASTableObject castableObject, CatalogResource.CatalogResource.MaterialBlock materialBlock)
+        public GameObjectPreset(CASTableObject castableObject, CatalogResource.CatalogResource.MaterialBlock materialBlock)
         {
             mCASTableObject = castableObject;
-            mInternal = new MaterialInternal(this, materialBlock);
+            mInternal = new PresetInternal(this, materialBlock);
         }
 
-        public void AddPattern(string patternSlotName, string newComplateName)
+        public override void AddPattern(string patternSlotName, string newComplateName)
         {
             MaterialBlock.Name = newComplateName;
             MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex] = new TGIBlock(0, null, ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(newComplateName));
@@ -394,7 +245,7 @@ namespace Destrospean.Common.Abstractions
                     var clonedComplateOverride = (CatalogResource.CatalogResource.ComplateElement)complateOverride.Clone(null);
                     clonedComplateOverride.VariableName = clonedComplateOverride.VariableName.Replace(lastPatternSlotName, patternSlotName);
                     MaterialBlock.ComplateOverrides.Add(clonedComplateOverride);
-                    mInternal.Properties.Add(clonedComplateOverride.VariableName, clonedComplateOverride);
+                    ((PresetInternal)mInternal).Properties.Add(clonedComplateOverride.VariableName, clonedComplateOverride);
                 }
             }
             foreach (var materialBlock in MaterialBlock.MaterialBlocks)
@@ -407,7 +258,7 @@ namespace Destrospean.Common.Abstractions
                     Patterns.Add(new Pattern(this, clonedMaterialBlock, MaterialBlock));
                 }
             }
-            mInternal.ReplaceMaterialComplate();
+            mInternal.ReplacePresetComplate();
         }
 
         public static object CreateComplateOverrideInstance(string name, string value, string type, CatalogResource.CatalogResource.MaterialBlock materialBlock, IPackage package)
@@ -451,7 +302,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static string GetValue(Material material, string propertyName, string type, IDictionary<string, object> properties)
+        public static string GetValue(GameObjectPreset preset, string propertyName, string type, IDictionary<string, object> properties)
         {
             switch (type)
             {
@@ -493,7 +344,7 @@ namespace Destrospean.Common.Abstractions
                         return ((CatalogResource.CatalogResource.TC01_String)properties[propertyName]).Data;
                     }
                 case "texture":
-                    return material.MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)properties[propertyName]).TGIIndex].ReverseEvaluateResourceKey();
+                    return preset.MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)properties[propertyName]).TGIIndex].ReverseEvaluateResourceKey();
                 case "vec2":
                     return ((CatalogResource.CatalogResource.TC05_XY)properties[propertyName]).Unknown1.ToString() + "," + ((CatalogResource.CatalogResource.TC05_XY)properties[propertyName]).Unknown2.ToString();
                 default:
@@ -501,21 +352,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public override string GetValue(string propertyName)
-        {
-            return mInternal.GetValue(propertyName);
-        }
-
-        public void RegenerateTexture()
-        {
-            new System.Threading.Thread(() =>
-                {
-                    mInternal.Texture = mInternal.NewTexture;
-                    MarkModelsNeedUpdatedCallback();
-                }).Start();
-        }
-
-        public void ReplacePattern(string patternSlotName, string patternKey)
+        public override void ReplacePattern(string patternSlotName, string patternKey)
         {
             var evaluated = ParentPackage.EvaluateResourceKey(patternKey);
             int i = 0,
@@ -568,7 +405,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void SetValue(Material material, CatalogResource.CatalogResource.MaterialBlock materialBlock, string propertyName, string newValue, string type, IDictionary<string, object> properties, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public static void SetValue(GameObjectPreset preset, CatalogResource.CatalogResource.MaterialBlock materialBlock, string propertyName, string newValue, string type, IDictionary<string, object> properties, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
         {
             if (!materialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
             {
@@ -611,12 +448,12 @@ namespace Destrospean.Common.Abstractions
                     }
                     break;
                 case "texture":
-                    var index = material.MaterialBlock.ParentTGIBlocks.FindIndex(x => x.ReverseEvaluateResourceKey() == newValue);
+                    var index = preset.MaterialBlock.ParentTGIBlocks.FindIndex(x => x.ReverseEvaluateResourceKey() == newValue);
                     if (index == -1)
                     {
-                        var evaluated = material.ParentPackage.EvaluateImageResourceKey(newValue);
-                        ((CatalogResource.CatalogResource.TC03_TGIIndex)properties[propertyName]).TGIIndex = (byte)material.MaterialBlock.ParentTGIBlocks.Count;
-                        material.MaterialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, evaluated.ResourceIndexEntry.ResourceType, evaluated.ResourceIndexEntry.ResourceGroup, evaluated.ResourceIndexEntry.Instance));
+                        var evaluated = preset.ParentPackage.EvaluateImageResourceKey(newValue);
+                        ((CatalogResource.CatalogResource.TC03_TGIIndex)properties[propertyName]).TGIIndex = (byte)preset.MaterialBlock.ParentTGIBlocks.Count;
+                        preset.MaterialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, evaluated.ResourceIndexEntry.ResourceType, evaluated.ResourceIndexEntry.ResourceGroup, evaluated.ResourceIndexEntry.Instance));
                         break;
                     }
                     ((CatalogResource.CatalogResource.TC03_TGIIndex)properties[propertyName]).TGIIndex = (byte)index;
@@ -632,11 +469,6 @@ namespace Destrospean.Common.Abstractions
                 beforeMarkUnsaved();
             }
             MarkUnsavedChangesCallback();
-        }
-
-        public override void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
-        {
-            mInternal.SetValue(propertyName, newValue, beforeMarkUnsaved ?? RegenerateTexture);
         }
     }
 }

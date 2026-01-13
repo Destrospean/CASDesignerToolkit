@@ -61,13 +61,13 @@ namespace Destrospean.Common.Abstractions
             private set;
         }
 
-        public readonly IPreset Preset;
+        public readonly Preset Preset;
 
         public override string[] PropertyNames
         {
             get
             {
-                if (Preset is Material)
+                if (Preset is GameObjectPreset)
                 {
                     return new List<string>(mProperties.Keys).ToArray();
                 }
@@ -77,7 +77,7 @@ namespace Destrospean.Common.Abstractions
 
         public readonly string SlotName;
 
-        public Pattern(Material material, object patternMaterialBlock, object presetMaterialBlock) : base()
+        public Pattern(GameObjectPreset preset, object patternMaterialBlock, object presetMaterialBlock) : base()
         {
             var patternMaterialBlockCast = (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock;
             SlotName = patternMaterialBlockCast.Pattern;
@@ -85,7 +85,7 @@ namespace Destrospean.Common.Abstractions
                 {
                     Name = patternMaterialBlockCast.Name
                 };
-            Preset = material;
+            Preset = preset;
             var evaluated = ParentPackage.EvaluateResourceKey(patternMaterialBlockCast.ParentTGIBlocks[patternMaterialBlockCast.ComplateXMLIndex].ReverseEvaluateResourceKey());
             mXmlDocument.LoadXml(new System.IO.StreamReader(s3pi.WrapperDealer.WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry).Stream).ReadToEnd());
             foreach (var complateOverride in patternMaterialBlockCast.ComplateOverrides)
@@ -104,7 +104,7 @@ namespace Destrospean.Common.Abstractions
                             PropertiesTyped.Add(key, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
                             if (!mProperties.ContainsKey(key))
                             {
-                                mProperties.Add(key, Material.CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock, ParentPackage));
+                                mProperties.Add(key, GameObjectPreset.CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock, ParentPackage));
                             }
                         }
                     }
@@ -113,7 +113,7 @@ namespace Destrospean.Common.Abstractions
             RefreshPatternInfo(false, presetMaterialBlock, ParentPackage);
         }
 
-        public Pattern(Preset preset, XmlNode patternXmlNode) : base()
+        public Pattern(CASPartPreset preset, XmlNode patternXmlNode) : base()
         {
             SlotName = patternXmlNode.Attributes["variable"].Value;
             PatternInfo = new PatternInfo
@@ -146,7 +146,7 @@ namespace Destrospean.Common.Abstractions
             RefreshPatternInfo(false);
         }
 
-        void PopulateVariablesForMaterialPatterns(s3pi.Interfaces.IPackage package, object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
+        void PopulateVariablesForGameObjectPatterns(s3pi.Interfaces.IPackage package, object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
         {
             System.Func<object, float> getFloatValue = (value) =>
                 {
@@ -162,7 +162,7 @@ namespace Destrospean.Common.Abstractions
             foreach (var propertyTypedKvp in PropertiesTyped)
             {
                 var key = propertyTypedKvp.Key.ToLowerInvariant();
-                var value = mProperties.ContainsKey(propertyTypedKvp.Key) ? mProperties[propertyTypedKvp.Key] : Material.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, (CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock, package);
+                var value = mProperties.ContainsKey(propertyTypedKvp.Key) ? mProperties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, (CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock, package);
                 if (key.StartsWith("channel"))
                 {
                     if (key.EndsWith("enabled"))
@@ -291,15 +291,15 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        void SetValue(Material material, string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        void SetValue(GameObjectPreset preset, string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
         {
-            Material.SetValue(material, material.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName), propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock, material.ParentPackage)));
+            GameObjectPreset.SetValue(preset, preset.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName), propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, preset.MaterialBlock, preset.ParentPackage)));
         }
 
         public override string GetValue(string propertyName)
         {
-            var material = Preset as Material;
-            return material == null ? base.GetValue(propertyName) : Material.GetValue(material, propertyName, PropertiesTyped[propertyName].Type, mProperties);
+            var material = Preset as GameObjectPreset;
+            return material == null ? base.GetValue(propertyName) : GameObjectPreset.GetValue(material, propertyName, PropertiesTyped[propertyName].Type, mProperties);
         }
 
         public void RefreshPatternInfo(bool regeneratePresetTexture = true, object presetMaterialBlock = null, s3pi.Interfaces.IPackage package = null)
@@ -327,7 +327,7 @@ namespace Destrospean.Common.Abstractions
             float[] hsvShiftBackground = null;
             if (mProperties.Count > 0)
             {
-                PopulateVariablesForMaterialPatterns(package, presetMaterialBlock, ref background, ref rgbMask, channels, channelsEnabled, ref baseHueBackground, ref baseSaturationBackground, ref baseValueBackground, ref hueBackground, ref saturationBackground, ref valueBackground, baseHues, baseSaturations, baseValues, hues, saturations, values, ref hsvShiftBackground, hsvShift, rgbColors);
+                PopulateVariablesForGameObjectPatterns(package, presetMaterialBlock, ref background, ref rgbMask, channels, channelsEnabled, ref baseHueBackground, ref baseSaturationBackground, ref baseValueBackground, ref hueBackground, ref saturationBackground, ref valueBackground, baseHues, baseSaturations, baseValues, hues, saturations, values, ref hsvShiftBackground, hsvShift, rgbColors);
             }
             foreach (var propertyXmlNodeKvp in mPropertiesXmlNodes)
             {
@@ -497,13 +497,13 @@ namespace Destrospean.Common.Abstractions
 
         public override void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
         {
-            var material = Preset as Material;
-            if (material == null)
+            var preset = Preset as GameObjectPreset;
+            if (preset == null)
             {
                 base.SetValue(propertyName, newValue, beforeMarkUnsaved ?? (() => RefreshPatternInfo()));
                 return;
             }
-            SetValue(material, propertyName, newValue, beforeMarkUnsaved);
+            SetValue(preset, propertyName, newValue, beforeMarkUnsaved);
         }
     }
 }

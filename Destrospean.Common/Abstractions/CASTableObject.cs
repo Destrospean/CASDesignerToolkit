@@ -8,11 +8,11 @@ namespace Destrospean.Common.Abstractions
     {
         protected Rig mCurrentRig;
 
-        public List<IPreset> AllPresets
+        public List<Preset> AllPresets
         {
             get
             {
-                var allPresets = new List<IPreset>(Presets);
+                var allPresets = new List<Preset>(Presets);
                 if (DefaultPreset != null)
                 {
                     allPresets.Insert(0, DefaultPreset);
@@ -26,13 +26,13 @@ namespace Destrospean.Common.Abstractions
             get;
         }
 
-        public readonly IPreset DefaultPreset;
+        public readonly Preset DefaultPreset;
 
         public readonly string DefaultPresetKey;
 
         public readonly s3pi.Interfaces.IPackage ParentPackage;
 
-        public readonly List<IPreset> Presets = new List<IPreset>();
+        public readonly List<Preset> Presets = new List<Preset>();
 
         public CASTableObject(s3pi.Interfaces.IPackage package, s3pi.Interfaces.IResourceIndexEntry resourceIndexEntry)
         {
@@ -46,7 +46,7 @@ namespace Destrospean.Common.Abstractions
             else
             {
                 DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
-                DefaultPreset = new Preset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
+                DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
             }
         }
 
@@ -62,7 +62,7 @@ namespace Destrospean.Common.Abstractions
                 return;
             }
             var defaultPresetResourceIndexEntry = ParentPackage.EvaluateResourceKey(DefaultPresetKey).ResourceIndexEntry;
-            var tempResourceIndexEntry = ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(((Preset)AllPresets[0]).XmlFile.ReadToEnd())), false);
+            var tempResourceIndexEntry = ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(((CASPartPreset)AllPresets[0]).XmlFile.ReadToEnd())), false);
             ParentPackage.ReplaceResource(defaultPresetResourceIndexEntry, s3pi.WrapperDealer.WrapperDealer.GetResource(0, ParentPackage, tempResourceIndexEntry));
             ParentPackage.DeleteResource(tempResourceIndexEntry);
         }
