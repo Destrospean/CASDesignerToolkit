@@ -422,28 +422,28 @@ public partial class MainWindow : RendererMainWindow
                     };
                 addMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
-                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
                         casPart.AddMeshGroup(lodKvp.Key, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         casPart.LoadLODs(PreloadedData.GEOMs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(casPart, selectedLODIndex, selectedGEOMIndex + 1);
+                        BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex + 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
-                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
-                        casPart.DeleteMeshGroup(lodKvp.Key, selectedGEOMIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                        casPart.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         casPart.LoadLODs(PreloadedData.GEOMs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(casPart, selectedLODIndex, selectedGEOMIndex == 0 ? 0 : selectedGEOMIndex - 1);
+                        BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 exportGEOMAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.GEOM);
@@ -724,28 +724,28 @@ public partial class MainWindow : RendererMainWindow
                     };
                 addMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
-                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
                         //gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedGEOMIndex + 1);
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex + 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
                     {
-                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
-                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
                         //gameObject.DeleteMeshGroup(lodKvp.Key, selectedGEOMIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedGEOMIndex == 0 ? 0 : selectedGEOMIndex - 1);
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 exportGEOMAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.GEOM);
