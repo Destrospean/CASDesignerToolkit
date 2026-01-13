@@ -63,7 +63,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public override IDictionary<string, string> PropertiesTyped
+        public override IDictionary<string, PropertyMeta> PropertiesTyped
         {
             get
             {
@@ -221,16 +221,6 @@ namespace Destrospean.Common.Abstractions
                             {
                             }
                         }
-                        if (overlay != null)
-                        {
-                            try
-                            {
-                                overlay = overlay.GetWithPatternsApplied(maskArray, patternImages, true);
-                            }
-                            catch (System.IndexOutOfRangeException)
-                            {
-                            }
-                        }
                     }
                     var texture = new Bitmap(width, height);
                     using (var graphics = Graphics.FromImage(texture))
@@ -343,7 +333,12 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (grandchildNode.Name == "param")
                             {
-                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                                var key = grandchildNode.Attributes["name"].Value;
+                                PropertiesTyped.Add(key, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
+                                if (!Properties.ContainsKey(key))
+                                {
+                                    Properties.Add(key, CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, MaterialBlock, ParentPackage));
+                                }
                             }
                         }
                     }
@@ -352,7 +347,7 @@ namespace Destrospean.Common.Abstractions
 
             public override string GetValue(string propertyName)
             {
-                return Material.GetValue(Material, propertyName, PropertiesTyped[propertyName], Properties);
+                return Material.GetValue(Material, propertyName, PropertiesTyped[propertyName].Type, Properties);
             }
 
             public void ReplaceMaterialComplate()
@@ -368,7 +363,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (grandchildNode.Name == "param")
                             {
-                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
                             }
                         }
                     }
@@ -377,7 +372,7 @@ namespace Destrospean.Common.Abstractions
 
             public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
             {
-                Material.SetValue(Material, propertyName, newValue, PropertiesTyped[propertyName], Properties, beforeMarkUnsaved);
+                Material.SetValue(Material, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
             }
         }
 
@@ -515,7 +510,6 @@ namespace Destrospean.Common.Abstractions
         {
             new System.Threading.Thread(() =>
                 {
-                    System.Threading.Thread.Sleep(1);
                     mInternal.Texture = mInternal.NewTexture;
                     MarkModelsNeedUpdatedCallback();
                 }).Start();

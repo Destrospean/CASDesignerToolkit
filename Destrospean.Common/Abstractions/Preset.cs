@@ -57,7 +57,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public override IDictionary<string, string> PropertiesTyped
+        public override IDictionary<string, PropertyMeta> PropertiesTyped
         {
             get
             {
@@ -440,7 +440,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (grandchildNode.Name == "param")
                             {
-                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
                             }
                         }
                     }
@@ -460,7 +460,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (grandchildNode.Name == "param")
                             {
-                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                                PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
                             }
                         }
                     }
@@ -510,7 +510,6 @@ namespace Destrospean.Common.Abstractions
         {
             new System.Threading.Thread(() =>
                 {
-                    System.Threading.Thread.Sleep(1);
                     mInternal.Texture = mInternal.NewTexture;
                     MarkModelsNeedUpdatedCallback();
                 }).Start();

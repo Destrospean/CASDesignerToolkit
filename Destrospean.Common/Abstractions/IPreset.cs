@@ -27,7 +27,7 @@
             get;
         }
 
-        System.Collections.Generic.IDictionary<string, string> PropertiesTyped
+        System.Collections.Generic.IDictionary<string, Complate.PropertyMeta> PropertiesTyped
         {
             get;
         }

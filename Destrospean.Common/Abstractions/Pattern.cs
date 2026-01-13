@@ -100,12 +100,17 @@ namespace Destrospean.Common.Abstractions
                     {
                         if (grandchildNode.Name == "param")
                         {
-                            PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                            var key = grandchildNode.Attributes["name"].Value;
+                            PropertiesTyped.Add(key, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
+                            if (!mProperties.ContainsKey(key))
+                            {
+                                mProperties.Add(key, Material.CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock, ParentPackage));
+                            }
                         }
                     }
                 }
             }
-            RefreshPatternInfo(false, presetMaterialBlock);
+            RefreshPatternInfo(false, presetMaterialBlock, ParentPackage);
         }
 
         public Pattern(Preset preset, XmlNode patternXmlNode) : base()
@@ -133,7 +138,7 @@ namespace Destrospean.Common.Abstractions
                     {
                         if (grandchildNode.Name == "param")
                         {
-                            PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value);
+                            PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
                         }
                     }
                 }
@@ -141,7 +146,7 @@ namespace Destrospean.Common.Abstractions
             RefreshPatternInfo(false);
         }
 
-        void PopulateVariablesForMaterialPatterns(object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
+        void PopulateVariablesForMaterialPatterns(s3pi.Interfaces.IPackage package, object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
         {
             System.Func<object, float> getFloatValue = (value) =>
                 {
@@ -154,10 +159,10 @@ namespace Destrospean.Common.Abstractions
                         return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data);
                     }
                 };
-            foreach (var propertyKvp in mProperties)
+            foreach (var propertyKvp in PropertiesTyped)
             {
                 var key = propertyKvp.Key.ToLowerInvariant();
-                var value = propertyKvp.Value;
+                var value = mProperties.ContainsKey(propertyKvp.Key) ? mProperties[propertyKvp.Key] : Material.CreateComplateOverrideInstance(propertyKvp.Key, propertyKvp.Value.DefaultValue, propertyKvp.Value.Type, (CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock, package);
                 if (key.StartsWith("channel"))
                 {
                     if (key.EndsWith("enabled"))
@@ -294,10 +299,10 @@ namespace Destrospean.Common.Abstractions
         public override string GetValue(string propertyName)
         {
             var material = Preset as Material;
-            return material == null ? base.GetValue(propertyName) : Material.GetValue(material, propertyName, PropertiesTyped[propertyName], mProperties);
+            return material == null ? base.GetValue(propertyName) : Material.GetValue(material, propertyName, PropertiesTyped[propertyName].Type, mProperties);
         }
 
-        public void RefreshPatternInfo(bool regeneratePresetTexture = true, object presetMaterialBlock = null)
+        public void RefreshPatternInfo(bool regeneratePresetTexture = true, object presetMaterialBlock = null, s3pi.Interfaces.IPackage package = null)
         {
             string background = null,
             rgbMask = null;
@@ -322,7 +327,7 @@ namespace Destrospean.Common.Abstractions
             float[] hsvShiftBackground = null;
             if (mProperties.Count > 0)
             {
-                PopulateVariablesForMaterialPatterns(presetMaterialBlock, ref background, ref rgbMask, channels, channelsEnabled, ref baseHueBackground, ref baseSaturationBackground, ref baseValueBackground, ref hueBackground, ref saturationBackground, ref valueBackground, baseHues, baseSaturations, baseValues, hues, saturations, values, ref hsvShiftBackground, hsvShift, rgbColors);
+                PopulateVariablesForMaterialPatterns(package, presetMaterialBlock, ref background, ref rgbMask, channels, channelsEnabled, ref baseHueBackground, ref baseSaturationBackground, ref baseValueBackground, ref hueBackground, ref saturationBackground, ref valueBackground, baseHues, baseSaturations, baseValues, hues, saturations, values, ref hsvShiftBackground, hsvShift, rgbColors);
             }
             foreach (var propertyXmlNodeKvp in mPropertiesXmlNodes)
             {
@@ -483,11 +488,11 @@ namespace Destrospean.Common.Abstractions
                     RGBMask = rgbMask,
                     SolidColor = rgbColors.Count == 1 ? rgbColors[0] : null
                 };
+            PatternImage = null;
             if (regeneratePresetTexture)
             {
                 Preset.RegenerateTexture();
             }
-            PatternImage = null;
         }
 
         public override void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
@@ -498,7 +503,7 @@ namespace Destrospean.Common.Abstractions
                 base.SetValue(propertyName, newValue, beforeMarkUnsaved ?? (() => RefreshPatternInfo()));
                 return;
             }
-            Material.SetValue(material, propertyName, newValue, PropertiesTyped[propertyName], mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock)));
+            Material.SetValue(material, propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock, material.ParentPackage)));
         }
     }
 }

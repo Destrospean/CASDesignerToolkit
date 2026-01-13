@@ -6,7 +6,7 @@ namespace Destrospean.Common.Abstractions
 {
     public abstract class Complate
     {
-        protected readonly IDictionary<string, string> mPropertiesTyped;
+        protected readonly IDictionary<string, PropertyMeta> mPropertiesTyped;
 
         protected readonly IDictionary<string, XmlNode> mPropertiesXmlNodes;
 
@@ -26,7 +26,7 @@ namespace Destrospean.Common.Abstractions
             get;
         }
 
-        public virtual IDictionary<string, string> PropertiesTyped
+        public virtual IDictionary<string, PropertyMeta> PropertiesTyped
         {
             get
             {
@@ -51,6 +51,17 @@ namespace Destrospean.Common.Abstractions
             set
             {
                 SetValue(propertyName, value);
+            }
+        }
+
+        public struct PropertyMeta
+        {
+            public string DefaultValue, Type;
+
+            public PropertyMeta(string type, string defaultValue)
+            {
+                DefaultValue = defaultValue;
+                Type = type;
             }
         }
 
@@ -92,7 +103,7 @@ namespace Destrospean.Common.Abstractions
         {
             mXmlDocument = new XmlDocument();
             mPropertiesXmlNodes = new SortedDictionary<string, XmlNode>(new PropertyNameComparer());
-            mPropertiesTyped = new SortedDictionary<string, string>(new PropertyNameComparer());
+            mPropertiesTyped = new SortedDictionary<string, PropertyMeta>(new PropertyNameComparer());
         }
 
         public virtual string GetValue(string propertyName)

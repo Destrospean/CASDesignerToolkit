@@ -77,15 +77,15 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             {
                 foreach (var propertyName in complate.PropertyNames)
                 {
-                    string type;
-                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out type))
+                    Complate.PropertyMeta propertyMeta;
+                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out propertyMeta))
                     {
                         continue;
                     }
                     Widget valueWidget = null;
                     var alignment = new Alignment(0, .5f, 1, 0);
                     var value = complate[propertyName];
-                    switch (type)
+                    switch (propertyMeta.Type)
                     {
                         case "bool":
                             var checkButton = new CheckButton
