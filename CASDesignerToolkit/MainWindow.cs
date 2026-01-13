@@ -847,6 +847,10 @@ public partial class MainWindow : RendererMainWindow
                 casPartKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
             }
+            foreach (var ftptResourceKvp in PreloadedData.FTPTs)
+            {
+                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(ftptResourceKvp.Key).ResourceIndexEntry, ftptResourceKvp.Value);
+            }
             foreach (var gameObjectKvp in PreloadedData.GameObjects)
             {
                 if (ResourceUtils.MissingResourceKeys.Exists(x => x.ToLowerInvariant() == gameObjectKvp.Key.ToLowerInvariant()))
@@ -863,6 +867,18 @@ public partial class MainWindow : RendererMainWindow
                 var resourceIndexEntry = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key).ResourceIndexEntry;
                 CurrentPackage.AddResource(resourceIndexEntry, stream, false);
                 CurrentPackage.DeleteResource(resourceIndexEntry);
+            }
+            foreach (var liteResourceKvp in PreloadedData.LITEs)
+            {
+                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(liteResourceKvp.Key).ResourceIndexEntry, liteResourceKvp.Value);
+            }
+            foreach (var mlodResourceKvp in PreloadedData.MLODs)
+            {
+                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(mlodResourceKvp.Key).ResourceIndexEntry, mlodResourceKvp.Value);
+            }
+            foreach (var modlResourceKvp in PreloadedData.MODLs)
+            {
+                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(modlResourceKvp.Key).ResourceIndexEntry, modlResourceKvp.Value);
             }
             foreach (var vpxyResourceKvp in PreloadedData.VPXYs)
             {
