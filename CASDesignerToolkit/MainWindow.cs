@@ -41,9 +41,18 @@ public partial class MainWindow : RendererMainWindow
             {
                 GlobalState.Meshes.Clear();
                 Sim.LoadGEOMs(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
-                if (PreloadedData.GameObjects.Count > 0)
+                TreeIter iter;
+                TreeModel model;
+                if (ResourceTreeView.Selection.GetSelected(out model, out iter))
                 {
-                    GlobalState.LoadMeshes(new List<GameObject>(PreloadedData.GameObjects.Values)[0], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, 0, GlobalState.LoadTexture);
+                    var key = ((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey();
+                    switch ((string)model.GetValue(iter, 0))
+                    {
+                        case "OBJD":
+                            GLWidget.Show();
+                            GlobalState.LoadMeshes(PreloadedData.GameObjects[key], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
+                            break;
+                    }
                 }
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
@@ -245,6 +254,7 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.Attach(mPresetNotebook, 1, 2, 0, 1);
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
+            BuildLODNotebook(gameObject);
         }
         catch (Exception ex)
         {
@@ -545,6 +555,242 @@ public partial class MainWindow : RendererMainWindow
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
                     geomNotebook.CurrentPage = startGEOMPageIndex;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ProgramUtils.WriteError(ex);
+            throw;
+        }
+    }
+
+    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
+    {
+        try
+        {
+            if (gameObject == null)
+            {
+                return;
+            }
+            if (mResourcePropertyNotebookSwitchPageHandler != null)
+            {
+                ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
+            }
+            mResourcePropertyNotebookSwitchPageHandler = (o, args) =>
+                {
+                    Sim.PreloadedLODsMorphed.Clear();
+                    NextState = NextStateOptions.UpdateModels;
+                };
+            ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
+            foreach (var lodKvp in gameObject.LODs)
+            {
+                var meshGroupNotebook = new Notebook
+                    {
+                        ShowTabs = false
+                    };
+                var actionGroup = new ActionGroup("Default");
+                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
+                    {
+                        Sensitive = lodKvp.Value.MeshGroups.Count > 1
+                    },
+                exportGEOMAction = new Gtk.Action("ExportGEOMAction", "Export GEOM", null, Stock.SaveAs),
+                exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
+                exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
+                importGEOMAction = new Gtk.Action("ImportGEOMAction", "Import GEOM", null, Stock.Directory),
+                importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
+                importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
+                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
+                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
+                actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
+                actionGroup.Add(addMeshGroupAction);
+                actionGroup.Add(deleteMeshGroupAction);
+                actionGroup.Add(exportGEOMAction);
+                actionGroup.Add(exportOBJAction);
+                actionGroup.Add(exportWSOAction);
+                actionGroup.Add(importGEOMAction);
+                actionGroup.Add(importOBJAction);
+                actionGroup.Add(importWSOAction);
+                var uiManager = new UIManager();
+                uiManager.InsertActionGroup(actionGroup, 0);
+                uiManager.AddUiFromString(@"
+                    <ui>
+                        <menubar name='GEOMPropertiesMenuBar'>
+                            <menu name='OptionsAction' action='OptionsAction'>
+                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
+                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
+                                <menu name='ImportAction' action='ImportAction'>
+                                    <menuitem name='ImportGEOMAction' action='ImportGEOMAction'/>
+                                    <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
+                                    <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
+                                </menu>                            
+                                <menu name='ExportAction' action='ExportAction'>
+                                    <menuitem name='ExportGEOMAction' action='ExportGEOMAction'/>
+                                    <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
+                                    <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
+                                </menu>
+                            </menu>
+                        </menubar>
+                    </ui>");
+                var menuBar = (MenuBar)uiManager.GetWidget("/GEOMPropertiesMenuBar");
+                menuBar.PackDirection = PackDirection.Rtl;
+                Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
+                    {
+                        Xalign = .5f
+                    }),
+                prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
+                    {
+                        Xalign = .5f
+                    });
+                var pageIndexLabel = new Label
+                    {
+                        Xalign = .5f
+                    };
+                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
+                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
+                Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+                prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+                nextButtonAlignment.Add(nextButton);
+                prevButtonAlignment.Add(prevButton);
+                meshGroupNotebook.SwitchPage += (o, args) =>
+                    {
+                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
+                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
+                    };
+                Action<MeshFileType> exportMeshGroup = (meshFileType) =>
+                    {
+                        try
+                        {
+                            switch (meshFileType)
+                            {
+                                case MeshFileType.GEOM:
+                                case MeshFileType.OBJ:
+                                case MeshFileType.WSO:
+                                    break;
+                                default:
+                                    return;
+                            }
+                            var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
+                            var fileFilter = new FileFilter
+                                {
+                                    Name = meshFileType == MeshFileType.GEOM ? "The Sims 3 GEOM Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                };
+                            fileFilter.AddPattern(meshFileType == MeshFileType.GEOM ? "*.simgeom" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                            fileChooserDialog.AddFilter(fileFilter);
+                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                            {
+                                //gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                            }
+                            fileChooserDialog.Destroy();
+                        }
+                        catch (Exception ex)
+                        {
+                            ProgramUtils.WriteError(ex);
+                            throw;
+                        }
+                    },
+                importMeshGroup = (meshFileType) =>
+                    {
+                        try
+                        {
+                            switch (meshFileType)
+                            {
+                                case MeshFileType.OBJ:
+                                case MeshFileType.WSO:
+                                    break;
+                                default:
+                                    return;
+                            }
+                            var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                            var fileFilter = new FileFilter
+                                {
+                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                };
+                            fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                            fileChooserDialog.AddFilter(fileFilter);
+                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                            {
+                                //gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                            }
+                            fileChooserDialog.Destroy();
+                        }
+                        catch (Exception ex)
+                        {
+                            ProgramUtils.WriteError(ex);
+                            throw;
+                        }
+                    };
+                addMeshGroupAction.Activated += (sender, e) =>
+                    {
+                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
+                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
+                        //gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        foreach (var child in ResourcePropertyNotebook.Children)
+                        {
+                            ResourcePropertyNotebook.Remove(child);
+                        }
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedGEOMIndex + 1);
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    };
+                deleteMeshGroupAction.Activated += (sender, e) =>
+                    {
+                        int selectedGEOMIndex = meshGroupNotebook.CurrentPage,
+                        selectedLODIndex = ResourcePropertyNotebook.CurrentPage;
+                        //gameObject.DeleteMeshGroup(lodKvp.Key, selectedGEOMIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        foreach (var child in ResourcePropertyNotebook.Children)
+                        {
+                            ResourcePropertyNotebook.Remove(child);
+                        }
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedGEOMIndex == 0 ? 0 : selectedGEOMIndex - 1);
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    };
+                exportGEOMAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.GEOM);
+                exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
+                exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
+                importGEOMAction.Activated += (sender, e) =>
+                    {
+                        var fileChooserDialog = new FileChooserDialog("Import GEOM", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                        var fileFilter = new FileFilter
+                            {
+                                Name = "The Sims 3 GEOM Resource"
+                            };
+                        fileFilter.AddPattern("*.simgeom");
+                        fileChooserDialog.AddFilter(fileFilter);
+                        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                        {
+                            try
+                            {
+                                //gameObject.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                            }
+                            catch (Exception ex)
+                            {
+                                ProgramUtils.WriteError(ex);
+                                throw;
+                            }
+                        }
+                        fileChooserDialog.Destroy();
+                    };
+                importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
+                importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
+                var meshGroupPageButtonHBox = new HBox(false, 0);
+                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
+                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
+                var lodPageVBox = new VBox(false, 0);
+                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
+                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
+                lodPageVBox.ShowAll();
+                ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
+                //lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, Image));
+                if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.MeshUtils.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
+                {
+                    ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
+                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
                 }
             }
         }
