@@ -373,6 +373,10 @@ namespace Destrospean.Common.Abstractions
             public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
             {
                 Material.SetValue(Material, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
+                if (!MaterialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
+                {
+                    MaterialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)Properties[propertyName]);
+                }
             }
         }
 

@@ -504,6 +504,10 @@ namespace Destrospean.Common.Abstractions
                 return;
             }
             Material.SetValue(material, propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock, material.ParentPackage)));
+            if (!material.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName).ComplateOverrides.Exists(x => x.VariableName == propertyName))
+            {
+                material.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName).ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)mProperties[propertyName]);
+            }
         }
     }
 }
