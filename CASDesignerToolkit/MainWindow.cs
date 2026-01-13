@@ -659,8 +659,8 @@ public partial class MainWindow : RendererMainWindow
         PreloadedData.GameObjects.Clear();
         PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
-        GlobalState.Materials.Clear();
         PreloadedData.LITEs.Clear();
+        GlobalState.Materials.Clear();
         PreloadedData.MLODs.Clear();
         PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
