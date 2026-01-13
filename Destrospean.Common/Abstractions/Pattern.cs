@@ -296,6 +296,11 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
+        void SetValue(Material material, string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        {
+            Material.SetValue(material, material.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName), propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock, material.ParentPackage)));
+        }
+
         public override string GetValue(string propertyName)
         {
             var material = Preset as Material;
@@ -503,12 +508,7 @@ namespace Destrospean.Common.Abstractions
                 base.SetValue(propertyName, newValue, beforeMarkUnsaved ?? (() => RefreshPatternInfo()));
                 return;
             }
-            Material.SetValue(material, propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, material.MaterialBlock, material.ParentPackage)));
-            var patternMaterialBlock = material.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName);
-            if (!patternMaterialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
-            {
-                patternMaterialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)mProperties[propertyName]);
-            }
+            SetValue(material, propertyName, newValue, beforeMarkUnsaved);
         }
     }
 }

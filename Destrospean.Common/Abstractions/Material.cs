@@ -372,11 +372,7 @@ namespace Destrospean.Common.Abstractions
 
             public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
             {
-                Material.SetValue(Material, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
-                if (!MaterialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
-                {
-                    MaterialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)Properties[propertyName]);
-                }
+                Material.SetValue(Material, MaterialBlock, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
             }
         }
 
@@ -572,8 +568,12 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void SetValue(Material material, string propertyName, string newValue, string type, IDictionary<string, object> properties, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public static void SetValue(Material material, CatalogResource.CatalogResource.MaterialBlock materialBlock, string propertyName, string newValue, string type, IDictionary<string, object> properties, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
         {
+            if (!materialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
+            {
+                materialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)properties[propertyName]);
+            }
             switch (type)
             {
                 case "bool":

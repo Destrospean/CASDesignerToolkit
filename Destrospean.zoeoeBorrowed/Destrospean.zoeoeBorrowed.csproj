@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Destrospean.zoeoeBorrowed</RootNamespace>
     <AssemblyName>Destrospean.zoeoeBorrowed</AssemblyName>
-    <UseMSBuildEngine>True</UseMSBuildEngine>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -21,7 +20,6 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
