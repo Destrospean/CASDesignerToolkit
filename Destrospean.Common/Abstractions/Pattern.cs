@@ -159,10 +159,10 @@ namespace Destrospean.Common.Abstractions
                         return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data);
                     }
                 };
-            foreach (var propertyKvp in PropertiesTyped)
+            foreach (var propertyTypedKvp in PropertiesTyped)
             {
-                var key = propertyKvp.Key.ToLowerInvariant();
-                var value = mProperties.ContainsKey(propertyKvp.Key) ? mProperties[propertyKvp.Key] : Material.CreateComplateOverrideInstance(propertyKvp.Key, propertyKvp.Value.DefaultValue, propertyKvp.Value.Type, (CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock, package);
+                var key = propertyTypedKvp.Key.ToLowerInvariant();
+                var value = mProperties.ContainsKey(propertyTypedKvp.Key) ? mProperties[propertyTypedKvp.Key] : Material.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, (CatalogResource.CatalogResource.MaterialBlock)presetMaterialBlock, package);
                 if (key.StartsWith("channel"))
                 {
                     if (key.EndsWith("enabled"))
@@ -230,33 +230,28 @@ namespace Destrospean.Common.Abstractions
                 }
                 else if (key.StartsWith("hsvshift"))
                 {
-                    CatalogResource.CatalogResource.TC06_XYZ color;
+                    float[] color;
                     try
                     {
-                        color = (CatalogResource.CatalogResource.TC06_XYZ)value;
+                        var complateElement = (CatalogResource.CatalogResource.TC06_XYZ)value;
+                        color = new float[]
+                            {
+                                complateElement.Unknown1,
+                                complateElement.Unknown2,
+                                complateElement.Unknown3
+                            };
                     }
                     catch (System.InvalidCastException)
                     {
-                        var temp = ParseCommaSeparatedValues(((CatalogResource.CatalogResource.TC01_String)value).Data);
-                        color = new CatalogResource.CatalogResource.TC06_XYZ(0, null, 0, "", temp[0], temp[1], temp[2]);
+                        color = ParseCommaSeparatedValues(((CatalogResource.CatalogResource.TC01_String)value).Data);
                     }
                     if (key.EndsWith("bg"))
                     {
-                        hsvShiftBackground = new float[]
-                            {
-                                color.Unknown1,
-                                color.Unknown2,
-                                color.Unknown3
-                            };
+                        hsvShiftBackground = color;
                     }
                     else
                     {
-                        hsvShift.Add(new float[]
-                            {
-                                color.Unknown1,
-                                color.Unknown2,
-                                color.Unknown3
-                            });
+                        hsvShift.Add(color);
                     }
                 }
                 else if (key.StartsWith("s "))

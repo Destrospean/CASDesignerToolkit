@@ -136,10 +136,10 @@ namespace Destrospean.Common.Abstractions
                     logosUpperLeft = new List<float[]>();
                     List<float> logosRotation = new List<float>(),
                     stencilsRotation = new List<float>();
-                    foreach (var propertyKvp in Properties)
+                    foreach (var propertyTypedKvp in PropertiesTyped)
                     {
-                        var key = propertyKvp.Key.ToLowerInvariant();
-                        var value = propertyKvp.Value;
+                        var key = propertyTypedKvp.Key.ToLowerInvariant();
+                        var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : Material.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
                         if (key.StartsWith("logo"))
                         {
                             if (key.EndsWith("enabled"))
