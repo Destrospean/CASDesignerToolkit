@@ -34,50 +34,14 @@ namespace Destrospean.Common.Abstractions
                     overlay = null;
                     int height = 1024,
                     width = 1024;
-                    List<Bitmap> logos = new List<Bitmap>(),
-                    stencils = new List<Bitmap>();
-                    List<bool> logosEnabled = new List<bool>(),
-                    stencilsEnabled = new List<bool>();
-                    List<float[]> logosLowerRight = new List<float[]>(),
-                    logosUpperLeft = new List<float[]>();
-                    List<float> logosRotation = new List<float>(),
-                    stencilsRotation = new List<float>();
+                    var stencils = new List<Bitmap>();
+                    var stencilsEnabled = new List<bool>();
+                    var stencilsRotation = new List<float>();
                     foreach (var propertyTypedKvp in PropertiesTyped)
                     {
                         var key = propertyTypedKvp.Key.ToLowerInvariant();
                         var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
-                        if (key.StartsWith("logo"))
-                        {
-                            if (key.EndsWith("enabled"))
-                            {
-                                logosEnabled.Add(((CatalogResource.CatalogResource.TC07_Boolean)value).Unknown1);
-                            }
-                            else if (key.EndsWith("lowerright"))
-                            {
-                                logosLowerRight.Add(new float[]
-                                    {
-                                        ((CatalogResource.CatalogResource.TC05_XY)value).Unknown1,
-                                        ((CatalogResource.CatalogResource.TC05_XY)value).Unknown2
-                                    });
-                            }
-                            else if (key.EndsWith("upperleft"))
-                            {
-                                logosUpperLeft.Add(new float[]
-                                    {
-                                        ((CatalogResource.CatalogResource.TC05_XY)value).Unknown1,
-                                        ((CatalogResource.CatalogResource.TC05_XY)value).Unknown2
-                                    });
-                            }
-                            else if (key.EndsWith("rotation"))
-                            {
-                                logosRotation.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
-                            }
-                            else if (key.EndsWith("texture"))
-                            {
-                                logos.Add(ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height));
-                            }
-                        }
-                        else if (key.StartsWith("stencil"))
+                        if (key.StartsWith("stencil"))
                         {
                             if (key.Length == 9)
                             {
@@ -146,15 +110,6 @@ namespace Destrospean.Common.Abstractions
                                 graphics.DrawImage(RotateImage(QuadrupleCanvasSize(stencils[i]), stencilsRotation[i] * 360), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
                             }
                         }
-                        for (var i = 0; i < logos.Count; i++)
-                        {
-                            if (logosEnabled[i])
-                            {
-                                int logoHeight = (int)((logosLowerRight[i][1] - logosUpperLeft[i][1]) * height),
-                                logoWidth = (int)((logosLowerRight[i][0] - logosUpperLeft[i][0]) * width);
-                                graphics.DrawImage(RotateImage(QuadrupleCanvasSize(logos[i]), logosRotation[i] * 360), logosUpperLeft[i][0] * width - (logoWidth >> 1), logosUpperLeft[i][1] * height - (logoHeight >> 1), logoWidth << 1, logoHeight << 1);
-                            }
-                        }
                     }
                     return texture;
                 }
@@ -218,7 +173,7 @@ namespace Destrospean.Common.Abstractions
 
             public override void ReplacePresetComplate()
             {
-                ReplacePresetComplate(ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex]));
+                ReplacePresetComplate(ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex].ReverseEvaluateResourceKey()));
             }
 
             public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
@@ -237,22 +192,26 @@ namespace Destrospean.Common.Abstractions
         {
             MaterialBlock.Name = newComplateName;
             MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex] = new TGIBlock(0, null, ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(newComplateName));
-            var lastPatternSlotName = Patterns.FindLast(x => x.SlotName != "Logo").SlotName;
-            foreach (var complateOverride in MaterialBlock.ComplateOverrides)
+            var lastPatternSlotName = Patterns[Patterns.Count - 1].SlotName;
+            foreach (var complateOverride in new List<CatalogResource.CatalogResource.ComplateElement>(MaterialBlock.ComplateOverrides))
             {
                 if (complateOverride.VariableName.StartsWith(lastPatternSlotName))
                 {
-                    var clonedComplateOverride = (CatalogResource.CatalogResource.ComplateElement)complateOverride.Clone(null);
+                    var clonedComplateOverride = (CatalogResource.CatalogResource.ComplateElement)complateOverride.Clone((sender, e) =>
+                        {
+                        });
                     clonedComplateOverride.VariableName = clonedComplateOverride.VariableName.Replace(lastPatternSlotName, patternSlotName);
                     MaterialBlock.ComplateOverrides.Add(clonedComplateOverride);
                     ((PresetInternal)mInternal).Properties.Add(clonedComplateOverride.VariableName, clonedComplateOverride);
                 }
             }
-            foreach (var materialBlock in MaterialBlock.MaterialBlocks)
+            foreach (var materialBlock in new List<CatalogResource.CatalogResource.MaterialBlock>(MaterialBlock.MaterialBlocks))
             {
                 if (materialBlock.Pattern == lastPatternSlotName)
                 {
-                    var clonedMaterialBlock = (CatalogResource.CatalogResource.MaterialBlock)materialBlock.Clone(null);
+                    var clonedMaterialBlock = (CatalogResource.CatalogResource.MaterialBlock)materialBlock.Clone((sender, e) =>
+                        {
+                        });
                     clonedMaterialBlock.Pattern = patternSlotName;
                     MaterialBlock.MaterialBlocks.Add(clonedMaterialBlock);
                     Patterns.Add(new Pattern(this, clonedMaterialBlock, MaterialBlock));

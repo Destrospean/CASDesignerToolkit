@@ -210,7 +210,7 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
-                    var patternImages = Patterns.ConvertAll(x => bool.Parse(GetValue(x.SlotName + " Enabled")) ? x.PatternImage : null);
+                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x => bool.Parse(GetValue(x.SlotName + " Enabled")) ? x.PatternImage : null);
                     if (maskArray != null)
                     {
                         if (multiplier != null)
