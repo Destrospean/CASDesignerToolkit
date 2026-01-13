@@ -657,8 +657,12 @@ public partial class MainWindow : RendererMainWindow
         GlobalState.Meshes.Clear();
         PreloadedData.CASParts.Clear();
         PreloadedData.GameObjects.Clear();
+        PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
         GlobalState.Materials.Clear();
+        PreloadedData.LITEs.Clear();
+        PreloadedData.MLODs.Clear();
+        PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
         Sim.PreloadedLODsMorphed.Clear();
         GlobalState.DeleteTextures();
