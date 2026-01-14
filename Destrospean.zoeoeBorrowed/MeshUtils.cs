@@ -52,7 +52,7 @@ namespace Destrospean.zoeoeBorrowed
 
             public SKIN SkinController;
 
-            public float UVScales;
+            public float[] UVScales;
 
             public VBUF VertexBuffer;
 
@@ -66,7 +66,7 @@ namespace Destrospean.zoeoeBorrowed
 
             public VRTF VertexFormat;
 
-            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController, float uvScales)
+            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
             {
                 DirectMATD = directMATD;
                 IndexBuffer = indexBuffer;
@@ -78,7 +78,7 @@ namespace Destrospean.zoeoeBorrowed
                 VertexFormat = vertexFormat;
             }
 
-            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController, float uvScales)
+            public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
             {
                 DirectMATD = null;
                 IndexBuffer = indexBuffer;
@@ -103,14 +103,25 @@ namespace Destrospean.zoeoeBorrowed
                 var materialIndexBlock = outerResource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
                 var mtst = materialIndexBlock as MTST;
                 var matd = mtst == null ? materialIndexBlock as MATD : outerResource.ChunkEntries[mtst.Entries[0].Index.TGIBlockIndex + publicChunkCount].RCOLBlock as MATD;
-                var uvScales = -1f;
+                float[] uvScales =
+                    {   
+                        -1,
+                        -1,
+                        -1
+                    };
                 if (matd != null)
                 {
-                    foreach (var shaderData in matd.Mtnf.SData)
+                    foreach (var element in matd.Mtnf.SData)
                     {
-                        if (shaderData.Field == FieldType.UVScales)
+                        if (element.Field == FieldType.UVScales)
                         {
-                            uvScales = ((ElementFloat3)shaderData).Data0;
+                            var elementFloat3 = ((ElementFloat3)element);
+                            uvScales = new float[]
+                                {
+                                    elementFloat3.Data0,
+                                    elementFloat3.Data1,
+                                    elementFloat3.Data2
+                                };
                         }
                     }
                 }

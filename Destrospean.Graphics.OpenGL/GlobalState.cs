@@ -413,12 +413,7 @@ namespace Destrospean.Graphics.OpenGL
                 {
                     continue;
                 }
-                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.VertexFormat, 0, meshGroup.VertexCount, new float[]
-                    {
-                        meshGroup.UVScales,
-                        0,
-                        0
-                    }))
+                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.Mesh, meshGroup.VertexFormat, meshGroup.UVScales))
                 {
                     colors.Add(Vector3.One);
                     normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
