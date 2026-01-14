@@ -119,6 +119,8 @@ namespace Destrospean.Graphics.OpenGL
 
         protected List<int[]> mFaces = new List<int[]>();
 
+        public object AdditionalData;
+
         public override Vector3[] ColorData
         {
             get

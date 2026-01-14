@@ -38,6 +38,22 @@ namespace Destrospean.zoeoeBorrowed
 
             public IBUF IndexBuffer;
 
+            public bool IsDropShadow
+            {
+                get
+                {
+                    return (Mesh.Flags & MeshFlags.DropShadow) != 0;
+                }
+            }
+
+            public bool IsShadowCaster
+            {
+                get
+                {
+                    return (Mesh.Flags & MeshFlags.ShadowCaster) != 0;
+                }
+            }
+
             public MTST MaterialSet;
 
             public MLOD.Mesh Mesh;

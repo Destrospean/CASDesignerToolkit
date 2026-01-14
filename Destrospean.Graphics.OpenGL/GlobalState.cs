@@ -293,6 +293,7 @@ namespace Destrospean.Graphics.OpenGL
                     vec3 viewvec = normalize(vec3(inverse(view) * vec4(0.0, 0.0, 0.0, 1.0)) - v_pos); 
                     float material_specularreflection = max(dot(v_norm, lightvec), 0.0) * pow(max(dot(reflectionvec, viewvec), 0.0), material_specExponent);
                     gl_FragColor = gl_FragColor + vec4(material_specular * light_color, 0.0) * material_specularreflection;
+                    gl_FragColor.a = texcolor.a;
                 }}", backportedFunctions)));
             Shaders.Add("lit_advanced", new Shader(litVertexShader, string.Format(@"
                 #version 100
@@ -370,6 +371,7 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         float distancefactor = distance(lights[i].position, v_pos);
                         gl_FragColor = gl_FragColor + lightcolor * 1.0 / (1.0 + distancefactor * lights[i].linearAttenuation + distancefactor * distancefactor * lights[i].quadraticAttenuation);
+                        gl_FragColor.a = texcolor.a;
                     }}
                 }}", backportedFunctions)));
             ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "lit_advanced" : "textured";
@@ -394,6 +396,10 @@ namespace Destrospean.Graphics.OpenGL
             var lodId = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
             foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
             {
+                if (meshGroup.IsDropShadow || meshGroup.VertexFormat == null && meshGroup.IsShadowCaster)
+                {
+                    continue;
+                }
                 List<Vector3> colors = new List<Vector3>(),
                 normals = new List<Vector3>(),
                 vertices = new List<Vector3>();
@@ -409,19 +415,24 @@ namespace Destrospean.Graphics.OpenGL
                             indices[i + 2]
                         });
                 }
-                if (meshGroup.VertexFormat == null)
+                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.Mesh, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.Mesh), meshGroup.UVScales))
                 {
-                    continue;
-                }
-                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.Mesh, meshGroup.VertexFormat, meshGroup.UVScales))
-                {
-                    colors.Add(Vector3.One);
-                    normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
-                    foreach (var uvSet in vertex.UV)
+                    colors.Add(vertex.Color == null ? Vector3.One : new Vector3(vertex.Color[0], vertex.Color[1], vertex.Color[2]));
+                    if (vertex.Normal != null)
                     {
-                        textureCoordinates.Add(new Vector2(uvSet[0], uvSet[1]));
+                        normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
                     }
-                    vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
+                    if (vertex.UV != null)
+                    {
+                        foreach (var uvSet in vertex.UV)
+                        {
+                            textureCoordinates.Add(new Vector2(uvSet[0], uvSet[1]));
+                        }
+                    }
+                    if (vertex.Position != null)
+                    {
+                        vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
+                    }
                 }
                 Material material;
                 if (!GlobalState.Materials.TryGetValue(gameObject.LODs[lodId].MLODResourceKey, out material))
@@ -468,13 +479,14 @@ namespace Destrospean.Graphics.OpenGL
                 var currentPreset = gameObject.AllPresets[presetIndex];
                 GlobalState.Meshes.Add(new Volume
                     {
+                        AdditionalData = meshGroup,
                         ColorData = colors.ToArray(),
                         Faces = faces,
                         Material = material,
                         Normals = normals.ToArray(),
                         TextureCoordinates = textureCoordinates.ToArray(),
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        MainTextureID = loadTextureCallback(gameObject.LODs[lodId].MLODResourceKey, currentPreset.Texture),
+                        MainTextureID = meshGroup.IsDropShadow ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(gameObject.LODs[lodId].MLODResourceKey, currentPreset.Texture),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
                         Vertices = vertices.ToArray()
                     });
@@ -519,115 +531,120 @@ namespace Destrospean.Graphics.OpenGL
             GL.ClearColor(System.Drawing.Color.CornflowerBlue);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.DepthTest);
-            GL.UseProgram(Shaders[ActiveShader].ProgramID);
-            Shaders[ActiveShader].EnableVertexAttribArrays();
             var indexAt = 0;
             foreach (var mesh in Meshes)
             {
+                var shader = ActiveShader;
+                if (mesh.AdditionalData != null && ((zoeoeBorrowed.MeshUtils.MeshGroupData)mesh.AdditionalData).IsDropShadow)
+                {
+                    shader = "textured";
+                }
+                GL.UseProgram(Shaders[shader].ProgramID);
+                Shaders[shader].EnableVertexAttribArrays();
                 GL.BindTexture(TextureTarget.Texture2D, mesh.MainTextureID);
-                GL.UniformMatrix4(Shaders[ActiveShader].GetUniform("modelview"), false, ref mesh.ModelViewProjectionMatrix);
-                if (Shaders[ActiveShader].GetUniform("light_ambientIntensity") != -1)
+                GL.UniformMatrix4(Shaders[shader].GetUniform("modelview"), false, ref mesh.ModelViewProjectionMatrix);
+                if (Shaders[shader].GetUniform("light_ambientIntensity") != -1)
                 {
-                    GL.Uniform1(Shaders[ActiveShader].GetUniform("light_ambientIntensity"), Lights[0].AmbientIntensity);
+                    GL.Uniform1(Shaders[shader].GetUniform("light_ambientIntensity"), Lights[0].AmbientIntensity);
                 }
-                if (Shaders[ActiveShader].GetUniform("light_color") != -1)
+                if (Shaders[shader].GetUniform("light_color") != -1)
                 {
-                    GL.Uniform3(Shaders[ActiveShader].GetUniform("light_color"), ref Lights[0].Color);
+                    GL.Uniform3(Shaders[shader].GetUniform("light_color"), ref Lights[0].Color);
                 }
-                if (Shaders[ActiveShader].GetUniform("light_diffuseIntensity") != -1)
+                if (Shaders[shader].GetUniform("light_diffuseIntensity") != -1)
                 {
-                    GL.Uniform1(Shaders[ActiveShader].GetUniform("light_diffuseIntensity"), Lights[0].DiffuseIntensity);
+                    GL.Uniform1(Shaders[shader].GetUniform("light_diffuseIntensity"), Lights[0].DiffuseIntensity);
                 }
-                if (Shaders[ActiveShader].GetUniform("light_position") != -1)
+                if (Shaders[shader].GetUniform("light_position") != -1)
                 {
-                    GL.Uniform3(Shaders[ActiveShader].GetUniform("light_position"), ref Lights[0].Position);
+                    GL.Uniform3(Shaders[shader].GetUniform("light_position"), ref Lights[0].Position);
                 }
                 for (var i = 0; i < Math.Min(Lights.Count, kMaxLights); i++)
                 {
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].ambientIntensity") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].ambientIntensity") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].ambientIntensity"), Lights[i].AmbientIntensity);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].ambientIntensity"), Lights[i].AmbientIntensity);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].color") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].color") != -1)
                     {
-                        GL.Uniform3(Shaders[ActiveShader].GetUniform("lights[" + i + "].color"), ref Lights[i].Color);
+                        GL.Uniform3(Shaders[shader].GetUniform("lights[" + i + "].color"), ref Lights[i].Color);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].coneAngle") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].coneAngle") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].coneAngle"), Lights[i].ConeAngle);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].coneAngle"), Lights[i].ConeAngle);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].diffuseIntensity") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].diffuseIntensity") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].diffuseIntensity"), Lights[i].DiffuseIntensity);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].diffuseIntensity"), Lights[i].DiffuseIntensity);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].direction") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].direction") != -1)
                     {
-                        GL.Uniform3(Shaders[ActiveShader].GetUniform("lights[" + i + "].direction"), ref Lights[i].Direction);
+                        GL.Uniform3(Shaders[shader].GetUniform("lights[" + i + "].direction"), ref Lights[i].Direction);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].linearAttenuation") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].linearAttenuation") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].linearAttenuation"), Lights[i].LinearAttenuation);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].linearAttenuation"), Lights[i].LinearAttenuation);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].position") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].position") != -1)
                     {
-                        GL.Uniform3(Shaders[ActiveShader].GetUniform("lights[" + i + "].position"), ref Lights[i].Position);
+                        GL.Uniform3(Shaders[shader].GetUniform("lights[" + i + "].position"), ref Lights[i].Position);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].quadraticAttenuation") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].quadraticAttenuation") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].quadraticAttenuation"), Lights[i].QuadraticAttenuation);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].quadraticAttenuation"), Lights[i].QuadraticAttenuation);
                     }
-                    if (Shaders[ActiveShader].GetUniform("lights[" + i + "].type") != -1)
+                    if (Shaders[shader].GetUniform("lights[" + i + "].type") != -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("lights[" + i + "].type"), (int)Lights[i].Type);
+                        GL.Uniform1(Shaders[shader].GetUniform("lights[" + i + "].type"), (int)Lights[i].Type);
                     }
                 }
-                if (Shaders[ActiveShader].GetAttribute("maintexture") != -1)
+                if (Shaders[shader].GetAttribute("maintexture") != -1)
                 {
-                    GL.Uniform1(Shaders[ActiveShader].GetAttribute("maintexture"), mesh.MainTextureID);
+                    GL.Uniform1(Shaders[shader].GetAttribute("maintexture"), mesh.MainTextureID);
                 }
-                if (Shaders[ActiveShader].GetUniform("map_specular") != -1)
+                if (Shaders[shader].GetUniform("map_specular") != -1)
                 {
                     if (mesh.SpecularMapID == -1)
                     {
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("hasSpecularMap"), 0);
+                        GL.Uniform1(Shaders[shader].GetUniform("hasSpecularMap"), 0);
                     }
                     else
                     {
                         GL.ActiveTexture(TextureUnit.Texture1);
                         GL.BindTexture(TextureTarget.Texture2D, mesh.SpecularMapID);
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("map_specular"), 1);
-                        GL.Uniform1(Shaders[ActiveShader].GetUniform("hasSpecularMap"), 1);
+                        GL.Uniform1(Shaders[shader].GetUniform("map_specular"), 1);
+                        GL.Uniform1(Shaders[shader].GetUniform("hasSpecularMap"), 1);
                         GL.ActiveTexture(TextureUnit.Texture0);
                     }
                 }
-                if (Shaders[ActiveShader].GetUniform("material_ambient") != -1)
+                if (Shaders[shader].GetUniform("material_ambient") != -1)
                 {
-                    GL.Uniform3(Shaders[ActiveShader].GetUniform("material_ambient"), ref mesh.Material.AmbientColor);
+                    GL.Uniform3(Shaders[shader].GetUniform("material_ambient"), ref mesh.Material.AmbientColor);
                 }
-                if (Shaders[ActiveShader].GetUniform("material_diffuse") != -1)
+                if (Shaders[shader].GetUniform("material_diffuse") != -1)
                 {
-                    GL.Uniform3(Shaders[ActiveShader].GetUniform("material_diffuse"), ref mesh.Material.DiffuseColor);
+                    GL.Uniform3(Shaders[shader].GetUniform("material_diffuse"), ref mesh.Material.DiffuseColor);
                 }
-                if (Shaders[ActiveShader].GetUniform("material_specExponent") != -1)
+                if (Shaders[shader].GetUniform("material_specExponent") != -1)
                 {
-                    GL.Uniform1(Shaders[ActiveShader].GetUniform("material_specExponent"), mesh.Material.SpecularExponent);
+                    GL.Uniform1(Shaders[shader].GetUniform("material_specExponent"), mesh.Material.SpecularExponent);
                 }
-                if (Shaders[ActiveShader].GetUniform("material_specular") != -1)
+                if (Shaders[shader].GetUniform("material_specular") != -1)
                 {
-                    GL.Uniform3(Shaders[ActiveShader].GetUniform("material_specular"), ref mesh.Material.SpecularColor);
+                    GL.Uniform3(Shaders[shader].GetUniform("material_specular"), ref mesh.Material.SpecularColor);
                 }
-                if (Shaders[ActiveShader].GetUniform("model") != -1)
+                if (Shaders[shader].GetUniform("model") != -1)
                 {
-                    GL.UniformMatrix4(Shaders[ActiveShader].GetUniform("model"), false, ref mesh.ModelMatrix);
+                    GL.UniformMatrix4(Shaders[shader].GetUniform("model"), false, ref mesh.ModelMatrix);
                 }
-                if (Shaders[ActiveShader].GetUniform("view") != -1)
+                if (Shaders[shader].GetUniform("view") != -1)
                 {
-                    GL.UniformMatrix4(Shaders[ActiveShader].GetUniform("view"), false, ref ViewMatrix);
+                    GL.UniformMatrix4(Shaders[shader].GetUniform("view"), false, ref ViewMatrix);
                 }
                 GL.DrawElements(BeginMode.Triangles, mesh.IndexCount, DrawElementsType.UnsignedInt, indexAt * sizeof(uint));
                 indexAt += mesh.IndexCount;
+                Shaders[shader].DisableVertexAttribArrays();
             }
-            Shaders[ActiveShader].DisableVertexAttribArrays();
             GL.Flush();
             OpenTK.Graphics.GraphicsContext.CurrentContext.SwapBuffers();
         }
