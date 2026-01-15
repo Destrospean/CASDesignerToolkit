@@ -387,7 +387,7 @@ namespace Destrospean.Graphics.OpenGL
             Camera.Position = new Vector3(0, 1, 4);
         }
 
-        public static void LoadMeshes(GameObject gameObject, int presetIndex, int lodIndex, SimBase.LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshes(GameObject gameObject, int presetIndex, int lodIndex, MTST.State materialState, SimBase.LoadTextureDelegate loadTextureCallback)
         {
             if (!PreloadedData.GameObjects.ContainsValue(gameObject) || gameObject.LODs.Count == 0)
             {
@@ -404,7 +404,7 @@ namespace Destrospean.Graphics.OpenGL
                 normals = new List<Vector3>(),
                 vertices = new List<Vector3>();
                 var faces = new List<int[]>();
-                var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.Mesh);
+                var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
                 var textureCoordinates = new List<Vector2>();
                 for (var i = 0; i < indices.Length; i += 3)
                 {
@@ -415,7 +415,7 @@ namespace Destrospean.Graphics.OpenGL
                             indices[i + 2]
                         });
                 }
-                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.Mesh, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.Mesh), meshGroup.UVScales))
+                foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
                 {
                     colors.Add(vertex.Color == null ? Vector3.One : new Vector3(vertex.Color[0], vertex.Color[1], vertex.Color[2]));
                     if (vertex.Normal != null)
@@ -435,7 +435,7 @@ namespace Destrospean.Graphics.OpenGL
                     }
                 }
                 var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
-                var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
+                var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 Material material;
                 if (!Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
                 {

@@ -42,7 +42,7 @@ namespace Destrospean.zoeoeBorrowed
             {
                 get
                 {
-                    return (Mesh.Flags & MeshFlags.DropShadow) != 0;
+                    return (MeshGroup.Flags & MeshFlags.DropShadow) != 0;
                 }
             }
 
@@ -50,19 +50,19 @@ namespace Destrospean.zoeoeBorrowed
             {
                 get
                 {
-                    return (Mesh.Flags & MeshFlags.ShadowCaster) != 0;
+                    return (MeshGroup.Flags & MeshFlags.ShadowCaster) != 0;
                 }
             }
 
             public MTST MaterialSet;
 
-            public MLOD.Mesh Mesh;
+            public MLOD.Mesh MeshGroup;
 
             public int PrimitiveCount
             {
                 get
                 {
-                    return Mesh.PrimitiveCount;
+                    return MeshGroup.PrimitiveCount;
                 }
             }
 
@@ -76,7 +76,7 @@ namespace Destrospean.zoeoeBorrowed
             {
                 get
                 {
-                    return Mesh.VertexCount;
+                    return MeshGroup.VertexCount;
                 }
             }
 
@@ -87,7 +87,7 @@ namespace Destrospean.zoeoeBorrowed
                 DirectMATD = directMATD;
                 IndexBuffer = indexBuffer;
                 MaterialSet = null;
-                Mesh = mesh;
+                MeshGroup = mesh;
                 SkinController = skinController;
                 UVScales = uvScales;
                 VertexBuffer = vertexBuffer;
@@ -99,7 +99,7 @@ namespace Destrospean.zoeoeBorrowed
                 DirectMATD = null;
                 IndexBuffer = indexBuffer;
                 MaterialSet = materialSet;
-                Mesh = mesh;
+                MeshGroup = mesh;
                 SkinController = skinController;
                 UVScales = uvScales;
                 VertexBuffer = vertexBuffer;
