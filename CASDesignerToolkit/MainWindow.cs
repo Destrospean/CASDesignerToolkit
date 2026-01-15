@@ -45,13 +45,10 @@ public partial class MainWindow : RendererMainWindow
                 TreeModel model;
                 if (ResourceTreeView.Selection.GetSelected(out model, out iter))
                 {
-                    var key = ((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey();
-                    switch ((string)model.GetValue(iter, 0))
+                    if ((string)model.GetValue(iter, 0) == "OBJD")
                     {
-                        case "OBJD":
-                            GLWidget.Show();
-                            GlobalState.LoadMeshes(PreloadedData.GameObjects[key], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
-                            break;
+                        GLWidget.Show();
+                        GlobalState.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
                     }
                 }
             }
@@ -577,11 +574,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
             }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) =>
-                {
-                    Sim.PreloadedLODsMorphed.Clear();
-                    NextState = NextStateOptions.UpdateModels;
-                };
+            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in gameObject.LODs)
             {
