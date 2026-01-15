@@ -396,7 +396,7 @@ namespace Destrospean.Graphics.OpenGL
             var lodId = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
             foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
             {
-                if (meshGroup.HasFlag(MeshFlags.DropShadow) || meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
+                if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
                 {
                     continue;
                 }
@@ -471,6 +471,10 @@ namespace Destrospean.Graphics.OpenGL
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };
                     Materials.Add(matd.MaterialNameHash.ToString(), material);
+                }
+                if (meshGroup.HasFlag(MeshFlags.DropShadow))
+                {
+                    continue;
                 }
                 var currentPreset = gameObject.AllPresets[presetIndex];
                 Meshes.Add(new Volume
