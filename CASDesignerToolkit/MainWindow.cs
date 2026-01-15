@@ -43,13 +43,9 @@ public partial class MainWindow : RendererMainWindow
                 Sim.LoadGEOMs(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                 TreeIter iter;
                 TreeModel model;
-                if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+                if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "OBJD")
                 {
-                    if ((string)model.GetValue(iter, 0) == "OBJD")
-                    {
-                        GLWidget.Show();
-                        GlobalState.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
-                    }
+                    GlobalState.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
                 }
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
