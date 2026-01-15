@@ -118,7 +118,7 @@ namespace Destrospean.zoeoeBorrowed
                 var vertexFormat = outerResource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + publicChunkCount].RCOLBlock as VRTF;
                 var materialIndexBlock = outerResource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + publicChunkCount].RCOLBlock;
                 var mtst = materialIndexBlock as MTST;
-                var matd = mtst == null ? materialIndexBlock as MATD : outerResource.ChunkEntries[mtst.Entries[0].Index.TGIBlockIndex + publicChunkCount].RCOLBlock as MATD;
+                var matd = mtst == null ? materialIndexBlock as MATD : outerResource.ChunkEntries[mtst.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + publicChunkCount].RCOLBlock as MATD;
                 float[] uvScales =
                     {   
                         -1,

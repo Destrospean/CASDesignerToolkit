@@ -434,31 +434,26 @@ namespace Destrospean.Graphics.OpenGL
                         vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
                     }
                 }
+                var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
+                var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 Material material;
-                if (!GlobalState.Materials.TryGetValue(gameObject.LODs[lodId].MLODResourceKey, out material))
+                if (!Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
                 {
                     var materialColors = new Dictionary<FieldType, Vector3>();
                     var materialMaps = new Dictionary<FieldType, string>();
-                    try
+                    foreach (var element in matd.Mtnf.SData)
                     {
-                        var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
-                        foreach (var element in (mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries[0].Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD ?? meshGroup.DirectMATD).Mtnf.SData)
+                        var elementFloat3 = element as ElementFloat3;
+                        if (elementFloat3 != null)
                         {
-                            var elementFloat3 = element as ElementFloat3;
-                            if (elementFloat3 != null)
-                            {
-                                materialColors[element.Field] = new Vector3(elementFloat3.Data0, elementFloat3.Data1, elementFloat3.Data2);
-                                continue;
-                            }
-                            var elementTextureRef = element as ElementTextureRef;
-                            if (elementTextureRef != null)
-                            {
-                                materialMaps[element.Field] = mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey();
-                            }
+                            materialColors[element.Field] = new Vector3(elementFloat3.Data0, elementFloat3.Data1, elementFloat3.Data2);
+                            continue;
                         }
-                    }
-                    catch
-                    {
+                        var elementTextureRef = element as ElementTextureRef;
+                        if (elementTextureRef != null)
+                        {
+                            materialMaps[element.Field] = mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey();
+                        }
                     }
                     Vector3 color;
                     string map;
@@ -471,22 +466,22 @@ namespace Destrospean.Graphics.OpenGL
                             DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
                             DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
                             NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
+                            Shader = meshGroup.IsDropShadow || matd.IsVideoSurface ? "textured" : "",
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };
-                    GlobalState.Materials.Add(gameObject.LODs[lodId].MLODResourceKey, material);
+                    Materials.Add(matd.MaterialNameHash.ToString(), material);
                 }
                 var currentPreset = gameObject.AllPresets[presetIndex];
-                GlobalState.Meshes.Add(new Volume
+                Meshes.Add(new Volume
                     {
-                        AdditionalData = meshGroup,
                         ColorData = colors.ToArray(),
                         Faces = faces,
                         Material = material,
                         Normals = normals.ToArray(),
                         TextureCoordinates = textureCoordinates.ToArray(),
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        MainTextureID = meshGroup.IsDropShadow ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(gameObject.LODs[lodId].MLODResourceKey, currentPreset.Texture),
+                        MainTextureID = Convert.ToUInt32(material.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(matd.MaterialNameHash.ToString(), currentPreset.Texture),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
                         Vertices = vertices.ToArray()
                     });
@@ -534,11 +529,7 @@ namespace Destrospean.Graphics.OpenGL
             var indexAt = 0;
             foreach (var mesh in Meshes)
             {
-                var shader = ActiveShader;
-                if (mesh.AdditionalData != null && ((zoeoeBorrowed.MeshUtils.MeshGroupData)mesh.AdditionalData).IsDropShadow)
-                {
-                    shader = "textured";
-                }
+                var shader = mesh.Material.Shader == "" ? ActiveShader : mesh.Material.Shader;
                 GL.UseProgram(Shaders[shader].ProgramID);
                 Shaders[shader].EnableVertexAttribArrays();
                 GL.BindTexture(TextureTarget.Texture2D, mesh.MainTextureID);
