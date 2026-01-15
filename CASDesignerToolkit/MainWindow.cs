@@ -670,7 +670,7 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                //gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
                         }
@@ -701,7 +701,7 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                //gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
                         }
@@ -715,7 +715,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
                         selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        //gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                        gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
@@ -728,7 +728,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
                         selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        //gameObject.DeleteMeshGroup(lodKvp.Key, selectedGEOMIndex, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                        gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
@@ -753,7 +753,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             try
                             {
-                                //gameObject.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                gameObject.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                             }
                             catch (Exception ex)
                             {
@@ -875,13 +875,21 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void RefreshLODNotebook(CASPart casPart, int lodIndex, int geomIndex)
+    void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)
     {
         foreach (var child in ResourcePropertyNotebook.Children)
         {
             ResourcePropertyNotebook.Remove(child);
         }
-        BuildLODNotebook(casPart, lodIndex, geomIndex);
+        var casPart = castableObject as CASPart;
+        if (casPart == null)
+        {
+            BuildLODNotebook((GameObject)castableObject, lodIndex, groupIndex);
+        }
+        else
+        {
+            BuildLODNotebook(casPart, lodIndex, groupIndex);
+        }
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
     }
 
