@@ -387,7 +387,7 @@ namespace Destrospean.Graphics.OpenGL
             Camera.Position = new Vector3(0, 1, 4);
         }
 
-        public static void LoadMeshes(GameObject gameObject, int presetIndex, int lodIndex, MTST.State materialState, SimBase.LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshes(GameObject gameObject, int presetIndex, int lodIndex, uint materialState, SimBase.LoadTextureDelegate loadTextureCallback)
         {
             if (!PreloadedData.GameObjects.ContainsValue(gameObject) || gameObject.LODs.Count == 0)
             {
@@ -435,7 +435,7 @@ namespace Destrospean.Graphics.OpenGL
                     }
                 }
                 var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
-                var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
+                var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 Material material;
                 if (!Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
                 {

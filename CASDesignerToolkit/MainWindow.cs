@@ -50,7 +50,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         case "OBJD":
                             GLWidget.Show();
-                            GlobalState.LoadMeshes(PreloadedData.GameObjects[key], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, MTST.State.Default, GlobalState.LoadTexture);
+                            GlobalState.LoadMeshes(PreloadedData.GameObjects[key], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
                             break;
                     }
                 }
