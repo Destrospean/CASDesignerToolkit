@@ -595,10 +595,10 @@ public partial class MainWindow : RendererMainWindow
                     {
                         Sensitive = lodKvp.Value.MeshGroups.Count > 1
                     },
-                exportGEOMAction = new Gtk.Action("ExportGEOMAction", "Export GEOM", null, Stock.SaveAs),
+                exportMODLAction = new Gtk.Action("ExportMODLAction", "Export MODL", null, Stock.SaveAs),
                 exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
                 exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
-                importGEOMAction = new Gtk.Action("ImportGEOMAction", "Import GEOM", null, Stock.Directory),
+                importMODLAction = new Gtk.Action("ImportMODLAction", "Import MODL", null, Stock.Directory),
                 importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
                 importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
                 actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
@@ -606,34 +606,34 @@ public partial class MainWindow : RendererMainWindow
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
                 actionGroup.Add(addMeshGroupAction);
                 actionGroup.Add(deleteMeshGroupAction);
-                actionGroup.Add(exportGEOMAction);
+                actionGroup.Add(exportMODLAction);
                 actionGroup.Add(exportOBJAction);
                 actionGroup.Add(exportWSOAction);
-                actionGroup.Add(importGEOMAction);
+                actionGroup.Add(importMODLAction);
                 actionGroup.Add(importOBJAction);
                 actionGroup.Add(importWSOAction);
                 var uiManager = new UIManager();
                 uiManager.InsertActionGroup(actionGroup, 0);
                 uiManager.AddUiFromString(@"
                     <ui>
-                        <menubar name='GEOMPropertiesMenuBar'>
+                        <menubar name='MODLPropertiesMenuBar'>
                             <menu name='OptionsAction' action='OptionsAction'>
                                 <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
                                 <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                                 <menu name='ImportAction' action='ImportAction'>
-                                    <menuitem name='ImportGEOMAction' action='ImportGEOMAction'/>
+                                    <menuitem name='ImportMODLAction' action='ImportMODLAction'/>
                                     <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
                                     <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
                                 </menu>                            
                                 <menu name='ExportAction' action='ExportAction'>
-                                    <menuitem name='ExportGEOMAction' action='ExportGEOMAction'/>
+                                    <menuitem name='ExportMODLAction' action='ExportMODLAction'/>
                                     <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
                                     <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
                                 </menu>
                             </menu>
                         </menubar>
                     </ui>");
-                var menuBar = (MenuBar)uiManager.GetWidget("/GEOMPropertiesMenuBar");
+                var menuBar = (MenuBar)uiManager.GetWidget("/MODLPropertiesMenuBar");
                 menuBar.PackDirection = PackDirection.Rtl;
                 Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
                     {
@@ -665,7 +665,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             switch (meshFileType)
                             {
-                                case MeshFileType.GEOM:
+                                case MeshFileType.MODL:
                                 case MeshFileType.OBJ:
                                 case MeshFileType.WSO:
                                     break;
@@ -675,9 +675,9 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.GEOM ? "The Sims 3 GEOM Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = meshFileType == MeshFileType.MODL ? "The Sims 3 MODL Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
                                 };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.GEOM ? "*.simgeom" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                            fileFilter.AddPattern(meshFileType == MeshFileType.MODL ? "*.model" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
@@ -748,17 +748,17 @@ public partial class MainWindow : RendererMainWindow
                         BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
-                exportGEOMAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.GEOM);
+                exportMODLAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MODL);
                 exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
                 exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
-                importGEOMAction.Activated += (sender, e) =>
+                importMODLAction.Activated += (sender, e) =>
                     {
-                        var fileChooserDialog = new FileChooserDialog("Import GEOM", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                        var fileChooserDialog = new FileChooserDialog("Import MODL", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter
                             {
-                                Name = "The Sims 3 GEOM Resource"
+                                Name = "The Sims 3 MODL Resource"
                             };
-                        fileFilter.AddPattern("*.simgeom");
+                        fileFilter.AddPattern("*.model");
                         fileChooserDialog.AddFilter(fileFilter);
                         if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                         {
