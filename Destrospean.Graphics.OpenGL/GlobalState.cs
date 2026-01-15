@@ -485,7 +485,7 @@ namespace Destrospean.Graphics.OpenGL
                         Normals = normals.ToArray(),
                         TextureCoordinates = textureCoordinates.ToArray(),
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        MainTextureID = Convert.ToUInt32(material.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(matd.MaterialNameHash.ToString(), currentPreset.Texture),
+                        MainTextureID = material.DiffuseMap.Length > 0 && Convert.ToUInt32(material.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(matd.MaterialNameHash.ToString(), currentPreset.Texture),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
                         Vertices = vertices.ToArray()
                     });

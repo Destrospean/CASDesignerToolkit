@@ -1,12 +1,15 @@
 ﻿using Destrospean.S3PIExtensions;
 using Gdk;
 using Gtk;
+using Destrospean.Common.Abstractions;
 
 namespace Destrospean.DestrospeanCASPEditor.Widgets
 {
     public class ImageResourceComboBox : ComboBox
     {
         protected readonly System.Collections.Generic.List<ImageResourceComboBoxEntry> mEntries;
+
+        protected static readonly System.Collections.Generic.Dictionary<string, Pixbuf> mPresetTextureSmallPixbufs = new System.Collections.Generic.Dictionary<string, Pixbuf>();
 
         public int EntryCount
         {
@@ -46,11 +49,27 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             mEntries = entries;
         }
 
-        public static ImageResourceComboBox CreateInstance(s3pi.Interfaces.IPackage package, string currentValue, Gtk.Image imageWidget)
+        public static ImageResourceComboBox CreateInstance(s3pi.Interfaces.IPackage package, string currentValue, Preset preset, Gtk.Image imageWidget, bool excludeTXTCs = false)
         {
             try
             {
-                var entries = package.GetResourceList.ConvertAll(ResourceUtils.ReverseEvaluateResourceKey).FindAll(ImageUtils.PreloadedImagePixbufs.ContainsKey).ConvertAll(x => new ImageResourceComboBoxEntry(ImageUtils.PreloadedImagePixbufs[x][1], x));
+                var entries = package.FindAll(x => "_IMGTXTC".Substring(0, preset is CASPartPreset || excludeTXTCs ? 4 : 8).Contains(x.GetResourceTypeTag())).ConvertAll(x =>
+                    {
+                        var key = x.ReverseEvaluateResourceKey();
+                        switch (x.GetResourceTypeTag())
+                        {
+                            case "_IMG":
+                                return new ImageResourceComboBoxEntry(ImageUtils.PreloadedImagePixbufs[key][1], key);
+                            default:
+                                Pixbuf pixbuf;
+                                if (!mPresetTextureSmallPixbufs.TryGetValue(key, out pixbuf))
+                                {
+                                    pixbuf = preset.Texture.ToPixbuf().ScaleSimple(WidgetUtils.SmallImageSize, WidgetUtils.SmallImageSize, InterpType.Bilinear);
+                                    mPresetTextureSmallPixbufs.Add(key, pixbuf);
+                                }
+                                return new ImageResourceComboBoxEntry(pixbuf, key);
+                        }
+                    });
                 var listStore = new ListStore(typeof(Pixbuf), typeof(string));
                 entries.ForEach(x => listStore.AppendValues(x.Image, x.Label));
                 var currentValueKey = currentValue;
@@ -160,6 +179,11 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 Common.ProgramUtils.WriteError(ex);
                 throw;
             }
+        }
+
+        public static void DeleteSmallTexturePixbufs()
+        {
+            mPresetTextureSmallPixbufs.Clear();
         }
     }
 }

@@ -163,7 +163,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             valueWidget = entry;
                             break;
                         case "texture":
-                            var comboBox = ImageResourceComboBox.CreateInstance(complate.ParentPackage, value, Image);
+                            var comboBox = ImageResourceComboBox.CreateInstance(complate.ParentPackage, value, complate as Preset ?? ((Pattern)complate).Preset, Image, true);
                             var comboBoxLastActive = comboBox.Active;
                             comboBox.Changed += (sender, e) =>
                                 {

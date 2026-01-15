@@ -543,7 +543,7 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label("LOD " + lodKvp.Key.ToString()));
-                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, Image));
+                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, casPart.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
                 if (lodKvp.Value == new List<List<GEOM>>(casPart.LODs.Values)[startLODPageIndex])
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
@@ -775,7 +775,7 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, Image));
+                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
                 if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.MeshUtils.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
@@ -905,6 +905,7 @@ public partial class MainWindow : RendererMainWindow
         ImageUtils.PreloadedGameImages.Clear();
         ImageUtils.PreloadedImagePixbufs.Clear();
         ImageUtils.PreloadedImages.Clear();
+        ImageResourceComboBox.DeleteSmallTexturePixbufs();
     }
 
     public void RefreshWidgets(bool clearTemporaryData = true)

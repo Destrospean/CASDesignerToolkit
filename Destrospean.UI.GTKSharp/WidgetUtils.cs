@@ -33,7 +33,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Gtk.Image imageWidget, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     };
                 scrolledWindow.AddWithViewport(table);
                 notebook.AppendPage(scrolledWindow, new Label("GEOM " + (notebook.NPages + pageIndexOffset).ToString()));
-                table.AddProperties(package, geometryResource, scrolledWindow, imageWidget);
+                table.AddProperties(package, geometryResource, preset, scrolledWindow, imageWidget);
                 table.SizeAllocated += (o, args) =>
                     {
                         var maxHeight = 0;
@@ -66,7 +66,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, Gtk.Image imageWidget, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     };
                 scrolledWindow.AddWithViewport(table);
                 notebook.AppendPage(scrolledWindow, new Label("MLOD " + (notebook.NPages + pageIndexOffset).ToString()));
-                table.AddProperties(package, lodData, meshGroupData, materialState, scrolledWindow, imageWidget);
+                table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
                 table.SizeAllocated += (o, args) =>
                     {
                         var maxHeight = 0;
@@ -99,7 +99,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, GEOM geometryResource, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
+        public static void AddProperties(this Table table, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
         {
             try
             {
@@ -267,7 +267,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     else if (valueType == 4)
                     {
                         alignment.Xscale = 1;
-                        var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)element[0]].Type, geometryResource.TGIList[(uint)element[0]].Group, geometryResource.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey(), imageWidget);
+                        var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)element[0]].Type, geometryResource.TGIList[(uint)element[0]].Group, geometryResource.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey(), preset, imageWidget);
                         var comboBoxLastActive = comboBox.Active;
                         comboBox.Changed += (sender, e) =>
                             {
@@ -324,7 +324,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             {
                                 table.Remove(child);
                             }
-                            table.AddProperties(package, geometryResource, scrolledWindow, imageWidget);
+                            table.AddProperties(package, geometryResource, preset, scrolledWindow, imageWidget);
                             table.ShowAll();
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         };
@@ -386,7 +386,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             geometryResource.Shader.Data = elementList.ToArray();
                             geometryResource.Shader.Fields = fieldList.ToArray();
                             geometryResource.Shader.FieldCount++;
-                            table.AddProperties(package, geometryResource, scrolledWindow, imageWidget);
+                            table.AddProperties(package, geometryResource, preset, scrolledWindow, imageWidget);
                             table.ShowAll();
                             scrolledWindow.Vadjustment.Value = scrolledWindow.Vadjustment.Upper;
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
@@ -403,7 +403,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
+        public static void AddProperties(this Table table, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
         {
             try
             {
@@ -571,7 +571,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     if (elementTextureRef != null)
                     {
                         alignment.Xscale = 1;
-                        var comboBox = ImageResourceComboBox.CreateInstance(package, mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey(), imageWidget);
+                        var comboBox = ImageResourceComboBox.CreateInstance(package, mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey(), preset, imageWidget);
                         var comboBoxLastActive = comboBox.Active;
                         comboBox.Changed += (sender, e) =>
                             {
@@ -620,7 +620,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             {
                                 table.Remove(child);
                             }
-                            table.AddProperties(package, lodData, meshGroupData, materialState, scrolledWindow, imageWidget);
+                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
                             table.ShowAll();
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         };
@@ -658,7 +658,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             var element = addMaterialPropertyDialog.DataType == typeof(ElementTextureRef) ? new ElementTextureRef(0, null) : (ShaderData)Activator.CreateInstance(addMaterialPropertyDialog.DataType, 0, null);
                             element.Field = (FieldType)addMaterialPropertyDialog.Field;
                             matd.Mtnf.SData.Add(element);
-                            table.AddProperties(package, lodData, meshGroupData, materialState, scrolledWindow, imageWidget);
+                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
                             table.ShowAll();
                             scrolledWindow.Vadjustment.Value = scrolledWindow.Vadjustment.Upper;
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
