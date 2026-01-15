@@ -504,6 +504,7 @@
         Rug = 712161697,
         SculptureIce = 3856237831,
         SculptureOpaque = 2631268511,
+        ShadowMap = 570302589,
         ShadowMapMerged = 3801188249,
         SimAlphaBlended = 3904172532,
         SimAlphaTested = 3691477573,
