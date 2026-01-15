@@ -396,7 +396,7 @@ namespace Destrospean.Graphics.OpenGL
             var lodId = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
             foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
             {
-                if (meshGroup.IsDropShadow || meshGroup.VertexFormat == null && meshGroup.IsShadowCaster)
+                if (meshGroup.HasFlag(MeshFlags.DropShadow) || meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
                 {
                     continue;
                 }
@@ -466,7 +466,7 @@ namespace Destrospean.Graphics.OpenGL
                             DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
                             DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
                             NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
-                            Shader = meshGroup.IsDropShadow || matd.IsVideoSurface ? "textured" : "",
+                            Shader = meshGroup.HasFlag(MeshFlags.DropShadow) || matd.IsVideoSurface ? "textured" : "",
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };

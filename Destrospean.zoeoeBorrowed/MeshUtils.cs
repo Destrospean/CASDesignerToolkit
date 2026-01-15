@@ -6,7 +6,7 @@ using s3pi.Interfaces;
 
 namespace Destrospean.zoeoeBorrowed
 {
-    public class MeshUtils
+    public static class MeshUtils
     {
         public struct LODData
         {
@@ -37,22 +37,6 @@ namespace Destrospean.zoeoeBorrowed
             public MATD DirectMATD;
 
             public IBUF IndexBuffer;
-
-            public bool IsDropShadow
-            {
-                get
-                {
-                    return (MeshGroup.Flags & MeshFlags.DropShadow) != 0;
-                }
-            }
-
-            public bool IsShadowCaster
-            {
-                get
-                {
-                    return (MeshGroup.Flags & MeshFlags.ShadowCaster) != 0;
-                }
-            }
 
             public MTST MaterialSet;
 
@@ -104,6 +88,11 @@ namespace Destrospean.zoeoeBorrowed
                 UVScales = uvScales;
                 VertexBuffer = vertexBuffer;
                 VertexFormat = vertexFormat;
+            }
+
+            public bool HasFlag(MeshFlags flag)
+            {
+                return (MeshGroup.Flags & flag) != 0;
             }
         }
 
