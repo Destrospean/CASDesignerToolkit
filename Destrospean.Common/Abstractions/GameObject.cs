@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.S3PIExtensions;
 using meshExpImp.ModelBlocks;
@@ -133,110 +134,78 @@ namespace Destrospean.Common.Abstractions
 
         public void ExportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            /*
-            var geom = LODs[lod][groupIndex];
-            byte[] bblnIndices =
-                {
-                    CASPartResource.BlendInfoFatIndex,
-                    CASPartResource.BlendInfoFitIndex,
-                    CASPartResource.BlendInfoThinIndex,
-                    CASPartResource.BlendInfoSpecialIndex
-                };
-            var morphs = new GEOM[bblnIndices.Length];
-            for (var i = 0; i < bblnIndices.Length; i++)
-            {
-                BBLN bbln;
-                EvaluatedResourceKey evaluated;
-                try
-                {
-                    evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey());
-                    bbln = new BBLN(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                }
-                catch (ResourceIndexEntryNotFoundException)
-                {
-                    morphs[i] = null;
-                    continue;
-                }
-                BGEO bgeo = null;
-                try
-                {
-                    evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.BGEOTGI.Type, bbln.BGEOTGI.Group, bbln.BGEOTGI.Instance).ReverseEvaluateResourceKey());
-                    bgeo = new BGEO(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                }
-                catch (ResourceIndexEntryNotFoundException)
-                {
-                }
-                foreach (var entry in bbln.Entries)
-                {
-                    foreach (var geomMorph in entry.GEOMMorphs)
-                    {
-                        if (bgeo != null)
-                        {
-                            morphs[i] = new GEOM(geom, bgeo, bgeo.GetSection1EntryIndex(AdjustedSpecies, (AgeGender)(uint)CASPartResource.AgeGender.Age, (AgeGender)((uint)CASPartResource.AgeGender.Gender << 12)), lod);
-                        }
-                        else if (bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
-                        {
-                            try
-                            {
-                                evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey());
-                                var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                                foreach (var link in vpxy.GetMeshLinks(lod))
-                                {
-                                    try
-                                    {
-                                        evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
-                                        morphs[i] = new GEOM(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                                    }
-                                    catch (ResourceIndexEntryNotFoundException)
-                                    {
-                                        morphs[i] = null;
-                                    }
-                                }
-                            }
-                            catch (ResourceIndexEntryNotFoundException)
-                            {
-                                morphs[i] = null;
-                            }
-                        }
-                    }
-                }
-            }
+            var meshGroup = LODs[lod].MeshGroups[groupIndex];
             switch (meshFileType)
             {
-                case MeshFileType.GEOM:
-                    if (filename.ToLowerInvariant().EndsWith(".simgeom"))
+                case MeshFileType.MODL:
+                    if (filename.ToLowerInvariant().EndsWith(".model"))
                     {
                         filename.Remove(filename.LastIndexOf('.'));
                     }
-                    using (var fileStream = File.Create(filename + ".simgeom"))
+                    using (var fileStream = File.Create(filename + ".model"))
                     {
-                        geom.Write(new BinaryWriter(fileStream));
-                    }
-                    for (var i = 0; i < Array.FindAll(morphs, x => x.IsValid).Length; i++)
-                    {
-                        if (morphs[i] != null)
-                        {
-                            using (var fileStream = File.Create(filename + "_" + "fat fit thin special".Split(' ')[i] + ".simgeom"))
-                            {
-                                morphs[i].Write(new BinaryWriter(fileStream));
-                            }
-                        }
+                        new BinaryWriter(fileStream).Write(LODs[lod].MLODResource.AsBytes);
                     }
                     break;
                 case MeshFileType.OBJ:
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".obj") ? "" : ".obj")))
                     {
-                        new OBJ(geom, Array.ConvertAll(morphs, x => x.IsValid ? x : null)).Write(new StreamWriter(fileStream));
+                        var groups = new List<OBJ.Group>();
+                        var normals = new List<OBJ.Normal>();
+                        var textureCoordinates = new List<OBJ.UV>();
+                        var vertices = new List<OBJ.Vertex>();
+                        foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat, meshGroup.UVScales))
+                        {
+                            if (vertex.Normal != null)
+                            {
+                                normals.Add(new OBJ.Normal(vertex.Normal));
+                            }
+                            if (vertex.UV != null)
+                            {
+                                foreach (var uvSet in vertex.UV)
+                                {
+                                    textureCoordinates.Add(new OBJ.UV(uvSet));
+                                }
+                            }
+                            if (vertex.Position != null)
+                            {
+                                vertices.Add(new OBJ.Vertex(vertex.Position));
+                            }
+                        }
+                        groups.Add(new OBJ.Group("group_0"));
+                        foreach (var group in groups)
+                        {
+                            var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
+                            for (var i = 0; i < indices.Length; i += 3)
+                            {
+                                group.AddFace(new OBJ.Face(new int[]
+                                    {
+                                        indices[i],
+                                        indices[i + 1],
+                                        indices[i + 2]
+                                    }, 1, OBJ.MeshType.Base));
+                            }
+                        }
+                        var obj = new OBJ
+                            {
+                                GroupArray = groups.ToArray(),
+                                NormalArray = normals.ToArray(),
+                                UVArray = textureCoordinates.ToArray(),
+                                VertexArray = vertices.ToArray()
+                            };
+                        obj.FlipUV(true, false);
+                        obj.Write(new StreamWriter(fileStream));
                     }
                     break;
                 case MeshFileType.WSO:
+                    /*
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".wso") ? "" : ".wso")))
                     {
-                        new WSO(geom, morphs).Write(new BinaryWriter(fileStream));
+                        new WSO(meshGroup, morphs).Write(new BinaryWriter(fileStream));
                     }
+                    */
                     break;
             }
-            */
         }
 
         public void ImportMesh(LODId lod, int groupIndex, string filename, System.Action<CASPart, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
