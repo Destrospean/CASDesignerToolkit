@@ -1025,13 +1025,11 @@ namespace Destrospean.CmarNYCBorrowed
             public void Write(BinaryWriter writer)
             {
                 writer.Write(VertexCount);
-                Console.WriteLine("Test 0");
                 for (var i = 0; i < VertexCount; i++)
                 {
                     Vertices[i].Write(writer);
                 }
                 writer.Write(FaceCount);
-                Console.WriteLine("Test 1");
                 for (var i = 0; i < FaceCount * 3; i++)
                 {
                     FacePoints[i].Write(writer);
