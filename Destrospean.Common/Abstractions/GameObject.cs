@@ -192,13 +192,14 @@ namespace Destrospean.Common.Abstractions
                             groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                         }
                         var wso = new WSO(LODs[lod].MLODResource, CurrentRig, groups.ToArray());
-                        if (meshFileType == MeshFileType.WSO)
+                        switch (meshFileType)
                         {
-                            wso.Write(new BinaryWriter(fileStream));
-                        }
-                        else
-                        {
-                            new OBJ(wso).Write(new StreamWriter(fileStream));
+                            case MeshFileType.OBJ:
+                                new OBJ(wso).Write(new StreamWriter(fileStream));
+                                break;
+                            case MeshFileType.WSO:
+                                wso.Write(new BinaryWriter(fileStream));
+                                break;
                         }
                     }
                     break;
