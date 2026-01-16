@@ -173,13 +173,13 @@ namespace Destrospean.Common.Abstractions
                                 {
                                     extendedVertex.SetNormals(vertex.Normal);
                                 }
-                                if (vertex.UV != null)
-                                {
-                                    extendedVertex.SetUVs(vertex.UV[0]);
-                                }
                                 if (vertex.Position != null)
                                 {
                                     extendedVertex.SetPosition(vertex.Position);
+                                }
+                                if (vertex.UV != null)
+                                {
+                                    extendedVertex.SetUVs(vertex.UV[0]);
                                 }
                                 extendedVertices.Add(extendedVertex);
                             }
