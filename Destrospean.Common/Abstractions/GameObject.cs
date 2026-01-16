@@ -137,12 +137,13 @@ namespace Destrospean.Common.Abstractions
             var extension = "";
             switch (meshFileType)
             {
-                case MeshFileType.MODL:
-                    if (filename.ToLowerInvariant().EndsWith(".model"))
+                case MeshFileType.MLOD:
+                    extension = ".lod";
+                    if (filename.ToLowerInvariant().EndsWith(extension))
                     {
                         filename.Remove(filename.LastIndexOf('.'));
                     }
-                    using (var fileStream = File.Create(filename + ".model"))
+                    using (var fileStream = File.Create(filename + extension))
                     {
                         new BinaryWriter(fileStream).Write(LODs[lod].MLODResource.AsBytes);
                     }

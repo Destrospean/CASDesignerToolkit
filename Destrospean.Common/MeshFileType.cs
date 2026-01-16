@@ -3,7 +3,7 @@
     public enum MeshFileType
     {
         GEOM,
-        MODL,
+        MLOD,
         OBJ,
         WSO
     }
