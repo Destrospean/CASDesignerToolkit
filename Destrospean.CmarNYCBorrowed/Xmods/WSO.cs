@@ -1367,16 +1367,17 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public WSO(s3pi.GenericRCOLResource.GenericRCOLResource mlodResource, Rig rig, MeshGroup[] meshGroups)
+        public WSO(s3pi.Interfaces.IResource mlodResource, Rig rig, MeshGroup[] meshGroups)
         {
             mVersion = 4;
             mMeshCount = meshGroups.Length;
             mMeshes = meshGroups;
-            var mlod = mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock as meshExpImp.ModelBlocks.MLOD;
+            var mlodResourceCast = (s3pi.GenericRCOLResource.GenericRCOLResource)mlodResource;
+            var mlod = mlodResourceCast.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock as meshExpImp.ModelBlocks.MLOD;
             var bones = new List<Bone>();
             foreach (var mesh in mlod.Meshes)
             {
-                var skinController = mlodResource.ChunkEntries[mesh.SkinControllerIndex.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as meshExpImp.ModelBlocks.SKIN;
+                var skinController = mlodResourceCast.ChunkEntries[mesh.SkinControllerIndex.TGIBlockIndex + mlodResourceCast.PublicChunks].RCOLBlock as meshExpImp.ModelBlocks.SKIN;
                 if (skinController != null && rig != null)
                 {
                     foreach (var bone in skinController.Bones)
