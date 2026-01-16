@@ -191,7 +191,7 @@ namespace Destrospean.Common.Abstractions
                             }
                             groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                         }
-                        var wso = new WSO((GenericRCOLResource)LODs[lod].MLODResource, CurrentRig, groups.ToArray());
+                        var wso = new WSO(LODs[lod].MLODResource, CurrentRig, groups.ToArray());
                         if (meshFileType == MeshFileType.WSO)
                         {
                             wso.Write(new BinaryWriter(fileStream));
@@ -409,13 +409,16 @@ namespace Destrospean.Common.Abstractions
             foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
             {
                 var entry01 = entry as s3pi.GenericRCOLResource.VPXY.Entry01;
-                if (entry01 != null && entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("_RIG"))
+                if (entry01 == null)
                 {
-                    Console.WriteLine("hello");
+                    continue;
+                }
+                if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("_RIG"))
+                {
                     var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
                     mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
                 }
-                if (entry01 != null && entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("MODL"))
+                else if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("MODL"))
                 {
                     var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);
                     var modlKey = modlResourceIndexEntry.ReverseEvaluateResourceKey();
@@ -428,19 +431,18 @@ namespace Destrospean.Common.Abstractions
                     LODs.Clear();
                     foreach (var lodEntry in ((MODL)modlResource.ChunkEntries[0].RCOLBlock).Entries)
                     {
-                        //outer resource that MLOD belongs to & public chunk count for it
                         GenericRCOLResource resourceWithMLOD = null;
                         MLOD mlodToLoad = null;
-                        var key = "";
-                        if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public) //MLOD is internal, assuming for low LOD. Note: public means don't use public chunk count
+                        var mlodKey = "";
+                        if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
                         {
                             resourceWithMLOD = modlResource;
                             mlodToLoad = (MLOD)resourceWithMLOD.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock;
                         }
-                        else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed) //MLOD in external resource, assuming for shadows and high LOD
+                        else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
                         {
                             var mlodResourceIndexEntry = ParentPackage.GetResourceIndexEntry(modlResource.Resources[lodEntry.ModelLodIndex.TGIBlockIndex]);
-                            var mlodKey = key = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
+                            mlodKey = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
                             GenericRCOLResource mlodResource;
                             if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
                             {
@@ -451,13 +453,13 @@ namespace Destrospean.Common.Abstractions
                             {
                                 resourceWithMLOD = new GenericRCOLResource(0, mlodStream);
                             }
-                            mlodToLoad = (MLOD)resourceWithMLOD.ChunkEntries[0].RCOLBlock; //internal MLOD is chunk 0 of external MLOD resource
+                            mlodToLoad = (MLOD)resourceWithMLOD.ChunkEntries[0].RCOLBlock;
                         }
                         else
                         {
-                            return;
+                            break;
                         }
-                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(key, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlodToLoad);
+                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(mlodKey, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlodToLoad);
                         lodData.ID = lodEntry.Id;
                         LODs.Add(lodData.ID, lodData);
                     }
