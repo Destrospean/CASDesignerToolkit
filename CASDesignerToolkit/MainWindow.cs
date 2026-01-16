@@ -530,7 +530,7 @@ public partial class MainWindow : RendererMainWindow
                 meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
                 meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                var iconSize = WidgetUtils.SmallImageSize << 1;
+                var iconSize = (int)(32 * WidgetUtils.Scale);
                 meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize)), false, true, 4);
                 meshGroupPageButtonHBox.PackStart(fatnessHScale, true, true, 4);
                 meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize)), false, true, 4);

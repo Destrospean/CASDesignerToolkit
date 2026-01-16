@@ -29,9 +29,11 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             get
             {
-                return (int)(16 * Scale);
+                return (int)(SmallImageSizeBase * Scale);
             }
         }
+
+        public static int SmallImageSizeBase = 16;
 
         public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
