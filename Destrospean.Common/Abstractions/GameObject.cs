@@ -134,7 +134,6 @@ namespace Destrospean.Common.Abstractions
 
         public void ExportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var meshGroup = LODs[lod].MeshGroups[groupIndex];
             switch (meshFileType)
             {
                 case MeshFileType.MODL:
@@ -154,36 +153,52 @@ namespace Destrospean.Common.Abstractions
                         var normals = new List<OBJ.Normal>();
                         var textureCoordinates = new List<OBJ.UV>();
                         var vertices = new List<OBJ.Vertex>();
-                        foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat, meshGroup.UVScales))
+                        foreach (var meshGroup in LODs[lod].MeshGroups)
                         {
-                            if (vertex.Normal != null)
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
                             {
-                                normals.Add(new OBJ.Normal(vertex.Normal));
+                                continue;
                             }
-                            if (vertex.UV != null)
+                            foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
                             {
-                                foreach (var uvSet in vertex.UV)
+                                if (vertex.Normal != null)
                                 {
-                                    textureCoordinates.Add(new OBJ.UV(uvSet));
+                                    normals.Add(new OBJ.Normal(vertex.Normal));
+                                }
+                                if (vertex.UV != null)
+                                {
+                                    foreach (var uvSet in vertex.UV)
+                                    {
+                                        textureCoordinates.Add(new OBJ.UV(uvSet));
+                                    }
+                                }
+                                if (vertex.Position != null)
+                                {
+                                    vertices.Add(new OBJ.Vertex(vertex.Position));
                                 }
                             }
-                            if (vertex.Position != null)
-                            {
-                                vertices.Add(new OBJ.Vertex(vertex.Position));
-                            }
-                        }
-                        groups.Add(new OBJ.Group("group_0"));
-                        foreach (var group in groups)
-                        {
+                            groups.Add(new OBJ.Group("group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                             var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
                             for (var i = 0; i < indices.Length; i += 3)
                             {
-                                group.AddFace(new OBJ.Face(new int[]
+                                groups[groups.Count - 1].AddFace(new OBJ.Face
                                     {
-                                        indices[i],
-                                        indices[i + 1],
-                                        indices[i + 2]
-                                    }, 1, OBJ.MeshType.Base));
+                                        Point1 = new int[]
+                                            {
+                                                indices[i] + 1,
+                                                indices[i] + 1,
+                                            },
+                                        Point2 = new int[]
+                                            {
+                                                indices[i + 1] + 1,
+                                                indices[i + 1] + 1,
+                                            },
+                                        Point3 = new int[]
+                                            {
+                                                indices[i + 2] + 1,
+                                                indices[i + 2] + 1,
+                                            }
+                                    });
                             }
                         }
                         var obj = new OBJ
