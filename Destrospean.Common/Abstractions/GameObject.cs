@@ -227,8 +227,8 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, System.Action<GameObject, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var mlodResource = (s3pi.GenericRCOLResource.GenericRCOLResource)LODs[lod].MLODResource;
-            var mlod = mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock as meshExpImp.ModelBlocks.MLOD;
+            var mlodResource = (GenericRCOLResource)LODs[lod].MLODResource;
+            var mlod = (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
                 var wso = new WSO(new BinaryReader(fileStream));
@@ -306,15 +306,15 @@ namespace Destrospean.Common.Abstractions
                         modlResource = modlResources[modlKey];
                     }
                     LODs.Clear();
-                    foreach (var lodEntry in ((MODL)modlResource.ChunkEntries[0].RCOLBlock).Entries)
+                    foreach (var lodEntry in ((MODL)modlResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MODL").RCOLBlock).Entries)
                     {
                         GenericRCOLResource resourceWithMLOD = null;
-                        MLOD mlodToLoad = null;
+                        MLOD mlod = null;
                         var mlodKey = "";
                         if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
                         {
                             resourceWithMLOD = modlResource;
-                            mlodToLoad = (MLOD)resourceWithMLOD.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock;
+                            mlod = (MLOD)resourceWithMLOD.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock;
                         }
                         else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
                         {
@@ -327,13 +327,13 @@ namespace Destrospean.Common.Abstractions
                                 mlodResource = mlodResources[mlodKey];
                             }
                             resourceWithMLOD = mlodResource;
-                            mlodToLoad = (MLOD)resourceWithMLOD.ChunkEntries[0].RCOLBlock;
+                            mlod = (MLOD)resourceWithMLOD.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
                         }
                         else
                         {
                             break;
                         }
-                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(mlodKey, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlodToLoad);
+                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(mlodKey, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlod);
                         lodData.ID = lodEntry.Id;
                         LODs.Add(lodData.ID, lodData);
                     }
