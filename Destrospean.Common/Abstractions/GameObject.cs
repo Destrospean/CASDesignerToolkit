@@ -213,13 +213,13 @@ namespace Destrospean.Common.Abstractions
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".wso") ? "" : ".wso")))
                     {
                         var groups = new List<WSO.MeshGroup>();
-                        var vertices = new List<WSO.VertexExtended>();
                         foreach (var meshGroup in LODs[lod].MeshGroups)
                         {
                             if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
                             {
                                 continue;
                             }
+                            var vertices = new List<WSO.VertexExtended>();
                             foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
                             {
                                 var vertexExtended = new WSO.VertexExtended();
