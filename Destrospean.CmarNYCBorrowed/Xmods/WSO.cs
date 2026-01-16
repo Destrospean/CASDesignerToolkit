@@ -1025,11 +1025,13 @@ namespace Destrospean.CmarNYCBorrowed
             public void Write(BinaryWriter writer)
             {
                 writer.Write(VertexCount);
+                Console.WriteLine("Test 0");
                 for (var i = 0; i < VertexCount; i++)
                 {
                     Vertices[i].Write(writer);
                 }
                 writer.Write(FaceCount);
+                Console.WriteLine("Test 1");
                 for (var i = 0; i < FaceCount * 3; i++)
                 {
                     FacePoints[i].Write(writer);
@@ -1364,6 +1366,32 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 mBones[baseMesh.BoneHashList.Length] = new Bone(1468550073);
             }
+        }
+
+        public WSO(MeshGroup[] meshGroups)
+        {
+            mVersion = 4;
+            mMeshCount = meshGroups.Length;
+            mMeshes = meshGroups;
+            mBoneCount = 0;
+            /*
+            mBoneCount = baseMesh.BoneHashList.Length;
+            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
+            {
+                mBoneCount++;
+            }
+            */
+            mBones = new Bone[mBoneCount];
+            /*
+            for (var i = 0; i < baseMesh.BoneHashList.Length; i++)
+            {
+                mBones[i] = new Bone(baseMesh.BoneHashList[i]);
+            }
+            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
+            {
+                mBones[baseMesh.BoneHashList.Length] = new Bone(1468550073);
+            }
+            */
         }
 
         public WSO(BinaryReader reader)

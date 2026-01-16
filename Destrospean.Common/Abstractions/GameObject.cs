@@ -167,10 +167,7 @@ namespace Destrospean.Common.Abstractions
                                 }
                                 if (vertex.UV != null)
                                 {
-                                    foreach (var uvSet in vertex.UV)
-                                    {
-                                        textureCoordinates.Add(new OBJ.UV(uvSet));
-                                    }
+                                    textureCoordinates.Add(new OBJ.UV(vertex.UV[0]));
                                 }
                                 if (vertex.Position != null)
                                 {
@@ -213,12 +210,43 @@ namespace Destrospean.Common.Abstractions
                     }
                     break;
                 case MeshFileType.WSO:
-                    /*
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".wso") ? "" : ".wso")))
                     {
-                        new WSO(meshGroup, morphs).Write(new BinaryWriter(fileStream));
+                        var groups = new List<WSO.MeshGroup>();
+                        var vertices = new List<WSO.VertexExtended>();
+                        foreach (var meshGroup in LODs[lod].MeshGroups)
+                        {
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
+                            {
+                                continue;
+                            }
+                            foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
+                            {
+                                var vertexExtended = new WSO.VertexExtended();
+                                if (vertex.Normal != null)
+                                {
+                                    vertexExtended.SetNormals(vertex.Normal);
+                                }
+                                if (vertex.UV != null)
+                                {
+                                    vertexExtended.SetUVs(vertex.UV[0]);
+                                }
+                                if (vertex.Position != null)
+                                {
+                                    vertexExtended.SetPosition(vertex.Position);
+                                }
+                                vertices.Add(vertexExtended);
+                            }
+                            var facePoints = new List<WSO.FacePoint>();
+                            var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
+                            for (var i = 0; i < indices.Length; i++)
+                            {
+                                facePoints.Add(new WSO.FacePoint(indices[i], vertices[indices[i]].GetNormals(), vertices[indices[i]].GetUVs(), true));
+                            }
+                            groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, vertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
+                        }
+                        new WSO(groups.ToArray()).Write(new BinaryWriter(fileStream));
                     }
-                    */
                     break;
             }
         }

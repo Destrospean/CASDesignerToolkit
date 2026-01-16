@@ -424,10 +424,7 @@ namespace Destrospean.Graphics.OpenGL
                     }
                     if (vertex.UV != null)
                     {
-                        foreach (var uvSet in vertex.UV)
-                        {
-                            textureCoordinates.Add(new Vector2(uvSet[0], uvSet[1]));
-                        }
+                        textureCoordinates.Add(new Vector2(vertex.UV[0][0], vertex.UV[0][1]));
                     }
                     if (vertex.Position != null)
                     {
