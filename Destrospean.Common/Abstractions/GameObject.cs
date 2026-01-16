@@ -191,7 +191,7 @@ namespace Destrospean.Common.Abstractions
                             }
                             groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                         }
-                        var wso = new WSO(groups.ToArray());
+                        var wso = new WSO((GenericRCOLResource)LODs[lod].MLODResource, CurrentRig, groups.ToArray());
                         if (meshFileType == MeshFileType.WSO)
                         {
                             wso.Write(new BinaryWriter(fileStream));
@@ -409,6 +409,12 @@ namespace Destrospean.Common.Abstractions
             foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
             {
                 var entry01 = entry as s3pi.GenericRCOLResource.VPXY.Entry01;
+                if (entry01 != null && entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("_RIG"))
+                {
+                    Console.WriteLine("hello");
+                    var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
+                    mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                }
                 if (entry01 != null && entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("MODL"))
                 {
                     var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);
@@ -455,7 +461,6 @@ namespace Destrospean.Common.Abstractions
                         lodData.ID = lodEntry.Id;
                         LODs.Add(lodData.ID, lodData);
                     }
-                    break;
                 }
             }
         }

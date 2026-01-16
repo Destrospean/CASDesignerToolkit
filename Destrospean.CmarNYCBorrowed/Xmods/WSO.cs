@@ -131,7 +131,7 @@ namespace Destrospean.CmarNYCBorrowed
                         }
                     }
                 }
-                return Array.IndexOf(BoneNameList, "b__ROOT_bind__");
+                return Array.IndexOf(BoneNameList, Enum.GetName(typeof(BoneHash), BoneHash.b__ROOT_bind__));
             }
         }
 
@@ -1351,7 +1351,8 @@ namespace Destrospean.CmarNYCBorrowed
                 count++;
             }
             mBoneCount = baseMesh.BoneHashList.Length;
-            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
+            var hasRootBind = Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) > -1;
+            if (!hasRootBind)
             {
                 mBoneCount++;
             }
@@ -1360,36 +1361,36 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 mBones[i] = new Bone(baseMesh.BoneHashList[i]);
             }
-            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
+            if (!hasRootBind)
             {
-                mBones[baseMesh.BoneHashList.Length] = new Bone(1468550073);
+                mBones[baseMesh.BoneHashList.Length] = new Bone((uint)BoneHash.b__ROOT_bind__);
             }
         }
 
-        public WSO(MeshGroup[] meshGroups)
+        public WSO(s3pi.GenericRCOLResource.GenericRCOLResource mlodResource, Rig rig, MeshGroup[] meshGroups)
         {
             mVersion = 4;
             mMeshCount = meshGroups.Length;
             mMeshes = meshGroups;
-            mBoneCount = 0;
-            /*
-            mBoneCount = baseMesh.BoneHashList.Length;
-            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
+            var mlod = mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock as meshExpImp.ModelBlocks.MLOD;
+            var bones = new List<Bone>();
+            foreach (var mesh in mlod.Meshes)
             {
-                mBoneCount++;
+                var skinController = mlodResource.ChunkEntries[mesh.SkinControllerIndex.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as meshExpImp.ModelBlocks.SKIN;
+                if (skinController != null && rig != null)
+                {
+                    foreach (var bone in skinController.Bones)
+                    {
+                        bones.Add(new Bone(Array.Find(rig.Bones, x => x.BoneHash == bone.NameHash).BoneName));
+                    }
+                }
             }
-            */
-            mBones = new Bone[mBoneCount];
-            /*
-            for (var i = 0; i < baseMesh.BoneHashList.Length; i++)
+            if (!bones.Exists(x => x.Name == Enum.GetName(typeof(BoneHash), BoneHash.b__ROOT_bind__)))
             {
-                mBones[i] = new Bone(baseMesh.BoneHashList[i]);
+                bones.Add(new Bone((uint)BoneHash.b__ROOT_bind__));
             }
-            if (Array.IndexOf(baseMesh.BoneHashList, BoneHash.b__ROOT_bind__) < 0)
-            {
-                mBones[baseMesh.BoneHashList.Length] = new Bone(1468550073);
-            }
-            */
+            mBoneCount = bones.Count;
+            mBones = bones.ToArray();
         }
 
         public WSO(BinaryReader reader)
@@ -2169,7 +2170,7 @@ namespace Destrospean.CmarNYCBorrowed
         public bool SeamFixer(string ageGender, bool fixBones, bool fixNormals)
         {
             var boneNameList = new List<string>(BoneNameList);
-            var emptyIndex = (byte)boneNameList.IndexOf("b__ROOT_bind__");
+            var emptyIndex = (byte)boneNameList.IndexOf(Enum.GetName(typeof(BoneHash), BoneHash.b__ROOT_bind__));
             if (emptyIndex < 0)
             {
                 emptyIndex = (byte)EmptyBoneIndex;
