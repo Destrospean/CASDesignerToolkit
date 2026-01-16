@@ -227,8 +227,7 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, System.Action<GameObject, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var mlodResource = (GenericRCOLResource)LODs[lod].MLODResource;
-            var mlod = (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
+            var mlod = (MLOD)((GenericRCOLResource)LODs[lod].MLODResource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
                 var wso = new WSO(new BinaryReader(fileStream));
