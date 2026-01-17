@@ -292,7 +292,6 @@
       <Link>GameFolders.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="MainWindow.cs.bak" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
