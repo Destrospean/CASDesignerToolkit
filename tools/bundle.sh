@@ -2,7 +2,7 @@
 cd "${0%/*}"
 mkdir CASDesignerToolkit
 export RELEASE_DIR=../CASDesignerToolkit/bin/Release
-wine rcedit.exe $RELEASE_DIR/CASDesignerToolkit.exe --set-icon ../../Icons/CASDesignerToolkit.ico --set-version-string "FileDescription" "CAS Designer Toolkit"
+wine rcedit.exe $RELEASE_DIR/CASDesignerToolkit.exe --set-icon ../CASDesignerToolkit/Icons/CASDesignerToolkit.ico --set-version-string "FileDescription" "CAS Designer Toolkit"
 wine rcedit.exe $RELEASE_DIR/Destrospean.CmarNYCBorrowed.dll --set-version-string "FileDescription" "CmarNYC's Code Repurposed"
 wine rcedit.exe $RELEASE_DIR/Destrospean.Common.dll --set-version-string "FileDescription" "Destrospean's Shared Code"
 wine rcedit.exe $RELEASE_DIR/Destrospean.Graphics.OpenGL.dll --set-version-string "FileDescription" "Destrospean's OpenGL Code"
