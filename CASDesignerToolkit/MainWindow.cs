@@ -15,7 +15,7 @@ using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
-    System.Drawing.Bitmap mAlphaCheckerboard;
+    Gdk.Pixbuf mAlphaCheckerboardPixbuf;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
@@ -28,6 +28,8 @@ public partial class MainWindow : RendererMainWindow
     string mSaveAsPath;
 
     public IPackage CurrentPackage;
+
+    public Image Image = new Image();
 
     public override NextStateOptions NextState
     {
@@ -85,30 +87,11 @@ public partial class MainWindow : RendererMainWindow
             new CacheGenerationWindow("Please wait as caches are being generated...", this, new Gdk.Pixbuf(System.Reflection.Assembly.GetExecutingAssembly(), "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png"));
         }
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
-        ResourcePropertyNotebook.RemovePage(0);
-        var alphaCheckerboardImageWidget = new Gtk.Image(((System.Drawing.Bitmap)mAlphaCheckerboard.Clone(new System.Drawing.Rectangle(0, 0, Image.Allocation.Width, Image.Allocation.Height), mAlphaCheckerboard.PixelFormat)).ToPixbuf())
-            {
-                HeightRequest = Image.HeightRequest,
-                WidthRequest = Image.WidthRequest,
-                Xalign = 0,
-                Yalign = 0
-            };
-        ImageTable.Attach(alphaCheckerboardImageWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
-        PrepareGLWidget();
-        GLWidget.SetSizeRequest(Image.WidthRequest, Image.HeightRequest);
+        ResourcePropertyNotebook.RemovePage(0);PrepareGLWidget();
+        GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
         ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
-        Image.SizeAllocated += (o, args) =>
-            {
-                alphaCheckerboardImageWidget.Pixbuf = ((System.Drawing.Bitmap)mAlphaCheckerboard.Clone(new System.Drawing.Rectangle(0, 0, Image.Allocation.Width, Image.Allocation.Height), mAlphaCheckerboard.PixelFormat)).ToPixbuf();
-                List<Gdk.Pixbuf> pixbufs;
-                TreeIter iter;
-                TreeModel model;
-                var scale = Image.Pixbuf == null ? 1 : (float)Math.Min(Image.Allocation.Width, Image.Allocation.Height) / Math.Min(Image.Pixbuf.Width, Image.Pixbuf.Height);
-                if (scale != 1 && ResourceTreeView.Selection.GetSelected(out model, out iter) && ImageUtils.PreloadedImagePixbufs.TryGetValue(((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey(), out pixbufs))
-                {
-                    new System.Threading.Thread(() => Application.Invoke((sender, e) => Image.Pixbuf = pixbufs[0].ScaleSimple((int)(Image.Pixbuf.Width * scale), (int)(Image.Pixbuf.Height * scale), Gdk.InterpType.Bilinear))).Start();
-                }
-            };
+        Image.SetSizeRequest(1024, 1024);
+        DrawingArea.ExposeEvent += (o, args) => DrawImage();
         MainHPaned.ShowAll();
         GLWidget.Hide();
     }
@@ -125,7 +108,7 @@ public partial class MainWindow : RendererMainWindow
             HBox buttonHBox = new HBox(false, 0), 
             flagPageButtonHBox = new HBox(false, 0)
                 {
-                    WidthRequest = Image.Allocation.Width
+                    WidthRequest = DrawingArea.Allocation.Width
                 };
             if (mGLWidgetSizeAllocatedHandler != null)
             {
@@ -858,8 +841,8 @@ public partial class MainWindow : RendererMainWindow
                                 List<Gdk.Pixbuf> pixbufs;
                                 if (ImageUtils.PreloadedImagePixbufs.TryGetValue(key, out pixbufs))
                                 {
-                                    var scale = (float)Math.Min(ImageTable.Allocation.Width, ImageTable.Allocation.Height) / Math.Min(pixbufs[0].Width, pixbufs[0].Height);
-                                    Image.Pixbuf = pixbufs[0].ScaleSimple((int)(pixbufs[0].Width * scale), (int)(pixbufs[0].Height * scale), Gdk.InterpType.Bilinear);
+                                    Image.Pixbuf = pixbufs[0];
+                                    DrawImage();
                                 }
                                 break;
                             case "CASP":
@@ -921,7 +904,29 @@ public partial class MainWindow : RendererMainWindow
         ImageUtils.PreloadedGameImages.Clear();
         ImageUtils.PreloadedImagePixbufs.Clear();
         ImageUtils.PreloadedImages.Clear();
-        ImageResourceComboBox.DeleteSmallTexturePixbufs();
+        ImageResourceComboBox.DeleteThumbnails();
+    }
+
+    public override void DrawImage()
+    {
+        using (var context = Gdk.CairoHelper.Create(DrawingArea.GdkWindow))
+        {
+            using (var surface = SurfaceCreateFromPixbuf(mAlphaCheckerboardPixbuf))
+            {
+                context.SetSourceSurface(surface, 0, 0);
+                context.Paint();
+            }
+            if (Image.Pixbuf != null)
+            {
+                var scale = (float)Math.Min(DrawingArea.Allocation.Width, DrawingArea.Allocation.Height) / Math.Min(Image.Pixbuf.Width, Image.Pixbuf.Height);
+                context.Scale(scale, scale);
+                using (var surface = SurfaceCreateFromPixbuf(Image.Pixbuf))
+                {
+                    context.SetSourceSurface(surface, 0, 0);
+                    context.Paint();
+                }
+            }
+        }
     }
 
     public void RefreshWidgets(bool clearTemporaryData = true)
@@ -1069,7 +1074,7 @@ public partial class MainWindow : RendererMainWindow
                 SetDefaultSize((int)(DefaultWidth * WidgetUtils.Scale), (int)(DefaultHeight * WidgetUtils.Scale));
                 foreach (var widget in new Widget[]
                     {
-                        Image,
+                        DrawingArea,
                         ImageTable,
                         MainHPaned,
                         ResourcePropertyNotebook,
@@ -1082,7 +1087,7 @@ public partial class MainWindow : RendererMainWindow
                 }
                 Resize(DefaultWidth, DefaultHeight);
             }
-            mAlphaCheckerboard = ImageUtils.CreateCheckerboard(monitorGeometry.Width, monitorGeometry.Height, (int)(8 * WidgetUtils.Scale), System.Drawing.Color.FromArgb(191, 191, 191), System.Drawing.Color.FromArgb(127, 127, 127));
+            mAlphaCheckerboardPixbuf = ImageUtils.CreateCheckerboard(monitorGeometry.Width, monitorGeometry.Height, (int)(8 * WidgetUtils.Scale), System.Drawing.Color.FromArgb(191, 191, 191), System.Drawing.Color.FromArgb(127, 127, 127)).ToPixbuf();
             Move(((int)(monitorGeometry.Width / WidgetUtils.WineScaleDenominator) - WidthRequest) >> 1, ((int)(monitorGeometry.Height / WidgetUtils.WineScaleDenominator) - HeightRequest) >> 1);
         }
         catch (Exception ex)
@@ -1168,6 +1173,18 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    public static Cairo.ImageSurface SurfaceCreateFromPixbuf(Gdk.Pixbuf pixbuf)
+    {
+        var surface = new Cairo.ImageSurface(Cairo.Format.ARGB32, pixbuf.Width, pixbuf.Height);
+        using (var context = new Cairo.Context(surface))
+        {
+            Gdk.CairoHelper.SetSourcePixbuf(context, pixbuf, 0, 0);
+            context.Paint();
+            context.Dispose();
+        }
+        return surface;
+    }
+
     protected void OnCloseActionActivated(object sender, EventArgs e)
     {
         if (HasUnsavedChanges)
@@ -1220,6 +1237,26 @@ public partial class MainWindow : RendererMainWindow
         ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
         RefreshWidgets(false);
         NextState = NextStateOptions.UnsavedChanges;
+    }
+
+    protected void OnDrawingAreaExposeEvent(object o, ExposeEventArgs args)
+    {
+        List<Gdk.Pixbuf> pixbufs;
+        TreeIter iter;
+        TreeModel model;
+        var scale = Image.Pixbuf == null ? 1 : (float)Math.Min(DrawingArea.Allocation.Width, DrawingArea.Allocation.Height) / Math.Min(Image.Pixbuf.Width, Image.Pixbuf.Height);
+        if (Image.Pixbuf != null && ResourceTreeView.Selection.GetSelected(out model, out iter) && ImageUtils.PreloadedImagePixbufs.TryGetValue(((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey(), out pixbufs))
+        {
+            using (var context = Gdk.CairoHelper.Create(DrawingArea.GdkWindow))
+            {
+                context.Scale(scale, scale);
+                using (var surface = SurfaceCreateFromPixbuf(Image.Pixbuf))
+                {
+                    context.SetSourceSurface(surface, 0, 0);
+                    context.Paint();
+                }
+            }
+        }
     }
 
     protected void OnGameFoldersActionActivated(object sender, EventArgs e)
