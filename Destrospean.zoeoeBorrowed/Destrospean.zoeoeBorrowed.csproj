@@ -43,10 +43,6 @@
       <HintPath>..\libs\System.Custom.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="s3pi.WrapperDealer">
-      <HintPath>..\libs\s3pi.WrapperDealer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="s3pi.Interfaces">
       <HintPath>..\libs\s3pi.Interfaces.dll</HintPath>
       <Private>False</Private>
