@@ -1,7 +1,7 @@
-﻿using Destrospean.S3PIExtensions;
+﻿using Destrospean.Common.Abstractions;
+using Destrospean.S3PIExtensions;
 using Gdk;
 using Gtk;
-using Destrospean.Common.Abstractions;
 
 namespace Destrospean.DestrospeanCASPEditor.Widgets
 {
@@ -28,6 +28,18 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             set
             {
                 mEntries[index] = value;
+            }
+        }
+
+        public class ImageResourceComboBoxCellRendererText : Gtk.CellRendererText
+        {
+            protected override void Render(Drawable window, Widget widget, Rectangle background_area, Rectangle cell_area, Rectangle expose_area, CellRendererState flags)
+            {
+                if (flags.HasFlag(CellRendererState.Prelit))
+                {
+                    //System.Console.WriteLine(Text);
+                }
+                base.Render(window, widget, background_area, cell_area, expose_area, flags);
             }
         }
 
@@ -164,7 +176,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                     {
                         Xpad = 4
                     };
-                var textRenderer = new CellRendererText
+                var textRenderer = new ImageResourceComboBoxCellRendererText
                     {
                         Xpad = 4
                     };
