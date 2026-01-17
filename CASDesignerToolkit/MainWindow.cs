@@ -1180,7 +1180,6 @@ public partial class MainWindow : RendererMainWindow
         {
             Gdk.CairoHelper.SetSourcePixbuf(context, pixbuf, 0, 0);
             context.Paint();
-            context.Dispose();
         }
         return surface;
     }
