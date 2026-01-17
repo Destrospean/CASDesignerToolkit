@@ -58,6 +58,8 @@
             return responseType;
         }
 
+        public abstract void DrawImage();
+
         public abstract void RescaleAndReposition(bool skipRescale = false);
     }
 }

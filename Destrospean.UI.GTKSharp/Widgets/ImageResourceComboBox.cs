@@ -9,7 +9,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
     {
         protected readonly System.Collections.Generic.List<ImageResourceComboBoxEntry> mEntries;
 
-        protected static readonly System.Collections.Generic.Dictionary<string, Pixbuf> mPresetTextureSmallPixbufs = new System.Collections.Generic.Dictionary<string, Pixbuf>();
+        protected static readonly System.Collections.Generic.Dictionary<string, Pixbuf> mThumbnails = new System.Collections.Generic.Dictionary<string, Pixbuf>();
 
         public int EntryCount
         {
@@ -31,15 +31,52 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
         }
 
-        public class ImageResourceComboBoxCellRendererText : Gtk.CellRendererText
+        protected class CellRendererText : Gtk.CellRendererText
         {
-            protected override void Render(Drawable window, Widget widget, Rectangle background_area, Rectangle cell_area, Rectangle expose_area, CellRendererState flags)
+            protected ComboBox mComboBox;
+
+            protected string mCurrentImageResourceKey;
+
+            protected Gtk.Image mImage;
+
+            public CellRendererText(ComboBox comboBox, Gtk.Image imageWidget) : base()
             {
-                if (flags.HasFlag(CellRendererState.Prelit))
+                mComboBox = comboBox;
+                mImage = imageWidget;
+            }
+
+            protected override void Render(Drawable window, Widget widget, Rectangle backgroundArea, Rectangle cellArea, Rectangle exposeArea, CellRendererState state)
+            {
+                System.Collections.Generic.List<Pixbuf> pixbufs;
+                Widget glWidget = null;
+                if (System.Array.Exists(System.AppDomain.CurrentDomain.GetAssemblies(), x => x.GetName().Name == "GLWidget"))
                 {
-                    //System.Console.WriteLine(Text);
+                    var propertyInfo = MainWindowBase.Singleton.GetType().GetProperty("GLWidget");
+                    if (propertyInfo != null)
+                    {
+                        glWidget = propertyInfo.GetValue(MainWindowBase.Singleton, null) as Widget;
+                    }
                 }
-                base.Render(window, widget, background_area, cell_area, expose_area, flags);
+                if (mComboBox.PopupShown && state.HasFlag(CellRendererState.Prelit) && (ImageUtils.PreloadedGameImagePixbufs.TryGetValue(Text, out pixbufs) || ImageUtils.PreloadedImagePixbufs.TryGetValue(Text, out pixbufs)))
+                {
+                    mImage.Pixbuf = pixbufs[0];
+                    mCurrentImageResourceKey = Text;
+                    if (glWidget != null)
+                    {
+                        glWidget.Hide();
+                    }
+                    MainWindowBase.Singleton.DrawImage();
+                }
+                else if (mCurrentImageResourceKey == Text)
+                {
+                    mImage.Clear();
+                    mCurrentImageResourceKey = null;
+                    if (glWidget != null)
+                    {
+                        glWidget.Show();
+                    }
+                }
+                base.Render(window, widget, backgroundArea, cellArea, exposeArea, state);
             }
         }
 
@@ -74,10 +111,10 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                 return new ImageResourceComboBoxEntry(ImageUtils.PreloadedImagePixbufs[key][1], key);
                             default:
                                 Pixbuf pixbuf;
-                                if (!mPresetTextureSmallPixbufs.TryGetValue(key, out pixbuf))
+                                if (!mThumbnails.TryGetValue(key, out pixbuf))
                                 {
                                     pixbuf = preset.Texture.ToPixbuf().ScaleSimple(WidgetUtils.SmallImageSize, WidgetUtils.SmallImageSize, InterpType.Bilinear);
-                                    mPresetTextureSmallPixbufs.Add(key, pixbuf);
+                                    mThumbnails.Add(key, pixbuf);
                                 }
                                 return new ImageResourceComboBoxEntry(pixbuf, key);
                         }
@@ -176,7 +213,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                     {
                         Xpad = 4
                     };
-                var textRenderer = new ImageResourceComboBoxCellRendererText
+                var textRenderer = new CellRendererText(comboBox, imageWidget)
                     {
                         Xpad = 4
                     };
@@ -193,9 +230,9 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
         }
 
-        public static void DeleteSmallTexturePixbufs()
+        public static void DeleteThumbnails()
         {
-            mPresetTextureSmallPixbufs.Clear();
+            mThumbnails.Clear();
         }
     }
 }

@@ -168,12 +168,10 @@
                     <property name="RowSpacing">6</property>
                     <property name="ColumnSpacing">6</property>
                     <child>
-                      <widget class="Gtk.Image" id="Image">
+                      <widget class="Gtk.DrawingArea" id="DrawingArea">
                         <property name="MemberName" />
                         <property name="WidthRequest">270</property>
                         <property name="HeightRequest">270</property>
-                        <property name="Xalign">0</property>
-                        <property name="Yalign">0</property>
                       </widget>
                       <packing>
                         <property name="AutoSize">False</property>

@@ -24,7 +24,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             private set;
         }
 
-        public delegate void InsertComplatePageDelegate(string Label, Table Table, int index);
+        public delegate void InsertComplatePageDelegate(string label, Table table, int index);
 
         public int LastSelectedPage
         {

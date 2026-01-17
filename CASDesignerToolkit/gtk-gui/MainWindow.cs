@@ -43,7 +43,7 @@ public partial class MainWindow
 	
 	private global::Gtk.Table ImageTable;
 	
-	private global::Gtk.Image Image;
+	private global::Gtk.DrawingArea DrawingArea;
 	
 	private global::Gtk.HPaned SecondHPaned;
 	
@@ -150,13 +150,11 @@ public partial class MainWindow
 		this.ImageTable.RowSpacing = ((uint)(6));
 		this.ImageTable.ColumnSpacing = ((uint)(6));
 		// Container child ImageTable.Gtk.Table+TableChild
-		this.Image = new global::Gtk.Image ();
-		this.Image.WidthRequest = 270;
-		this.Image.HeightRequest = 270;
-		this.Image.Name = "Image";
-		this.Image.Xalign = 0F;
-		this.Image.Yalign = 0F;
-		this.ImageTable.Add (this.Image);
+		this.DrawingArea = new global::Gtk.DrawingArea ();
+		this.DrawingArea.WidthRequest = 270;
+		this.DrawingArea.HeightRequest = 270;
+		this.DrawingArea.Name = "DrawingArea";
+		this.ImageTable.Add (this.DrawingArea);
 		this.MainHPaned.Add (this.ImageTable);
 		global::Gtk.Paned.PanedChild w4 = ((global::Gtk.Paned.PanedChild)(this.MainHPaned [this.ImageTable]));
 		w4.Resize = false;
