@@ -273,6 +273,11 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
         }
 
+        public void AddGameObjectPreset()
+        {
+            CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+        }
+
         public void AddPreset()
         {
             if (CASTableObject is CASPart)
@@ -281,7 +286,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             else
             {
-                CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+                AddGameObjectPreset();
             }
             AddPreset(CASTableObject.AllPresets[CASTableObject.AllPresets.Count - 1]);
             CurrentPage = CASTableObject.AllPresets.Count - 1;
