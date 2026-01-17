@@ -1239,26 +1239,6 @@ public partial class MainWindow : RendererMainWindow
         NextState = NextStateOptions.UnsavedChanges;
     }
 
-    protected void OnDrawingAreaExposeEvent(object o, ExposeEventArgs args)
-    {
-        List<Gdk.Pixbuf> pixbufs;
-        TreeIter iter;
-        TreeModel model;
-        var scale = Image.Pixbuf == null ? 1 : (float)Math.Min(DrawingArea.Allocation.Width, DrawingArea.Allocation.Height) / Math.Min(Image.Pixbuf.Width, Image.Pixbuf.Height);
-        if (Image.Pixbuf != null && ResourceTreeView.Selection.GetSelected(out model, out iter) && ImageUtils.PreloadedImagePixbufs.TryGetValue(((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey(), out pixbufs))
-        {
-            using (var context = Gdk.CairoHelper.Create(DrawingArea.GdkWindow))
-            {
-                context.Scale(scale, scale);
-                using (var surface = SurfaceCreateFromPixbuf(Image.Pixbuf))
-                {
-                    context.SetSourceSurface(surface, 0, 0);
-                    context.Paint();
-                }
-            }
-        }
-    }
-
     protected void OnGameFoldersActionActivated(object sender, EventArgs e)
     {
         new GameFoldersDialog(this);
