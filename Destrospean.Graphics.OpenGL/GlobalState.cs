@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Destrospean.Common;
 using Destrospean.Common.Abstractions;
+using Destrospean.S3PIExtensions;
 using meshExpImp.ModelBlocks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using s3pi.GenericRCOLResource;
 using Vector2 = OpenTK.Vector2;
 using Vector3 = OpenTK.Vector3;
-using Destrospean.S3PIExtensions;
 
 namespace Destrospean.Graphics.OpenGL
 {

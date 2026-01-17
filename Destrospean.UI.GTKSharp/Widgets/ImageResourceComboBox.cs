@@ -1,7 +1,7 @@
-﻿using Destrospean.S3PIExtensions;
+﻿using Destrospean.Common.Abstractions;
+using Destrospean.S3PIExtensions;
 using Gdk;
 using Gtk;
-using Destrospean.Common.Abstractions;
 
 namespace Destrospean.DestrospeanCASPEditor.Widgets
 {
