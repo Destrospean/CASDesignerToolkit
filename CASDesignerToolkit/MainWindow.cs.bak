@@ -41,14 +41,12 @@ public partial class MainWindow : RendererMainWindow
             {
                 GlobalState.Meshes.Clear();
                 Sim.LoadGEOMs(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
-                /*
                 TreeIter iter;
                 TreeModel model;
                 if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "OBJD")
                 {
                     GlobalState.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
                 }
-                */
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
             {
@@ -218,7 +216,6 @@ public partial class MainWindow : RendererMainWindow
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Species", additionalToggleAction, casPart.CASPartResource.AgeGender, "Species"), 2, 3, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Handedness", additionalToggleAction, casPart.CASPartResource.AgeGender, "Handedness"), 1, 2, 1, 2);
             }
-            /*
             var gameObject = castableObject as GameObject;
             if (gameObject != null)
             {
@@ -243,7 +240,6 @@ public partial class MainWindow : RendererMainWindow
                     flagTables.RemoveAt(flagTables.Count - 1);
                 }
             }
-            */
             ResourcePropertyTable.Attach(flagPageVBox, 0, 1, 0, 1);
             mPresetNotebook = PresetNotebook.CreateInstance(castableObject, Image);
             mPresetNotebook.Scrollable = true;
@@ -251,7 +247,7 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.Attach(mPresetNotebook, 1, 2, 0, 1);
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
-            //BuildLODNotebook(gameObject);
+            BuildLODNotebook(gameObject);
         }
         catch (Exception ex)
         {
@@ -562,7 +558,6 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    /*
     void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
     {
         try
@@ -794,7 +789,6 @@ public partial class MainWindow : RendererMainWindow
             throw;
         }
     }
-    */
 
     void BuildResourceTable()
     {
@@ -866,12 +860,10 @@ public partial class MainWindow : RendererMainWindow
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
                                 break;
-                            /*
                             case "OBJD":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
                                 break;
-                            */
                         }
                     }
                 };
@@ -892,7 +884,7 @@ public partial class MainWindow : RendererMainWindow
         var casPart = castableObject as CASPart;
         if (casPart == null)
         {
-            //BuildLODNotebook((GameObject)castableObject, lodIndex, groupIndex);
+            BuildLODNotebook((GameObject)castableObject, lodIndex, groupIndex);
         }
         else
         {
@@ -907,12 +899,12 @@ public partial class MainWindow : RendererMainWindow
         mSaveAsPath = null;
         GlobalState.Meshes.Clear();
         PreloadedData.CASParts.Clear();
-        //PreloadedData.GameObjects.Clear();
-        //PreloadedData.FTPTs.Clear();
+        PreloadedData.GameObjects.Clear();
+        PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
-        //PreloadedData.LITEs.Clear();
-        //PreloadedData.MLODs.Clear();
-        //PreloadedData.MODLs.Clear();
+        PreloadedData.LITEs.Clear();
+        PreloadedData.MLODs.Clear();
+        PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
         Sim.PreloadedLODsMorphed.Clear();
         GlobalState.Materials.Clear();
@@ -965,7 +957,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     case "_IMG":
                     case "CASP":
-                    //case "OBJD":
+                    case "OBJD":
                         ResourceListStore.AppendValues(tag, "0x" + resourceIndexEntry.ResourceType.ToString("X8"), "0x" + resourceIndexEntry.ResourceGroup.ToString("X8"), "0x" + resourceIndexEntry.Instance.ToString("X16"), resourceIndexEntry);
                         break;
                 }
@@ -985,21 +977,18 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.CASParts[key] = new CASPart(CurrentPackage, resourceIndexEntry, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         }
                         break;
-                    /*
                     case "FTPT":
                         if (!PreloadedData.FTPTs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
                             PreloadedData.FTPTs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
                         }
                         break;
-                    */
                     case "GEOM":
                         if (!PreloadedData.GEOMs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
                             PreloadedData.GEOMs[key] = new GEOM(new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)));
                         }
                         break;
-                    /*
                     case "LITE":
                         if (!PreloadedData.LITEs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1024,7 +1013,6 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         }
                         break;
-                    */
                     case "VPXY":
                         if (!PreloadedData.VPXYs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1041,12 +1029,10 @@ public partial class MainWindow : RendererMainWindow
             {
                 AddCASTableObjectWidgets(casPart);
             }
-            /*
             foreach (var gameObject in PreloadedData.GameObjects.Values)
             {
                 AddCASTableObjectWidgets(gameObject);
             }
-            */
             ResourceTreeView.Selection.SelectPath(new TreePath("0"));
         }
         catch (Exception ex)
@@ -1109,7 +1095,6 @@ public partial class MainWindow : RendererMainWindow
                 casPartKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
             }
-            /*
             foreach (var ftptResourceKvp in PreloadedData.FTPTs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(ftptResourceKvp.Key).ResourceIndexEntry, ftptResourceKvp.Value);
@@ -1123,7 +1108,6 @@ public partial class MainWindow : RendererMainWindow
                 gameObjectKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(gameObjectKvp.Key).ResourceIndexEntry, gameObjectKvp.Value.CatalogResource);
             }
-            */
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
                 var stream = new MemoryStream();
@@ -1132,7 +1116,6 @@ public partial class MainWindow : RendererMainWindow
                 CurrentPackage.AddResource(resourceIndexEntry, stream, false);
                 CurrentPackage.DeleteResource(resourceIndexEntry);
             }
-            /*
             foreach (var liteResourceKvp in PreloadedData.LITEs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(liteResourceKvp.Key).ResourceIndexEntry, liteResourceKvp.Value);
@@ -1145,7 +1128,6 @@ public partial class MainWindow : RendererMainWindow
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(modlResourceKvp.Key).ResourceIndexEntry, modlResourceKvp.Value);
             }
-            */
             foreach (var vpxyResourceKvp in PreloadedData.VPXYs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
@@ -1329,12 +1311,10 @@ public partial class MainWindow : RendererMainWindow
                 {
                     casPartKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
                 }
-                /*
                 foreach (var gameObjectKvp in PreloadedData.GameObjects)
                 {
                     gameObjectKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
                 }
-                */
                 NextState = NextStateOptions.UnsavedChanges;
             }
             catch (Exception ex)

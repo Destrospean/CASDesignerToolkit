@@ -34,6 +34,10 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 return mGroupList.ToArray();
             }
+            set
+            {
+                mGroupList = new List<Group>(value);
+            }
         }
 
         public int GroupCount

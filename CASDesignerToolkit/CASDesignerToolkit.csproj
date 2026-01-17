@@ -201,8 +201,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="gtk-gui\generated.cs" />
-    <Compile Include="MainWindow.cs" />
     <Compile Include="gtk-gui\MainWindow.cs" />
+    <Compile Include="MainWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -291,6 +291,7 @@
       <Link>GameFolders.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="MainWindow.cs.bak" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
@@ -312,6 +313,11 @@
     <ProjectReference Include="..\Destrospean.UI.GTKSharp\Destrospean.UI.GTKSharp.csproj">
       <Project>{6D08DD91-7AE1-4A4C-B81D-DC9DEE93CF25}</Project>
       <Name>Destrospean.UI.GTKSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
+      <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
+      <Name>Destrospean.zoeoeBorrowed</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>

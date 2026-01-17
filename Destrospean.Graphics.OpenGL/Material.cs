@@ -12,6 +12,7 @@ namespace Destrospean.Graphics.OpenGL
         DiffuseMap = "",
         NormalMap = "",
         OpacityMap = "",
+        Shader = "",
         SpecularMap = "";
 
         public float Opacity = 1,

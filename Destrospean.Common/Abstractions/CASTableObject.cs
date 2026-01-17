@@ -32,7 +32,7 @@ namespace Destrospean.Common.Abstractions
 
         public readonly s3pi.Interfaces.IPackage ParentPackage;
 
-        public readonly List<Preset> Presets;
+        public readonly List<Preset> Presets = new List<Preset>();
 
         public CASTableObject(s3pi.Interfaces.IPackage package, s3pi.Interfaces.IResourceIndexEntry resourceIndexEntry)
         {
@@ -46,12 +46,9 @@ namespace Destrospean.Common.Abstractions
             else
             {
                 DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
-                DefaultPreset = new Preset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
+                DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
             }
-            Presets = new List<Preset>();
         }
-
-        public abstract void AdjustPresetCount();
 
         public void ClearCurrentRig()
         {
@@ -65,12 +62,10 @@ namespace Destrospean.Common.Abstractions
                 return;
             }
             var defaultPresetResourceIndexEntry = ParentPackage.EvaluateResourceKey(DefaultPresetKey).ResourceIndexEntry;
-            var tempResourceIndexEntry = ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(AllPresets[0].XmlFile.ReadToEnd())), false);
+            var tempResourceIndexEntry = ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(((CASPartPreset)AllPresets[0]).XmlFile.ReadToEnd())), false);
             ParentPackage.ReplaceResource(defaultPresetResourceIndexEntry, s3pi.WrapperDealer.WrapperDealer.GetResource(0, ParentPackage, tempResourceIndexEntry));
             ParentPackage.DeleteResource(tempResourceIndexEntry);
         }
-
-        public abstract void SavePreset(int index);
 
         public abstract void SavePresets();
     }

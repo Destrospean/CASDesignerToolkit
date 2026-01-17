@@ -77,15 +77,15 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             {
                 foreach (var propertyName in complate.PropertyNames)
                 {
-                    string type;
-                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out type))
+                    Complate.PropertyMeta propertyMeta;
+                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out propertyMeta))
                     {
                         continue;
                     }
                     Widget valueWidget = null;
                     var alignment = new Alignment(0, .5f, 1, 0);
                     var value = complate[propertyName];
-                    switch (type)
+                    switch (propertyMeta.Type)
                     {
                         case "bool":
                             var checkButton = new CheckButton
@@ -121,7 +121,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             break;
                         case "float":
                             alignment.Xscale = 0;
-                            var spinButton = new SpinButton(new Adjustment(float.Parse(value, CultureInfo.InvariantCulture), -1, 1, .0001, 10, 0), 0, 4);
+                            var spinButton = new SpinButton(new Adjustment(float.Parse(value, CultureInfo.InvariantCulture), float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4);
                             spinButton.ValueChanged += (sender, e) => complate[propertyName] = spinButton.Value.ToString("F4");
                             valueWidget = spinButton;
                             break;
@@ -163,7 +163,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             valueWidget = entry;
                             break;
                         case "texture":
-                            var comboBox = ImageResourceComboBox.CreateInstance(complate.ParentPackage, value, Image);
+                            var comboBox = ImageResourceComboBox.CreateInstance(complate.ParentPackage, value, complate as Preset ?? ((Pattern)complate).Preset, Image, true);
                             var comboBoxLastActive = comboBox.Active;
                             comboBox.Changed += (sender, e) =>
                                 {
@@ -180,8 +180,8 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             var coordinates = System.Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
                             var spinButtons = new List<SpinButton>
                                 {
-                                    new SpinButton(new Adjustment(coordinates[0], -1, 1, .0001, 10, 0), 0, 4),
-                                    new SpinButton(new Adjustment(coordinates[1], -1, 1, .0001, 10, 0), 0, 4)
+                                    new SpinButton(new Adjustment(coordinates[0], float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4),
+                                    new SpinButton(new Adjustment(coordinates[1], float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4)
                                 };
                             spinButtons.ForEach(x =>
                                 {
@@ -275,7 +275,14 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
 
         public void AddPreset()
         {
-            CASTableObject.Presets.Add(new Preset(CASTableObject, CASTableObject.AllPresets[CurrentPage].XmlFile));
+            if (CASTableObject is CASPart)
+            {
+                CASTableObject.Presets.Add(new CASPartPreset(CASTableObject, ((CASPartPreset)CASTableObject.AllPresets[CurrentPage]).XmlFile));
+            }
+            else
+            {
+                CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+            }
             AddPreset(CASTableObject.AllPresets[CASTableObject.AllPresets.Count - 1]);
             CurrentPage = CASTableObject.AllPresets.Count - 1;
             SetTabLabel(GetNthPage(0), GetPageLabelHBox(-CASTableObject.AllPresets.Count, CASTableObject.DefaultPreset != null));

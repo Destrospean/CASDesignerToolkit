@@ -1,0 +1,348 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Destrospean.CmarNYCBorrowed;
+using Destrospean.S3PIExtensions;
+using meshExpImp.ModelBlocks;
+using s3pi.GenericRCOLResource;
+using s3pi.Interfaces;
+using s3pi.WrapperDealer;
+
+namespace Destrospean.Common.Abstractions
+{
+    public class GameObject : CASTableObject
+    {
+        ObjKeyResource.ObjKeyResource mObjKeyResource;
+
+        public readonly CatalogResource.CatalogResource CatalogResource;
+
+        public override Rig CurrentRig
+        {
+            get
+            {
+                return mCurrentRig;
+            }
+        }
+
+        public readonly Dictionary<LODId, zoeoeBorrowed.MeshUtils.LODData> LODs = new Dictionary<LODId, zoeoeBorrowed.MeshUtils.LODData>();
+
+        public CatalogResource.ObjectCatalogResource ObjectCatalogResource
+        {
+            get
+            {
+                return CatalogResource as CatalogResource.ObjectCatalogResource;
+            }
+        }
+
+        public ObjKeyResource.ObjKeyResource ObjKeyResource
+        {
+            get
+            {
+                if (ObjectCatalogResource == null)
+                {
+                    return null;
+                }
+                if (mObjKeyResource == null)
+                {
+                    var evaluated = ParentPackage.EvaluateResourceKey(ObjectCatalogResource.TGIBlocks[(int)ObjectCatalogResource.OBJKIndex].ReverseEvaluateResourceKey());
+                    mObjKeyResource = (ObjKeyResource.ObjKeyResource)WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry);
+                }
+                return mObjKeyResource;
+            }
+        }
+
+        public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
+        {
+            CatalogResource = (CatalogResource.CatalogResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
+            var propertyInfo = CatalogResource.GetType().GetProperty("Materials", typeof(CatalogResource.CatalogResource.MaterialList));
+            if (propertyInfo != null)
+            {
+                Presets.AddRange(((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null)).ConvertAll(x => new GameObjectPreset(this, x.MaterialBlock) as Preset));
+            }
+            LoadLODs(mlodResources, modlResources, vpxyResources);
+        }
+
+        public void AddMeshGroup(LODId lod, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            /*
+            var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(CASPartResource.TGIBlocks[CASPartResource.VPXYIndexes[0]]);
+            var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
+            GenericRCOLResource vpxyResource;
+            if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+            {
+                vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
+                vpxyResource = vpxyResources[vpxyKey];
+            }
+            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
+            var geomTGIs = new TGI[4][];
+            for (var i = 0; i < geomTGIs.GetLength(0); i++)
+            {
+                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
+                if (i == lod || lod == -1)
+                {
+                    var temp = "_lod" + i.ToString() + "-" + (geomTGIList.Count + 1).ToString();
+                    var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount.ToString() + temp));
+                    var geomStream = new MemoryStream();
+                    var geom = geometryResources[new ResourceKey(geomTGIList[geomTGIList.Count - 1].Type, geomTGIList[geomTGIList.Count - 1].Group, geomTGIList[geomTGIList.Count - 1].Instance).ReverseEvaluateResourceKey()];
+                    geom.Write(new BinaryWriter(geomStream));
+                    var newGEOMResourceIndexEntry = ParentPackage.AddResource(new ResourceKey(newGEOMTGI.Type, newGEOMTGI.Group, newGEOMTGI.Instance), geomStream, true);
+                    geometryResources.Add(newGEOMResourceIndexEntry.ReverseEvaluateResourceKey(), new GEOM(new BinaryReader(geomStream)));
+                    geomTGIList.Add(newGEOMTGI);
+                }
+                geomTGIs[i] = geomTGIList.ToArray();
+            }
+            var vpxyStream = new MemoryStream();
+            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
+            vpxyResource = new GenericRCOLResource(0, vpxyStream);
+            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
+            vpxyResources[vpxyKey] = vpxyResource;
+            */
+        }
+
+        public void DeleteMeshGroup(LODId lod, int groupIndex, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            /*
+            var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(CASPartResource.TGIBlocks[CASPartResource.VPXYIndexes[0]]);
+            var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
+            GenericRCOLResource vpxyResource;
+            if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+            {
+                vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
+                vpxyResource = vpxyResources[vpxyKey];
+            }
+            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
+            var geomTGIs = new TGI[4][];
+            for (var i = 0; i < geomTGIs.GetLength(0); i++)
+            {
+                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
+                if (i == lod || lod == -1)
+                {
+                    var geomKey = new ResourceKey(geomTGIList[groupIndex].Type, geomTGIList[groupIndex].Group, geomTGIList[groupIndex].Instance).ReverseEvaluateResourceKey();
+                    ParentPackage.DeleteResource(ParentPackage.EvaluateResourceKey(geomKey).ResourceIndexEntry);
+                    geometryResources.Remove(geomKey);
+                    geomTGIList.RemoveAt(groupIndex);
+                }
+                geomTGIs[i] = geomTGIList.ToArray();
+            }
+            var vpxyStream = new MemoryStream();
+            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
+            vpxyResource = new GenericRCOLResource(0, vpxyStream);
+            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
+            vpxyResources[vpxyKey] = vpxyResource;
+            */
+        }
+
+        public void ExportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            var extension = "";
+            switch (meshFileType)
+            {
+                case MeshFileType.MLOD:
+                    extension = ".lod";
+                    if (filename.ToLowerInvariant().EndsWith(extension))
+                    {
+                        filename.Remove(filename.LastIndexOf('.'));
+                    }
+                    using (var fileStream = File.Create(filename + extension))
+                    {
+                        new BinaryWriter(fileStream).Write(LODs[lod].MLODResource.AsBytes);
+                    }
+                    break;
+                case MeshFileType.OBJ:
+                    extension = ".obj";
+                    goto case MeshFileType.WSO;
+                case MeshFileType.WSO:
+                    if (string.IsNullOrEmpty(extension))
+                    {
+                        extension = ".wso";
+                    }
+                    using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(extension) ? "" : extension)))
+                    {
+                        var groups = new List<WSO.MeshGroup>();
+                        foreach (var meshGroup in LODs[lod].MeshGroups)
+                        {
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
+                            {
+                                continue;
+                            }
+                            var extendedVertices = new List<WSO.VertexExtended>();
+                            foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
+                            {
+                                var extendedVertex = new WSO.VertexExtended();
+                                if (vertex.Normal != null)
+                                {
+                                    extendedVertex.SetNormals(vertex.Normal);
+                                }
+                                if (vertex.Position != null)
+                                {
+                                    extendedVertex.SetPosition(vertex.Position);
+                                }
+                                if (vertex.UV != null)
+                                {
+                                    extendedVertex.SetUVs(vertex.UV[0]);
+                                }
+                                extendedVertices.Add(extendedVertex);
+                            }
+                            var facePoints = new List<WSO.FacePoint>();
+                            var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
+                            for (var i = 0; i < indices.Length; i++)
+                            {
+                                facePoints.Add(new WSO.FacePoint(indices[i], extendedVertices[indices[i]].GetNormals(), extendedVertices[indices[i]].GetUVs(), false));
+                            }
+                            groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
+                        }
+                        var wso = new WSO(LODs[lod].MLODResource, CurrentRig, groups.ToArray());
+                        switch (meshFileType)
+                        {
+                            case MeshFileType.OBJ:
+                                new OBJ(wso).Write(new StreamWriter(fileStream));
+                                break;
+                            case MeshFileType.WSO:
+                                wso.Write(new BinaryWriter(fileStream));
+                                break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public void ImportMesh(LODId lod, int groupIndex, string filename, System.Action<CASPart, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            /*
+            foreach (var geometryResourceKvp in geometryResources)
+            {
+                if (geometryResourceKvp.Value == LODs[lod][groupIndex])
+                {
+                    var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
+                    ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
+                    ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+                    geometryResources[geometryResourceKvp.Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
+                    LoadLODs(geometryResources, vpxyResources);
+                    updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
+                    break;
+                }
+            }
+            */
+        }
+
+        public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, System.Action<GameObject, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            var mlod = (MLOD)((GenericRCOLResource)LODs[lod].MLODResource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
+            using (var fileStream = File.OpenRead(filename))
+            {
+                var wso = new WSO(new BinaryReader(fileStream));
+                for (var i = 0; i < LODs[lod].MeshGroups.Count; i++)
+                {
+                    var meshGroup = LODs[lod].MeshGroups[i];
+                    if (groupIndex > -1 && groupIndex != i)
+                    {
+                        continue;
+                    }
+                    var group = wso.Mesh(groupIndex == -1 ? i : 0);
+                    var vertices = new List<meshExpImp.ModelBlocks.Vertex>();
+                    foreach (var extendedVertex in group.GetExtendedVertices())
+                    {
+                        vertices.Add(new meshExpImp.ModelBlocks.Vertex 
+                            {
+                                Normal = extendedVertex.GetNormals(),
+                                Position = extendedVertex.GetPosition(),
+                                UV = new float[][]
+                                    {
+                                        extendedVertex.GetUVs()
+                                    }
+                            });
+                    }
+                    meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices.ToArray(), meshGroup.UVScales);
+                    var indices = new int[group.FacePointCount];
+                    for (var j = 0; j < indices.Length; j += 3)
+                    {
+                        indices[j] = group.GetFacePoint(j).VertexIndex;
+                    }
+                    meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, indices);
+                }
+                LoadLODs(mlodResources, modlResources, vpxyResources);
+                updateUICallback(this, new List<LODId>(LODs.Keys).IndexOf(lod), groupIndex);
+            }
+        }
+
+        public void LoadLODs(Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            GenericRCOLResource vpxyResource = null;
+            if (ObjKeyResource != null)
+            {
+                var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(ObjKeyResource.TGIBlocks[0]);
+                var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
+                if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+                {
+                    vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
+                    vpxyResource = vpxyResources[vpxyKey];
+                }
+            }
+            if (vpxyResource == null)
+            {
+                return;
+            }
+            foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
+            {
+                var entry01 = entry as s3pi.GenericRCOLResource.VPXY.Entry01;
+                if (entry01 == null)
+                {
+                    continue;
+                }
+                if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("_RIG"))
+                {
+                    var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
+                    mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                }
+                else if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("MODL"))
+                {
+                    var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);
+                    var modlKey = modlResourceIndexEntry.ReverseEvaluateResourceKey();
+                    GenericRCOLResource modlResource;
+                    if (!modlResources.TryGetValue(modlKey, out modlResource))
+                    {
+                        modlResources.Add(modlKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, modlResourceIndexEntry));
+                        modlResource = modlResources[modlKey];
+                    }
+                    LODs.Clear();
+                    foreach (var lodEntry in ((MODL)modlResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MODL").RCOLBlock).Entries)
+                    {
+                        GenericRCOLResource resourceWithMLOD = null;
+                        MLOD mlod = null;
+                        var mlodKey = "";
+                        if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
+                        {
+                            resourceWithMLOD = modlResource;
+                            mlod = (MLOD)resourceWithMLOD.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock;
+                        }
+                        else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
+                        {
+                            var mlodResourceIndexEntry = ParentPackage.GetResourceIndexEntry(modlResource.Resources[lodEntry.ModelLodIndex.TGIBlockIndex]);
+                            mlodKey = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
+                            GenericRCOLResource mlodResource;
+                            if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
+                            {
+                                mlodResources.Add(mlodKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, mlodResourceIndexEntry));
+                                mlodResource = mlodResources[mlodKey];
+                            }
+                            resourceWithMLOD = mlodResource;
+                            mlod = (MLOD)resourceWithMLOD.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(mlodKey, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlod);
+                        lodData.ID = lodEntry.Id;
+                        LODs.Add(lodData.ID, lodData);
+                    }
+                }
+            }
+        }
+
+        public override void SavePresets()
+        {
+            SaveDefaultPreset();
+        }
+    }
+}

@@ -6,7 +6,13 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public partial class AddMaterialPropertyDialog : Dialog
     {
-        public uint DataType
+        public uint DataTypeUInt
+        {
+            get;
+            private set;
+        }
+
+        public System.Type DataType
         {
             get;
             private set;
@@ -66,30 +72,31 @@ namespace Destrospean.DestrospeanCASPEditor
                         switch (dataTypes[DataTypeComboBox.Active])
                         {
                             case "ElementFloat":
-                                DataType = 1;
+                                DataTypeUInt = 1;
                                 ValueCount = 1;
                                 break;
                             case "ElementFloat2":
-                                DataType = 1;
+                                DataTypeUInt = 1;
                                 ValueCount = 2;
                                 break;
                             case "ElementFloat3":
-                                DataType = 1;
+                                DataTypeUInt = 1;
                                 ValueCount = 3;
                                 break;
                             case "ElementFloat4":
-                                DataType = 1;
+                                DataTypeUInt = 1;
                                 ValueCount = 4;
                                 break;
                             case "ElementInt":
-                                DataType = 2;
+                                DataTypeUInt = 2;
                                 ValueCount = 1;
                                 break;
                             case "ElementTextureRef":
-                                DataType = 4;
+                                DataTypeUInt = 4;
                                 ValueCount = 1;
                                 break;
                         }
+                        DataType = assembly.GetType("s3pi.GenericRCOLResource." + dataTypes[DataTypeComboBox.Active]);
                         Field = (uint)System.Enum.Parse(typeof(FieldType), fields[FieldComboBox.Active]);
                     }
                 };

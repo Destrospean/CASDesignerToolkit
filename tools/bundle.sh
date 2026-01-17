@@ -8,6 +8,7 @@ wine rcedit.exe $RELEASE_DIR/Destrospean.Common.dll --set-version-string "FileDe
 wine rcedit.exe $RELEASE_DIR/Destrospean.Graphics.OpenGL.dll --set-version-string "FileDescription" "Destrospean's OpenGL Code"
 wine rcedit.exe $RELEASE_DIR/Destrospean.S3PIExtensions.dll --set-version-string "FileDescription" "Destrospean's S3PI Extensions"
 wine rcedit.exe $RELEASE_DIR/Destrospean.UI.GTKSharp.dll --set-version-string "FileDescription" "Destrospean's GTK# Code"
+wine rcedit.exe $RELEASE_DIR/Destrospean.zoeoeBorrowed.dll --set-version-string "FileDescription" "zoeoe's Object Geometry Code Repurposed"
 rm $RELEASE_DIR/CASDesignerToolkit-*.rar
 rm $RELEASE_DIR/CASDesignerToolkit-Self-Extractor.exe
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit

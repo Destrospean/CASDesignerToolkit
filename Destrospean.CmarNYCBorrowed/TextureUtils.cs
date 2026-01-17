@@ -56,6 +56,10 @@ namespace Destrospean.CmarNYCBorrowed
             Bitmap background = pattern.Background == null ? null : package.GetTexture(pattern.Background, getTextureCallback, width, height),
             patternImage = new Bitmap(width, height, PixelFormat.Format32bppArgb);
             var patternBack = new Bitmap[3];
+            if (pattern.RGBMask == null)
+            {
+                return null;
+            }
             var rgbMaskArray = package.GetTextureARGBArray(pattern.RGBMask, getTextureCallback, width, height);
             if (rgbMaskArray == null)
             {
@@ -332,7 +336,7 @@ namespace Destrospean.CmarNYCBorrowed
                         mask[0],
                         mask[3]
                     };
-                for (var j = 0; j < patternImages.Count - 1; j++)
+                for (var j = 0; j < patternImages.Count; j++)
                 {
                     var blend = maskControl[j] * kInverseByteMax;
                     if (patternImages[j] != null && maskControl[j] > 0)
