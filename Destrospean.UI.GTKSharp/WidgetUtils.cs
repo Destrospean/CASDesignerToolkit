@@ -116,9 +116,9 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                 }
                 var shaders = new List<string>();
-                foreach (var shader in Enum.GetValues(typeof(Shader)))
+                foreach (var shader in Enum.GetNames(typeof(Shader)))
                 {
-                    shaders.Add(string.Format("{0} ({1})", shader, (uint)shader));
+                    shaders.Add(string.Format("{0} ({1})", shader, (uint)Enum.Parse(typeof(Shader), shader)));
                 }
                 shaders.Sort();
                 var shaderComboBoxAlignment = new Alignment(0, .5f, 1, 0);
@@ -413,9 +413,9 @@ namespace Destrospean.DestrospeanCASPEditor
                 var mlodResource = (GenericRCOLResource)lodData.MLODResource;
                 var matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 var shaders = new List<string>();
-                foreach (var shader in Enum.GetValues(typeof(Shader)))
+                foreach (var shader in Enum.GetNames(typeof(Shader)))
                 {
-                    shaders.Add(string.Format("{0} ({1})", shader, (uint)shader));
+                    shaders.Add(string.Format("{0} ({1})", shader, (uint)Enum.Parse(typeof(Shader), shader)));
                 }
                 shaders.Sort();
                 var shaderComboBoxAlignment = new Alignment(0, .5f, 1, 0);
