@@ -193,7 +193,7 @@
                   <widget class="Gtk.HPaned" id="SecondHPaned">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">353</property>
+                    <property name="Position">352</property>
                     <child>
                       <widget class="Gtk.ScrolledWindow" id="ScrolledWindow">
                         <property name="MemberName" />
