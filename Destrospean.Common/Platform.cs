@@ -112,11 +112,6 @@ namespace Destrospean.Common
             }
         }
 
-        public static bool UnblockFile(string filename)
-        {
-            return FileUnblocker.Unblock(filename);
-        }
-
         public static string GetCommandOutput(string command, string arguments = "")
         {
             var startInfo = new ProcessStartInfo
@@ -139,6 +134,11 @@ namespace Destrospean.Common
                 process.WaitForExit();
                 return string.IsNullOrEmpty(error) ? output : string.Format("Error: {0}\nOutput: {1}", error, output);
             }
+        }
+
+        public static bool UnblockFile(string filename)
+        {
+            return FileUnblocker.Unblock(filename);
         }
     }
 }
