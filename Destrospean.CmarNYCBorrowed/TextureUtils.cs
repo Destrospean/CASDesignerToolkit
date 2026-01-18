@@ -348,14 +348,14 @@ namespace Destrospean.CmarNYCBorrowed
                             {
                                 var temp = gray * rgba[2 - k];
                                 temp = temp < 0 ? 0 : temp > 1 ? 1 : temp;
+                                /*
                                 if (k == 0 || !overlay)
                                 {
                                     multiplierArray[i + k] = (byte)(temp * byte.MaxValue);
+                                    continue;
                                 }
-                                else
-                                {
-                                    multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
-                                }
+                                */
+                                multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
                             }
                             continue;
                         }
@@ -380,14 +380,14 @@ namespace Destrospean.CmarNYCBorrowed
                             {
                                 var temp = gray * rgba[2 - k];
                                 temp = temp < 0 ? 0 : temp > 1 ? 1 : temp;
+                                /*
                                 if (k == 0 || !overlay)
                                 {
                                     multiplierArray[i + k] = (byte)(temp * byte.MaxValue);
+                                    continue;
                                 }
-                                else
-                                {
-                                    multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
-                                }
+                                */
+                                multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
                             }
                         }
                     }
