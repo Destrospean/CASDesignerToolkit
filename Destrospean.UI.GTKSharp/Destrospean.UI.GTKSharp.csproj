@@ -196,6 +196,7 @@
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
@@ -223,6 +224,7 @@
     <Compile Include="Windows\AddMaterialPropertyDialog.cs" />
     <Compile Include="Windows\MainWindowBase.cs" />
     <Compile Include="Windows\RendererMainWindow.cs" />
+    <Compile Include="CairoHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
