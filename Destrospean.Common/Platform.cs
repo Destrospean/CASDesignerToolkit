@@ -79,6 +79,18 @@ namespace Destrospean.Common
             Darwin = 8
         }
 
+        static class FileUnblocker
+        {
+            [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            static extern bool DeleteFile(string name);
+
+            public static bool Unblock(string filename)
+            {
+                return DeleteFile(filename + ":Zone.Identifier");
+            }
+        }
+
         static class WineDetector
         {
             [DllImport("ntdll.dll", EntryPoint = "wine_get_version")]
@@ -98,6 +110,11 @@ namespace Destrospean.Common
                     }
                 }
             }
+        }
+
+        public static bool UnblockFile(string filename)
+        {
+            return FileUnblocker.Unblock(filename);
         }
 
         public static string GetCommandOutput(string command, string arguments = "")

@@ -6,6 +6,16 @@
         {
             try
             {
+                if (Common.Platform.IsWindows)
+                {
+                    foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
+                    {
+                        if (filename.EndsWith(".dll"))
+                        {
+                            Common.Platform.UnblockFile(filename);
+                        }
+                    }
+                }
                 Gtk.Application.Init();
                 new MainWindow();
                 if (args.Length > 0)
