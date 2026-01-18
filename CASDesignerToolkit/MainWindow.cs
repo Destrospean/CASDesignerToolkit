@@ -901,7 +901,7 @@ public partial class MainWindow : RendererMainWindow
 
     public override void DrawImage()
     {
-        using (var context = Gdk.CairoHelper.Create(DrawingArea.GdkWindow))
+        using (var context = CairoHelper.Create(DrawingArea.GdkWindow))
         {
             using (var surface = SurfaceCreateFromPixbuf(mAlphaCheckerboardPixbuf))
             {
@@ -1160,7 +1160,7 @@ public partial class MainWindow : RendererMainWindow
         var surface = new Cairo.ImageSurface(Cairo.Format.ARGB32, pixbuf.Width, pixbuf.Height);
         using (var context = new Cairo.Context(surface))
         {
-            Gdk.CairoHelper.SetSourcePixbuf(context, pixbuf, 0, 0);
+            CairoHelper.SetSourcePixbuf(context, pixbuf, 0, 0);
             context.Paint();
         }
         return surface;
