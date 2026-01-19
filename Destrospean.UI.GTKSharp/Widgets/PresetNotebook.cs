@@ -122,7 +122,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         case "float":
                             alignment.Xscale = 0;
                             var spinButton = new SpinButton(new Adjustment(float.Parse(value, CultureInfo.InvariantCulture), float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4);
-                            spinButton.ValueChanged += (sender, e) => complate[propertyName] = spinButton.Value.ToString("F4");
+                            spinButton.ValueChanged += (sender, e) => complate[propertyName] = spinButton.Value.ToString("F4", CultureInfo.InvariantCulture);
                             valueWidget = spinButton;
                             break;
                         case "pattern":
@@ -185,7 +185,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                 };
                             spinButtons.ForEach(x =>
                                 {
-                                    x.ValueChanged += (sender, e) => complate[propertyName] = spinButtons[0].Value.ToString("F4") + "," + spinButtons[1].Value.ToString("F4");
+                                    x.ValueChanged += (sender, e) => complate[propertyName] = spinButtons[0].Value.ToString("F4", CultureInfo.InvariantCulture) + "," + spinButtons[1].Value.ToString("F4", CultureInfo.InvariantCulture);
                                     hBox.PackStart(x, false, false, 0);
                                 });
                             valueWidget = hBox;

@@ -156,7 +156,7 @@ namespace Destrospean.Common.Abstractions
                     }
                     catch (System.InvalidCastException)
                     {
-                        return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data);
+                        return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data, CultureInfo.InvariantCulture);
                     }
                 };
             foreach (var propertyTypedKvp in PropertiesTyped)

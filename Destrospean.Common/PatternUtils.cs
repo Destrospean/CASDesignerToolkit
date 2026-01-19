@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using Destrospean.CmarNYCBorrowed;
@@ -195,44 +196,44 @@ namespace Destrospean.Common
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseHueBackground = float.Parse(value);
+                        baseHueBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        baseHues.Add(float.Parse(value));
+                        baseHues.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else if (key.StartsWith("base s"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseSaturationBackground = float.Parse(value);
+                        baseSaturationBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        baseSaturations.Add(float.Parse(value));
+                        baseSaturations.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else if (key.StartsWith("base v"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseValueBackground = float.Parse(value);
+                        baseValueBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        baseValues.Add(float.Parse(value));
+                        baseValues.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else if (key.StartsWith("h "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        hueBackground = float.Parse(value);
+                        hueBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        hues.Add(float.Parse(value));
+                        hues.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else if (key.StartsWith("hsvshift"))
@@ -250,22 +251,22 @@ namespace Destrospean.Common
                 {
                     if (key.EndsWith("bg"))
                     {
-                        saturationBackground = float.Parse(value);
+                        saturationBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        saturations.Add(float.Parse(value));
+                        saturations.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else if (key.StartsWith("v "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        valueBackground = float.Parse(value);
+                        valueBackground = float.Parse(value, CultureInfo.InvariantCulture);
                     }
                     else
                     {
-                        values.Add(float.Parse(value));
+                        values.Add(float.Parse(value, CultureInfo.InvariantCulture));
                     }
                 }
                 else
