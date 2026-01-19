@@ -3,7 +3,7 @@ Below is a list of people who helped with this project either directly or indire
 - Peter L. Jones - Provided the S3PI library which serves as the basis of this tool and many other Sims 3 tools
 - CmarNYC - Her code for TS3SimRipper helped with applying patterns to textures and displaying morphs in the 3D renderer; the code for her Meshing Toolkit for importing/exporting OBJs and WSOs was also borrowed
 - MonoChaos - Provided the icon for the tool and helped test the tool for issues
-- zoeoe - Helped with issues related to the S3PI library
+- zoeoe - Helped with issues related to the S3PI library and for providing some code for object meshes
 - VirtualHugs - Helped with explaining things related to CASPs; I'm not a mesher, so her advice was incredibly helpful
 
 Testers:
