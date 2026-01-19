@@ -7,6 +7,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Destrospean.DestrospeanCASPEditor</RootNamespace>
     <AssemblyName>CASDesignerToolkit</AssemblyName>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +29,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="../tools/bundle.sh" />
+        <Command type="AfterBuild" command="../tools/bundle_docker.sh" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
