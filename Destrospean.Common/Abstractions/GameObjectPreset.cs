@@ -230,7 +230,7 @@ namespace Destrospean.Common.Abstractions
                     var rgba = System.Array.ConvertAll(ParseCommaSeparatedValues(value), x => (byte)(x * byte.MaxValue));
                     return new CatalogResource.CatalogResource.TC02_ARGB(0, null, 0, name, ((uint)rgba[3] << 24) + ((uint)rgba[0] << 16) + ((uint)rgba[1] << 8) + rgba[2]);
                 case "float":
-                    return new CatalogResource.CatalogResource.TC04_Single(0, null, 0, name, float.Parse(value));
+                    return new CatalogResource.CatalogResource.TC04_Single(0, null, 0, name, float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
                 case "pattern":
                     return new CatalogResource.CatalogResource.TC01_String(0, null, 0, name, value);
                 case "string":
@@ -382,7 +382,7 @@ namespace Destrospean.Common.Abstractions
                 case "float":
                     try
                     {
-                        ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1 = float.Parse(newValue);
+                        ((CatalogResource.CatalogResource.TC04_Single)properties[propertyName]).Unknown1 = float.Parse(newValue, System.Globalization.CultureInfo.InvariantCulture);
                     }
                     catch (System.InvalidCastException)
                     {
