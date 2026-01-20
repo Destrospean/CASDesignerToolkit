@@ -29,7 +29,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="../tools/bundle_docker.sh" />
+        <Command type="AfterBuild" command="../tools/bundle.sh" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
