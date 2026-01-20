@@ -36,6 +36,8 @@ namespace Destrospean.CmarNYCBorrowed
 
         public delegate Bitmap GetTextureDelegate(IPackage package, IResourceIndexEntry resourceIndexEntry);
 
+        public static object Lock = new object();
+
         public static Dictionary<string, Bitmap> PreloadedGameImages
         {
             get
@@ -286,11 +288,14 @@ namespace Destrospean.CmarNYCBorrowed
                     PreloadedGameImages[key] = image;
                 }
             }
-            if (dimensions != null && dimensions[0] != image.Size.Width && dimensions[1] != image.Size.Height)
+            lock (Lock)
             {
-                image = new Bitmap(image, new Size(dimensions[0], dimensions[1]));
+                if (dimensions != null && dimensions[0] != image.Size.Width && dimensions[1] != image.Size.Height)
+                {
+                    image = new Bitmap(image, new Size(dimensions[0], dimensions[1]));
+                }
+                return (Bitmap)image.Clone();
             }
-            return (Bitmap)image.Clone();
         }
 
         public static Bitmap GetTexture(this IPackage package, string key, GetTextureDelegate getTextureCallback, int width, int height)

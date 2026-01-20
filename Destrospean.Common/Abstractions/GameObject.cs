@@ -206,7 +206,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void ImportMesh(LODId lod, int groupIndex, string filename, System.Action<CASPart, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMesh(LODId lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             /*
             foreach (var geometryResourceKvp in geometryResources)
@@ -225,7 +225,7 @@ namespace Destrospean.Common.Abstractions
             */
         }
 
-        public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, System.Action<GameObject, int, int> updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             var mlod = (MLOD)((GenericRCOLResource)LODs[lod].MLODResource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))

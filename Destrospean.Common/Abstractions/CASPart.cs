@@ -236,7 +236,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void ImportMesh(int lod, int groupIndex, string filename, System.Action<CASPart, int, int> updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMesh(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             foreach (var geometryResourceKvp in geometryResources)
             {
@@ -253,7 +253,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void ImportMeshGroup(int lod, int groupIndex, MeshFileType meshFileType, string filename, System.Action<CASPart, int, int> updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMeshGroup(int lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             var geom = LODs[lod][groupIndex];
             byte[] bblnIndices =

@@ -85,35 +85,38 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static Bitmap GetTexture(this IPackage package, IResourceIndexEntry resourceIndexEntry)
         {
-            Bitmap image;
-            var resource = s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, resourceIndexEntry);
-            try
+            lock (CmarNYCBorrowed.TextureUtils.Lock)
             {
-                image = GDImageLibrary._DDS.LoadImage(resource.AsBytes);
-            }
-            catch (ArgumentNullException)
-            {
-                var dds = TeximpNet.DDS.DDSFile.Read(resource.Stream);
-                var mipmap = dds.MipChains[0][0];
-                var pixelFormat = PixelFormat.Format32bppArgb;
-                image = new Bitmap(mipmap.Width, mipmap.Height, pixelFormat);
-                var bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
-                var byteArray = new byte[mipmap.SizeInBytes];
-                System.Runtime.InteropServices.Marshal.Copy(mipmap.Data, byteArray, 0, byteArray.Length);
-                if (dds.Format == TeximpNet.DDS.DXGIFormat.R8G8_UNorm)
+                Bitmap image;
+                var resource = s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, resourceIndexEntry);
+                try
                 {
-                    var tempByteArray = new byte[byteArray.Length * 2];
-                    for (var i = 0; i < byteArray.Length; i += 2)
-                    {
-                        tempByteArray[i * 2] = tempByteArray[i * 2 + 1] = tempByteArray[i * 2 + 2] = byteArray[i];
-                        tempByteArray[i * 2 + 3] = byteArray[i + 1];
-                    }
-                    byteArray = tempByteArray;
+                    image = GDImageLibrary._DDS.LoadImage(resource.AsBytes);
                 }
-                System.Runtime.InteropServices.Marshal.Copy(byteArray, 0, bitmapData.Scan0, byteArray.Length);
-                image.UnlockBits(bitmapData);
+                catch (ArgumentNullException)
+                {
+                    var dds = TeximpNet.DDS.DDSFile.Read(resource.Stream);
+                    var mipmap = dds.MipChains[0][0];
+                    var pixelFormat = PixelFormat.Format32bppArgb;
+                    image = new Bitmap(mipmap.Width, mipmap.Height, pixelFormat);
+                    var bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
+                    var byteArray = new byte[mipmap.SizeInBytes];
+                    System.Runtime.InteropServices.Marshal.Copy(mipmap.Data, byteArray, 0, byteArray.Length);
+                    if (dds.Format == TeximpNet.DDS.DXGIFormat.R8G8_UNorm)
+                    {
+                        var tempByteArray = new byte[byteArray.Length * 2];
+                        for (var i = 0; i < byteArray.Length; i += 2)
+                        {
+                            tempByteArray[i * 2] = tempByteArray[i * 2 + 1] = tempByteArray[i * 2 + 2] = byteArray[i];
+                            tempByteArray[i * 2 + 3] = byteArray[i + 1];
+                        }
+                        byteArray = tempByteArray;
+                    }
+                    System.Runtime.InteropServices.Marshal.Copy(byteArray, 0, bitmapData.Scan0, byteArray.Length);
+                    image.UnlockBits(bitmapData);
+                }
+                return image;
             }
-            return image;
         }
 
         public static bool PreloadGameImage(this IPackage package, IResourceIndexEntry resourceIndexEntry, Gtk.Image imageWidget)
