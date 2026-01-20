@@ -116,7 +116,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     colorButton.Color.Green,
                                     colorButton.Color.Blue,
                                     colorButton.Alpha
-                                }, x => (float)x / ushort.MaxValue));
+                                }, x => ((float)x / ushort.MaxValue).ToString("F4", CultureInfo.InvariantCulture)));
                             valueWidget = colorButton;
                             break;
                         case "float":

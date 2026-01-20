@@ -14,6 +14,7 @@ rm $RELEASE_DIR/CASDesignerToolkit-Self-Extractor.exe
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
 cp $RELEASE_DIR/* CASDesignerToolkit
 rm CASDesignerToolkit/*.log
+unix2dos CASDesignerToolkit/*.config CASDesignerToolkit/*.md CASDesignerToolkit/*.txt CASDesignerToolkit/*.xml
 rar a -sfxwindows.sfx "CASDesignerToolkit-Self-Extractor.exe" CASDesignerToolkit/*
 rar a CASDesignerToolkit-win32-i386.rar CASDesignerToolkit/*
 mv CASDesignerToolkit-Self-Extractor.exe $RELEASE_DIR
