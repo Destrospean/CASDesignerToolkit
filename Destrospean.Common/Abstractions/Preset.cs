@@ -184,8 +184,11 @@
         {
             new System.Threading.Thread(() =>
                 {
-                    mInternal.Texture = mInternal.NewTexture;
-                    MarkModelsNeedUpdatedCallback();
+                    lock (CmarNYCBorrowed.TextureUtils.Lock)
+                    {
+                        mInternal.Texture = mInternal.NewTexture;
+                        MarkModelsNeedUpdatedCallback();
+                    }
                 }).Start();
         }
 

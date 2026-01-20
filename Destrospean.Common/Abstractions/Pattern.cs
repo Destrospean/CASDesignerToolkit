@@ -146,19 +146,20 @@ namespace Destrospean.Common.Abstractions
             RefreshPatternInfo(false);
         }
 
+        float GetFloatValue(object value)
+        {
+            try
+            {
+                return ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
+            }
+            catch (System.InvalidCastException)
+            {
+                return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data, CultureInfo.InvariantCulture);
+            }
+        }
+
         void PopulateVariablesForGameObjectPatterns(s3pi.Interfaces.IPackage package, object presetMaterialBlock, ref string background, ref string rgbMask, List<string> channels, List<bool> channelsEnabled, ref float baseHueBackground, ref float baseSaturationBackground, ref float baseValueBackground, ref float hueBackground, ref float saturationBackground, ref float valueBackground, List<float> baseHues, List<float> baseSaturations, List<float> baseValues, List<float> hues, List<float> saturations, List<float> values, ref float[] hsvShiftBackground, List<float[]> hsvShift, List<float[]> rgbColors)
         {
-            System.Func<object, float> getFloatValue = (value) =>
-                {
-                    try
-                    {
-                        return ((CatalogResource.CatalogResource.TC04_Single)value).Unknown1;
-                    }
-                    catch (System.InvalidCastException)
-                    {
-                        return float.Parse(((CatalogResource.CatalogResource.TC01_String)value).Data, CultureInfo.InvariantCulture);
-                    }
-                };
             foreach (var propertyTypedKvp in PropertiesTyped)
             {
                 var key = propertyTypedKvp.Key.ToLowerInvariant();
@@ -188,44 +189,44 @@ namespace Destrospean.Common.Abstractions
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseHueBackground = getFloatValue(value);
+                        baseHueBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        baseHues.Add(getFloatValue(value));
+                        baseHues.Add(GetFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("base s"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseSaturationBackground = getFloatValue(value);
+                        baseSaturationBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        baseSaturations.Add(getFloatValue(value));
+                        baseSaturations.Add(GetFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("base v"))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        baseValueBackground = getFloatValue(value);
+                        baseValueBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        baseValues.Add(getFloatValue(value));
+                        baseValues.Add(GetFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("h "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        hueBackground = getFloatValue(value);
+                        hueBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        hues.Add(getFloatValue(value));
+                        hues.Add(GetFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("hsvshift"))
@@ -258,22 +259,22 @@ namespace Destrospean.Common.Abstractions
                 {
                     if (key.EndsWith("bg"))
                     {
-                        saturationBackground = getFloatValue(value);
+                        saturationBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        saturations.Add(getFloatValue(value));
+                        saturations.Add(GetFloatValue(value));
                     }
                 }
                 else if (key.StartsWith("v "))
                 {
                     if (key.EndsWith("bg"))
                     {
-                        valueBackground = getFloatValue(value);
+                        valueBackground = GetFloatValue(value);
                     }
                     else
                     {
-                        values.Add(getFloatValue(value));
+                        values.Add(GetFloatValue(value));
                     }
                 }
                 else

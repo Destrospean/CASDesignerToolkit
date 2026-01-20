@@ -50,6 +50,8 @@
             Title = OriginalWindowTitle + " \u2013 " + (directoryPath.Length > 40 ? "..." + directoryPath.Substring(directoryPath.Length - 40) : directoryPath) + System.IO.Path.DirectorySeparatorChar + System.IO.Path.GetFileName(path);
         }
 
+        public abstract void DrawImage();
+
         public Gtk.ResponseType GetUnsavedChangesDialogResponseType()
         {
             var unsavedChangesDialog = new UnsavedChangesDialog(this);
@@ -57,8 +59,6 @@
             unsavedChangesDialog.Destroy();
             return responseType;
         }
-
-        public abstract void DrawImage();
 
         public abstract void RescaleAndReposition(bool skipRescale = false);
     }
