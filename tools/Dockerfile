@@ -10,6 +10,6 @@ RUN dpkg --add-architecture i386
 RUN apt update && apt install -y mono-complete gtk-sharp2 rar unrar wine32:i386 && rm -rf /var/lib/apt/lists/*
 
 # Unpack older .NET frameworks for Mono
-#COPY libs/mono*.rar /tmp && unrar x /tmp/mono-older-frameworks.part01.rar -y -op/usr/lib/ && rm /tmp/mono*.rar
+#COPY tools/mono*.rar /tmp && unrar x /tmp/mono-older-frameworks.part01.rar -y -op/usr/lib/ && rm /tmp/mono*.rar
 
 CMD ["/bin/bash", "/CASDesignerToolkit/tools/bundle_debian.sh"]
