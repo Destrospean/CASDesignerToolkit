@@ -19,6 +19,8 @@ namespace Destrospean.Common.Abstractions
 
         public static CmarNYCBorrowed.TextureUtils.GetTextureDelegate GetTextureCallback;
 
+        public readonly string ID;
+
         public static CmarNYCBorrowed.Action MarkModelsNeedUpdatedCallback, MarkUnsavedChangesCallback;
 
         public abstract s3pi.Interfaces.IPackage ParentPackage
@@ -103,6 +105,7 @@ namespace Destrospean.Common.Abstractions
         {
             mPropertiesXmlNodes = new SortedDictionary<string, XmlNode>(new PropertyNameComparer());
             mPropertiesTyped = new SortedDictionary<string, PropertyMeta>(new PropertyNameComparer());
+            ID = System.Guid.NewGuid().ToString();
         }
 
         public virtual string GetValue(string propertyName)
