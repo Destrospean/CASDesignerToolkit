@@ -32,6 +32,16 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             private set;
         }
 
+        class PageLabelHBox : HBox
+        {
+            public readonly string PresetID;
+
+            public PageLabelHBox(bool homogeneous, int spacing, string presetID) : base(homogeneous, spacing)
+            {
+                PresetID = presetID;
+            }
+        }
+
         protected PresetNotebook(CASTableObject castableObject, Gtk.Image imageWidget, bool isSubNotebook = false) : base()
         {
             try
@@ -63,6 +73,26 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         */
                         LastSelectedPage = CurrentPage;
                     };
+                if (!mIsSubNotebook)
+                {
+                    PageReordered += (o, args) =>
+                        {
+                            var newIndex = (int)args.P1 - CASTableObject.AllPresets.Count + CASTableObject.Presets.Count;
+                            if (newIndex == -1)
+                            {
+                                ReorderChild(args.P0, (int)args.P1 + 1);
+                                return;
+                            }
+                            var preset = CASTableObject.Presets.Find(x => x.ID == ((PageLabelHBox)GetTabLabel(args.P0)).PresetID);
+                            CASTableObject.Presets.Remove(preset);
+                            CASTableObject.Presets.Insert(newIndex, preset);
+                            for (var i = CASTableObject.AllPresets.Count - CASTableObject.Presets.Count; i < CASTableObject.AllPresets.Count; i++)
+                            {
+                                SetTabLabel(GetNthPage(i), GetPageLabelHBox(i - NPages - 1));
+                            }
+                            Complate.MarkUnsavedChangesCallback();
+                        };
+                }
             }
             catch (System.Exception ex)
             {
@@ -257,8 +287,8 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         mDisableSwitchPage = false;
                         MainWindowBase.Singleton.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
-                var hBox = new HBox(false, 0);
-                hBox.PackStart(new Label(isDefault ? "Default" : "Preset " + pageIndex.ToString()), true, true, 0);
+                var hBox = new PageLabelHBox(false, 0, CASTableObject.AllPresets[pageIndex + CASTableObject.AllPresets.Count - CASTableObject.Presets.Count].ID);
+                hBox.PackStart(new Label(isDefault ? "Default" : "Preset " + pageIndex), true, true, 0);
                 if (CASTableObject.DefaultPreset == null ? CASTableObject.Presets.Count > 1 : !isDefault)
                 {
                     hBox.PackEnd(deleteButton, false, true, 0);
@@ -304,6 +334,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 if (!mIsSubNotebook)
                 {
                     AppendPage(subNotebook, GetPageLabelHBox(CASTableObject.Presets.Count - CASTableObject.AllPresets.Count, isDefault));
+                    SetTabReorderable(GetNthPage(NPages - 1), !isDefault);
                 }
                 var complates = new List<Complate>
                     {
