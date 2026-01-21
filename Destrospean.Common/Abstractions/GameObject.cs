@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.S3PIExtensions;
+using Destrospean.zoeoeBorrowed;
 using meshExpImp.ModelBlocks;
 using s3pi.GenericRCOLResource;
 using s3pi.Interfaces;
@@ -24,7 +25,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public readonly Dictionary<LODId, zoeoeBorrowed.MeshUtils.LODData> LODs = new Dictionary<LODId, zoeoeBorrowed.MeshUtils.LODData>();
+        public readonly Dictionary<LODId, LODData> LODs = new Dictionary<LODId, LODData>();
 
         public CatalogResource.ObjectCatalogResource ObjectCatalogResource
         {
@@ -60,6 +61,19 @@ namespace Destrospean.Common.Abstractions
                 Presets.AddRange(((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null)).ConvertAll(x => new GameObjectPreset(this, x.MaterialBlock) as Preset));
             }
             LoadLODs(mlodResources, modlResources, vpxyResources);
+            LODData lodData;
+            if (LODs.TryGetValue(LODId.MediumDetail, out lodData))
+            {
+                DefaultPresetKey = "key:" + ResourceUtils.GetResourceType("_XML").ToString("X8") + lodData.ResourceKey.Substring(12);
+                try
+                {   
+                    var defaultPresetResourceEvaluated = ParentPackage.EvaluateResourceKey(DefaultPresetKey);
+                    DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)));
+                }
+                catch (ResourceIndexEntryNotFoundException)
+                {
+                }
+            }
         }
 
         public void AddMeshGroup(LODId lod, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
@@ -145,7 +159,7 @@ namespace Destrospean.Common.Abstractions
                     }
                     using (var fileStream = File.Create(filename + extension))
                     {
-                        new BinaryWriter(fileStream).Write(LODs[lod].MLODResource.AsBytes);
+                        new BinaryWriter(fileStream).Write(LODs[lod].Resource.AsBytes);
                     }
                     break;
                 case MeshFileType.OBJ:
@@ -191,7 +205,7 @@ namespace Destrospean.Common.Abstractions
                             }
                             groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                         }
-                        var wso = new WSO(LODs[lod].MLODResource, CurrentRig, groups.ToArray());
+                        var wso = new WSO(LODs[lod].Resource, CurrentRig, groups.ToArray());
                         switch (meshFileType)
                         {
                             case MeshFileType.OBJ:
@@ -227,7 +241,7 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var mlod = (MLOD)((GenericRCOLResource)LODs[lod].MLODResource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
+            var mlod = (MLOD)((GenericRCOLResource)LODs[lod].Resource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
                 var wso = new WSO(new BinaryReader(fileStream));
@@ -289,53 +303,45 @@ namespace Destrospean.Common.Abstractions
                 {
                     continue;
                 }
-                if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("_RIG"))
+                switch (entry01.ParentTGIBlocks[entry01.TGIIndex].GetResourceTypeTag())
                 {
-                    var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
-                    mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                }
-                else if (entry01.ParentTGIBlocks[entry01.TGIIndex].ResourceType == ResourceUtils.GetResourceType("MODL"))
-                {
-                    var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);
-                    var modlKey = modlResourceIndexEntry.ReverseEvaluateResourceKey();
-                    GenericRCOLResource modlResource;
-                    if (!modlResources.TryGetValue(modlKey, out modlResource))
-                    {
-                        modlResources.Add(modlKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, modlResourceIndexEntry));
-                        modlResource = modlResources[modlKey];
-                    }
-                    LODs.Clear();
-                    foreach (var lodEntry in ((MODL)modlResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MODL").RCOLBlock).Entries)
-                    {
-                        GenericRCOLResource resourceWithMLOD = null;
-                        MLOD mlod = null;
-                        var mlodKey = "";
-                        if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
+                    case "_RIG":
+                        var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
+                        mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                        break;
+                    case "MODL":
+                        var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);
+                        var modlKey = modlResourceIndexEntry.ReverseEvaluateResourceKey();
+                        GenericRCOLResource modlResource;
+                        if (!modlResources.TryGetValue(modlKey, out modlResource))
                         {
-                            resourceWithMLOD = modlResource;
-                            mlod = (MLOD)resourceWithMLOD.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock;
+                            modlResources.Add(modlKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, modlResourceIndexEntry));
+                            modlResource = modlResources[modlKey];
                         }
-                        else if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
+                        LODs.Clear();
+                        foreach (var lodEntry in ((MODL)modlResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MODL").RCOLBlock).Entries)
                         {
-                            var mlodResourceIndexEntry = ParentPackage.GetResourceIndexEntry(modlResource.Resources[lodEntry.ModelLodIndex.TGIBlockIndex]);
-                            mlodKey = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
-                            GenericRCOLResource mlodResource;
-                            if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
+                            if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
                             {
-                                mlodResources.Add(mlodKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, mlodResourceIndexEntry));
-                                mlodResource = mlodResources[mlodKey];
+                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, modlKey, modlResource, (MLOD)modlResource.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock));
+                                continue;
                             }
-                            resourceWithMLOD = mlodResource;
-                            mlod = (MLOD)resourceWithMLOD.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
-                        }
-                        else
-                        {
+                            if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
+                            {
+                                var mlodResourceIndexEntry = ParentPackage.GetResourceIndexEntry(modlResource.Resources[lodEntry.ModelLodIndex.TGIBlockIndex]);
+                                var mlodKey = mlodResourceIndexEntry.ReverseEvaluateResourceKey();
+                                GenericRCOLResource mlodResource;
+                                if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
+                                {
+                                    mlodResources.Add(mlodKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, mlodResourceIndexEntry));
+                                    mlodResource = mlodResources[mlodKey];
+                                }
+                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, mlodKey, mlodResource, (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock));
+                                continue;
+                            }
                             break;
                         }
-                        var lodData = zoeoeBorrowed.MeshUtils.LoadMLODData(mlodKey, resourceWithMLOD, resourceWithMLOD.PublicChunks, mlod);
-                        lodData.ID = lodEntry.Id;
-                        LODs.Add(lodData.ID, lodData);
-                    }
+                        break;
                 }
             }
         }
@@ -343,6 +349,18 @@ namespace Destrospean.Common.Abstractions
         public override void SavePresets()
         {
             SaveDefaultPreset();
+            var propertyInfo = CatalogResource.GetType().GetProperty("Materials", typeof(CatalogResource.CatalogResource.MaterialList));
+            if (propertyInfo != null)
+            {
+                var materials = ((CatalogResource.CatalogResource.MaterialList)propertyInfo.GetValue(CatalogResource, null));
+                var materialsReordered = new List<CatalogResource.CatalogResource.Material>();
+                for (var i = 0; i < Presets.Count; i++)
+                {
+                    materialsReordered.Add(materials.Find(x => x.MaterialBlock == ((GameObjectPreset)Presets[i]).MaterialBlock));
+                }
+                materials.Clear();
+                materials.AddRange(materialsReordered);
+            }
         }
     }
 }

@@ -131,7 +131,7 @@ namespace Destrospean.Common
             var evaluated = package.EvaluateResourceKey(patternKey);
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(new StreamReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)).ReadToEnd());
-            var propertiesXmlNodes = new Dictionary<string, string>();
+            var properties = new Dictionary<string, string>();
             foreach (XmlNode childNode in xmlDocument.SelectSingleNode("complate").ChildNodes)
             {
                 if (childNode.Name == "variables")
@@ -141,7 +141,7 @@ namespace Destrospean.Common
                         if (grandchildNode.Name == "param")
                         {
                             var defaultValue = grandchildNode.Attributes["default"].Value;
-                            propertiesXmlNodes.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value == "texture" && defaultValue.StartsWith("($assetRoot)") ? "key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(defaultValue.Substring(defaultValue.LastIndexOf("\\") + 1, defaultValue.LastIndexOf(".") - defaultValue.LastIndexOf("\\") - 1)).ToString("X16") : defaultValue);
+                            properties.Add(grandchildNode.Attributes["name"].Value, grandchildNode.Attributes["type"].Value == "texture" && defaultValue.StartsWith("($assetRoot)") ? "key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(defaultValue.Substring(defaultValue.LastIndexOf("\\") + 1, defaultValue.LastIndexOf(".") - defaultValue.LastIndexOf("\\") - 1)).ToString("X16") : defaultValue);
                         }
                     }
                 }
@@ -167,10 +167,10 @@ namespace Destrospean.Common
             hsvShift = new List<float[]>(),
             rgbColors = new List<float[]>();
             float[] hsvShiftBackground = null;
-            foreach (var propertyXmlNodeKvp in propertiesXmlNodes)
+            foreach (var propertyKvp in properties)
             {
-                string key = propertyXmlNodeKvp.Key.ToLower(),
-                value = propertyXmlNodeKvp.Value;
+                string key = propertyKvp.Key.ToLower(),
+                value = propertyKvp.Value;
                 if (key.StartsWith("channel"))
                 {
                     if (key.EndsWith("enabled"))

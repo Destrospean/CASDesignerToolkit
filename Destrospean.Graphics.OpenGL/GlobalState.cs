@@ -431,7 +431,7 @@ namespace Destrospean.Graphics.OpenGL
                         vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
                     }
                 }
-                var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].MLODResource;
+                var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].Resource;
                 var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 Material material;
                 if (!Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
