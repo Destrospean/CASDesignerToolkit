@@ -816,6 +816,7 @@ public partial class MainWindow : RendererMainWindow
                     GlobalState.Meshes.Clear();
                     GLWidget.Hide();
                     Image.Clear();
+                    DrawImage();
                     foreach (var child in ResourcePropertyTable.Children)
                     {
                         ResourcePropertyTable.Remove(child);
