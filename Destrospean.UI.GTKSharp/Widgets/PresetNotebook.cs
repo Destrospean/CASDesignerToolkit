@@ -88,7 +88,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             CASTableObject.Presets.Insert(newIndex, preset);
                             for (var i = CASTableObject.AllPresets.Count - CASTableObject.Presets.Count; i < CASTableObject.AllPresets.Count; i++)
                             {
-                                SetTabLabel(GetNthPage(i), GetPageLabelHBox(i - NPages - 1));
+                                SetTabLabel(GetNthPage(i), GetPageLabelHBox(i - NPages - CASTableObject.AllPresets.Count + CASTableObject.Presets.Count));
                             }
                             Complate.MarkUnsavedChangesCallback();
                         };
