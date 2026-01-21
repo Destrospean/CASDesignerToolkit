@@ -47,7 +47,7 @@ public partial class MainWindow : RendererMainWindow
                 TreeModel model;
                 if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "OBJD")
                 {
-                    GlobalState.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
+                    Destrospean.Graphics.OpenGL.Sims3.GameObjectUtils.LoadMeshes(PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()], mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture);
                 }
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
