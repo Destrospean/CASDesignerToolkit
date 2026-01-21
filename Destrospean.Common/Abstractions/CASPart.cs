@@ -47,6 +47,12 @@ namespace Destrospean.Common.Abstractions
 
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
+            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.ResourceGroup == resourceIndexEntry.ResourceGroup && x.Instance == resourceIndexEntry.Instance);
+            if (defaultPresetResourceIndexEntries.Count > 0)
+            {
+                DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
+                DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
+            }
             CASPartResource = (CASPartResource.CASPartResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
             Presets.AddRange(CASPartResource.Presets.ConvertAll(x => new CASPartPreset(this, x.XmlFile) as Preset));
             LoadLODs(geometryResources, vpxyResources);

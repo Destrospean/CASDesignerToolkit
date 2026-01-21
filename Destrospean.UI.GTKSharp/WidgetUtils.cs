@@ -5,6 +5,7 @@ using Destrospean.Common;
 using Destrospean.DestrospeanCASPEditor.Widgets;
 using Destrospean.Graphics.OpenGL;
 using Destrospean.S3PIExtensions;
+using Destrospean.zoeoeBorrowed;
 using Gdk;
 using Gtk;
 using s3pi.GenericRCOLResource;
@@ -68,7 +69,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
             try
             {
@@ -405,12 +406,12 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, zoeoeBorrowed.MeshUtils.LODData lodData, zoeoeBorrowed.MeshUtils.MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
+        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
         {
             try
             {
                 var mainWindow = MainWindowBase.Singleton;
-                var mlodResource = (GenericRCOLResource)lodData.MLODResource;
+                var mlodResource = (GenericRCOLResource)lodData.Resource;
                 var matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 var shaders = new List<string>();
                 foreach (var shader in Enum.GetNames(typeof(Shader)))

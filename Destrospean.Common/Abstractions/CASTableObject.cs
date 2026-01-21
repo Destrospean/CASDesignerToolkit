@@ -26,9 +26,17 @@ namespace Destrospean.Common.Abstractions
             get;
         }
 
-        public readonly Preset DefaultPreset;
+        public Preset DefaultPreset
+        {
+            get;
+            protected set;
+        }
 
-        public readonly string DefaultPresetKey;
+        public string DefaultPresetKey
+        {
+            get;
+            protected set;
+        }
 
         public readonly s3pi.Interfaces.IPackage ParentPackage;
 
@@ -39,17 +47,6 @@ namespace Destrospean.Common.Abstractions
         public CASTableObject(s3pi.Interfaces.IPackage package, s3pi.Interfaces.IResourceIndexEntry resourceIndexEntry)
         {
             ParentPackage = package;
-            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.ResourceGroup == resourceIndexEntry.ResourceGroup && x.Instance == resourceIndexEntry.Instance);
-            if (defaultPresetResourceIndexEntries.Count == 0)
-            {
-                DefaultPresetKey = null;
-                DefaultPreset = null;
-            }
-            else
-            {
-                DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
-                DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
-            }
         }
 
         public void ClearCurrentRig()
