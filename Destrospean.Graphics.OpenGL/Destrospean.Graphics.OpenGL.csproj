@@ -68,7 +68,8 @@
     <Compile Include="Shader.cs" />
     <Compile Include="Volume.cs" />
     <Compile Include="GlobalState.cs" />
-    <Compile Include="Sim.cs" />
+    <Compile Include="Sims3\GameObjectUtils.cs" />
+    <Compile Include="Sims3\Sim.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -92,5 +93,8 @@
       <Name>Destrospean.zoeoeBorrowed</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sims3\" />
   </ItemGroup>
 </Project>

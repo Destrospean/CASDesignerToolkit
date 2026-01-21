@@ -201,6 +201,8 @@ namespace Destrospean.Graphics.OpenGL
             }
         }
 
+        public string GroupID;
+
         public override void CalculateModelMatrix()
         {
             ModelMatrix = Matrix4.Scale(Scale) * Matrix4.CreateRotationX(Rotation.X) * Matrix4.CreateRotationY(Rotation.Y) * Matrix4.CreateRotationZ(Rotation.Z) * Matrix4.CreateTranslation(Position);

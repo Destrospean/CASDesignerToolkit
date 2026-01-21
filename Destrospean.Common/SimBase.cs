@@ -8,6 +8,8 @@ namespace Destrospean.Common
     {
         readonly Dictionary<CASPartResource.ClothingType, CASPart> mCASParts = new Dictionary<CASPartResource.ClothingType, CASPart>();
 
+        string mID;
+
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
             get
@@ -36,6 +38,18 @@ namespace Destrospean.Common
         Special = 0,
         Thin = 0;
 
+        public string ID
+        {
+            get
+            {
+                if (mID == null)
+                {
+                    mID = System.Guid.NewGuid().ToString();
+                }
+                return mID;
+            }
+        }
+
         public delegate int LoadTextureDelegate(string key, System.Drawing.Bitmap image);
 
         public readonly Dictionary<string, PreloadedLODMorphed> PreloadedLODsMorphed = new Dictionary<string, PreloadedLODMorphed>(System.StringComparer.InvariantCultureIgnoreCase);
@@ -61,11 +75,11 @@ namespace Destrospean.Common
             }
         }
 
-        protected abstract void LoadGEOMs(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback);
+        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback);
 
-        public void LoadGEOMs(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
+        public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
         {
-            System.Array.ForEach(new List<CASPart>(CASParts.Values).FindAll(x => x != null).ToArray(), x => LoadGEOMs(x, presetIndex, lodIndex, loadTextureCallback));
+            System.Array.ForEach(new List<CASPart>(CASParts.Values).FindAll(x => x != null).ToArray(), x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback));
         }
     }
 }

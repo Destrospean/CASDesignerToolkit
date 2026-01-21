@@ -42,7 +42,7 @@ public partial class MainWindow : RendererMainWindow
             if (value.HasFlag(NextStateOptions.UpdateModels))
             {
                 GlobalState.Meshes.Clear();
-                Sim.LoadGEOMs(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
+                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                 TreeIter iter;
                 TreeModel model;
                 if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "OBJD")
