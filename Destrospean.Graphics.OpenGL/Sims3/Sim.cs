@@ -12,7 +12,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
 {
     public class Sim : SimBase
     {
-        protected override void LoadGEOMs(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
+        protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
         {
             if (!CASParts.ContainsValue(casPart) || casPart.LODs.Count == 0)
             {
@@ -77,8 +77,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         {
                             if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed) && bgeo != null)
                             {
-                                //bgeo.Weight = weights[i] * geomMorph.Amount;
-                                //geom = geom.LoadBGEOMorph(bgeo, lod, casPart.AdjustedSpecies, (AgeGender)(uint)casPart.CASPartResource.AgeGender.Age, (AgeGender)((uint)casPart.CASPartResource.AgeGender.Gender << 12));
                                 preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
                                     {
                                         new GEOM(geom, bgeo, 0, lod)
@@ -207,14 +205,15 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 var currentPreset = casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0];
                 GlobalState.Meshes.Add(new Volume
                     {
+                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
                         ColorData = colors.ToArray(),
                         Faces = faces,
+                        GroupID = ID,
+                        MainTextureID = loadTextureCallback(key, currentPreset.Texture),
                         Material = material,
                         Normals = normals.ToArray(),
-                        TextureCoordinates = textureCoordinates.ToArray(),
-                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        MainTextureID = loadTextureCallback(key, currentPreset.Texture),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
+                        TextureCoordinates = textureCoordinates.ToArray(),
                         Vertices = vertices.ToArray()
                     });
             }
