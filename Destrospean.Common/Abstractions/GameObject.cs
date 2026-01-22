@@ -90,7 +90,6 @@ namespace Destrospean.Common.Abstractions
             {
                 materialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)GameObjectPreset.CreateComplateOverrideInstance(name, casPartPreset[name], casPartPreset.PropertiesTyped[name].Type, materialBlock, ParentPackage));
             }
-            var preset = new GameObjectPreset(this, materialBlock);
             foreach (var pattern in casPartPreset.Patterns)
             {
                 var patternMaterialBlock = new CatalogResource.CatalogResource.MaterialBlock(0, (sender, e) =>
@@ -102,7 +101,7 @@ namespace Destrospean.Common.Abstractions
                         Pattern = pattern.SlotName
                     };
                 patternMaterialBlock.ParentTGIBlocks.Add(new TGIBlock(0, null, ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(patternMaterialBlock.Name)));
-                var gameObjectPattern = new Pattern(preset, patternMaterialBlock, materialBlock);
+                var gameObjectPattern = new Pattern(new GameObjectPreset(this, materialBlock), patternMaterialBlock, materialBlock);
                 foreach (var name in gameObjectPattern.PropertiesTyped.Keys)
                 {
                     patternMaterialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)GameObjectPreset.CreateComplateOverrideInstance(name, gameObjectPattern[name], gameObjectPattern.PropertiesTyped[name].Type, patternMaterialBlock, gameObjectPattern.ParentPackage));
@@ -114,7 +113,7 @@ namespace Destrospean.Common.Abstractions
                 {
                 }, 1, 0, (ushort)0x42, materialBlock, materialBlock.ParentTGIBlocks, (uint)materials.Count);
             materials.Add(material);
-            preset = new GameObjectPreset(this, material.MaterialBlock);
+            var preset = new GameObjectPreset(this, material.MaterialBlock);
             Presets.Add(preset);
             for (var i = 0; i < preset.Patterns.Count; i++)
             {
