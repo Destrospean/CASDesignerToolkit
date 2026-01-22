@@ -85,7 +85,7 @@ namespace Destrospean.Common.Abstractions
                     Name = casPartPreset.Patterns.Exists(x => x.SlotName == "Pattern D") ? "ObjectRgbaMask" : "ObjectRgbMask"
                 };
             materialBlock.ComplateXMLIndex = (byte)materialBlock.ParentTGIBlocks.Count;
-            materialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, S3PIExtensions.ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(materialBlock.Name)));
+            materialBlock.ParentTGIBlocks.Add(new TGIBlock(0, null, ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(materialBlock.Name)));
             foreach (var name in casPartPreset.PropertiesTyped.Keys)
             {
                 materialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)GameObjectPreset.CreateComplateOverrideInstance(name, casPartPreset[name], casPartPreset.PropertiesTyped[name].Type, materialBlock, ParentPackage));
@@ -101,7 +101,7 @@ namespace Destrospean.Common.Abstractions
                         Name = pattern.PatternInfo.Name,
                         Pattern = pattern.SlotName
                     };
-                patternMaterialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, S3PIExtensions.ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(patternMaterialBlock.Name)));
+                patternMaterialBlock.ParentTGIBlocks.Add(new TGIBlock(0, null, ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(patternMaterialBlock.Name)));
                 var gameObjectPattern = new Pattern(preset, patternMaterialBlock, materialBlock);
                 foreach (var name in gameObjectPattern.PropertiesTyped.Keys)
                 {
