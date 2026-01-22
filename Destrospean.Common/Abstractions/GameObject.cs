@@ -76,6 +76,55 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
+        public void AddCASPartPreset(CASPartPreset casPartPreset)
+        {
+            var materialBlock = new CatalogResource.CatalogResource.MaterialBlock(0, (sender, e) =>
+                {
+                }, (TGIBlockList)CatalogResource.GetType().GetProperty("TGIBlocks").GetValue(CatalogResource, null))
+                {
+                    Name = casPartPreset.Patterns.Exists(x => x.SlotName == "Pattern D") ? "ObjectRgbaMask" : "ObjectRgbMask"
+                };
+            materialBlock.ComplateXMLIndex = (byte)materialBlock.ParentTGIBlocks.Count;
+            materialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, S3PIExtensions.ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(materialBlock.Name)));
+            foreach (var name in casPartPreset.PropertiesTyped.Keys)
+            {
+                materialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)GameObjectPreset.CreateComplateOverrideInstance(name, casPartPreset[name], casPartPreset.PropertiesTyped[name].Type, materialBlock, ParentPackage));
+            }
+            var preset = new GameObjectPreset(this, materialBlock);
+            foreach (var pattern in casPartPreset.Patterns)
+            {
+                var patternMaterialBlock = new CatalogResource.CatalogResource.MaterialBlock(0, (sender, e) =>
+                    {
+                    }, materialBlock.ParentTGIBlocks)
+                    {
+                        ComplateXMLIndex = (byte)materialBlock.ParentTGIBlocks.Count,
+                        Name = pattern.PatternInfo.Name,
+                        Pattern = pattern.SlotName
+                    };
+                patternMaterialBlock.ParentTGIBlocks.Add(new s3pi.Interfaces.TGIBlock(0, null, S3PIExtensions.ResourceUtils.GetResourceType("_XML"), 0, System.Security.Cryptography.FNV64.GetHash(patternMaterialBlock.Name)));
+                var gameObjectPattern = new Pattern(preset, patternMaterialBlock, materialBlock);
+                foreach (var name in gameObjectPattern.PropertiesTyped.Keys)
+                {
+                    patternMaterialBlock.ComplateOverrides.Add((CatalogResource.CatalogResource.ComplateElement)GameObjectPreset.CreateComplateOverrideInstance(name, gameObjectPattern[name], gameObjectPattern.PropertiesTyped[name].Type, patternMaterialBlock, gameObjectPattern.ParentPackage));
+                }
+                materialBlock.MaterialBlocks.Add(patternMaterialBlock);
+            }
+            var materials = (CatalogResource.CatalogResource.MaterialList)CatalogResource.GetType().GetProperty("Materials").GetValue(CatalogResource, null);
+            var material = new CatalogResource.CatalogResource.Material(0, (sender, e) =>
+                {
+                }, 1, 0, (ushort)0x42, materialBlock, materialBlock.ParentTGIBlocks, (uint)materials.Count);
+            materials.Add(material);
+            preset = new GameObjectPreset(this, material.MaterialBlock);
+            Presets.Add(preset);
+            for (var i = 0; i < preset.Patterns.Count; i++)
+            {
+                foreach (var name in preset.Patterns[i].PropertyNames)
+                {
+                    preset.Patterns[i][name] = casPartPreset.Patterns[i][name];
+                }
+            }
+        }
+
         public void AddMeshGroup(LODId lod, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             /*
