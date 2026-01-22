@@ -305,7 +305,13 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
 
         public void AddGameObjectPreset()
         {
-            CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+            var casPartPreset = CASTableObject.AllPresets[CurrentPage] as CASPartPreset;
+            if (casPartPreset == null)
+            {
+                CASTableObject.Presets.Add(new GameObjectPreset(CASTableObject, ((GameObjectPreset)CASTableObject.AllPresets[CurrentPage]).MaterialBlock));
+                return;
+            }
+            ((GameObject)CASTableObject).AddCASPartPreset(casPartPreset);
         }
 
         public void AddPreset()
