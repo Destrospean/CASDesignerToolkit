@@ -124,6 +124,8 @@ namespace Destrospean.S3PIExtensions
     {
         static Dictionary<PackageTag, IPackage> sGameContentPackages, sGameImageResourcePackages;
 
+        static object sLock = new object();
+
         static List<string> sMissingResourceKeys;
 
         public static Dictionary<PackageTag, IPackage> GameContentPackages
@@ -180,18 +182,21 @@ namespace Destrospean.S3PIExtensions
 
         static EvaluatedResourceKey EvaluateResourceKeyInternal(this IPackage package, string key)
         {
-            var tgi = new ulong[3];
-            var i = 0;
-            foreach (var hex in key.Substring(4).Split(':'))
+            lock (sLock)
             {
-                tgi[i++] = Convert.ToUInt64(hex, 16);
+                var tgi = new ulong[3];
+                var i = 0;
+                foreach (var hex in key.Substring(4).Split(':'))
+                {
+                    tgi[i++] = Convert.ToUInt64(hex, 16);
+                }
+                var results = package.FindAll(x => x.ResourceType == tgi[0] && x.ResourceGroup == tgi[1] && x.Instance == tgi[2]);
+                if (results.Count == 0)
+                {
+                    throw new ResourceIndexEntryNotFoundException();
+                }
+                return new EvaluatedResourceKey(package, results[0]);
             }
-            var results = package.FindAll(x => x.ResourceType == tgi[0] && x.ResourceGroup == tgi[1] && x.Instance == tgi[2]);
-            if (results.Count == 0)
-            {
-                throw new ResourceIndexEntryNotFoundException();
-            }
-            return new EvaluatedResourceKey(package, results[0]);
         }
 
         public static IResourceIndexEntry AddResource(this IPackage package, string filename, IResourceKey resourceKey = null, bool rejectDups = true)

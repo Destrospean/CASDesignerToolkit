@@ -16,6 +16,7 @@
                     try
                     {
                         ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                        Common.Abstractions.CASPart.GenerateCache();
                     }
                     catch (System.Exception ex)
                     {

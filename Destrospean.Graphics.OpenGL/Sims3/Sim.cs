@@ -7,21 +7,34 @@ using Destrospean.S3PIExtensions;
 using s3pi.GenericRCOLResource;
 using Vector2 = OpenTK.Vector2;
 using Vector3 = OpenTK.Vector3;
+using Vector4 = OpenTK.Vector4;
 
 namespace Destrospean.Graphics.OpenGL.Sims3
 {
     public class Sim : SimBase
     {
+        public class CASPartVolume : Volume
+        {
+            public List<Vector3> DeltaNormalsFat, DeltaNormalsFit, DeltaNormalsSpecial, DeltaNormalsThin, DeltaVerticesFat, DeltaVerticesFit, DeltaVerticesSpecial, DeltaVerticesThin;
+
+            public SimBase ParentSim;
+        }
+
         protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
         {
             if (!CASParts.ContainsValue(casPart) || casPart.LODs.Count == 0)
             {
                 return;
             }
-            var lod = new List<int>(casPart.LODs.Keys)[lodIndex];
-            foreach (var geometryResource in new List<List<GEOM>>(casPart.LODs.Values)[lodIndex])
+            var adjustedLODIndex = lodIndex < casPart.LODs.Count ? lodIndex : casPart.LODs.Count - 1;
+            if (adjustedLODIndex < 0)
             {
-                var geom = geometryResource;
+                return;
+            }
+            var lod = new List<int>(casPart.LODs.Keys)[adjustedLODIndex];
+            foreach (var geomAndKey in new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[adjustedLODIndex])
+            {
+                var geom = geomAndKey.GEOM;
                 byte[] bblnIndices =
                     {
                         casPart.CASPartResource.BlendInfoFatIndex,
@@ -29,13 +42,14 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         casPart.CASPartResource.BlendInfoThinIndex,
                         casPart.CASPartResource.BlendInfoSpecialIndex
                     };
-                float[] weights =
-                    {
-                        Fat,
-                        Fit,
-                        Thin,
-                        Special
-                    };
+                List<float[]> deltaNormalsFat = new List<float[]>(),
+                deltaNormalsFit = new List<float[]>(),
+                deltaNormalsSpecial = new List<float[]>(),
+                deltaNormalsThin = new List<float[]>(),
+                deltaVerticesFat = new List<float[]>(),
+                deltaVerticesFit = new List<float[]>(),
+                deltaVerticesSpecial = new List<float[]>(),
+                deltaVerticesThin = new List<float[]>();
                 for (var i = 0; i < bblnIndices.Length; i++)
                 {
                     BBLN bbln;
@@ -75,38 +89,63 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         foreach (var geomMorph in entry.GEOMMorphs)
                         {
-                            if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed) && bgeo != null)
+                            if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed))
                             {
-                                preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
-                                    {
-                                        new GEOM(geom, bgeo, 0, lod)
-                                    });
-                                PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
-                            }
-                            else if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed) && bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
-                            {
-                                try
+                                if (bgeo != null)
                                 {
-                                    var geoms = new List<GEOM>();
-                                    foreach (var link in new CmarNYCBorrowed.VPXY(new BinaryReader(PreloadedData.VPXYs[new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey()].Stream)).GetMeshLinks(lod))
-                                    {
-                                        try
+                                    preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
                                         {
-                                            geoms.Add(PreloadedData.GEOMs[new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey()]);
-                                        }
-                                        catch (ResourceIndexEntryNotFoundException)
-                                        {
-                                        }
-                                    }
-                                    preloadedLODMorphed = new PreloadedLODMorphed(bbln, geoms.ToArray());
+                                            new GEOM(geom, bgeo, 0, lod)
+                                        });
                                     PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
                                 }
-                                catch (ResourceIndexEntryNotFoundException)
+                                else if (bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
                                 {
+                                    try
+                                    {
+                                        var geoms = new List<GEOM>();
+                                        foreach (var link in new CmarNYCBorrowed.VPXY(new BinaryReader(PreloadedData.VPXYs[new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey()].Stream)).GetMeshLinks(lod))
+                                        {
+                                            try
+                                            {
+                                                geoms.Add(PreloadedData.GEOMs[new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey()]);
+                                            }
+                                            catch (ResourceIndexEntryNotFoundException)
+                                            {
+                                            }
+                                        }
+                                        preloadedLODMorphed = new PreloadedLODMorphed(bbln, geoms.ToArray());
+                                        PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
+                                    }
+                                    catch (ResourceIndexEntryNotFoundException)
+                                    {
+                                    }
                                 }
                             }
-                            geom = geom.LoadGEOMMorph(preloadedLODMorphed.GEOMs, weights[i]);
+                            List<float[]> deltaNormals, deltaVertices;
+                            switch (i)
+                            {
+                                case 0:
+                                    deltaNormals = deltaNormalsFat;
+                                    deltaVertices = deltaVerticesFat;
+                                    break;
+                                case 1:
+                                    deltaNormals = deltaNormalsFit;
+                                    deltaVertices = deltaVerticesFit;
+                                    break;
+                                case 2:
+                                    deltaNormals = deltaNormalsThin;
+                                    deltaVertices = deltaVerticesThin;
+                                    break;
+                                default:
+                                    deltaNormals = deltaNormalsSpecial;
+                                    deltaVertices = deltaVerticesSpecial;
+                                    break;
+                            }
+                            MeshUtils.GetDeltaVertices(preloadedLODMorphed.GEOMs, deltaNormals, deltaVertices);
+                            //geom = geom.LoadGEOMMorph(preloadedLODMorphed.GEOMs, weights[i]);
                         }
+                        /*
                         foreach (var boneMorph in entry.BoneMorphs)
                         {
                             try
@@ -129,13 +168,14 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             {
                             }
                         }
+                        */
                     }
                 }
-                List<Vector3> colors = new List<Vector3>(),
-                normals = new List<Vector3>(),
-                vertices = new List<Vector3>();
+                List<float[]> colors = new List<float[]>(),
+                normals = new List<float[]>(),
+                vertices = new List<float[]>();
                 var faces = new List<int[]>();
-                var textureCoordinates = new List<Vector2>();
+                var textureCoordinates = new List<float[]>();
                 for (var i = 0; i < geom.FaceCount; i++)
                 {
                     var indices = geom.GetFaceIndices(i);
@@ -148,28 +188,22 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 }
                 for (var i = 0; i < geom.VertexCount; i++)
                 {
-                    colors.Add(Vector3.One);
-                    float[] normal = geom.GetNormal(i),
-                    position = geom.GetPosition(i);
-                    normals.Add(new Vector3(normal[0], normal[1], normal[2]));
-                    vertices.Add(new Vector3(position[0], position[1], position[2]));
+                    colors.Add(new float[]
+                        {
+                            1,
+                            1,
+                            1
+                        });
+                    normals.Add(geom.GetNormal(i));
+                    vertices.Add(geom.GetPosition(i));
                     for (var j = 0; j < geom.UVCount; j++)
                     {
                         var uv = geom.GetUV(i, j);
-                        textureCoordinates.Add(new Vector2(uv[0], uv[1]));
-                    }
-                }
-                var key = "";
-                foreach (var geometryResourceKvp in PreloadedData.GEOMs)
-                {
-                    if (geometryResourceKvp.Value == geometryResource)
-                    {
-                        key = geometryResourceKvp.Key;
-                        break;
+                        textureCoordinates.Add(uv);
                     }
                 }
                 Material material;
-                if (!GlobalState.Materials.TryGetValue(key, out material))
+                if (!GlobalState.Materials.TryGetValue(geomAndKey.Key, out material))
                 {
                     var materialColors = new Dictionary<FieldType, Vector3>();
                     var materialMaps = new Dictionary<FieldType, string>();
@@ -200,22 +234,31 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };
-                    GlobalState.Materials.Add(key, material);
+                    GlobalState.Materials[geomAndKey.Key] = material;
                 }
                 var currentPreset = casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0];
-                GlobalState.Meshes.Add(new Volume
+                GlobalState.Meshes[geomAndKey.Key] = new CASPartVolume
                     {
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
-                        ColorData = colors.ToArray(),
+                        ColorData = colors.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
+                        DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaNormalsFit = FillMissingDeltas(normals, deltaNormalsFit).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaNormalsSpecial = FillMissingDeltas(normals, deltaNormalsSpecial).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaNormalsThin = FillMissingDeltas(normals, deltaNormalsThin).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaVerticesFat = FillMissingDeltas(vertices, deltaVerticesFat).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaVerticesFit = FillMissingDeltas(vertices, deltaVerticesFit).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaVerticesSpecial = FillMissingDeltas(vertices, deltaVerticesSpecial).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        DeltaVerticesThin = FillMissingDeltas(vertices, deltaVerticesThin).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
                         Faces = faces,
                         GroupID = ID,
-                        MainTextureID = loadTextureCallback(key, currentPreset.Texture),
+                        MainTextureID = loadTextureCallback(geomAndKey.Key, currentPreset.Texture),
                         Material = material,
-                        Normals = normals.ToArray(),
+                        ParentSim = this,
+                        Normals = normals.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
-                        TextureCoordinates = textureCoordinates.ToArray(),
-                        Vertices = vertices.ToArray()
-                    });
+                        TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
+                        Vertices = vertices.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
+                    };
             }
         }
     }

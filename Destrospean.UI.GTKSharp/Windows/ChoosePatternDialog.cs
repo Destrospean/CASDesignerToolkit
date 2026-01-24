@@ -178,6 +178,10 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static void GenerateCache(IPackage package)
         {
+            if (File.Exists(PatternUtils.CacheFilePath))
+            {
+                return;
+            }
             PatternUtils.GenerateCache(package);
             foreach (var patternImageKvp in PatternUtils.PreloadedPatternImages)
             {

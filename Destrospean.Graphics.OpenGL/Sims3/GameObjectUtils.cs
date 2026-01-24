@@ -99,7 +99,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     continue;
                 }
                 var currentPreset = gameObject.AllPresets[presetIndex];
-                GlobalState.Meshes.Add(new Volume
+                GlobalState.Meshes.Add(matd.MaterialNameHash.ToString(), new Volume
                     {
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
                         ColorData = colors.ToArray(),

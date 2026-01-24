@@ -27,6 +27,8 @@ public partial class MainWindow : RendererMainWindow
 
     string mSaveAsPath;
 
+    static object sLock = new object();
+
     public IPackage CurrentPackage;
 
     public Image Image = new Image();
@@ -41,8 +43,24 @@ public partial class MainWindow : RendererMainWindow
             }
             if (value.HasFlag(NextStateOptions.UpdateModels))
             {
-                GlobalState.Meshes.Clear();
-                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
+                if (GlobalState.GLInitialized && GraphicsContext != null)
+                {
+                    new System.Threading.Thread(() =>
+                        {
+                            lock (sLock)
+                            {
+                                using (var graphicsContext = new OpenTK.Graphics.GraphicsContext(GraphicsContext.GraphicsMode, WindowInfo))
+                                {
+                                    graphicsContext.MakeCurrent(WindowInfo);
+                                    lock (GlobalState.Lock)
+                                    {
+                                        GlobalState.Meshes.Clear();
+                                    }
+                                    Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
+                                }
+                            }
+                        }).Start();
+                }
                 /*
                 TreeIter iter;
                 TreeModel model;
@@ -82,7 +100,8 @@ public partial class MainWindow : RendererMainWindow
         RescaleAndReposition();
         BuildResourceTable();
         new System.Threading.Thread(ChoosePatternDialog.LoadCache).Start();
-        if (!File.Exists(PatternUtils.CacheFilePath))
+        new System.Threading.Thread(CASPart.LoadCache).Start();
+        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow("Please wait as caches are being generated...", this, new Gdk.Pixbuf(System.Reflection.Assembly.GetExecutingAssembly(), "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png"));
         }
@@ -179,12 +198,12 @@ public partial class MainWindow : RendererMainWindow
             flagPageButtonHBox.PackEnd(exportTextureButton, false, true, 4);
             buttonHBox.PackStart(flagPageButtonHBox, false, true, 0);
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
+            var casPart = castableObject as CASPart;
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
                     castableObject.ClearCurrentRig();
                     NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                 };
-            var casPart = castableObject as CASPart;
             if (casPart != null)
             {
                 Sim.CurrentCASPart = casPart;
@@ -466,7 +485,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         Value = Sim.Special
                     };
-                Destrospean.CmarNYCBorrowed.Action changeOtherSlidersAndUpdateModels = delegate
+                Destrospean.CmarNYCBorrowed.Action changeOtherSliders = delegate
                     {
                         for (var i = 0; i < casPart.LODs.Count; i++)
                         {
@@ -493,23 +512,22 @@ public partial class MainWindow : RendererMainWindow
                                 }
                             }
                         }
-                        ModelsNeedUpdated = true;
                     };
                 fatnessHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Fat = fatnessHScale.Value > 0 ? (float)fatnessHScale.Value : 0;
                         Sim.Thin = fatnessHScale.Value < 0 ? (float)-fatnessHScale.Value : 0;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 fitnessHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Fit = (float)fitnessHScale.Value;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 specialHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Special = (float)specialHScale.Value;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 var meshGroupPageButtonHBox = new HBox(false, 0);
                 meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
@@ -530,8 +548,8 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label("LOD " + lodKvp.Key.ToString()));
-                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, casPart.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
-                if (lodKvp.Value == new List<List<GEOM>>(casPart.LODs.Values)[startLODPageIndex])
+                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x.GEOM, casPart.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
+                if (lodKvp.Value == new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[startLODPageIndex])
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
                     meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
@@ -849,6 +867,14 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
+                                new System.Threading.Thread(x =>
+                                    {
+                                        lock (sLock)
+                                        {
+                                            Sim.RandomizeCASParts();
+                                            ModelsNeedUpdated = true;
+                                        }
+                                    }).Start();
                                 break;
                             /*
                             case "OBJD":

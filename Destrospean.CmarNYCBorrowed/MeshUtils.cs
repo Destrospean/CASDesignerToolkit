@@ -24,6 +24,25 @@ namespace Destrospean.CmarNYCBorrowed
 {
     public static class MeshUtils
     {
+        public static void GetDeltaVertices(GEOM[] morphs, List<float[]> deltaNormals, List<float[]> deltaPositions)
+        {
+            for (var i = 0; i < morphs.Length; i++)
+            {
+                for (var j = 0; j < morphs[i].VertexCount; j++)
+                {
+                    try
+                    {
+                        morphs[i].GetVertexID(j);
+                        deltaNormals.Add(morphs[i].GetNormal(j));
+                        deltaPositions.Add(morphs[i].GetPosition(j));
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                    }
+                }
+            }
+        }
+
         public static Rig GetRig(this s3pi.Interfaces.IPackage package, Species species, AgeGender age)
         {
             var rigName = GetRigPrefix(species, age, AgeGender.Unisex) + "Rig";

@@ -23,9 +23,25 @@ namespace Destrospean.DestrospeanCASPEditor
             protected set;
         }
 
+        public OpenTK.Graphics.IGraphicsContext GraphicsContext
+        {
+            get
+            {
+                return (OpenTK.Graphics.IGraphicsContext)GLWidget.GetType().GetField("graphicsContext", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(GLWidget);
+            }
+        }
+
         public bool ModelsNeedUpdated = false;
 
         public readonly Destrospean.Graphics.OpenGL.Sims3.Sim Sim;
+
+        public OpenTK.Platform.IWindowInfo WindowInfo
+        {
+            get
+            {
+                return (OpenTK.Platform.IWindowInfo)GLWidget.GetType().GetField("windowInfo", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(GLWidget);
+            }
+        }
 
         [System.Flags]
         public enum MouseButtonsHeld : byte
@@ -38,6 +54,7 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public RendererMainWindow(Gtk.WindowType windowType) : base(windowType)
         {
+            OpenTK.Graphics.GraphicsContext.ShareContexts = true;
             Common.Abstractions.Complate.MarkModelsNeedUpdatedCallback = () => ModelsNeedUpdated = true;
             Sim = new Graphics.OpenGL.Sims3.Sim();
         }
