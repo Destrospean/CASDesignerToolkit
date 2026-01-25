@@ -55,19 +55,12 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     BBLN bbln;
                     string bblnKey;
                     EvaluatedResourceKey evaluated;
-                    PreloadedLODMorphed preloadedLODMorphed;
+                    //PreloadedLODMorphed preloadedLODMorphed;
                     try
                     {
                         bblnKey = casPart.CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey();
-                        if (PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed))
-                        {
-                            bbln = preloadedLODMorphed.BBLN;
-                        }
-                        else
-                        {
-                            evaluated = casPart.ParentPackage.EvaluateResourceKey(bblnKey);
-                            bbln = new BBLN(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                        }
+                        evaluated = casPart.ParentPackage.EvaluateResourceKey(bblnKey);
+                        bbln = new BBLN(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
                     }
                     catch (ResourceIndexEntryNotFoundException)
                     {
@@ -76,11 +69,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     BGEO bgeo = null;
                     try
                     {
-                        if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed))
-                        {
-                            evaluated = casPart.ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.BGEOTGI.Type, bbln.BGEOTGI.Group, bbln.BGEOTGI.Instance).ReverseEvaluateResourceKey());
-                            bgeo = new BGEO(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                        }
+                        evaluated = casPart.ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.BGEOTGI.Type, bbln.BGEOTGI.Group, bbln.BGEOTGI.Instance).ReverseEvaluateResourceKey());
+                        bgeo = new BGEO(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
                     }
                     catch (ResourceIndexEntryNotFoundException)
                     {
@@ -89,39 +79,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         foreach (var geomMorph in entry.GEOMMorphs)
                         {
-                            if (!PreloadedLODsMorphed.TryGetValue(bblnKey, out preloadedLODMorphed))
-                            {
-                                if (bgeo != null)
-                                {
-                                    preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
-                                        {
-                                            new GEOM(geom, bgeo, 0, lod)
-                                        });
-                                    PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
-                                }
-                                else if (bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
-                                {
-                                    try
-                                    {
-                                        var geoms = new List<GEOM>();
-                                        foreach (var link in new CmarNYCBorrowed.VPXY(new BinaryReader(PreloadedData.VPXYs[new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey()].Stream)).GetMeshLinks(lod))
-                                        {
-                                            try
-                                            {
-                                                geoms.Add(PreloadedData.GEOMs[new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey()]);
-                                            }
-                                            catch (ResourceIndexEntryNotFoundException)
-                                            {
-                                            }
-                                        }
-                                        preloadedLODMorphed = new PreloadedLODMorphed(bbln, geoms.ToArray());
-                                        PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
-                                    }
-                                    catch (ResourceIndexEntryNotFoundException)
-                                    {
-                                    }
-                                }
-                            }
                             List<float[]> deltaNormals, deltaVertices;
                             switch (i)
                             {
@@ -142,10 +99,42 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                     deltaVertices = deltaVerticesSpecial;
                                     break;
                             }
-                            MeshUtils.GetDeltaVertices(preloadedLODMorphed.GEOMs, deltaNormals, deltaVertices);
+                            if (bgeo != null)
+                            {
+                                /*
+                                preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
+                                    {
+                                        new GEOM(geom, bgeo, 0, lod)
+                                    });
+                                PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
+                                */
+                                geom.GetDeltaVertices(bgeo, lod, 0, deltaNormals, deltaVertices);
+                            }
+                            else if (bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
+                            {
+                                try
+                                {
+                                    var geoms = new List<GEOM>();
+                                    foreach (var link in new CmarNYCBorrowed.VPXY(new BinaryReader(PreloadedData.VPXYs[new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey()].Stream)).GetMeshLinks(lod))
+                                    {
+                                        try
+                                        {
+                                            geoms.Add(PreloadedData.GEOMs[new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey()]);
+                                        }
+                                        catch (ResourceIndexEntryNotFoundException)
+                                        {
+                                        }
+                                    }
+                                    //preloadedLODMorphed = new PreloadedLODMorphed(bbln, geoms.ToArray());
+                                    //PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
+                                    MeshUtils.GetDeltaVertices(geoms.ToArray(), deltaNormals, deltaVertices);
+                                }
+                                catch (ResourceIndexEntryNotFoundException)
+                                {
+                                }
+                            }
                             //geom = geom.LoadGEOMMorph(preloadedLODMorphed.GEOMs, weights[i]);
                         }
-                        /*
                         foreach (var boneMorph in entry.BoneMorphs)
                         {
                             try
@@ -156,8 +145,14 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                     {   
                                         evaluated = casPart.ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
                                         var bond = new BOND(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                                        bond.Weight = weights[i] * boneMorph.Amount;
-                                        geom = geom.LoadBONDMorph(bond, CurrentRig);
+                                        bond.Weight = new float[]
+                                            {
+                                                Fat,
+                                                Fit,
+                                                Thin,
+                                                Special
+                                            }[i] * boneMorph.Amount;
+                                        geom = geom.LoadBONDMorph(bond, casPart.CurrentRig);
                                     }
                                     catch (ResourceIndexEntryNotFoundException)
                                     {
@@ -168,7 +163,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             {
                             }
                         }
-                        */
                     }
                 }
                 List<float[]> colors = new List<float[]>(),
@@ -203,6 +197,18 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     }
                 }
                 Material material;
+                var shader = "";
+                switch ((CmarNYCBorrowed.Shader)geom.ShaderHash)
+                {
+                    case Destrospean.CmarNYCBorrowed.Shader.SimAlphaTested:
+                    case Destrospean.CmarNYCBorrowed.Shader.SimGlass:
+                    case Destrospean.CmarNYCBorrowed.Shader.SimHair:
+                        shader = "sim_hair";
+                        break;
+                    case Destrospean.CmarNYCBorrowed.Shader.SimSkin:
+                        shader = "sim_skin";
+                        break;
+                }
                 if (!GlobalState.Materials.TryGetValue(geomAndKey.Key, out material))
                 {
                     var materialColors = new Dictionary<FieldType, Vector3>();
@@ -231,6 +237,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
                             DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
                             NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
+                            Shader = shader,
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };

@@ -78,6 +78,8 @@ namespace Destrospean.Common
             }
         }
 
+        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback);
+
         public static bool CASPartsConflict(CASPart a, CASPart b)
         {
             if (a == null || b == null || a == b)
@@ -106,6 +108,7 @@ namespace Destrospean.Common
             if (newDeltas.Count > correctCount)
             {
                 newDeltas.Clear();
+                newDeltas.AddRange(deltas.GetRange(0, correctCount));
             }
             while (newDeltas.Count < correctCount)
             {
@@ -118,8 +121,6 @@ namespace Destrospean.Common
             }
             return newDeltas;
         }
-
-        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback);
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
         {

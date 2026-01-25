@@ -49,14 +49,14 @@ public partial class MainWindow : RendererMainWindow
                         {
                             lock (sLock)
                             {
-                                using (var graphicsContext = new OpenTK.Graphics.GraphicsContext(GraphicsContext.GraphicsMode, WindowInfo))
+                                lock (GlobalState.Lock)
                                 {
-                                    graphicsContext.MakeCurrent(WindowInfo);
-                                    lock (GlobalState.Lock)
+                                    using (var graphicsContext = new OpenTK.Graphics.GraphicsContext(GraphicsContext.GraphicsMode, WindowInfo))
                                     {
+                                        graphicsContext.MakeCurrent(WindowInfo);
                                         GlobalState.Meshes.Clear();
+                                        Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                                     }
-                                    Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                                 }
                             }
                         }).Start();
@@ -108,7 +108,21 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         ResourcePropertyNotebook.RemovePage(0);PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
-        ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
+        GLWidget.ExposeEvent += (sender, e) => 
+            {
+                lock (GlobalState.Lock)
+                {
+                    GLWidget.SizeAllocate(DrawingArea.Allocation);
+                }
+            };
+        DrawingArea.SizeAllocated += (o, args) =>
+            {
+                lock (GlobalState.Lock)
+                {
+                    GLWidget.SizeAllocate(DrawingArea.Allocation);
+                }
+            };
+        ImageTable.Attach(GLWidget, 0, 1, 0, 1, 0, 0, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
         MainHPaned.ShowAll();
@@ -867,7 +881,7 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
-                                new System.Threading.Thread(x =>
+                                new System.Threading.Thread(() =>
                                     {
                                         lock (sLock)
                                         {
@@ -1439,6 +1453,6 @@ public partial class MainWindow : RendererMainWindow
     protected void OnUseAdvancedShadersActionToggled(object sender, EventArgs e)
     {
         ApplicationSettings.UseAdvancedOpenGLShaders = UseAdvancedShadersAction.Active;
-        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "lit_advanced" : "textured";
+        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "sim_skin" : "textured";
     }
 }
