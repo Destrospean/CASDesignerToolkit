@@ -211,6 +211,7 @@ public partial class MainWindow : RendererMainWindow
             var casPart = castableObject as CASPart;
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
+                    NextState = NextStateOptions.UnsavedChanges;
                     castableObject.ClearCurrentRig();
                     new Thread(() =>
                         {
