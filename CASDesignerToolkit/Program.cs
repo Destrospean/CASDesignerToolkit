@@ -10,10 +10,7 @@
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
                     {
-                        if (filename.EndsWith(".dll"))
-                        {
-                            Common.Platform.UnblockFile(filename);
-                        }
+                        Common.Platform.UnblockFile(filename);
                     }
                 }
                 Gtk.Application.Init();

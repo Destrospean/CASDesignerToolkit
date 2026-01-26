@@ -114,18 +114,17 @@ namespace Destrospean.Common
 
         public static string GetCommandOutput(string command, string arguments = "")
         {
-            var startInfo = new ProcessStartInfo
-                {
-                    Arguments = arguments,
-                    CreateNoWindow = true,
-                    FileName = command,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false
-                };
             using (var process = new Process
                 {
-                    StartInfo = startInfo
+                    StartInfo = new ProcessStartInfo
+                        {
+                            Arguments = arguments,
+                            CreateNoWindow = true,
+                            FileName = command,
+                            RedirectStandardError = true,
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false
+                        }
                 })
             {
                 process.Start();
