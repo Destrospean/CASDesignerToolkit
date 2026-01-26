@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
 using Destrospean.Common.Abstractions;
@@ -45,7 +46,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 if (GlobalState.GLInitialized && GraphicsContext != null)
                 {
-                    new System.Threading.Thread(() =>
+                    new Thread(() =>
                         {
                             lock (sLock)
                             {
@@ -99,8 +100,8 @@ public partial class MainWindow : RendererMainWindow
         mOriginalWindowTitle = Title;
         RescaleAndReposition();
         BuildResourceTable();
-        new System.Threading.Thread(ChoosePatternDialog.LoadCache).Start();
-        new System.Threading.Thread(CASPart.LoadCache).Start();
+        new Thread(ChoosePatternDialog.LoadCache).Start();
+        new Thread(CASPart.LoadCache).Start();
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow("Please wait as caches are being generated...", this, new Gdk.Pixbuf(System.Reflection.Assembly.GetExecutingAssembly(), "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png"));
@@ -108,20 +109,15 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         ResourcePropertyNotebook.RemovePage(0);PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
-        GLWidget.ExposeEvent += (sender, e) => 
+        Destrospean.CmarNYCBorrowed.Action glWidgetAllocate = delegate
             {
                 lock (GlobalState.Lock)
                 {
                     GLWidget.SizeAllocate(DrawingArea.Allocation);
                 }
             };
-        DrawingArea.SizeAllocated += (o, args) =>
-            {
-                lock (GlobalState.Lock)
-                {
-                    GLWidget.SizeAllocate(DrawingArea.Allocation);
-                }
-            };
+        DrawingArea.SizeAllocated += (o, args) => glWidgetAllocate();
+        GLWidget.ExposeEvent += (sender, e) => glWidgetAllocate();
         ImageTable.Attach(GLWidget, 0, 1, 0, 1, 0, 0, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
@@ -216,7 +212,14 @@ public partial class MainWindow : RendererMainWindow
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
                     castableObject.ClearCurrentRig();
-                    NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    new Thread(() =>
+                        {
+                            lock (sLock)
+                            {
+                                Sim.RandomizeCASParts();
+                                ModelsNeedUpdated = true;
+                            }
+                        }).Start();
                 };
             if (casPart != null)
             {
@@ -881,7 +884,7 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
-                                new System.Threading.Thread(() =>
+                                new Thread(() =>
                                     {
                                         lock (sLock)
                                         {
