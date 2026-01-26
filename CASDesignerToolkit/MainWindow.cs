@@ -213,14 +213,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     NextState = NextStateOptions.UnsavedChanges;
                     castableObject.ClearCurrentRig();
-                    new Thread(() =>
-                        {
-                            lock (sLock)
-                            {
-                                Sim.RandomizeCASParts();
-                                ModelsNeedUpdated = true;
-                            }
-                        }).Start();
+                    RandomizeCASParts();
                 };
             if (casPart != null)
             {
@@ -885,14 +878,7 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
-                                new Thread(() =>
-                                    {
-                                        lock (sLock)
-                                        {
-                                            Sim.RandomizeCASParts();
-                                            ModelsNeedUpdated = true;
-                                        }
-                                    }).Start();
+                                RandomizeCASParts();
                                 break;
                             /*
                             case "OBJD":
@@ -909,6 +895,18 @@ public partial class MainWindow : RendererMainWindow
             ProgramUtils.WriteError(ex);
             throw;
         }
+    }
+
+    void RandomizeCASParts()
+    {
+        new Thread(() =>
+            {
+                lock (sLock)
+                {
+                    Sim.RandomizeCASParts();
+                    Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
+                }
+            }).Start();
     }
 
     void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)

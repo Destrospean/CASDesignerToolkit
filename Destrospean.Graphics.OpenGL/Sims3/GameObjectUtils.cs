@@ -101,13 +101,13 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 var currentPreset = gameObject.AllPresets[presetIndex];
                 GlobalState.Meshes.Add(matd.MaterialNameHash.ToString(), new Volume
                     {
-                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
+                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? material.AmbientMap, null),
                         ColorData = colors.ToArray(),
                         Faces = faces,
                         MainTextureID = material.DiffuseMap.Length > 0 && Convert.ToUInt32(material.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(material.DiffuseMap, null) : loadTextureCallback(matd.MaterialNameHash.ToString(), currentPreset.Texture),
                         Material = material,
                         Normals = normals.ToArray(),
-                        SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
+                        SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? material.SpecularMap, null),
                         TextureCoordinates = textureCoordinates.ToArray(),
                         Vertices = vertices.ToArray()
                     });

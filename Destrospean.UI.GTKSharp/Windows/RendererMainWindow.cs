@@ -31,8 +31,6 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public bool ModelsNeedUpdated = false;
-
         public readonly Destrospean.Graphics.OpenGL.Sims3.Sim Sim;
 
         public OpenTK.Platform.IWindowInfo WindowInfo
@@ -55,17 +53,12 @@ namespace Destrospean.DestrospeanCASPEditor
         public RendererMainWindow(Gtk.WindowType windowType) : base(windowType)
         {
             OpenTK.Graphics.GraphicsContext.ShareContexts = true;
-            Common.Abstractions.Complate.MarkModelsNeedUpdatedCallback = () => ModelsNeedUpdated = true;
+            Common.Abstractions.Complate.MarkModelsNeedUpdatedCallback = () => Gtk.Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
             Sim = new Graphics.OpenGL.Sims3.Sim();
         }
 
         protected bool OnIdleProcessMain()
         {
-            if (ModelsNeedUpdated)
-            {
-                ModelsNeedUpdated = false;
-                NextState = NextStateOptions.UpdateModels;
-            }
             if (GlobalState.GLInitialized)
             {
                 GlobalState.OnUpdateFrame(ProcessInput, mFOV, (float)GLWidget.Allocation.Width / GLWidget.Allocation.Height);

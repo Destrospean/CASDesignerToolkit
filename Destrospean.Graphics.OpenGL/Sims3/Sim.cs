@@ -246,7 +246,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 var currentPreset = casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0];
                 GlobalState.Meshes[geomAndKey.Key] = new CASPartVolume
                     {
-                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap == null ? material.AmbientMap : currentPreset.AmbientMap, null),
+                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? material.AmbientMap, null),
                         ColorData = colors.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
                         DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
                         DeltaNormalsFit = FillMissingDeltas(normals, deltaNormalsFit).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
@@ -262,7 +262,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         Material = material,
                         ParentSim = this,
                         Normals = normals.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
-                        SpecularMapID = loadTextureCallback(currentPreset.SpecularMap == null ? material.SpecularMap : currentPreset.SpecularMap, null),
+                        SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? material.SpecularMap, null),
                         TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                         Vertices = vertices.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
                     };
