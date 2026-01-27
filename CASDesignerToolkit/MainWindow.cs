@@ -1455,6 +1455,6 @@ public partial class MainWindow : RendererMainWindow
     protected void OnUseAdvancedShadersActionToggled(object sender, EventArgs e)
     {
         ApplicationSettings.UseAdvancedOpenGLShaders = UseAdvancedShadersAction.Active;
-        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "sim_skin" : "textured";
+        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "lit" : "textured";
     }
 }

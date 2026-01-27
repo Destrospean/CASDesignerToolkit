@@ -251,13 +251,21 @@ namespace Destrospean.Graphics.OpenGL
 
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
+                uniform bool hasTransparency;
      
                 void main()
                 {
                     vec4 texcolor = texture2D(maintexture, f_texcoord);
                     if (texcolor.a < 0.1)
                     {{
-                        discard;
+                        if (hasTransparency)
+                        {{
+                            discard;
+                        }}
+                        else
+                        {{
+                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                        }}
                     }}
                     gl_FragColor = texcolor;
                 }"));
@@ -293,47 +301,6 @@ namespace Destrospean.Graphics.OpenGL
 
                 precision highp float;
 
-                varying vec3 v_norm;
-                varying vec3 v_pos;
-                varying vec2 f_texcoord;
-                uniform sampler2D maintexture;
-                uniform mat4 view;
-                uniform vec3 material_ambient;
-                uniform vec3 material_diffuse;
-                uniform vec3 material_specular;
-                uniform float material_specExponent;
-                uniform vec3 light_position;
-                uniform vec3 light_color;
-                uniform float light_ambientIntensity;
-                uniform float light_diffuseIntensity;
-
-                {0}
-
-                void main()
-                {{
-                    vec3 n = normalize(v_norm);
-                    vec4 texcolor = texture2D(maintexture, f_texcoord);
-                    if (texcolor.a < 0.1)
-                    {{
-                        discard;
-                    }}
-                    vec3 lightvec = normalize(light_position - v_pos);
-                    vec4 light_ambient = light_ambientIntensity * vec4(light_color, 0.0);
-                    vec4 light_diffuse = light_diffuseIntensity * vec4(light_color, 0.0);
-                    gl_FragColor = texcolor * light_ambient * vec4(material_ambient, 0.0);
-                    float lambertmaterial_diffuse = max(dot(n, lightvec), 0.0);
-                    gl_FragColor = gl_FragColor + light_diffuse * texcolor * vec4(material_diffuse, 0.0) * lambertmaterial_diffuse;
-                    vec3 reflectionvec = normalize(reflect(-lightvec, v_norm));
-                    vec3 viewvec = normalize(vec3(inverse(view) * vec4(0.0, 0.0, 0.0, 1.0)) - v_pos); 
-                    float material_specularreflection = max(dot(v_norm, lightvec), 0.0) * pow(max(dot(reflectionvec, viewvec), 0.0), material_specExponent);
-                    gl_FragColor = gl_FragColor + vec4(material_specular * light_color, 0.0) * material_specularreflection;
-                    gl_FragColor.a = texcolor.a;
-                }}", backportedFunctions)));
-            Shaders.Add("sim_hair", new Shader(litVertexShader, string.Format(@"
-                #version 100
-
-                precision highp float;
-
                 struct Light
                 {{
                     vec3 position;
@@ -352,6 +319,7 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
                 uniform bool hasSpecularMap;
+                uniform bool hasTransparency;
                 uniform sampler2D map_specular;
                 uniform mat4 view;
                 uniform vec3 material_ambient;
@@ -368,7 +336,14 @@ namespace Destrospean.Graphics.OpenGL
                     vec4 texcolor = texture2D(maintexture, f_texcoord);
                     if (texcolor.a < 0.1)
                     {{
-                        discard;
+                        if (hasTransparency)
+                        {{
+                            discard;
+                        }}
+                        else
+                        {{
+                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                        }}
                     }}
                     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
                     for (int i = 0; i < 5; i++)
@@ -408,86 +383,7 @@ namespace Destrospean.Graphics.OpenGL
                         gl_FragColor.a = texcolor.a;
                     }}
                 }}", backportedFunctions)));
-            Shaders.Add("sim_skin", new Shader(litVertexShader, string.Format(@"
-                #version 100
-
-                precision highp float;
-
-                struct Light
-                {{
-                    vec3 position;
-                    vec3 color;
-                    float ambientIntensity;
-                    float diffuseIntensity;
-                    int type;
-                    vec3 direction;
-                    float coneAngle;
-                    float linearAttenuation;
-                    float quadraticAttenuation;
-                    float radius;
-                }};
-                varying vec3 v_norm;
-                varying vec3 v_pos;
-                varying vec2 f_texcoord;
-                uniform sampler2D maintexture;
-                uniform bool hasSpecularMap;
-                uniform sampler2D map_specular;
-                uniform mat4 view;
-                uniform vec3 material_ambient;
-                uniform vec3 material_diffuse;
-                uniform vec3 material_specular;
-                uniform float material_specExponent;
-                uniform Light lights[5];
-
-                {0}
-
-                void main()
-                {{
-                    vec3 n = normalize(v_norm);
-                    vec4 texcolor = texture2D(maintexture, f_texcoord);
-                    if (texcolor.a < 0.1)
-                    {{
-                        texcolor = vec4(1.0, 1.0, 1.0, 1.0);
-                    }}
-                    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-                    for (int i = 0; i < 5; i++)
-                    {{
-                        if (lights[i].color == vec3(0.0, 0.0, 0.0))
-                        {{
-                            continue;
-                        }}
-                        vec3 lightvec = normalize(lights[i].position - v_pos);
-                        vec4 lightcolor = vec4(0.0, 0.0, 0.0, 1.0);
-                        if (lights[i].type == 0)
-                        {{
-                            lightvec = lights[i].direction;
-                        }}
-                        vec4 light_ambient = lights[i].ambientIntensity * vec4(lights[i].color, 0.0);
-                        vec4 light_diffuse = lights[i].diffuseIntensity * vec4(lights[i].color, 0.0);
-                        lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0);
-                        float lambertmaterial_diffuse = max(dot(n, lightvec), 0.0);
-                        bool inConeOrNotSpotlight = lights[i].type != 2 || degrees(acos(dot(lightvec, lights[i].direction))) < lights[i].coneAngle;
-                        if (inConeOrNotSpotlight)
-                        {{
-                            lightcolor = lightcolor + light_diffuse * texcolor * vec4(material_diffuse, 0.0) * lambertmaterial_diffuse;
-                        }}
-                        vec3 reflectionvec = normalize(reflect(-lightvec, v_norm));
-                        vec3 viewvec = normalize(vec3(inverse(view) * vec4(0.0, 0.0, 0.0, 1.0)) - v_pos); 
-                        float material_specularreflection = max(dot(v_norm, lightvec), 0.0) * pow(max(dot(reflectionvec, viewvec), 0.0), material_specExponent);
-                        if (hasSpecularMap)
-                        {{
-                            material_specularreflection = material_specularreflection * texture2D(map_specular, f_texcoord).r;
-                        }}
-                        if (inConeOrNotSpotlight)
-                        {{
-                            lightcolor = lightcolor + vec4(material_specular * lights[i].color, 0.0) * material_specularreflection;
-                        }}
-                        float distancefactor = distance(lights[i].position, v_pos);
-                        gl_FragColor = gl_FragColor + lightcolor * 1.0 / (1.0 + distancefactor * lights[i].linearAttenuation + distancefactor * distancefactor * lights[i].quadraticAttenuation);
-                        gl_FragColor.a = texcolor.a;
-                    }}
-                }}", backportedFunctions)));
-            ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "sim_skin" : "textured";
+            ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "lit" : "textured";
             Lights.Add(new Light(new Vector3(0, 1, 3), Vector3.One)
                 {
                     QuadraticAttenuation = .05f
@@ -560,6 +456,10 @@ namespace Destrospean.Graphics.OpenGL
                     else
                     {
                         GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 0);
+                    }
+                    if (Shaders[shader].GetUniform("hasTransparency") != -1)
+                    {
+                        GL.Uniform1(Shaders[shader].GetUniform("hasTransparency"), Convert.ToInt32(mesh.Material.HasTransparency));
                     }
                     GL.BindTexture(TextureTarget.Texture2D, mesh.MainTextureID);
                     GL.UniformMatrix4(Shaders[shader].GetUniform("modelview"), false, ref mesh.ModelViewProjectionMatrix);

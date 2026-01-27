@@ -196,19 +196,16 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         textureCoordinates.Add(uv);
                     }
                 }
-                Material material;
-                var shader = "";
+                var hasTransparency = false;
                 switch ((CmarNYCBorrowed.Shader)geom.ShaderHash)
                 {
                     case CmarNYCBorrowed.Shader.SimAlphaTested:
                     case CmarNYCBorrowed.Shader.SimGlass:
                     case CmarNYCBorrowed.Shader.SimHair:
-                        shader = "sim_hair";
-                        break;
-                    case CmarNYCBorrowed.Shader.SimSkin:
-                        shader = "sim_skin";
+                        hasTransparency = true;
                         break;
                 }
+                Material material;
                 if (!GlobalState.Materials.TryGetValue(geomAndKey.Key, out material))
                 {
                     var materialColors = new Dictionary<FieldType, Vector3>();
@@ -236,8 +233,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             AmbientMap = materialMaps.TryGetValue(FieldType.AmbientOcclusionMap, out map) ? map : "",
                             DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
                             DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
+                            HasTransparency = hasTransparency,
                             NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
-                            Shader = shader,
                             SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                             SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                         };
