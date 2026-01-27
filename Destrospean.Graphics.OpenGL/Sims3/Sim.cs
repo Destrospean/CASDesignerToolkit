@@ -200,12 +200,12 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 var shader = "";
                 switch ((CmarNYCBorrowed.Shader)geom.ShaderHash)
                 {
-                    case Destrospean.CmarNYCBorrowed.Shader.SimAlphaTested:
-                    case Destrospean.CmarNYCBorrowed.Shader.SimGlass:
-                    case Destrospean.CmarNYCBorrowed.Shader.SimHair:
+                    case CmarNYCBorrowed.Shader.SimAlphaTested:
+                    case CmarNYCBorrowed.Shader.SimGlass:
+                    case CmarNYCBorrowed.Shader.SimHair:
                         shader = "sim_hair";
                         break;
-                    case Destrospean.CmarNYCBorrowed.Shader.SimSkin:
+                    case CmarNYCBorrowed.Shader.SimSkin:
                         shader = "sim_skin";
                         break;
                 }

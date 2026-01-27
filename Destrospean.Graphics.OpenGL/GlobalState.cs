@@ -488,11 +488,11 @@ namespace Destrospean.Graphics.OpenGL
                     }}
                 }}", backportedFunctions)));
             ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "sim_skin" : "textured";
-            Lights.Add(new Light(new Vector3(0, 1, 3), Vector3.One)
+            Lights.Add(new Light(new Vector3(0, 1, 4), Vector3.One)
                 {
                     QuadraticAttenuation = .05f
                 });
-            Lights.Add(new Light(new Vector3(0, 1, -3), Vector3.One)
+            Lights.Add(new Light(new Vector3(0, 1, -4), Vector3.One)
                 {
                     Direction = new Vector3(0, 0, -1),
                     QuadraticAttenuation = .05f
