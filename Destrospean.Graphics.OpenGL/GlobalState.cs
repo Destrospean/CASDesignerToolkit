@@ -61,7 +61,7 @@ namespace Destrospean.Graphics.OpenGL
         public static void InitProgram()
         {
             GL.GenBuffers(1, out IBOElements);
-            string backportedFunctions = @"
+            var backportedFunctions = @"
                 mat3 inverse(mat3 m)
                 {
                     vec3 c0 = m[0];
@@ -139,11 +139,102 @@ namespace Destrospean.Graphics.OpenGL
                     result[3][2] = m[2][3];
                     result[3][3] = m[3][3];
                     return result;
-                }",
-            litVertexShader = string.Format(@"
-                #version 100
+                }";
+            Shaders.Add("default", new Shader(@"
+                #version 110
 
-                precision highp float;
+                attribute vec3 vPosition;
+                attribute vec3 vColor;
+                varying vec4 color;
+                uniform mat4 modelview;
+     
+                void main()
+                {
+                    gl_Position = modelview * vec4(vPosition, 1.0);
+                    color = vec4(vColor, 1.0);
+                }", @"
+                #version 110
+
+                varying vec4 color;
+     
+                void main()
+                {
+                    gl_FragColor = color;
+                }"));
+            Shaders.Add("textured", new Shader(@"
+                #version 110
+
+                attribute vec3 vPosition;
+                attribute vec3 vDeltaPositionFat;
+                attribute vec3 vDeltaPositionFit;
+                attribute vec3 vDeltaPositionSpecial;
+                attribute vec3 vDeltaPositionThin;
+                attribute vec2 texcoord;
+                varying vec2 f_texcoord;
+                uniform mat4 modelview;
+                uniform vec4 morphWeights;
+                uniform bool hasMorphs;
+
+                void main()
+                {
+                    vec3 morphPos = vPosition;
+                    if (hasMorphs)
+                    {{
+                        morphPos = morphPos + vDeltaPositionFat * morphWeights.x;
+                        morphPos = morphPos + vDeltaPositionFit * morphWeights.y;
+                        morphPos = morphPos + vDeltaPositionSpecial * morphWeights.z;
+                        morphPos = morphPos + vDeltaPositionThin * morphWeights.w;
+                    }}
+                    gl_Position = modelview * vec4(morphPos, 1.0);
+                    f_texcoord = texcoord;
+                }", @"
+                #version 110
+
+                varying vec2 f_texcoord;
+                uniform sampler2D maintexture;
+                uniform bool hasTransparency;
+     
+                void main()
+                {
+                    vec4 texcolor = texture2D(maintexture, f_texcoord);
+                    if (texcolor.a < 0.1)
+                    {{
+                        if (hasTransparency)
+                        {{
+                            discard;
+                        }}
+                        else
+                        {{
+                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                        }}
+                    }}
+                    gl_FragColor = texcolor;
+                }"));
+            Shaders.Add("normal", new Shader(@"
+                #version 110
+
+                attribute vec3 vPosition;
+                attribute vec3 vNormal;
+                varying vec3 v_norm;
+                uniform mat4 modelview;
+     
+                void main()
+                {
+                    gl_Position = modelview * vec4(vPosition, 1.0);
+                    v_norm = normalize(mat3(modelview[0].xyz, modelview[1].xyz, modelview[2].xyz) * vNormal);
+                    v_norm = vNormal;
+                }", @"
+                #version 110
+
+                varying vec3 v_norm;
+     
+                void main()
+                {
+                    vec3 n = normalize(v_norm);
+                    gl_FragColor = vec4(0.5 + 0.5 * n, 1.0);
+                }"));
+            Shaders.Add("lit", new Shader(string.Format(@"
+                #version 110
 
                 attribute vec3 vPosition;
                 attribute vec3 vDeltaPositionFat;
@@ -190,116 +281,8 @@ namespace Destrospean.Graphics.OpenGL
                     }}
                     v_norm = normMatrix * v_norm;
                     v_pos = (model * vec4(morphPos, 1.0)).xyz;
-                }}", backportedFunctions);
-            Shaders.Add("default", new Shader(@"
-                #version 100
-
-                precision highp float;
-
-                attribute vec3 vPosition;
-                attribute vec3 vColor;
-                varying vec4 color;
-                uniform mat4 modelview;
-     
-                void main()
-                {
-                    gl_Position = modelview * vec4(vPosition, 1.0);
-                    color = vec4(vColor, 1.0);
-                }", @"
-                #version 100
-
-                precision highp float;
-
-                varying vec4 color;
-     
-                void main()
-                {
-                    gl_FragColor = color;
-                }"));
-            Shaders.Add("textured", new Shader(@"
-                #version 100
-
-                precision highp float;
-
-                attribute vec3 vPosition;
-                attribute vec3 vDeltaPositionFat;
-                attribute vec3 vDeltaPositionFit;
-                attribute vec3 vDeltaPositionSpecial;
-                attribute vec3 vDeltaPositionThin;
-                attribute vec2 texcoord;
-                varying vec2 f_texcoord;
-                uniform mat4 modelview;
-                uniform vec4 morphWeights;
-                uniform bool hasMorphs;
-
-                void main()
-                {
-                    vec3 morphPos = vPosition;
-                    if (hasMorphs)
-                    {{
-                        morphPos = morphPos + vDeltaPositionFat * morphWeights.x;
-                        morphPos = morphPos + vDeltaPositionFit * morphWeights.y;
-                        morphPos = morphPos + vDeltaPositionSpecial * morphWeights.z;
-                        morphPos = morphPos + vDeltaPositionThin * morphWeights.w;
-                    }}
-                    gl_Position = modelview * vec4(morphPos, 1.0);
-                    f_texcoord = texcoord;
-                }", @"
-                #version 100
-
-                precision highp float;
-
-                varying vec2 f_texcoord;
-                uniform sampler2D maintexture;
-                uniform bool hasTransparency;
-     
-                void main()
-                {
-                    vec4 texcolor = texture2D(maintexture, f_texcoord);
-                    if (texcolor.a < 0.1)
-                    {{
-                        if (hasTransparency)
-                        {{
-                            discard;
-                        }}
-                        else
-                        {{
-                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
-                        }}
-                    }}
-                    gl_FragColor = texcolor;
-                }"));
-            Shaders.Add("normal", new Shader(@"
-                #version 100
-
-                precision highp float;
-
-                attribute vec3 vPosition;
-                attribute vec3 vNormal;
-                varying vec3 v_norm;
-                uniform mat4 modelview;
-     
-                void main()
-                {
-                    gl_Position = modelview * vec4(vPosition, 1.0);
-                    v_norm = normalize(mat3(modelview[0].xyz, modelview[1].xyz, modelview[2].xyz) * vNormal);
-                    v_norm = vNormal;
-                }", @"
-                #version 100
-
-                precision highp float;
-
-                varying vec3 v_norm;
-     
-                void main()
-                {
-                    vec3 n = normalize(v_norm);
-                    gl_FragColor = vec4(0.5 + 0.5 * n, 1.0);
-                }"));
-            Shaders.Add("lit", new Shader(litVertexShader, string.Format(@"
-                #version 100
-
-                precision highp float;
+                }}", backportedFunctions), string.Format(@"
+                #version 110
 
                 struct Light
                 {{

@@ -55,20 +55,7 @@ namespace Destrospean.Common
 
         public delegate int LoadTextureDelegate(string key, System.Drawing.Bitmap image);
 
-        public readonly Dictionary<string, PreloadedLODMorphed> PreloadedLODsMorphed = new Dictionary<string, PreloadedLODMorphed>(System.StringComparer.InvariantCultureIgnoreCase);
-
-        public struct PreloadedLODMorphed
-        {
-            public BBLN BBLN;
-
-            public GEOM[] GEOMs;
-
-            public PreloadedLODMorphed(BBLN bbln, GEOM[] geoms)
-            {
-                BBLN = bbln;
-                GEOMs = geoms;
-            }
-        }
+        public bool ShowMaternityPartsOnly = false;
 
         public SimBase()
         {
@@ -101,14 +88,14 @@ namespace Destrospean.Common
             return false;
         }
 
-        public static List<float[]> FillMissingDeltas(IEnumerable<float[]> vertices, List<float[]> deltas)
+        public static List<float[]> FillMissingDeltas(IEnumerable<float[]> vertices, IEnumerable<float[]> deltas)
         {
             var newDeltas = new List<float[]>(deltas);
             var correctCount = new List<float[]>(vertices).Count;
             if (newDeltas.Count > correctCount)
             {
                 newDeltas.Clear();
-                newDeltas.AddRange(deltas.GetRange(0, correctCount));
+                newDeltas.AddRange(new List<float[]>(deltas).GetRange(0, correctCount));
             }
             while (newDeltas.Count < correctCount)
             {
@@ -141,7 +128,7 @@ namespace Destrospean.Common
                     foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
                     {
                         var flags = casPartLookupKvp.Value;
-                        if ((flags["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && flags["Clothing"] == (uint)clothingType && (flags["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (flags["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && flags["Species"] == (uint)CurrentCASPart.CASPartResource.AgeGender.Species)
+                        if ((!ShowMaternityPartsOnly || flags["Clothing"] < (uint)CASPartResource.ClothingType.Body || flags["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (flags["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && flags["Clothing"] == (uint)clothingType && (flags["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (flags["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && flags["Species"] == (uint)CurrentCASPart.CASPartResource.AgeGender.Species)
                         {
                             validCurrentTypePartKeys.Add(casPartLookupKvp.Key);
                         }

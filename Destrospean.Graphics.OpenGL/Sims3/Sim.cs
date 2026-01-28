@@ -55,7 +55,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     BBLN bbln;
                     string bblnKey;
                     EvaluatedResourceKey evaluated;
-                    //PreloadedLODMorphed preloadedLODMorphed;
                     try
                     {
                         bblnKey = casPart.CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey();
@@ -101,13 +100,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             }
                             if (bgeo != null)
                             {
-                                /*
-                                preloadedLODMorphed = new PreloadedLODMorphed(bbln, new GEOM[]
-                                    {
-                                        new GEOM(geom, bgeo, 0, lod)
-                                    });
-                                PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
-                                */
                                 geom.GetDeltaVertices(bgeo, lod, 0, deltaNormals, deltaVertices);
                             }
                             else if (bbln.TGIList != null && bbln.TGIList.Length > geomMorph.TGIIndex && geom.HasVertexIDs)
@@ -125,15 +117,12 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                         {
                                         }
                                     }
-                                    //preloadedLODMorphed = new PreloadedLODMorphed(bbln, geoms.ToArray());
-                                    //PreloadedLODsMorphed.Add(bblnKey, preloadedLODMorphed);
                                     MeshUtils.GetDeltaVertices(geoms.ToArray(), deltaNormals, deltaVertices);
                                 }
                                 catch (ResourceIndexEntryNotFoundException)
                                 {
                                 }
                             }
-                            //geom = geom.LoadGEOMMorph(preloadedLODMorphed.GEOMs, weights[i]);
                         }
                         foreach (var boneMorph in entry.BoneMorphs)
                         {
@@ -214,13 +203,17 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         int valueType;
                         var element = geom.Shader.GetFieldValue(field, out valueType);
-                        if (valueType == 1 && (element.Length == 3 || element.Length == 4))
+                        switch ((MeshFormatDataType)valueType)
                         {
-                            materialColors[(FieldType)field] = new Vector3((float)element[0], (float)element[1], (float)element[2]);
-                        }
-                        else if (valueType == 4)
-                        {
-                            materialMaps[(FieldType)field] = new ResourceKey(geom.TGIList[(uint)element[0]].Type, geom.TGIList[(uint)element[0]].Group, geom.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey();
+                            case MeshFormatDataType.Float:
+                                if (element.Length > 2)
+                                {
+                                    materialColors[(FieldType)field] = ToVector3(System.Array.ConvertAll(element, x => (float)x));
+                                }
+                                break;
+                            case MeshFormatDataType.Uint:
+                                materialMaps[(FieldType)field] = new ResourceKey(geom.TGIList[(uint)element[0]].Type, geom.TGIList[(uint)element[0]].Group, geom.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey();
+                                break;
                         }
                     }
                     Vector3 color;
@@ -244,26 +237,31 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 GlobalState.Meshes[geomAndKey.Key] = new CASPartVolume
                     {
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? material.AmbientMap, null),
-                        ColorData = colors.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
-                        DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaNormalsFit = FillMissingDeltas(normals, deltaNormalsFit).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaNormalsSpecial = FillMissingDeltas(normals, deltaNormalsSpecial).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaNormalsThin = FillMissingDeltas(normals, deltaNormalsThin).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaVerticesFat = FillMissingDeltas(vertices, deltaVerticesFat).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaVerticesFit = FillMissingDeltas(vertices, deltaVerticesFit).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaVerticesSpecial = FillMissingDeltas(vertices, deltaVerticesSpecial).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
-                        DeltaVerticesThin = FillMissingDeltas(vertices, deltaVerticesThin).ConvertAll(x => new Vector3(x[0], x[1], x[2])),
+                        ColorData = colors.ConvertAll(ToVector3).ToArray(),
+                        DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(ToVector3),
+                        DeltaNormalsFit = FillMissingDeltas(normals, deltaNormalsFit).ConvertAll(ToVector3),
+                        DeltaNormalsSpecial = FillMissingDeltas(normals, deltaNormalsSpecial).ConvertAll(ToVector3),
+                        DeltaNormalsThin = FillMissingDeltas(normals, deltaNormalsThin).ConvertAll(ToVector3),
+                        DeltaVerticesFat = FillMissingDeltas(vertices, deltaVerticesFat).ConvertAll(ToVector3),
+                        DeltaVerticesFit = FillMissingDeltas(vertices, deltaVerticesFit).ConvertAll(ToVector3),
+                        DeltaVerticesSpecial = FillMissingDeltas(vertices, deltaVerticesSpecial).ConvertAll(ToVector3),
+                        DeltaVerticesThin = FillMissingDeltas(vertices, deltaVerticesThin).ConvertAll(ToVector3),
                         Faces = faces,
                         GroupID = ID,
                         MainTextureID = loadTextureCallback(geomAndKey.Key, currentPreset.Texture),
                         Material = material,
                         ParentSim = this,
-                        Normals = normals.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
+                        Normals = normals.ConvertAll(ToVector3).ToArray(),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? material.SpecularMap, null),
                         TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
-                        Vertices = vertices.ConvertAll(x => new Vector3(x[0], x[1], x[2])).ToArray(),
+                        Vertices = vertices.ConvertAll(ToVector3).ToArray(),
                     };
             }
+        }
+
+        public static Vector3 ToVector3(float[] coordinates)
+        {
+            return new Vector3(coordinates[0], coordinates[1], coordinates[2]);
         }
     }
 }

@@ -2,11 +2,10 @@
 {
     public partial class CacheGenerationWindow : Gtk.Window
     {
-        public CacheGenerationWindow(string message, Gtk.Window parent, Gdk.Pixbuf icon) : base(Gtk.WindowType.Toplevel)
+        public CacheGenerationWindow(Gtk.Window parent, Gdk.Pixbuf icon) : base(Gtk.WindowType.Toplevel)
         {
             Build();
             Icon = icon;
-            Label.Text = message;
             this.RescaleAndReposition(parent);
             Reposition();
             new System.Threading.Thread(() =>

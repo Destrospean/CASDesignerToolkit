@@ -38,10 +38,6 @@ public partial class MainWindow : RendererMainWindow
     {
         set
         {
-            if (value == NextStateOptions.UnsavedChangesAndUpdateModels)
-            {
-                Sim.PreloadedLODsMorphed.Clear();
-            }
             if (value.HasFlag(NextStateOptions.UpdateModels))
             {
                 if (GlobalState.GLInitialized && GraphicsContext != null)
@@ -104,10 +100,11 @@ public partial class MainWindow : RendererMainWindow
         new Thread(CASPart.LoadCache).Start();
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
-            new CacheGenerationWindow("Please wait as caches are being generated...", this, new Gdk.Pixbuf(System.Reflection.Assembly.GetExecutingAssembly(), "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png"));
+            new CacheGenerationWindow(this, Icon);
         }
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
-        ResourcePropertyNotebook.RemovePage(0);PrepareGLWidget();
+        ResourcePropertyNotebook.RemovePage(0);
+        PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
         Destrospean.CmarNYCBorrowed.Action glWidgetAllocate = delegate
             {
@@ -166,6 +163,10 @@ public partial class MainWindow : RendererMainWindow
                     Xalign = .5f
                 }),
             resetViewButton = new Button("Reset View");
+            var showMaternityPartsOnlyCheckButton = new CheckButton("Show Maternity Parts Only")
+                {
+                    Active = Sim.ShowMaternityPartsOnly
+                };
             addPresetButton.Clicked += (sender, e) => mPresetNotebook.AddPreset();
             exportTextureButton.Clicked += (sender, e) =>
                 {
@@ -191,6 +192,11 @@ public partial class MainWindow : RendererMainWindow
                     GlobalState.CurrentRotation = OpenTK.Vector3.Zero;
                     mFOV = OpenTK.MathHelper.DegreesToRadians(30);
                 };
+            showMaternityPartsOnlyCheckButton.Toggled += (sender, e) =>
+                {
+                    Sim.ShowMaternityPartsOnly = showMaternityPartsOnlyCheckButton.Active;
+                    RandomizeCASParts();
+                };
             flagNotebook.SwitchPage += (o, args) =>
                 {
                     nextButton.Sensitive = flagNotebook.CurrentPage < flagNotebook.NPages - 1;
@@ -198,15 +204,21 @@ public partial class MainWindow : RendererMainWindow
                 };
             Alignment addPresetButtonAlignment = new Alignment(.5f, .5f, 0, 0),
             nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            showMaternityPartsOnlyCheckButtonAlignment = new Alignment(0, 0, 0, 0)
+                {
+                    LeftPadding = (uint)(6 * WidgetUtils.Scale)
+                };
             addPresetButtonAlignment.Add(addPresetButton);
             nextButtonAlignment.Add(nextButton);
             prevButtonAlignment.Add(prevButton);
+            showMaternityPartsOnlyCheckButtonAlignment.Add(showMaternityPartsOnlyCheckButton);
             flagPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackEnd(resetViewButton, false, true, 4);
             flagPageButtonHBox.PackEnd(exportTextureButton, false, true, 4);
             buttonHBox.PackStart(flagPageButtonHBox, false, true, 0);
+            buttonHBox.PackStart(showMaternityPartsOnlyCheckButtonAlignment, false, true, 0);
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
             var casPart = castableObject as CASPart;
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
@@ -285,11 +297,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
             }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) =>
-                {
-                    Sim.PreloadedLODsMorphed.Clear();
-                    NextState = NextStateOptions.UpdateModels;
-                };
+            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in casPart.LODs)
             {
@@ -940,7 +948,6 @@ public partial class MainWindow : RendererMainWindow
         //PreloadedData.MLODs.Clear();
         //PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
-        Sim.PreloadedLODsMorphed.Clear();
         GlobalState.Materials.Clear();
         GlobalState.DeleteTextures();
         ImageUtils.PreloadedGameImagePixbufs.Clear();

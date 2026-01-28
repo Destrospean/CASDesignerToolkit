@@ -18,7 +18,7 @@ namespace Destrospean.Common
         {
             get
             {
-                return Settings != null && Settings.ContainsKey(JSONNodeNames.UseAdvancedOpenGLShaders) ? (bool)Settings[JSONNodeNames.UseAdvancedOpenGLShaders] : !Platform.IsWindows || System.Environment.OSVersion.Version.Major > 5;
+                return Settings != null && Settings.ContainsKey(JSONNodeNames.UseAdvancedOpenGLShaders) && (bool)Settings[JSONNodeNames.UseAdvancedOpenGLShaders];
             }
             set
             {

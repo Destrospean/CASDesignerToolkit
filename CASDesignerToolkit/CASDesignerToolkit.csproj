@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{6D08DD91-7AE1-4A4C-B81D-DC9DEE93CF24}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Destrospean.DestrospeanCASPEditor</RootNamespace>
     <AssemblyName>CASDesignerToolkit</AssemblyName>
     <UseMSBuildEngine>False</UseMSBuildEngine>

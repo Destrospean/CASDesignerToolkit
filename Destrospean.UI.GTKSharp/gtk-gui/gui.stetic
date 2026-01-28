@@ -603,7 +603,7 @@
         <child>
           <widget class="Gtk.Label" id="Label">
             <property name="MemberName" />
-            <property name="LabelProp" translatable="yes">Label</property>
+            <property name="LabelProp" translatable="yes">Please wait as caches are being generated...</property>
           </widget>
           <packing>
             <property name="Position">0</property>
