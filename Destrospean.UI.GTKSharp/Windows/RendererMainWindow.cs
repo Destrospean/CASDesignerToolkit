@@ -31,7 +31,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public readonly Destrospean.Graphics.OpenGL.Sims3.Sim Sim;
+        public readonly Graphics.OpenGL.Sims3.Sim Sim;
 
         public OpenTK.Platform.IWindowInfo WindowInfo
         {

@@ -158,7 +158,7 @@ namespace Destrospean.Common
                 return;
             }
             var evaluated = package.EvaluateResourceKey(key);
-            mCASParts[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, PreloadedData.GEOMs, PreloadedData.VPXYs);
+            mCASParts[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>());
         }
 
         public void SetCASPart(CASPartResource.ClothingType clothingType, uint type, uint group, ulong instance)

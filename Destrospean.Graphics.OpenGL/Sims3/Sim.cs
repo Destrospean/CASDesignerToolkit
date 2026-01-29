@@ -15,6 +15,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
     {
         public class CASPartVolume : Volume
         {
+            public int SkinAmbientMapID, SkinSpecularMapID;
+
             public List<Vector3> DeltaNormalsFat, DeltaNormalsFit, DeltaNormalsSpecial, DeltaNormalsThin, DeltaVerticesFat, DeltaVerticesFit, DeltaVerticesSpecial, DeltaVerticesThin;
 
             public SimBase ParentSim;
@@ -233,7 +235,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         };
                     GlobalState.Materials[geomAndKey.Key] = material;
                 }
-                var currentPreset = casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0];
+                var currentPreset = (CASPartPreset)(casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0]);
                 GlobalState.Meshes[geomAndKey.Key] = new CASPartVolume
                     {
                         AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? material.AmbientMap, null),
@@ -252,6 +254,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         Material = material,
                         ParentSim = this,
                         Normals = normals.ConvertAll(ToVector3).ToArray(),
+                        SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap ?? material.AmbientMap, null),
+                        SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap ?? material.SpecularMap, null),
                         SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? material.SpecularMap, null),
                         TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                         Vertices = vertices.ConvertAll(ToVector3).ToArray(),

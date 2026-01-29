@@ -52,6 +52,15 @@ public partial class MainWindow : RendererMainWindow
                                     {
                                         graphicsContext.MakeCurrent(WindowInfo);
                                         GlobalState.Meshes.Clear();
+                                        GlobalState.Materials.Clear();
+                                        foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                                        {
+                                            if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
+                                            {
+                                                ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                                GlobalState.DeleteTexture(imageKey);
+                                            }
+                                        }
                                         Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                                     }
                                 }
@@ -1162,7 +1171,11 @@ public partial class MainWindow : RendererMainWindow
                     continue;
                 }
                 casPartKvp.Value.SavePresets();
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
+                var evaluated = CurrentPackage.EvaluateResourceKey(casPartKvp.Key);
+                if (evaluated.Package == CurrentPackage)
+                {
+                    CurrentPackage.ReplaceResource(evaluated.ResourceIndexEntry, casPartKvp.Value.CASPartResource);
+                }
             }
             /*
             foreach (var ftptResourceKvp in PreloadedData.FTPTs)
@@ -1183,9 +1196,12 @@ public partial class MainWindow : RendererMainWindow
             {
                 var stream = new MemoryStream();
                 PreloadedData.GEOMs[geometryResourceKvp.Key].Write(new BinaryWriter(stream));
-                var resourceIndexEntry = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key).ResourceIndexEntry;
-                CurrentPackage.AddResource(resourceIndexEntry, stream, false);
-                CurrentPackage.DeleteResource(resourceIndexEntry);
+                var evaluated = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
+                if (evaluated.Package == CurrentPackage)
+                {
+                    CurrentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
+                    CurrentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+                }
             }
             /*
             foreach (var liteResourceKvp in PreloadedData.LITEs)

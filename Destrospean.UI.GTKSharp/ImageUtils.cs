@@ -5,7 +5,6 @@ using System.Drawing.Imaging;
 using Destrospean.S3PIExtensions;
 using Gdk;
 using s3pi.Interfaces;
-using TeximpNet;
 
 namespace Destrospean.DestrospeanCASPEditor
 {
@@ -95,25 +94,34 @@ namespace Destrospean.DestrospeanCASPEditor
                 }
                 catch (ArgumentNullException)
                 {
-                    var dds = TeximpNet.DDS.DDSFile.Read(resource.Stream);
-                    var mipmap = dds.MipChains[0][0];
-                    var pixelFormat = PixelFormat.Format32bppArgb;
-                    image = new Bitmap(mipmap.Width, mipmap.Height, pixelFormat);
-                    var bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
-                    var byteArray = new byte[mipmap.SizeInBytes];
-                    System.Runtime.InteropServices.Marshal.Copy(mipmap.Data, byteArray, 0, byteArray.Length);
-                    if (dds.Format == TeximpNet.DDS.DXGIFormat.R8G8_UNorm)
+                    try
                     {
-                        var tempByteArray = new byte[byteArray.Length * 2];
-                        for (var i = 0; i < byteArray.Length; i += 2)
+                        using (var dds = TeximpNet.DDS.DDSFile.Read(resource.Stream))
                         {
-                            tempByteArray[i * 2] = tempByteArray[i * 2 + 1] = tempByteArray[i * 2 + 2] = byteArray[i];
-                            tempByteArray[i * 2 + 3] = byteArray[i + 1];
+                            var mipmap = dds.MipChains[0][0];
+                            var pixelFormat = PixelFormat.Format32bppArgb;
+                            image = new Bitmap(mipmap.Width, mipmap.Height, pixelFormat);
+                            var bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
+                            var byteArray = new byte[mipmap.SizeInBytes];
+                            System.Runtime.InteropServices.Marshal.Copy(mipmap.Data, byteArray, 0, byteArray.Length);
+                            if (dds.Format == TeximpNet.DDS.DXGIFormat.R8G8_UNorm)
+                            {
+                                var tempByteArray = new byte[byteArray.Length * 2];
+                                for (var i = 0; i < byteArray.Length; i += 2)
+                                {
+                                    tempByteArray[i * 2] = tempByteArray[i * 2 + 1] = tempByteArray[i * 2 + 2] = byteArray[i];
+                                    tempByteArray[i * 2 + 3] = byteArray[i + 1];
+                                }
+                                byteArray = tempByteArray;
+                            }
+                            System.Runtime.InteropServices.Marshal.Copy(byteArray, 0, bitmapData.Scan0, byteArray.Length);
+                            image.UnlockBits(bitmapData);
                         }
-                        byteArray = tempByteArray;
                     }
-                    System.Runtime.InteropServices.Marshal.Copy(byteArray, 0, bitmapData.Scan0, byteArray.Length);
-                    image.UnlockBits(bitmapData);
+                    catch (System.OverflowException)
+                    {
+                        image = new Bitmap(1024, 1024);
+                    }
                 }
                 return image;
             }

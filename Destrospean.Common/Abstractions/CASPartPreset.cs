@@ -11,6 +11,22 @@ namespace Destrospean.Common.Abstractions
 {
     public class CASPartPreset : Preset
     {
+        public string SkinAmbientMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).SkinAmbientMap;
+            }
+        }
+
+        public string SkinSpecularMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).SkinSpecularMap;
+            }
+        }
+
         public StringReader XmlFile
         {
             get
@@ -132,6 +148,12 @@ namespace Destrospean.Common.Abstractions
                                     break;
                                 case "root color":
                                     rootColor = ParseCommaSeparatedValues(value);
+                                    break;
+                                case "skin ambient":
+                                    SkinAmbientMap = value;
+                                    break;
+                                case "skin specular":
+                                    SkinSpecularMap = value;
                                     break;
                                 case "tip color":
                                     tipColor = ParseCommaSeparatedValues(value);
@@ -277,6 +299,18 @@ namespace Destrospean.Common.Abstractions
                 {
                     return mPropertiesXmlNodes;
                 }
+            }
+
+            public string SkinAmbientMap
+            {
+                get;
+                protected set;
+            }
+
+            public string SkinSpecularMap
+            {
+                get;
+                protected set;
             }
 
             public PresetInternal(CASPartPreset preset, XmlNode complateXmlNode) : base()

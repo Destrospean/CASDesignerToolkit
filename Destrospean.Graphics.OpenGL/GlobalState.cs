@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Destrospean.S3PIExtensions;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -302,8 +303,10 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
                 uniform bool hasSpecularMap;
+                uniform bool hasSkinSpecularMap;
                 uniform bool hasTransparency;
                 uniform sampler2D map_specular;
+                uniform sampler2D map_skin_specular;
                 uniform mat4 view;
                 uniform vec3 material_ambient;
                 uniform vec3 material_diffuse;
@@ -315,6 +318,7 @@ namespace Destrospean.Graphics.OpenGL
 
                 void main()
                 {{
+                    bool isSkin = false;
                     vec3 n = normalize(v_norm);
                     vec4 texcolor = texture2D(maintexture, f_texcoord);
                     if (texcolor.a < 0.1)
@@ -325,10 +329,11 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         else
                         {{
+                            isSkin = true;
                             texcolor = vec4(1.0, 1.0, 1.0, 1.0);
                         }}
                     }}
-                    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, texcolor.a);
                     for (int i = 0; i < 5; i++)
                     {{
                         if (lights[i].color == vec3(0.0, 0.0, 0.0))
@@ -353,7 +358,11 @@ namespace Destrospean.Graphics.OpenGL
                         vec3 reflectionvec = normalize(reflect(-lightvec, v_norm));
                         vec3 viewvec = normalize(vec3(inverse(view) * vec4(0.0, 0.0, 0.0, 1.0)) - v_pos); 
                         float material_specularreflection = max(dot(v_norm, lightvec), 0.0) * pow(max(dot(reflectionvec, viewvec), 0.0), material_specExponent);
-                        if (hasSpecularMap)
+                        if (hasSkinSpecularMap && isSkin)
+                        {{
+                            material_specularreflection = material_specularreflection * texture2D(map_skin_specular, f_texcoord).r;
+                        }}
+                        else if (hasSpecularMap)
                         {{
                             material_specularreflection = material_specularreflection * texture2D(map_specular, f_texcoord).r;
                         }}
@@ -373,7 +382,7 @@ namespace Destrospean.Graphics.OpenGL
                 });
             Lights.Add(new Light(new Vector3(0, 1, -3), Vector3.One)
                 {
-                    Direction = new Vector3(0, 0, -1),
+                    Direction = new Vector3(0, 0, 1),
                     QuadraticAttenuation = .05f
                 });
             Camera.Position = new Vector3(0, 1, 4);
@@ -429,8 +438,8 @@ namespace Destrospean.Graphics.OpenGL
                     }
                     var shader = mesh.Material.Shader == "" ? ActiveShader : mesh.Material.Shader;
                     GL.UseProgram(Shaders[shader].ProgramID);
-                    Shaders[shader].EnableVertexAttribArrays();
                     var casPartVolume = mesh as Sims3.Sim.CASPartVolume;
+                    Shaders[shader].EnableVertexAttribArrays();
                     if (casPartVolume != null && Shaders[shader].GetUniform("morphWeights") != -1)
                     {
                         GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 1);
@@ -517,6 +526,21 @@ namespace Destrospean.Graphics.OpenGL
                             GL.BindTexture(TextureTarget.Texture2D, mesh.SpecularMapID);
                             GL.Uniform1(Shaders[shader].GetUniform("map_specular"), 1);
                             GL.Uniform1(Shaders[shader].GetUniform("hasSpecularMap"), 1);
+                            GL.ActiveTexture(TextureUnit.Texture0);
+                        }
+                    }
+                    if (casPartVolume != null && Shaders[shader].GetUniform("map_skin_specular") != -1)
+                    {
+                        if (casPartVolume.SkinSpecularMapID == -1)
+                        {
+                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinSpecularMap"), 0);
+                        }
+                        else
+                        {
+                            GL.ActiveTexture(TextureUnit.Texture2);
+                            GL.BindTexture(TextureTarget.Texture2D, casPartVolume.SkinSpecularMapID);
+                            GL.Uniform1(Shaders[shader].GetUniform("map_skin_specular"), 2);
+                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinSpecularMap"), 1);
                             GL.ActiveTexture(TextureUnit.Texture0);
                         }
                     }

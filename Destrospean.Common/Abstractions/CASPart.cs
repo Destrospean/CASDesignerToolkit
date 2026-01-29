@@ -11,6 +11,8 @@ namespace Destrospean.Common.Abstractions
 {
     public class CASPart : CASTableObject
     {
+        //TxtcResource.TxtcResource mDiffuseTXTCResource, mSpecularTXTCResource;
+
         public AgeGender AdjustedAge
         {
             get
@@ -47,7 +49,53 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
+        /*
+        public TxtcResource.TxtcResource DiffuseTXTCResource
+        {
+            get
+            {
+                if (mDiffuseTXTCResource == null && CASPartResource.Diffuse1Indexes.Count > 0)
+                {
+                    EvaluatedResourceKey evaluated;
+                    try
+                    {
+                        evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[CASPartResource.Diffuse1Indexes[0]].ReverseEvaluateResourceKey());
+                    }
+                    catch (ResourceIndexEntryNotFoundException)
+                    {
+                        return null;
+                    }
+                    mDiffuseTXTCResource = WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry) as TxtcResource.TxtcResource;
+                }
+                return mDiffuseTXTCResource;
+            }
+        }
+        */
+
         public readonly Dictionary<int, List<GEOMAndKey>> LODs = new Dictionary<int, List<GEOMAndKey>>();
+
+        /*
+        public TxtcResource.TxtcResource SpecularTXTCResource
+        {
+            get
+            {
+                if (mSpecularTXTCResource == null && CASPartResource.Specular1Indexes.Count > 0)
+                {
+                    EvaluatedResourceKey evaluated;
+                    try
+                    {
+                        evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[CASPartResource.Specular1Indexes[0]].ReverseEvaluateResourceKey());
+                    }
+                    catch (ResourceIndexEntryNotFoundException)
+                    {
+                        return null;
+                    }
+                    mSpecularTXTCResource = WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry) as TxtcResource.TxtcResource;
+                }
+                return mSpecularTXTCResource;
+            }
+        }
+        */
 
         public struct GEOMAndKey
         {
@@ -61,6 +109,122 @@ namespace Destrospean.Common.Abstractions
                 Key = key;
             }
         }
+
+        /*
+        public struct TextureCompositor
+        {
+            public IPackage ParentPackage;
+
+            public List<TextureStep> TextureSteps;
+
+            public struct TextureStep
+            {
+                public System.Drawing.Bitmap Image;
+
+                public Dictionary<string, object> Properties;
+            }
+
+            public TextureCompositor(IPackage package, TxtcResource.TxtcResource txtcResource)
+            {
+                ParentPackage = package;
+                TextureSteps = new List<TextureStep>();
+                foreach (var entryBlock in txtcResource.Root.Entries)
+                {
+                    var textureStep = new TextureStep();
+                    textureStep.Properties = new Dictionary<string, object>();
+                    foreach (var entry in entryBlock.Entries)
+                    {
+                        var entryBoolean = entry as TxtcResource.TxtcResource.EntryBoolean;
+                        if (entryBoolean != null)
+                        {
+                            textureStep.Properties[entryBoolean.Property.ToString()] = Convert.ToBoolean(entryBoolean.Data);
+                            continue;
+                        }
+                        var entryByte = entry as TxtcResource.TxtcResource.EntryByte;
+                        if (entryByte != null)
+                        {
+                            textureStep.Properties[entryByte.Property.ToString()] = entryByte.Data;
+                            continue;
+                        }
+                        var entryInt16 = entry as TxtcResource.TxtcResource.EntryInt16;
+                        if (entryInt16 != null)
+                        {
+                            textureStep.Properties[entryInt16.Property.ToString()] = entryInt16.Data;
+                            continue;
+                        }
+                        var entryInt32 = entry as TxtcResource.TxtcResource.EntryInt32;
+                        if (entryInt32 != null)
+                        {
+                            textureStep.Properties[entryInt32.Property.ToString()] = entryInt32.Data;
+                            continue;
+                        }
+                        var entryInt64 = entry as TxtcResource.TxtcResource.EntryInt64;
+                        if (entryInt64 != null)
+                        {
+                            textureStep.Properties[entryInt64.Property.ToString()] = entryInt64.Data;
+                            continue;
+                        }
+                        var entryNull = entry as TxtcResource.TxtcResource.EntryNull;
+                        if (entryNull != null)
+                        {
+                            continue;
+                        }
+                        var entryRectangle = entry as TxtcResource.TxtcResource.EntryRectangle;
+                        if (entryRectangle != null)
+                        {
+                            textureStep.Properties[entryRectangle.Property.ToString()] = entryRectangle.Data;
+                            continue;
+                        }
+                        var entrySByte = entry as TxtcResource.TxtcResource.EntrySByte;
+                        if (entrySByte != null)
+                        {
+                            continue;
+                        }
+                        var entrySingle = entry as TxtcResource.TxtcResource.EntrySingle;
+                        if (entrySingle != null)
+                        {
+                            continue;
+                        }
+                        var entryString = entry as TxtcResource.TxtcResource.EntryString;
+                        if (entryString != null)
+                        {
+                            continue;
+                        }
+                        var entryTGIIndex = entry as TxtcResource.TxtcResource.EntryTGIIndex;
+                        if (entryTGIIndex != null)
+                        {
+                            if (entryTGIIndex.Property == TxtcResource.TxtcResource.EntryTGIIndex.TGIIndexProperties.ImageKey)
+                            {
+                                textureStep.Image = ParentPackage.GetTexture(entryTGIIndex.ParentTGIBlocks[entryTGIIndex.Data].ReverseEvaluateResourceKey(), Complate.GetTextureCallback);
+                            }
+                            continue;
+                        }
+                        var entryUInt16 = entry as TxtcResource.TxtcResource.EntryUInt16;
+                        if (entryUInt16 != null)
+                        {
+                            continue;
+                        }
+                        var entryUInt32 = entry as TxtcResource.TxtcResource.EntryUInt32;
+                        if (entryUInt32 != null)
+                        {
+                            continue;
+                        }
+                        var entryUInt64 = entry as TxtcResource.TxtcResource.EntryUInt64;
+                        if (entryUInt64 != null)
+                        {
+                            continue;
+                        }
+                        var entryVector = entry as TxtcResource.TxtcResource.EntryVector;
+                        if (entryVector != null)
+                        {
+                            continue;
+                        }
+                    }
+                    TextureSteps.Add(textureStep);
+                }
+            }
+        }
+        */
 
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
