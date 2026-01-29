@@ -680,7 +680,15 @@ namespace Destrospean.Common.Abstractions
                 GenericRCOLResource vpxyResource;
                 if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
                 {
-                    var evaluated = ParentPackage.EvaluateResourceKey(vpxyKey);
+                    EvaluatedResourceKey evaluated;
+                    try
+                    {
+                        evaluated = ParentPackage.EvaluateResourceKey(vpxyKey);
+                    }
+                    catch (ResourceIndexEntryNotFoundException)
+                    {
+                        continue;
+                    }
                     vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry));
                     vpxyResource = vpxyResources[vpxyKey];
                 }
