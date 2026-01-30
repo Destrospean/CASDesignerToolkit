@@ -15,14 +15,16 @@ namespace Destrospean.Graphics.OpenGL.Sims3
     {
         public class CASPartVolume : Volume
         {
-            public int SkinAmbientMapID, SkinSpecularMapID;
-
             public List<Vector3> DeltaNormalsFat, DeltaNormalsFit, DeltaNormalsSpecial, DeltaNormalsThin, DeltaVerticesFat, DeltaVerticesFit, DeltaVerticesSpecial, DeltaVerticesThin;
 
+            public string Key;
+
             public SimBase ParentSim;
+
+            public int SkinAmbientMapID, SkinSpecularMapID;
         }
 
-        protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
+        protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
         {
             if (!CASParts.ContainsValue(casPart) || casPart.LODs.Count == 0)
             {
@@ -236,9 +238,9 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     GlobalState.Materials[geomAndKey.Key] = material;
                 }
                 var currentPreset = (CASPartPreset)(casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0]);
-                GlobalState.Meshes[geomAndKey.Key] = new CASPartVolume
+                var presetTexture = currentPreset.Texture;
+                loadMeshesOnMainThreadCallback(new CASPartVolume
                     {
-                        AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? material.AmbientMap, null),
                         ColorData = colors.ConvertAll(ToVector3).ToArray(),
                         DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(ToVector3),
                         DeltaNormalsFit = FillMissingDeltas(normals, deltaNormalsFit).ConvertAll(ToVector3),
@@ -250,17 +252,26 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         DeltaVerticesThin = FillMissingDeltas(vertices, deltaVerticesThin).ConvertAll(ToVector3),
                         Faces = faces,
                         GroupID = ID,
-                        MainTextureID = loadTextureCallback(geomAndKey.Key, currentPreset.Texture),
+                        Key = geomAndKey.Key,
                         Material = material,
                         ParentSim = this,
                         Normals = normals.ConvertAll(ToVector3).ToArray(),
-                        SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap ?? material.AmbientMap, null),
-                        SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap ?? material.SpecularMap, null),
-                        SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? material.SpecularMap, null),
                         TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                         Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                    };
+                    }, currentPreset, presetTexture, material, loadTextureCallback);
             }
+        }
+
+        public static void LoadMeshesOnMainThread(object casPartVolume, CASPartPreset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
+        {
+            var casPartVolumeCast = (CASPartVolume)casPartVolume;
+            var materialCast = (Material)material;
+            casPartVolumeCast.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
+            casPartVolumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
+            casPartVolumeCast.SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap ?? materialCast.AmbientMap, null);
+            casPartVolumeCast.SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap ?? materialCast.SpecularMap, null);
+            casPartVolumeCast.MainTextureID = loadTextureCallback(casPartVolumeCast.Key, presetTexture);
+            GlobalState.Meshes[casPartVolumeCast.Key] = casPartVolumeCast;
         }
 
         public static Vector3 ToVector3(float[] coordinates)

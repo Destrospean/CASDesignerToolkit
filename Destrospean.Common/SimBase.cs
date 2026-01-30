@@ -53,6 +53,8 @@ namespace Destrospean.Common
             }
         }
 
+        public delegate void LoadMeshesOnMainThreadDelegate(object casPartVolume, CASPartPreset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
+
         public delegate int LoadTextureDelegate(string key, System.Drawing.Bitmap image);
 
         public bool ShowMaternityPartsOnly = false;
@@ -65,7 +67,7 @@ namespace Destrospean.Common
             }
         }
 
-        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback);
+        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback);
 
         public static bool CASPartsConflict(CASPart a, CASPart b)
         {
@@ -109,11 +111,11 @@ namespace Destrospean.Common
             return newDeltas;
         }
 
-        public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback)
+        public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
         {
             lock (sLock)
             {
-                new List<CASPart>(CASParts.Values).FindAll(x => x != null && !CASPartsConflict(x, CurrentCASPart)).ForEach(x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback));
+                new List<CASPart>(CASParts.Values).FindAll(x => x != null && !CASPartsConflict(x, CurrentCASPart)).ForEach(x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback, loadMeshesOnMainThreadCallback));
             }
         }
 

@@ -40,7 +40,7 @@ public partial class MainWindow : RendererMainWindow
         {
             if (value.HasFlag(NextStateOptions.UpdateModels))
             {
-                if (GlobalState.GLInitialized && GraphicsContext != null)
+                if (GlobalState.GLInitialized)
                 {
                     new Thread(() =>
                         {
@@ -48,21 +48,19 @@ public partial class MainWindow : RendererMainWindow
                             {
                                 lock (GlobalState.Lock)
                                 {
-                                    using (var graphicsContext = new OpenTK.Graphics.GraphicsContext(GraphicsContext.GraphicsMode, WindowInfo))
+                                    GlobalState.Locked = true;
+                                    GlobalState.Meshes.Clear();
+                                    GlobalState.Materials.Clear();
+                                    foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
                                     {
-                                        graphicsContext.MakeCurrent(WindowInfo);
-                                        GlobalState.Meshes.Clear();
-                                        GlobalState.Materials.Clear();
-                                        foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                                        if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
                                         {
-                                            if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
-                                            {
-                                                ImageUtils.PreloadedGameImages.Remove(imageKey);
-                                                GlobalState.DeleteTexture(imageKey);
-                                            }
+                                            ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                            Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
                                         }
-                                        Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
                                     }
+                                    Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                    GlobalState.Locked = false;
                                 }
                             }
                         }).Start();
@@ -115,16 +113,7 @@ public partial class MainWindow : RendererMainWindow
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
-        Destrospean.CmarNYCBorrowed.Action glWidgetAllocate = delegate
-            {
-                lock (GlobalState.Lock)
-                {
-                    GLWidget.SizeAllocate(DrawingArea.Allocation);
-                }
-            };
-        DrawingArea.SizeAllocated += (o, args) => glWidgetAllocate();
-        GLWidget.ExposeEvent += (sender, e) => glWidgetAllocate();
-        ImageTable.Attach(GLWidget, 0, 1, 0, 1, 0, 0, 0, 0);
+        ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
         MainHPaned.ShowAll();

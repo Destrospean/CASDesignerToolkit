@@ -18,7 +18,8 @@ namespace Destrospean.Graphics.OpenGL
 
         public static Vector3 CurrentRotation = Vector3.Zero;
 
-        public static bool GLInitialized = false;
+        public static bool GLInitialized = false,
+        Locked = false;
 
         public static int IBOElements;
 
