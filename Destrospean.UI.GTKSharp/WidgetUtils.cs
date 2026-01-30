@@ -198,21 +198,29 @@ namespace Destrospean.DestrospeanCASPEditor
                                             element[1] = (float)colorButton.Color.Green / ushort.MaxValue;
                                             element[2] = (float)colorButton.Color.Blue / ushort.MaxValue;
                                             var color = new OpenTK.Vector3((float)element[0], (float)element[1], (float)element[2]);
-                                            var material = GlobalState.Materials[geometryResourceKey];
-                                            switch ((FieldType)field)
+                                            Material material;
+                                            if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                             {
+                                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                                return;
+                                            }
+                                            lock (GlobalState.Lock)
+                                            {
+                                                switch ((FieldType)field)
+                                                {
 #pragma warning disable 0618
-                                                case FieldType.Ambient:
+                                                    case FieldType.Ambient:
 #pragma warning restore 0618
-                                                    material.AmbientColor = color;
-                                                    break;
-                                                case FieldType.Diffuse:
-                                                    material.DiffuseColor = color;
-                                                    break;
-                                                case FieldType.Specular:
-                                                    material.SpecularColor = color;
-                                                    break;
-                                            };
+                                                        material.AmbientColor = color;
+                                                        break;
+                                                    case FieldType.Diffuse:
+                                                        material.DiffuseColor = color;
+                                                        break;
+                                                    case FieldType.Specular:
+                                                        material.SpecularColor = color;
+                                                        break;
+                                                }
+                                            }
                                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                         };
                                     valueWidget = colorButton;
@@ -236,22 +244,29 @@ namespace Destrospean.DestrospeanCASPEditor
                                             element[2] = (float)colorButtonWithAlpha.Color.Blue / ushort.MaxValue;
                                             element[3] = (float)colorButtonWithAlpha.Alpha / ushort.MaxValue;
                                             var color = new OpenTK.Vector3((float)element[0], (float)element[1], (float)element[2]);
-                                            var material = GlobalState.Materials[geometryResourceKey];
-                                            switch ((FieldType)field)
+                                            Material material;
+                                            if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                             {
-#pragma warning disable 0618
-                                                case FieldType.Ambient:
-#pragma warning restore 0618
-                                                    material.AmbientColor = color;
-                                                    break;
-                                                case FieldType.Diffuse:
-                                                    material.DiffuseColor = color;
-                                                    break;
-                                                case FieldType.Specular:
-                                                    material.SpecularColor = color;
-                                                    break;
+                                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                                return;
                                             }
-                                            ;
+                                            lock (GlobalState.Lock)
+                                            {
+                                                switch ((FieldType)field)
+                                                {
+#pragma warning disable 0618
+                                                    case FieldType.Ambient:
+#pragma warning restore 0618
+                                                        material.AmbientColor = color;
+                                                        break;
+                                                    case FieldType.Diffuse:
+                                                        material.DiffuseColor = color;
+                                                        break;
+                                                    case FieldType.Specular:
+                                                        material.SpecularColor = color;
+                                                        break;
+                                                }
+                                            }
                                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                         };
                                     valueWidget = colorButtonWithAlpha;
@@ -289,22 +304,30 @@ namespace Destrospean.DestrospeanCASPEditor
                                         index = geometryResource.TGIList.Length - 1;
                                     }
                                     element[0] = (uint)index;
-                                    var material = GlobalState.Materials[geometryResourceKey];
-                                    switch ((FieldType)field)
+                                    Material material;
+                                    if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                     {
-                                        case FieldType.AmbientOcclusionMap:
-                                            material.AmbientMap = key;
-                                            break;
-                                        case FieldType.DiffuseMap:
-                                            material.DiffuseMap = key;
-                                            break;
-                                        case FieldType.NormalMap:
-                                            material.NormalMap = key;
-                                            break;
-                                        case FieldType.SpecularMap:
-                                            material.SpecularMap = key;
-                                            break;
-                                    };
+                                        mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                        return;
+                                    }
+                                    lock (GlobalState.Lock)
+                                    {
+                                        switch ((FieldType)field)
+                                        {
+                                            case FieldType.AmbientOcclusionMap:
+                                                material.AmbientMap = key;
+                                                break;
+                                            case FieldType.DiffuseMap:
+                                                material.DiffuseMap = key;
+                                                break;
+                                            case FieldType.NormalMap:
+                                                material.NormalMap = key;
+                                                break;
+                                            case FieldType.SpecularMap:
+                                                material.SpecularMap = key;
+                                                break;
+                                        }
+                                    }
                                     mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                 };
                             valueWidget = comboBox;
@@ -497,21 +520,29 @@ namespace Destrospean.DestrospeanCASPEditor
                                 elementFloat3.Data1 = (float)colorButton.Color.Green / ushort.MaxValue;
                                 elementFloat3.Data2 = (float)colorButton.Color.Blue / ushort.MaxValue;
                                 var color = new OpenTK.Vector3(elementFloat3.Data0, elementFloat3.Data1, elementFloat3.Data2);
-                                var material = GlobalState.Materials[matd.MaterialNameHash.ToString()];
-                                switch (element.Field)
+                                Material material;
+                                if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
+                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    return;
+                                }
+                                lock (GlobalState.Lock)
+                                {
+                                    switch (element.Field)
+                                    {
 #pragma warning disable 0618
-                                    case FieldType.Ambient:
+                                        case FieldType.Ambient:
 #pragma warning restore 0618
-                                        material.AmbientColor = color;
-                                        break;
-                                    case FieldType.Diffuse:
-                                        material.DiffuseColor = color;
-                                        break;
-                                    case FieldType.Specular:
-                                        material.SpecularColor = color;
-                                        break;
-                                };
+                                            material.AmbientColor = color;
+                                            break;
+                                        case FieldType.Diffuse:
+                                            material.DiffuseColor = color;
+                                            break;
+                                        case FieldType.Specular:
+                                            material.SpecularColor = color;
+                                            break;
+                                    }
+                                }
                                 mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                             };
                         valueWidget = colorButton;
@@ -538,21 +569,29 @@ namespace Destrospean.DestrospeanCASPEditor
                                 elementFloat4.Data2 = (float)colorButton.Color.Blue / ushort.MaxValue;
                                 elementFloat4.Data3 = (float)colorButton.Alpha / ushort.MaxValue;
                                 var color = new OpenTK.Vector3(elementFloat4.Data0, elementFloat4.Data1, elementFloat4.Data2);
-                                var material = GlobalState.Materials[matd.MaterialNameHash.ToString()];
-                                switch (element.Field)
+                                Material material;
+                                if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
+                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    return;
+                                }
+                                lock (GlobalState.Lock)
+                                {
+                                    switch (element.Field)
+                                    {
 #pragma warning disable 0618
-                                    case FieldType.Ambient:
+                                        case FieldType.Ambient:
 #pragma warning restore 0618
-                                        material.AmbientColor = color;
-                                        break;
-                                    case FieldType.Diffuse:
-                                        material.DiffuseColor = color;
-                                        break;
-                                    case FieldType.Specular:
-                                        material.SpecularColor = color;
-                                        break;
-                                };
+                                            material.AmbientColor = color;
+                                            break;
+                                        case FieldType.Diffuse:
+                                            material.DiffuseColor = color;
+                                            break;
+                                        case FieldType.Specular:
+                                            material.SpecularColor = color;
+                                            break;
+                                    }
+                                }
                                 mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                             };
                         valueWidget = colorButton;
@@ -591,22 +630,30 @@ namespace Destrospean.DestrospeanCASPEditor
                                     index = mlodResource.Resources.Count - 1;
                                 }
                                 elementTextureRef.Data.TGIBlockIndex = index;
-                                var material = GlobalState.Materials[matd.MaterialNameHash.ToString()];
-                                switch (element.Field)
+                                Material material;
+                                if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
-                                    case FieldType.AmbientOcclusionMap:
-                                        material.AmbientMap = key;
-                                        break;
-                                    case FieldType.DiffuseMap:
-                                        material.DiffuseMap = key;
-                                        break;
-                                    case FieldType.NormalMap:
-                                        material.NormalMap = key;
-                                        break;
-                                    case FieldType.SpecularMap:
-                                        material.SpecularMap = key;
-                                        break;
-                                };
+                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    return;
+                                }
+                                lock (GlobalState.Lock)
+                                {
+                                    switch (element.Field)
+                                    {
+                                        case FieldType.AmbientOcclusionMap:
+                                            material.AmbientMap = key;
+                                            break;
+                                        case FieldType.DiffuseMap:
+                                            material.DiffuseMap = key;
+                                            break;
+                                        case FieldType.NormalMap:
+                                            material.NormalMap = key;
+                                            break;
+                                        case FieldType.SpecularMap:
+                                            material.SpecularMap = key;
+                                            break;
+                                    }
+                                }
                                 mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                             };
                         valueWidget = comboBox;

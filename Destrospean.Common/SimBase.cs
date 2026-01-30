@@ -137,6 +137,23 @@ namespace Destrospean.Common
                     }
                     if (validCurrentTypePartKeys.Count > 0)
                     {
+                        switch (clothingType)
+                        {
+                            case CASPartResource.ClothingType.Body:
+                            case CASPartResource.ClothingType.Bottom:
+                            case CASPartResource.ClothingType.Dental:
+                            case CASPartResource.ClothingType.Earrings:
+                            case CASPartResource.ClothingType.Eyebrow:
+                            case CASPartResource.ClothingType.EyeColor:
+                            case CASPartResource.ClothingType.Face:
+                            case CASPartResource.ClothingType.Hair:
+                            case CASPartResource.ClothingType.Scalp:
+                            case CASPartResource.ClothingType.Shoes:
+                            case CASPartResource.ClothingType.Top:
+                                break;
+                            default:
+                                continue;
+                        }
                         SetCASPart(clothingType, validCurrentTypePartKeys[random.Next(0, validCurrentTypePartKeys.Count - 1)]);
                     }
                 }
