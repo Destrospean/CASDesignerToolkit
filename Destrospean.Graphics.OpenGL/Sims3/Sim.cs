@@ -63,7 +63,10 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         bblnKey = casPart.CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey();
                         evaluated = casPart.ParentPackage.EvaluateResourceKey(bblnKey);
-                        bbln = new BBLN(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                        var stream = ((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry);
+                        stream.Position = 0;
+                        bbln = new BBLN(new BinaryReader(stream));
+                        stream.Position = 0;
                     }
                     catch (ResourceIndexEntryNotFoundException)
                     {

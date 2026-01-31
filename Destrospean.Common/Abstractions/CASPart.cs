@@ -481,6 +481,11 @@ namespace Destrospean.Common.Abstractions
             SaveCache();
         }
 
+        public static CASPartResource.SpeciesType GetAdjustedSpecies(CASPartResource.SpeciesType species)
+        {
+            return (uint)species == 0 ? (CASPartResource.SpeciesType)1 : species;
+        }
+
         public void ImportMesh(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             foreach (var geometryResourceKvp in geometryResources)
@@ -643,16 +648,15 @@ namespace Destrospean.Common.Abstractions
                         var vpxyTGI = new TGI(ResourceUtils.GetResourceType("VPXY"), 1, bblnResourceIndexEntries[i - 1].Instance);
                         var newVPXY = new CmarNYCBorrowed.VPXY(vpxyTGI, geomTGIs);
                         var newBBLN = new BBLN(7, CASPartResource.Unknown1 + morphName, vpxyTGI);
-                        var vpxyResourceKey = new TGIBlock(0, null, bblnResourceIndexEntries[i - 1].ResourceType, bblnResourceIndexEntries[i - 1].ResourceGroup, bblnResourceIndexEntries[i - 1].Instance);
-                        var vpxyStream = new MemoryStream();
-                        newBBLN.Write(new BinaryWriter(vpxyStream));
+                        var resourceStream = new MemoryStream();
+                        newBBLN.Write(new BinaryWriter(resourceStream));
                         ParentPackage.DeleteResource(morphEvaluated.ResourceIndexEntry);
                         ParentPackage.DeleteResource(bblnResourceIndexEntries[i - 1]);
-                        ParentPackage.AddResource(vpxyResourceKey, vpxyStream, true);
-                        vpxyResourceKey = new TGIBlock(0, null, vpxyTGI.Type, vpxyTGI.Group, vpxyTGI.Instance);
-                        vpxyStream = new MemoryStream();
-                        newVPXY.Write(new BinaryWriter(vpxyStream));
-                        var vpxyResourceIndexEntry = ParentPackage.AddResource(vpxyResourceKey, vpxyStream, true);
+                        ParentPackage.AddResource(bblnResourceIndexEntries[i - 1], resourceStream, true);
+                        var vpxyResourceKey = new TGIBlock(0, null, vpxyTGI.Type, vpxyTGI.Group, vpxyTGI.Instance);
+                        resourceStream = new MemoryStream();
+                        newVPXY.Write(new BinaryWriter(resourceStream));
+                        var vpxyResourceIndexEntry = ParentPackage.AddResource(vpxyResourceKey, resourceStream, true);
                         vpxyResources[vpxyResourceIndexEntry.ReverseEvaluateResourceKey()] = (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry);
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].ResourceGroup = bblnResourceIndexEntries[i - 1].ResourceGroup;
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].Instance = bblnResourceIndexEntries[i - 1].Instance;

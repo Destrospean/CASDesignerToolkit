@@ -426,7 +426,10 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                lock (SimBase.Lock)
+                                {
+                                    casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                }
                             }
                             fileChooserDialog.Destroy();
                         }

@@ -11,8 +11,6 @@ namespace Destrospean.Common
 
         string mID;
 
-        static object sLock = new object();
-
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
             get
@@ -56,6 +54,8 @@ namespace Destrospean.Common
         public delegate void LoadMeshesOnMainThreadDelegate(object casPartVolume, CASPartPreset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
 
         public delegate int LoadTextureDelegate(string key, System.Drawing.Bitmap image);
+
+        public static object Lock = new object();
 
         public bool ShowMaternityPartsOnly = false;
 
@@ -113,7 +113,7 @@ namespace Destrospean.Common
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
         {
-            lock (sLock)
+            lock (Lock)
             {
                 new List<CASPart>(CASParts.Values).FindAll(x => x != null && !CASPartsConflict(x, CurrentCASPart)).ForEach(x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback, loadMeshesOnMainThreadCallback));
             }
@@ -121,7 +121,7 @@ namespace Destrospean.Common
 
         public void RandomizeCASParts()
         {
-            lock (sLock)
+            lock (Lock)
             {
                 var random = new System.Random();
                 foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
@@ -130,7 +130,7 @@ namespace Destrospean.Common
                     foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
                     {
                         var flags = casPartLookupKvp.Value;
-                        if ((!ShowMaternityPartsOnly || flags["Clothing"] < (uint)CASPartResource.ClothingType.Body || flags["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (flags["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && flags["Clothing"] == (uint)clothingType && (flags["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (flags["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && flags["Species"] == (uint)CurrentCASPart.CASPartResource.AgeGender.Species)
+                        if ((!ShowMaternityPartsOnly || flags["Clothing"] < (uint)CASPartResource.ClothingType.Body || flags["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (flags["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && flags["Clothing"] == (uint)clothingType && (flags["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (flags["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)flags["Species"]) == CASPart.GetAdjustedSpecies(CurrentCASPart.CASPartResource.AgeGender.Species))
                         {
                             validCurrentTypePartKeys.Add(casPartLookupKvp.Key);
                         }
