@@ -92,8 +92,8 @@ namespace Destrospean.Common
 
         public static List<float[]> FillMissingDeltas(IEnumerable<float[]> vertices, IEnumerable<float[]> deltas)
         {
-            var newDeltas = new List<float[]>(deltas);
             var correctCount = new List<float[]>(vertices).Count;
+            var newDeltas = new List<float[]>(deltas);
             if (newDeltas.Count > correctCount)
             {
                 newDeltas.Clear();

@@ -206,6 +206,12 @@ namespace Destrospean.S3PIExtensions
             return package.AddResource(resourceKey ?? new ResourceKey(0, 0, System.Security.Cryptography.FNV64.GetHash(Guid.NewGuid().ToString())), System.IO.File.OpenRead(filename), rejectDups);
         }
 
+        public static void ClearGamePackages()
+        {
+            sGameContentPackages = null;
+            sGameImageResourcePackages = null;
+        }
+
         public static EvaluatedResourceKey EvaluateImageResourceKey(this IPackage package, string key)
         {
             try

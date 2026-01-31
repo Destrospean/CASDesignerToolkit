@@ -15,7 +15,7 @@ namespace Destrospean.DestrospeanCASPEditor
 			global::Stetic.Gui.Initialize (this);
 			// Widget Destrospean.DestrospeanCASPEditor.GameFoldersDialog
 			this.WidthRequest = 480;
-			this.HeightRequest = 584;
+			this.HeightRequest = 540;
 			this.Name = "Destrospean.DestrospeanCASPEditor.GameFoldersDialog";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Game Folders");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -65,7 +65,7 @@ namespace Destrospean.DestrospeanCASPEditor
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 480;
-			this.DefaultHeight = 584;
+			this.DefaultHeight = 540;
 			this.Show ();
 			this.OKButton.Clicked += new global::System.EventHandler (this.OnOKButtonClicked);
 		}

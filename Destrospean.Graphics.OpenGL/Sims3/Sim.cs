@@ -7,7 +7,6 @@ using Destrospean.S3PIExtensions;
 using s3pi.GenericRCOLResource;
 using Vector2 = OpenTK.Vector2;
 using Vector3 = OpenTK.Vector3;
-using Vector4 = OpenTK.Vector4;
 
 namespace Destrospean.Graphics.OpenGL.Sims3
 {

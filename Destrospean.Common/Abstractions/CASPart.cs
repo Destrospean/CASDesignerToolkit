@@ -429,10 +429,6 @@ namespace Destrospean.Common.Abstractions
 
         public static void GenerateCache()
         {
-            if (File.Exists(CacheFilePath))
-            {
-                return;
-            }
             CASPartLookupCache = new Dictionary<string, Dictionary<string, uint>>();
             foreach (var gamePackageKvp in ResourceUtils.GameContentPackages)
             {
