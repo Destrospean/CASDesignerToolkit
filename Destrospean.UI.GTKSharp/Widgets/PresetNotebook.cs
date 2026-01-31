@@ -400,6 +400,25 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         complateTable.Attach(addPatternButton, 0, 2, 0, 1);
                         complateTable.NRows++;
                     }
+                    bool swapped;
+                    for (var i = 0; i < subNotebook.NPages - 1; i++)
+                    {
+                        swapped = false;
+                        for (var j = 0; j < subNotebook.NPages - i - 1; j++)
+                        {
+                            string a = subNotebook.GetTabLabelText(subNotebook.GetNthPage(j)),
+                            b = subNotebook.GetTabLabelText(subNotebook.GetNthPage(j + 1));
+                            if (string.Compare(a, b) == 1 && b != "Logo" || a == "Logo")
+                            {
+                                subNotebook.ReorderChild(subNotebook.GetNthPage(j), j + 1);
+                                swapped = true;
+                            }
+                        }
+                        if (!swapped)
+                        {
+                            break;
+                        }
+                    }
                     AddPropertiesToTable(complateTable, complate);
                 }
                 ShowAll();

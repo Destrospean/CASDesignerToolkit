@@ -161,7 +161,7 @@ public partial class MainWindow : RendererMainWindow
                     Xalign = .5f
                 }),
             resetViewButton = new Button("Reset View");
-            var showMaternityPartsOnlyCheckButton = new CheckButton("Show Maternity Parts Only")
+            var showMaternityPartsOnlyCheckButton = new CheckButton("Maternity Mode")
                 {
                     Active = Sim.ShowMaternityPartsOnly
                 };
