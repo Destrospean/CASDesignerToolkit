@@ -75,19 +75,12 @@ namespace Destrospean.Common
             {
                 return false;
             }
-            if (a.CASPartResource.Clothing == b.CASPartResource.Clothing)
-            {
-                return true;
-            }
-            if (a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (b.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || b.CASPartResource.Clothing == CASPartResource.ClothingType.Top))
-            {
-                return true;
-            }
-            if ((a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && b.CASPartResource.Clothing == CASPartResource.ClothingType.Body)
-            {
-                return true;
-            }
-            return false;
+            return a.CASPartResource.Clothing == b.CASPartResource.Clothing || a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (b.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || b.CASPartResource.Clothing == CASPartResource.ClothingType.Top) || (a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && b.CASPartResource.Clothing == CASPartResource.ClothingType.Body;
+        }
+
+        public static bool CASPartsConflict(CASPart a, Dictionary<string, uint> b)
+        {
+            return (uint)a.CASPartResource.Clothing == b["Clothing"] || a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (b["Clothing"] == (uint)CASPartResource.ClothingType.Bottom || b["Clothing"] == (uint)CASPartResource.ClothingType.Top) || (a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && b["Clothing"] == (uint)CASPartResource.ClothingType.Body;
         }
 
         public static List<float[]> FillMissingDeltas(IEnumerable<float[]> vertices, IEnumerable<float[]> deltas)
@@ -123,16 +116,35 @@ namespace Destrospean.Common
         {
             lock (Lock)
             {
+                foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
+                {
+                    mCASParts[clothingType] = null;
+                }
                 var random = new System.Random();
                 foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
                 {
                     var validCurrentTypePartKeys = new List<string>();
                     foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
                     {
-                        var flags = casPartLookupKvp.Value;
-                        if ((!ShowMaternityPartsOnly || flags["Clothing"] < (uint)CASPartResource.ClothingType.Body || flags["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (flags["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && flags["Clothing"] == (uint)clothingType && (flags["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (flags["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (flags["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)flags["Species"]) == CASPart.GetAdjustedSpecies(CurrentCASPart.CASPartResource.AgeGender.Species))
+                        if (((!ShowMaternityPartsOnly || casPartLookupKvp.Value["Clothing"] < (uint)CASPartResource.ClothingType.Body || casPartLookupKvp.Value["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (casPartLookupKvp.Value["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (casPartLookupKvp.Value["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && casPartLookupKvp.Value["Clothing"] == (uint)clothingType && (casPartLookupKvp.Value["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (casPartLookupKvp.Value["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (casPartLookupKvp.Value["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)casPartLookupKvp.Value["Species"]) == CASPart.GetAdjustedSpecies(CurrentCASPart.CASPartResource.AgeGender.Species)) && !CASPartsConflict(CurrentCASPart, casPartLookupKvp.Value))
                         {
-                            validCurrentTypePartKeys.Add(casPartLookupKvp.Key);
+                            var isValid = true;
+                            foreach (var casPart in mCASParts.Values)
+                            {
+                                if (casPart == null)
+                                {
+                                    continue;
+                                }
+                                if (CASPartsConflict(casPart, casPartLookupKvp.Value) || (casPartLookupKvp.Value["Age"] & (uint)casPart.CASPartResource.AgeGender.Age) == 0 || (casPartLookupKvp.Value["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)casPart.CASPartResource.ClothingCategory) == 0 || (casPartLookupKvp.Value["Gender"] & (uint)casPart.CASPartResource.AgeGender.Gender) == 0 || CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)casPartLookupKvp.Value["Species"]) != CASPart.GetAdjustedSpecies(casPart.CASPartResource.AgeGender.Species))
+                                {
+                                    isValid = false;
+                                    break;
+                                }
+                            }
+                            if (isValid)
+                            {
+                                validCurrentTypePartKeys.Add(casPartLookupKvp.Key);
+                            }
                         }
                     }
                     if (validCurrentTypePartKeys.Count > 0)

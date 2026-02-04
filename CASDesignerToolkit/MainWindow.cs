@@ -304,7 +304,10 @@ public partial class MainWindow : RendererMainWindow
                         ShowTabs = false
                     };
                 var actionGroup = new ActionGroup("Default");
-                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    },
                 deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
                     {
                         Sensitive = lodKvp.Value.Count > 1
@@ -315,8 +318,14 @@ public partial class MainWindow : RendererMainWindow
                 importGEOMAction = new Gtk.Action("ImportGEOMAction", "Import GEOM", null, Stock.Directory),
                 importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
                 importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
-                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
-                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
+                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    });
+                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    });
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
                 actionGroup.Add(addMeshGroupAction);
                 actionGroup.Add(deleteMeshGroupAction);
@@ -352,11 +361,17 @@ public partial class MainWindow : RendererMainWindow
                 Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
                     {
                         Xalign = .5f
-                    }),
+                    })
+                    {
+                        Sensitive = false
+                    },
                 prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
                     {
                         Xalign = .5f
-                    });
+                    })
+                    {
+                        Sensitive = false
+                    };
                 var pageIndexLabel = new Label
                     {
                         Xalign = .5f

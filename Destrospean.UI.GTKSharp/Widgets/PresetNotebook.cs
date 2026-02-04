@@ -362,7 +362,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             ColumnSpacing = WidgetUtils.DefaultTableColumnSpacing
                         };
                     insertComplatePage(complateAsPreset == null ? ((Pattern)complate).SlotName : "Configuration", complateTable, subNotebook.NPages);
-                    if (complateAsPreset != null && !complateAsPreset.Patterns.Exists(x => x.SlotName == addPatternSlotName))
+                    if (complateAsPreset != null && complateAsPreset.Patterns.Exists(x => x.SlotName.StartsWith("Pattern ")) && !complateAsPreset.Patterns.Exists(x => x.SlotName == addPatternSlotName))
                     {
                         var addPatternButtonHBox = new HBox(false, 4);
                         addPatternButtonHBox.PackStart(new Gtk.Image(Stock.Add, IconSize.SmallToolbar)
@@ -393,6 +393,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                         patternTable.NRows = 1;
                                         AddPropertiesToTable(patternTable, i == 0 ? complate : complateAsPreset.Patterns[i - 1]);
                                     }
+                                    subNotebook.ReorderChild(subNotebook.GetNthPage(subNotebook.NPages - 1), complateAsPreset.Patterns.FindLastIndex(x => x.SlotName != "Logo"));
                                     ShowAll();
                                 }
                                 choosePatternDialog.Destroy();

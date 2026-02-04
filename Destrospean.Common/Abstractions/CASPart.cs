@@ -241,6 +241,13 @@ namespace Destrospean.Common.Abstractions
             CASPartResource = (CASPartResource.CASPartResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
             Presets.AddRange(CASPartResource.Presets.ConvertAll(x => new CASPartPreset(this, x.XmlFile) as Preset));
             LoadLODs(geometryResources, vpxyResources);
+            if (LODs.Count == 0)
+            {
+                for (var i = 0; i < 4; i++)
+                {
+                    LODs[i] = new List<CASPart.GEOMAndKey>();
+                }
+            }
         }
 
         public void AddMeshGroup(int lod, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
