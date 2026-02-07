@@ -3592,7 +3592,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public static GEOM[] GEOMsFromWSO(WSO wso, GEOM refMesh, TGI bumpMapTGI, Action updateProgressCallback = null)
         {
-            var geom = new GEOM(refMesh);
+            var geom = GEOMsFromOBJ(new OBJ(wso), refMesh, bumpMapTGI, false, false, updateProgressCallback)[0];
             geom.SetBoneHashList(Array.ConvertAll(wso.BoneNameList, x => (uint)Enum.Parse(typeof(BoneHash), x)));
             for (var j = 0; j < wso.Base.VertexCount; j++)
             {
