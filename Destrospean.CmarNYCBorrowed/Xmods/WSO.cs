@@ -1567,8 +1567,8 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 for (var j = 0; j < MeshCount; j++)
                 {
-                    Mesh(j).GetVertex(i).BoneAssignments = newBones.GetRange(0, 4).ToArray();
-                    Mesh(j).GetVertex(i).BoneWeights = newWeights.GetRange(0, 4).ToArray();
+                    GetMesh(j).GetVertex(i).BoneAssignments = newBones.GetRange(0, 4).ToArray();
+                    GetMesh(j).GetVertex(i).BoneWeights = newWeights.GetRange(0, 4).ToArray();
                 }
             }
         }
@@ -1722,7 +1722,7 @@ namespace Destrospean.CmarNYCBorrowed
                     }
                     for (var j = 0; j < MeshCount; j++)
                     {
-                        Mesh(j).FacePoints[i].UVs = newUV;
+                        GetMesh(j).FacePoints[i].UVs = newUV;
                     }
                 }
             }
@@ -1740,10 +1740,10 @@ namespace Destrospean.CmarNYCBorrowed
             var maxBone = 0;
             for (var i = 0; i < mMeshCount; i++)
             {
-                for (var j = 0; j < Mesh(i).VertexCount; j++)
+                for (var j = 0; j < GetMesh(i).VertexCount; j++)
                 {
-                    var boneAssignments = Mesh(i).GetVertex(j).BoneAssignments;
-                    var boneWeights = Mesh(i).GetVertex(j).BoneWeights;
+                    var boneAssignments = GetMesh(i).GetVertex(j).BoneAssignments;
+                    var boneWeights = GetMesh(i).GetVertex(j).BoneWeights;
                     for (var k = 0; k < 4; k++)
                     {
                         if (boneWeights[k] > 0 && boneAssignments[k] > maxBone)
@@ -1756,7 +1756,7 @@ namespace Destrospean.CmarNYCBorrowed
                         badBone = true;
                     }
                 }
-                if (Mesh(i).BonesUsedCount > 60)
+                if (GetMesh(i).BonesUsedCount > 60)
                 {
                     tooManyBones = true;
                 }
@@ -1781,9 +1781,9 @@ namespace Destrospean.CmarNYCBorrowed
         {
             for (var i = 0; i < mMeshCount; i++)
             {
-                for (var j = 0; j < Mesh(i).VertexCount; j++)
+                for (var j = 0; j < GetMesh(i).VertexCount; j++)
                 {
-                    var boneWeights = Mesh(i).GetVertex(j).BoneWeights;
+                    var boneWeights = GetMesh(i).GetVertex(j).BoneWeights;
                     var totalWeight = 0;
                     for (var k = 0; k < 4; k++)
                     {
@@ -1798,9 +1798,33 @@ namespace Destrospean.CmarNYCBorrowed
                             break;
                         }
                     }
-                    Mesh(i).GetVertex(j).BoneWeights = boneWeights;
+                    GetMesh(i).GetVertex(j).BoneWeights = boneWeights;
                 }
             }
+        }
+
+        public MeshGroup GetMesh(int index)
+        {
+            if (index < mMeshes.Length)
+            {
+                return mMeshes[index];
+            }
+            return null;
+        }
+
+        public MeshGroup GetMesh(string name)
+        {
+            var index = Array.IndexOf(MeshNames, name);
+            if (index > -1)
+            {
+                return mMeshes[index];
+            }
+            return null;
+        }
+
+        public int GetMeshIndex(string name)
+        {
+            return Array.IndexOf(MeshNames, name);
         }
 
         public Bone GetBone(int index)
@@ -1836,30 +1860,6 @@ namespace Destrospean.CmarNYCBorrowed
             return newMorph;
         }
 
-        public MeshGroup Mesh(string name)
-        {
-            var index = Array.IndexOf(MeshNames, name);
-            if (index > -1)
-            {
-                return mMeshes[index];
-            }
-            return null;
-        }
-
-        public MeshGroup Mesh(int index)
-        {
-            if (index < mMeshes.Length)
-            {
-                return mMeshes[index];
-            }
-            return null;
-        }
-
-        public int MeshIndex(string name)
-        {
-            return Array.IndexOf(MeshNames, name);
-        }
-
         public bool MorphMatch()
         {
             if (!Base.HasValidIDs)
@@ -1870,7 +1870,7 @@ namespace Destrospean.CmarNYCBorrowed
             var newMorphs = new MeshGroup[mMeshCount - 1];
             for (var i = 0; i < mMeshCount - 1; i++)
             {
-                var meshGroup = Mesh(i + 1);
+                var meshGroup = GetMesh(i + 1);
                 VertexExtended[] oldMorphVertices = meshGroup.GetExtendedVertices(),
                 newMorphVertices = new VertexExtended[baseMesh.VertexCount];
                 var oldMorphVertexIDs = new int[meshGroup.VertexCount];
@@ -1908,7 +1908,7 @@ namespace Destrospean.CmarNYCBorrowed
                         }
                     }
                 }
-                newMorphs[i] = new MeshGroup(baseMesh, Mesh(i + 1).MeshName);
+                newMorphs[i] = new MeshGroup(baseMesh, GetMesh(i + 1).MeshName);
                 if (!newMorphs[i].ApplyExtendedVertices(newMorphVertices, true, false))
                 {
                     return false;
@@ -2104,7 +2104,6 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 throw new WSOException("Source number of vertices does not equal target number of vertices!");
             }
-            
             for (var i = 0; i < mMeshes.Length; i++)
             {
                 var meshGroup = mMeshes[i];

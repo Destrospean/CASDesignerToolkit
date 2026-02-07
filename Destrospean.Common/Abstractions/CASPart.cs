@@ -64,7 +64,7 @@ namespace Destrospean.Common.Abstractions
 
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
-            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.ResourceGroup == resourceIndexEntry.ResourceGroup && x.Instance == resourceIndexEntry.Instance);
+            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.Instance == resourceIndexEntry.Instance);
             if (defaultPresetResourceIndexEntries.Count > 0)
             {
                 var stream = ((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0]);
@@ -390,7 +390,7 @@ namespace Destrospean.Common.Abstractions
             }
             using (var fileStream = File.OpenRead(filename))
             {
-                var newGEOMPlusMorphs = GEOM.GEOMsFromOBJ(meshFileType == MeshFileType.OBJ ? new OBJ(new StreamReader(fileStream)) : meshFileType == MeshFileType.WSO ? new OBJ(new WSO(new BinaryReader(fileStream))) : null, geom, new TGI(), false, false);
+                var newGEOMPlusMorphs = meshFileType == MeshFileType.OBJ ? GEOM.GEOMsFromOBJ(new OBJ(new StreamReader(fileStream)), geom, new TGI(), false, false) : meshFileType == MeshFileType.WSO ? GEOM.GEOMsFromWSO(new WSO(new BinaryReader(fileStream)), geom, new TGI()) : null;
                 for (var i = newGEOMPlusMorphs.Length - 1; i > -1 ; i--)
                 {
                     var stream = new MemoryStream();
