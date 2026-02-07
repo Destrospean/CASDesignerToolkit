@@ -57,6 +57,7 @@ namespace Destrospean.Common.Abstractions
                     uint[] controlMapArray = null,
                     maskArray = null;
                     Bitmap diffuseMap = null,
+                    faceOverlay = null,
                     multiplier = null,
                     overlay = null;
                     float[] diffuseColor = null,
@@ -119,6 +120,10 @@ namespace Destrospean.Common.Abstractions
                         {
                             switch (key)
                             {
+                                case "ambient":
+                                    AmbientMap = value;
+                                    SkinAmbientMap = value;
+                                    break;
                                 case "clothing ambient":
                                     AmbientMap = value;
                                     break;
@@ -133,6 +138,9 @@ namespace Destrospean.Common.Abstractions
                                     break;
                                 case "diffuse map":
                                     diffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                    break;
+                                case "face overlay":
+                                    faceOverlay = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
                                     break;
                                 case "highlight color":
                                     highlightColor = ParseCommaSeparatedValues(value);
@@ -153,6 +161,10 @@ namespace Destrospean.Common.Abstractions
                                     SkinAmbientMap = value;
                                     break;
                                 case "skin specular":
+                                    SkinSpecularMap = value;
+                                    break;
+                                case "specular":
+                                    SpecularMap = value;
                                     SkinSpecularMap = value;
                                     break;
                                 case "tip color":
@@ -271,6 +283,10 @@ namespace Destrospean.Common.Abstractions
                         if (overlay != null)
                         {
                             graphics.DrawImage(overlay, 0, 0);
+                        }
+                        if (faceOverlay != null)
+                        {
+                            graphics.DrawImage(faceOverlay, 0, 0);
                         }
                         for (var i = 0; i < stencils.Count; i++)
                         {

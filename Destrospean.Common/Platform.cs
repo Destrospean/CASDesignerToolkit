@@ -6,6 +6,14 @@ namespace Destrospean.Common
 {
     public static class Platform
     {
+        public static string CacheDirectoryPath
+        {
+            get
+            {
+                return IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            }
+        }
+
         public static bool IsLinux
         {
             get

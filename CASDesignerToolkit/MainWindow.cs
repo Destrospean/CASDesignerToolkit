@@ -104,7 +104,7 @@ public partial class MainWindow : RendererMainWindow
         RescaleAndReposition();
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
-        new Thread(CASPart.LoadCache).Start();
+        new Thread(CASPart.LoadLookupCache).Start();
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow(this, Icon);
@@ -496,7 +496,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             try
                             {
-                                casPart.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             catch (Exception ex)
                             {
@@ -1224,10 +1224,6 @@ public partial class MainWindow : RendererMainWindow
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(modlResourceKvp.Key).ResourceIndexEntry, modlResourceKvp.Value);
             }
             */
-            foreach (var vpxyResourceKvp in PreloadedData.VPXYs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
-            }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
             if (string.IsNullOrEmpty(mSaveAsPath))
             {

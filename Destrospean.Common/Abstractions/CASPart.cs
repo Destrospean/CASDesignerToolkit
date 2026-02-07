@@ -11,8 +11,6 @@ namespace Destrospean.Common.Abstractions
 {
     public class CASPart : CASTableObject
     {
-        //TxtcResource.TxtcResource mDiffuseTXTCResource, mSpecularTXTCResource;
-
         public AgeGender AdjustedAge
         {
             get
@@ -31,7 +29,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", Platform.IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : Platform.IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Path.DirectorySeparatorChar);
+        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
             
         public static Dictionary<string, Dictionary<string, uint>> CASPartLookupCache;
 
@@ -49,53 +47,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        /*
-        public TxtcResource.TxtcResource DiffuseTXTCResource
-        {
-            get
-            {
-                if (mDiffuseTXTCResource == null && CASPartResource.Diffuse1Indexes.Count > 0)
-                {
-                    EvaluatedResourceKey evaluated;
-                    try
-                    {
-                        evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[CASPartResource.Diffuse1Indexes[0]].ReverseEvaluateResourceKey());
-                    }
-                    catch (ResourceIndexEntryNotFoundException)
-                    {
-                        return null;
-                    }
-                    mDiffuseTXTCResource = WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry) as TxtcResource.TxtcResource;
-                }
-                return mDiffuseTXTCResource;
-            }
-        }
-        */
-
         public readonly Dictionary<int, List<GEOMAndKey>> LODs = new Dictionary<int, List<GEOMAndKey>>();
-
-        /*
-        public TxtcResource.TxtcResource SpecularTXTCResource
-        {
-            get
-            {
-                if (mSpecularTXTCResource == null && CASPartResource.Specular1Indexes.Count > 0)
-                {
-                    EvaluatedResourceKey evaluated;
-                    try
-                    {
-                        evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[CASPartResource.Specular1Indexes[0]].ReverseEvaluateResourceKey());
-                    }
-                    catch (ResourceIndexEntryNotFoundException)
-                    {
-                        return null;
-                    }
-                    mSpecularTXTCResource = WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry) as TxtcResource.TxtcResource;
-                }
-                return mSpecularTXTCResource;
-            }
-        }
-        */
 
         public struct GEOMAndKey
         {
@@ -109,122 +61,6 @@ namespace Destrospean.Common.Abstractions
                 Key = key;
             }
         }
-
-        /*
-        public struct TextureCompositor
-        {
-            public IPackage ParentPackage;
-
-            public List<TextureStep> TextureSteps;
-
-            public struct TextureStep
-            {
-                public System.Drawing.Bitmap Image;
-
-                public Dictionary<string, object> Properties;
-            }
-
-            public TextureCompositor(IPackage package, TxtcResource.TxtcResource txtcResource)
-            {
-                ParentPackage = package;
-                TextureSteps = new List<TextureStep>();
-                foreach (var entryBlock in txtcResource.Root.Entries)
-                {
-                    var textureStep = new TextureStep();
-                    textureStep.Properties = new Dictionary<string, object>();
-                    foreach (var entry in entryBlock.Entries)
-                    {
-                        var entryBoolean = entry as TxtcResource.TxtcResource.EntryBoolean;
-                        if (entryBoolean != null)
-                        {
-                            textureStep.Properties[entryBoolean.Property.ToString()] = Convert.ToBoolean(entryBoolean.Data);
-                            continue;
-                        }
-                        var entryByte = entry as TxtcResource.TxtcResource.EntryByte;
-                        if (entryByte != null)
-                        {
-                            textureStep.Properties[entryByte.Property.ToString()] = entryByte.Data;
-                            continue;
-                        }
-                        var entryInt16 = entry as TxtcResource.TxtcResource.EntryInt16;
-                        if (entryInt16 != null)
-                        {
-                            textureStep.Properties[entryInt16.Property.ToString()] = entryInt16.Data;
-                            continue;
-                        }
-                        var entryInt32 = entry as TxtcResource.TxtcResource.EntryInt32;
-                        if (entryInt32 != null)
-                        {
-                            textureStep.Properties[entryInt32.Property.ToString()] = entryInt32.Data;
-                            continue;
-                        }
-                        var entryInt64 = entry as TxtcResource.TxtcResource.EntryInt64;
-                        if (entryInt64 != null)
-                        {
-                            textureStep.Properties[entryInt64.Property.ToString()] = entryInt64.Data;
-                            continue;
-                        }
-                        var entryNull = entry as TxtcResource.TxtcResource.EntryNull;
-                        if (entryNull != null)
-                        {
-                            continue;
-                        }
-                        var entryRectangle = entry as TxtcResource.TxtcResource.EntryRectangle;
-                        if (entryRectangle != null)
-                        {
-                            textureStep.Properties[entryRectangle.Property.ToString()] = entryRectangle.Data;
-                            continue;
-                        }
-                        var entrySByte = entry as TxtcResource.TxtcResource.EntrySByte;
-                        if (entrySByte != null)
-                        {
-                            continue;
-                        }
-                        var entrySingle = entry as TxtcResource.TxtcResource.EntrySingle;
-                        if (entrySingle != null)
-                        {
-                            continue;
-                        }
-                        var entryString = entry as TxtcResource.TxtcResource.EntryString;
-                        if (entryString != null)
-                        {
-                            continue;
-                        }
-                        var entryTGIIndex = entry as TxtcResource.TxtcResource.EntryTGIIndex;
-                        if (entryTGIIndex != null)
-                        {
-                            if (entryTGIIndex.Property == TxtcResource.TxtcResource.EntryTGIIndex.TGIIndexProperties.ImageKey)
-                            {
-                                textureStep.Image = ParentPackage.GetTexture(entryTGIIndex.ParentTGIBlocks[entryTGIIndex.Data].ReverseEvaluateResourceKey(), Complate.GetTextureCallback);
-                            }
-                            continue;
-                        }
-                        var entryUInt16 = entry as TxtcResource.TxtcResource.EntryUInt16;
-                        if (entryUInt16 != null)
-                        {
-                            continue;
-                        }
-                        var entryUInt32 = entry as TxtcResource.TxtcResource.EntryUInt32;
-                        if (entryUInt32 != null)
-                        {
-                            continue;
-                        }
-                        var entryUInt64 = entry as TxtcResource.TxtcResource.EntryUInt64;
-                        if (entryUInt64 != null)
-                        {
-                            continue;
-                        }
-                        var entryVector = entry as TxtcResource.TxtcResource.EntryVector;
-                        if (entryVector != null)
-                        {
-                            continue;
-                        }
-                    }
-                    TextureSteps.Add(textureStep);
-                }
-            }
-        }
-        */
 
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
@@ -434,7 +270,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void GenerateCache()
+        public static void GenerateLookupCache()
         {
             CASPartLookupCache = new Dictionary<string, Dictionary<string, uint>>();
             foreach (var gamePackageKvp in ResourceUtils.GameContentPackages)
@@ -481,7 +317,7 @@ namespace Destrospean.Common.Abstractions
                     };
                 }
             }
-            SaveCache();
+            SaveLookupCache();
         }
 
         public static CASPartResource.SpeciesType GetAdjustedSpecies(CASPartResource.SpeciesType species)
@@ -489,21 +325,14 @@ namespace Destrospean.Common.Abstractions
             return (uint)species == 0 ? (CASPartResource.SpeciesType)1 : species;
         }
 
-        public void ImportMesh(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMeshGroup(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            foreach (var geometryResourceKvp in geometryResources)
-            {
-                if (geometryResourceKvp.Value == LODs[lod][groupIndex].GEOM)
-                {
-                    var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
-                    ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
-                    ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
-                    geometryResources[geometryResourceKvp.Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
-                    LoadLODs(geometryResources, vpxyResources);
-                    updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
-                    break;
-                }
-            }
+            var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
+            ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
+            ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+            geometryResources[LODs[lod][groupIndex].Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
+            LoadLODs(geometryResources, vpxyResources);
+            updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
         }
 
         public void ImportMeshGroup(int lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
@@ -568,19 +397,12 @@ namespace Destrospean.Common.Abstractions
                     newGEOMPlusMorphs[i].Write(new BinaryWriter(stream));
                     if (i == 0)
                     {
-                        foreach (var geometryResourceKvp in geometryResources)
-                        {
-                            if (geometryResourceKvp.Value == LODs[lod][groupIndex].GEOM)
-                            {
-                                var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
-                                ParentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
-                                ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
-                                geometryResources[geometryResourceKvp.Key] = newGEOMPlusMorphs[i];
-                                LoadLODs(geometryResources, vpxyResources);
-                                updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
-                                break;
-                            }
-                        }
+                        var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
+                        ParentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
+                        ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+                        geometryResources[LODs[lod][groupIndex].Key] = newGEOMPlusMorphs[i];
+                        LoadLODs(geometryResources, vpxyResources);
+                        updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
                     }
                     else if (morphsEvaluated[i - 1].HasValue)
                     {
@@ -591,7 +413,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] =  LODs.ContainsKey(j) ? new GEOM[]
+                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
                                     {
                                         j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
                                     } : new GEOM[0];
@@ -619,62 +441,25 @@ namespace Destrospean.Common.Abstractions
                                 }
                             }
                         }
-                        var geomTGIs = new TGI[lodMorphMeshes.Length][];
-                        var group = 0u;
-                        foreach (var j in CASPartResource.Diffuse1Indexes)
+                        var vpxyResourceKey = morphEvaluated.ResourceIndexEntry.ReverseEvaluateResourceKey();
+                        if (vpxyResources.ContainsKey(vpxyResourceKey))
                         {
-                            group = CASPartResource.TGIBlocks[j].ResourceGroup;
+                            vpxyResources.Remove(vpxyResourceKey);
                         }
-                        foreach (var j in CASPartResource.Specular1Indexes)
-                        {
-                            group = CASPartResource.TGIBlocks[j].ResourceGroup;
-                        }
-                        for (var j = 0; j < lodMorphMeshes.Length; j++)
-                        {
-                            geomTGIs[j] = new TGI[lodMorphMeshes[j].Length];
-                            for (var k = 0; k < geomTGIs[j].Length; k++)
-                            {
-                                var temp = "_lod" + j.ToString();
-                                if (k > 0)
-                                {
-                                    temp += "-" + (k + 1).ToString();
-                                }
-                                temp += morphName;
-                                geomTGIs[j][k] = new TGI(ResourceUtils.GetResourceType("GEOM"), group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + morphName + Environment.UserName + Environment.TickCount.ToString() + temp));
-                                var geomResourceKey = new TGIBlock(0, null, geomTGIs[j][k].Type, geomTGIs[j][k].Group, geomTGIs[j][k].Instance);
-                                var geomStream = new MemoryStream();
-                                lodMorphMeshes[j][k].Write(new BinaryWriter(geomStream));
-                                var geomResourceIndexEntry = ParentPackage.AddResource(geomResourceKey, geomStream, true);
-                                geometryResources[geomResourceIndexEntry.ReverseEvaluateResourceKey()] = new GEOM(lodMorphMeshes[j][k]);
-                            }
-                        }
-                        var vpxyTGI = new TGI(ResourceUtils.GetResourceType("VPXY"), 1, bblnResourceIndexEntries[i - 1].Instance);
-                        var newVPXY = new CmarNYCBorrowed.VPXY(vpxyTGI, geomTGIs);
-                        var newBBLN = new BBLN(7, CASPartResource.Unknown1 + morphName, vpxyTGI);
+                        var bgeoTGI = new TGI(ResourceUtils.GetResourceType("BGEO"), 0, bblnResourceIndexEntries[i - 1].Instance);
+                        var newBBLN = new BBLN(8, CASPartResource.Unknown1 + morphName, bgeoTGI);
+                        var newBGEO = new BGEO(lodMorphMeshes);
                         var resourceStream = new MemoryStream();
                         newBBLN.Write(new BinaryWriter(resourceStream));
                         ParentPackage.DeleteResource(morphEvaluated.ResourceIndexEntry);
                         ParentPackage.DeleteResource(bblnResourceIndexEntries[i - 1]);
                         ParentPackage.AddResource(bblnResourceIndexEntries[i - 1], resourceStream, true);
-                        var vpxyResourceKey = new TGIBlock(0, null, vpxyTGI.Type, vpxyTGI.Group, vpxyTGI.Instance);
                         resourceStream = new MemoryStream();
-                        newVPXY.Write(new BinaryWriter(resourceStream));
-                        var vpxyResourceIndexEntry = ParentPackage.AddResource(vpxyResourceKey, resourceStream, true);
-                        vpxyResources[vpxyResourceIndexEntry.ReverseEvaluateResourceKey()] = (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry);
+                        newBGEO.Write(new BinaryWriter(resourceStream));
+                        ParentPackage.AddResource(new TGIBlock(0, null, bgeoTGI.Type, bgeoTGI.Group, bgeoTGI.Instance), resourceStream, true);
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].ResourceGroup = bblnResourceIndexEntries[i - 1].ResourceGroup;
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].Instance = bblnResourceIndexEntries[i - 1].Instance;
                     }
-                }
-            }
-        }
-
-        public static void LoadCache()
-        {
-            if (File.Exists(CacheFilePath))
-            {
-                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
-                {
-                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, uint>>>(reader);
                 }
             }
         }
@@ -722,7 +507,18 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void SaveCache()
+        public static void LoadLookupCache()
+        {
+            if (File.Exists(CacheFilePath))
+            {
+                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
+                {
+                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, uint>>>(reader);
+                }
+            }
+        }
+
+        public static void SaveLookupCache()
         {
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(CacheFilePath));
             using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(CacheFilePath, FileMode.Create)))

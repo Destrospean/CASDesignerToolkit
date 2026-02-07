@@ -638,7 +638,11 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     newSection2[i] = new Section2(hasPosition, hasNormals, offset);
                     offset = 0;
-                    if (hasNormals || hasPosition)
+                    if (hasNormals)
+                    {
+                        offset++;
+                    }
+                    if (hasPosition)
                     {
                         offset++;
                     }
