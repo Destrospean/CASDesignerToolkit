@@ -362,7 +362,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             ColumnSpacing = WidgetUtils.DefaultTableColumnSpacing
                         };
                     insertComplatePage(complateAsPreset == null ? ((Pattern)complate).SlotName : "Configuration", complateTable, subNotebook.NPages);
-                    if (complateAsPreset != null && !complateAsPreset.Patterns.Exists(x => x.SlotName == addPatternSlotName))
+                    if (complateAsPreset != null && complateAsPreset.Patterns.Exists(x => x.SlotName.StartsWith("Pattern ")) && !complateAsPreset.Patterns.Exists(x => x.SlotName == addPatternSlotName))
                     {
                         var addPatternButtonHBox = new HBox(false, 4);
                         addPatternButtonHBox.PackStart(new Gtk.Image(Stock.Add, IconSize.SmallToolbar)
@@ -393,12 +393,32 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                         patternTable.NRows = 1;
                                         AddPropertiesToTable(patternTable, i == 0 ? complate : complateAsPreset.Patterns[i - 1]);
                                     }
+                                    subNotebook.ReorderChild(subNotebook.GetNthPage(subNotebook.NPages - 1), complateAsPreset.Patterns.FindLastIndex(x => x.SlotName != "Logo"));
                                     ShowAll();
                                 }
                                 choosePatternDialog.Destroy();
                             };
                         complateTable.Attach(addPatternButton, 0, 2, 0, 1);
                         complateTable.NRows++;
+                    }
+                    bool swapped;
+                    for (var i = 0; i < subNotebook.NPages - 1; i++)
+                    {
+                        swapped = false;
+                        for (var j = 0; j < subNotebook.NPages - i - 1; j++)
+                        {
+                            string a = subNotebook.GetTabLabelText(subNotebook.GetNthPage(j)),
+                            b = subNotebook.GetTabLabelText(subNotebook.GetNthPage(j + 1));
+                            if (string.Compare(a, b) == 1 && b != "Logo" || a == "Logo")
+                            {
+                                subNotebook.ReorderChild(subNotebook.GetNthPage(j), j + 1);
+                                swapped = true;
+                            }
+                        }
+                        if (!swapped)
+                        {
+                            break;
+                        }
                     }
                     AddPropertiesToTable(complateTable, complate);
                 }

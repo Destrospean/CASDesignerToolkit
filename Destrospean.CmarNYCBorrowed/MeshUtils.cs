@@ -24,6 +24,53 @@ namespace Destrospean.CmarNYCBorrowed
 {
     public static class MeshUtils
     {
+        public static void GetDeltaVertices(this GEOM baseMesh, BGEO morph, int lod, int bgeoSection1EntryNumber, List<float[]> deltaNormals, List<float[]> deltaPositions)
+        {
+            if (baseMesh == null || !baseMesh.HasVertexIDs || bgeoSection1EntryNumber < 0 || morph == null)
+            {
+                return;
+            }
+            var vertexDeltas = morph.GetDeltas(bgeoSection1EntryNumber, lod);
+            for (var i = 0; i < baseMesh.VertexCount; i++)
+            {
+                var vertexDeltaIndex = vertexDeltas.FindIndex(x => x.VertexID == baseMesh.GetVertexID(i));
+                if (vertexDeltaIndex > -1)
+                {
+                    var delta = vertexDeltas[vertexDeltaIndex].Position;
+                    deltaNormals.Add(delta.Coordinates);
+                    deltaPositions.Add(delta.Coordinates);
+                }
+            }
+        }
+
+        public static void GetDeltaVertices(this GEOM baseMesh, BGEO morph, int lod, Species species, AgeGender age, AgeGender gender, List<float[]> deltaNormals, List<float[]> deltaPositions)
+        {
+            GetDeltaVertices(baseMesh, morph, lod, morph.GetSection1EntryIndex(species, age, gender), deltaNormals, deltaPositions);
+        }
+
+        public static void GetDeltaVertices(GEOM[] morphs, List<float[]> deltaNormals, List<float[]> deltaPositions)
+        {
+            if (morphs == null)
+            {
+                return;
+            }
+            for (var i = 0; i < morphs.Length; i++)
+            {
+                for (var j = 0; j < morphs[i].VertexCount; j++)
+                {
+                    try
+                    {
+                        morphs[i].GetVertexID(j);
+                        deltaNormals.Add(morphs[i].GetNormal(j));
+                        deltaPositions.Add(morphs[i].GetPosition(j));
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                    }
+                }
+            }
+        }
+
         public static Rig GetRig(this s3pi.Interfaces.IPackage package, Species species, AgeGender age)
         {
             var rigName = GetRigPrefix(species, age, AgeGender.Unisex) + "Rig";

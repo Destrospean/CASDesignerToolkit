@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -13,7 +12,7 @@ namespace Destrospean.Common
 {
     public static class PatternUtils
     {
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", Platform.IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : Platform.IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), System.IO.Path.DirectorySeparatorChar);
+        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
 
         public static readonly Dictionary<string, Bitmap> PreloadedPatternImages = new Dictionary<string, Bitmap>();
 
@@ -335,7 +334,7 @@ namespace Destrospean.Common
                 {
                     foreach (var patternImageBase64StringKvp in new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, string>>(reader))
                     {
-                        using (var stream = new MemoryStream(Convert.FromBase64String(patternImageBase64StringKvp.Value)))
+                        using (var stream = new MemoryStream(System.Convert.FromBase64String(patternImageBase64StringKvp.Value)))
                         {
                             PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, (Bitmap)Bitmap.FromStream(stream));
                         }
@@ -352,10 +351,10 @@ namespace Destrospean.Common
                 using (var stream = new MemoryStream())
                 {
                     patternImageKvp.Value.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    patternThumbnailCache.Add(patternImageKvp.Key, Convert.ToBase64String(stream.ToArray()));
+                    patternThumbnailCache.Add(patternImageKvp.Key, System.Convert.ToBase64String(stream.ToArray()));
                 }
             }
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(CacheFilePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));
             using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(CacheFilePath, FileMode.Create)))
             {
                 new Newtonsoft.Json.JsonSerializer().Serialize(writer, patternThumbnailCache);

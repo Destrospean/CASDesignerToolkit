@@ -26,7 +26,7 @@ namespace Destrospean.DestrospeanCASPEditor
 			// Container child MainVBox.Gtk.Box+BoxChild
 			this.Label = new global::Gtk.Label ();
 			this.Label.Name = "Label";
-			this.Label.LabelProp = global::Mono.Unix.Catalog.GetString ("Label");
+			this.Label.LabelProp = global::Mono.Unix.Catalog.GetString ("Please wait as caches are being generated...");
 			this.MainVBox.Add (this.Label);
 			global::Gtk.Box.BoxChild w1 = ((global::Gtk.Box.BoxChild)(this.MainVBox [this.Label]));
 			w1.Position = 0;

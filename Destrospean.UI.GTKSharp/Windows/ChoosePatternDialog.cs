@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Xml;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
-using Destrospean.Common.Abstractions;
 using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.Interfaces;
@@ -51,7 +48,7 @@ namespace Destrospean.DestrospeanCASPEditor
             System.Action<IResource> addPatternsByCategory = (patternListResource) =>
                 {
                     var xmlDocument = new XmlDocument();
-                    xmlDocument.LoadXml(new StreamReader(patternListResource.Stream).ReadToEnd());
+                    xmlDocument.LoadXml(new System.IO.StreamReader(patternListResource.Stream).ReadToEnd());
                     foreach (XmlNode childNode in xmlDocument.SelectSingleNode("patternlist").ChildNodes)
                     {
                         if (childNode.Name == "category")
@@ -130,7 +127,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             }
                             if (patternImage != null)
                             {
-                                patternImage = PatternUtils.PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
+                                patternImage = PatternUtils.PreloadedPatternImages[patternNameKeyPath[1]] = new System.Drawing.Bitmap(patternImage, 64, 64);
                                 pixbuf = PreloadedPatternImagePixbufs[patternNameKeyPath[1]] = patternImage.ToPixbuf();
                             }
                             uncachedPatternExists = true;
@@ -178,6 +175,10 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static void GenerateCache(IPackage package)
         {
+            if (System.IO.File.Exists(PatternUtils.CacheFilePath))
+            {
+                return;
+            }
             PatternUtils.GenerateCache(package);
             foreach (var patternImageKvp in PatternUtils.PreloadedPatternImages)
             {

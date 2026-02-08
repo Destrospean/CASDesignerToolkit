@@ -83,6 +83,14 @@
       <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="s3pi.Package">
+      <HintPath>..\libs\s3pi.Package.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="s3pi.TxtcResource">
+      <HintPath>..\libs\s3pi.TxtcResource.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

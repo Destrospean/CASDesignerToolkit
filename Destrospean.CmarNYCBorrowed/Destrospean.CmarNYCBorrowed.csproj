@@ -8,6 +8,7 @@
     <RootNamespace>Destrospean.CmarNYCBorrowed</RootNamespace>
     <AssemblyName>Destrospean.CmarNYCBorrowed</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

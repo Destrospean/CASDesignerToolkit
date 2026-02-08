@@ -3364,9 +3364,9 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 obj.CalculateNormals(true);
             }
-            var geomList = new GEOM[obj.GroupCount];
+            var geoms = new GEOM[obj.GroupCount];
             var currentBase = 0;
-            for (var i = 0; i < geomList.Length; i++)
+            for (var i = 0; i < geoms.Length; i++)
             {
                 if (!isMorph[i])
                 {
@@ -3406,38 +3406,38 @@ namespace Destrospean.CmarNYCBorrowed
                     }
                     faces.Add(temp);
                 }
-                geomList[i] = new GEOM();
-                geomList[i].mVersion1 = refMesh.mVersion1;
-                geomList[i].mCount = refMesh.mCount;
-                geomList[i].mIndexCount = refMesh.mIndexCount;
-                geomList[i].mExternalCount = refMesh.mExternalCount;
-                geomList[i].mInternalCount = refMesh.mInternalCount;
-                geomList[i].mDummyTGI = new TGI(refMesh.mDummyTGI);
-                geomList[i].mAbsolutePosition = refMesh.mAbsolutePosition;
-                geomList[i].mMagic = refMesh.mMagic;
-                geomList[i].mVersion = refMesh.mVersion;
+                geoms[i] = new GEOM();
+                geoms[i].mVersion1 = refMesh.mVersion1;
+                geoms[i].mCount = refMesh.mCount;
+                geoms[i].mIndexCount = refMesh.mIndexCount;
+                geoms[i].mExternalCount = refMesh.mExternalCount;
+                geoms[i].mInternalCount = refMesh.mInternalCount;
+                geoms[i].mDummyTGI = new TGI(refMesh.mDummyTGI);
+                geoms[i].mAbsolutePosition = refMesh.mAbsolutePosition;
+                geoms[i].mMagic = refMesh.mMagic;
+                geoms[i].mVersion = refMesh.mVersion;
                 if (isMorph[i])
                 {
-                    geomList[i].mShaderHash = 0;
-                    geomList[i].mMTNFSize = 0;
+                    geoms[i].mShaderHash = 0;
+                    geoms[i].mMTNFSize = 0;
                 }
                 else
                 {
-                    geomList[i].mShaderHash = refMesh.mShaderHash;
-                    geomList[i].mMTNFSize = refMesh.mMTNFSize;
-                    geomList[i].mMTNF = new MTNF(refMesh.mMTNF);
+                    geoms[i].mShaderHash = refMesh.mShaderHash;
+                    geoms[i].mMTNFSize = refMesh.mMTNFSize;
+                    geoms[i].mMTNF = new MTNF(refMesh.mMTNF);
                 }
-                geomList[i].mMergeGroup = refMesh.mMergeGroup;
-                geomList[i].mSortOrder = refMesh.mSortOrder;
-                geomList[i].mVertexCount = vertices.Count;
-                if (isMorph[i] && geomList[i].mVertexCount != geomList[currentBase].mVertexCount)
+                geoms[i].mMergeGroup = refMesh.mMergeGroup;
+                geoms[i].mSortOrder = refMesh.mSortOrder;
+                geoms[i].mVertexCount = vertices.Count;
+                if (isMorph[i] && geoms[i].mVertexCount != geoms[currentBase].mVertexCount)
                 {
                     throw new MeshException("The number of vertices in " + groupArray[i].GroupName + " does not match the base mesh!");
                 }
                 if (isMorph[i])
                 {
-                    geomList[i].mFaceCount = 3;
-                    geomList[i].mVertexFormats = new VertexFormat[]
+                    geoms[i].mFaceCount = 3;
+                    geoms[i].mVertexFormats = new VertexFormat[]
                         {
                             new VertexFormat(1, 1, 12),
                             new VertexFormat(2, 1, 12),
@@ -3446,148 +3446,167 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 else
                 {
-                    geomList[i].mFaceCount = refMesh.mFaceCount;
-                    geomList[i].mVertexFormats = new VertexFormat[refMesh.mFaceCount];
+                    geoms[i].mFaceCount = refMesh.mFaceCount;
+                    geoms[i].mVertexFormats = new VertexFormat[refMesh.mFaceCount];
                     for (var j = 0; j < refMesh.mFaceCount; j++)
                     {
-                        geomList[i].mVertexFormats[j] = new VertexFormat(refMesh.mVertexFormats[j]);
+                        geoms[i].mVertexFormats[j] = new VertexFormat(refMesh.mVertexFormats[j]);
                     }
                 }
-                geomList[i].mSubMeshCount = refMesh.mSubMeshCount;
-                geomList[i].mBytesPerFacePoint = refMesh.mBytesPerFacePoint;
-                geomList[i].mFacePointCount = faces.Count * 3;
-                if (isMorph[i] && geomList[i].mFacePointCount != geomList[currentBase].mFacePointCount)
+                geoms[i].mSubMeshCount = refMesh.mSubMeshCount;
+                geoms[i].mBytesPerFacePoint = refMesh.mBytesPerFacePoint;
+                geoms[i].mFacePointCount = faces.Count * 3;
+                if (isMorph[i] && geoms[i].mFacePointCount != geoms[currentBase].mFacePointCount)
                 {
                     throw new MeshException("The number of faces in " + groupArray[i].GroupName + " does not match the base mesh!");
                 }
-                geomList[i].mFaces = new Face[faces.Count];
+                geoms[i].mFaces = new Face[faces.Count];
                 for (var j = 0; j < faces.Count; j++)
                 {
-                    geomList[i].mFaces[j] = new Face(faces[j]);
+                    geoms[i].mFaces[j] = new Face(faces[j]);
                 }
-                geomList[i].mSKCONIndex = refMesh.mSKCONIndex;
-                geomList[i].mBoneHashCount = refMesh.mBoneHashCount;
-                geomList[i].mBoneHashArray = new uint[refMesh.mBoneHashArray.Length];
+                geoms[i].mSKCONIndex = refMesh.mSKCONIndex;
+                geoms[i].mBoneHashCount = refMesh.mBoneHashCount;
+                geoms[i].mBoneHashArray = new uint[refMesh.mBoneHashArray.Length];
                 for (var j = 0; j < refMesh.mBoneHashArray.Length; j++)
                 {
-                    geomList[i].mBoneHashArray[j] = refMesh.mBoneHashArray[j];
+                    geoms[i].mBoneHashArray[j] = refMesh.mBoneHashArray[j];
                 }
                 if (isMorph[i])
                 {
-                    geomList[i].mTGICount = 1;
-                    geomList[i].mTGIs = new TGI[1];
-                    geomList[i].mTGIs[0] = new TGI(0, 0, 0);
+                    geoms[i].mTGICount = 1;
+                    geoms[i].mTGIs = new TGI[1];
+                    geoms[i].mTGIs[0] = new TGI(0, 0, 0);
                 }
                 else
                 {
-                    geomList[i].mTGICount = refMesh.mTGICount;
-                    geomList[i].mTGIs = new TGI[refMesh.mTGIs.Length];
+                    geoms[i].mTGICount = refMesh.mTGICount;
+                    geoms[i].mTGIs = new TGI[refMesh.mTGIs.Length];
                     for (var j = 0; j < refMesh.mTGIs.Length; j++)
                     {
-                        geomList[i].mTGIs[j] = new TGI(refMesh.mTGIs[j]);
+                        geoms[i].mTGIs[j] = new TGI(refMesh.mTGIs[j]);
                     }
-                    if (bumpMapTGI.Instance > 0 && geomList[i].Shader.NormalIndex >= 0)
+                    if (bumpMapTGI.Instance > 0 && geoms[i].Shader.NormalIndex >= 0)
                     {
-                        geomList[i].mTGIs[geomList[i].Shader.NormalIndex] = bumpMapTGI;
+                        geoms[i].mTGIs[geoms[i].Shader.NormalIndex] = bumpMapTGI;
                     }
                 }
-                for (var j = 0; j < geomList[i].mVertexFormats.Length; j++)
+                for (var j = 0; j < geoms[i].mVertexFormats.Length; j++)
                 {
-                    switch (geomList[i].mVertexFormats[j].FormatDataType) //OBJ vertex references are 1-based, so subtract one
+                    switch (geoms[i].mVertexFormats[j].FormatDataType) //OBJ vertex references are 1-based, so subtract one
                     {
                         case 1:
-                            geomList[i].mPositions = new Position[vertices.Count];
+                            geoms[i].mPositions = new Position[vertices.Count];
                             for (var k = 0; k < vertices.Count; k++)
                             {
                                 if (isMorph[i])
                                 {
-                                    Vector3 basePosition = new Vector3(geomList[currentBase].GetPosition(k)),
+                                    Vector3 basePosition = new Vector3(geoms[currentBase].GetPosition(k)),
                                     morphPosition = new Vector3(obj.VertexArray[vertices[k][0] - 1].Coordinates),
                                     morph = morphPosition - basePosition;
-                                    geomList[i].mPositions[k] = new Position(morph.Coordinates);
+                                    geoms[i].mPositions[k] = new Position(morph.Coordinates);
                                 }
                                 else
                                 {
-                                    geomList[i].mPositions[k] = new Position(obj.VertexArray[vertices[k][0] - 1].Coordinates);
+                                    geoms[i].mPositions[k] = new Position(obj.VertexArray[vertices[k][0] - 1].Coordinates);
                                 }
                             }
                             break;
                         case 2:
-                            geomList[i].mNormals = new Normal[vertices.Count];
+                            geoms[i].mNormals = new Normal[vertices.Count];
                             for (var k = 0; k < vertices.Count; k++)
                             {
                                 if (isMorph[i])
                                 {
-                                    Vector3 baseNormal = new Vector3(geomList[currentBase].GetNormal(k)),
+                                    Vector3 baseNormal = new Vector3(geoms[currentBase].GetNormal(k)),
                                     morphNormal = new Vector3(obj.NormalArray[vertices[k][2] - 1].Coordinates),
                                     morph = morphNormal - baseNormal;
-                                    geomList[i].mNormals[k] = new Normal(morph.Coordinates);
+                                    geoms[i].mNormals[k] = new Normal(morph.Coordinates);
                                 }
                                 else
                                 {
-                                    geomList[i].mNormals[k] = new Normal(obj.NormalArray[vertices[k][2] - 1].Coordinates);
+                                    geoms[i].mNormals[k] = new Normal(obj.NormalArray[vertices[k][2] - 1].Coordinates);
                                 }
                             }
                             break;
                         case 3:
-                            geomList[i].mUVs = new UV[1][];
-                            geomList[i].mUVs[0] = new UV[vertices.Count];
+                            geoms[i].mUVs = new UV[1][];
+                            geoms[i].mUVs[0] = new UV[vertices.Count];
                             for (var k = 0; k < vertices.Count; k++)
                             {
-                                geomList[i].mUVs[0][k] = new UV(obj.UVArray[vertices[k][1] - 1].Coordinates, true);
+                                geoms[i].mUVs[0][k] = new UV(obj.UVArray[vertices[k][1] - 1].Coordinates, true);
                             }
                             break;
                     }
                 }
-                for (var j = 0; j < geomList[i].mVertexFormats.Length; j++)
+                for (var j = 0; j < geoms[i].mVertexFormats.Length; j++)
                 {
-                    switch (geomList[i].mVertexFormats[j].FormatDataType)
+                    switch (geoms[i].mVertexFormats[j].FormatDataType)
                     {
                         case 4:
-                            geomList[i].mBones = new Bones[geomList[i].mVertexCount];
-                            for (var k = 0; k < geomList[i].mVertexCount; k++)
+                            geoms[i].mBones = new Bones[geoms[i].mVertexCount];
+                            for (var k = 0; k < geoms[i].mVertexCount; k++)
                             {
-                                geomList[i].mBones[k] = new Bones();
+                                geoms[i].mBones[k] = new Bones();
                             }
-                            geomList[i].AutoBone(refMesh, false, true, 3, 2, false, null);
-                            geomList[i].FixBoneWeights();
+                            geoms[i].AutoBone(refMesh, false, true, 3, 2, false, null);
+                            geoms[i].FixBoneWeights();
                             break;
                         case 6:
-                            geomList[i].mTangents = new Tangent[geomList[i].mVertexCount];
-                            for (var k = 0; k < geomList[i].mVertexCount; k++)
+                            geoms[i].mTangents = new Tangent[geoms[i].mVertexCount];
+                            for (var k = 0; k < geoms[i].mVertexCount; k++)
                             {
-                                geomList[i].mTangents[k] = new Tangent();
+                                geoms[i].mTangents[k] = new Tangent();
                             }
-                            geomList[i].CalculateTangents();
+                            geoms[i].CalculateTangents();
                             break;
                         case 7:
-                            geomList[i].mTags = new TagValue[geomList[i].mVertexCount];
-                            for (var k = 0; k < geomList[i].mVertexCount; k++)
+                            geoms[i].mTags = new TagValue[geoms[i].mVertexCount];
+                            for (var k = 0; k < geoms[i].mVertexCount; k++)
                             {
-                                geomList[i].mTags[k] = new TagValue(0xFFFFFFFF);
+                                geoms[i].mTags[k] = new TagValue(0xFFFFFFFF);
                             }
                             break;
                     }
                 }
-                for (var j = 0; j < geomList[i].mVertexFormats.Length; j++)
+                for (var j = 0; j < geoms[i].mVertexFormats.Length; j++)
                 {
-                    switch (geomList[i].mVertexFormats[j].FormatDataType)
+                    switch (geoms[i].mVertexFormats[j].FormatDataType)
                     {
                         case 10:
-                            geomList[i].mVertexIDs = new int[geomList[i].mVertexCount];
-                            if (geomList[i].IsBase)
+                            geoms[i].mVertexIDs = new int[geoms[i].mVertexCount];
+                            if (geoms[i].IsBase)
                             {
-                                geomList[i].RenumberBase(refMesh.MinVertexID);
+                                geoms[i].RenumberBase(refMesh.MinVertexID);
                             }
-                            else if (geomList[i].IsMorph)
+                            else if (geoms[i].IsMorph)
                             {
-                                geomList[i].RenumberMorph(geomList[currentBase]);
+                                geoms[i].RenumberMorph(geoms[currentBase]);
                             }
                             break;
                     }
                 }
             }
-            return geomList;
+            return geoms;
+        }
+
+        public static GEOM[] GEOMsFromWSO(WSO wso, GEOM refMesh, TGI bumpMapTGI, Action updateProgressCallback = null)
+        {
+            var geom = GEOMsFromOBJ(new OBJ(wso), refMesh, bumpMapTGI, false, false, updateProgressCallback)[0];
+            geom.SetBoneHashList(Array.ConvertAll(wso.BoneNameList, x => (uint)Enum.Parse(typeof(BoneHash), x)));
+            for (var j = 0; j < wso.Base.VertexCount; j++)
+            {
+                geom.SetBones(j, Array.ConvertAll(wso.Base.Vertices[j].BoneAssignments, x => (byte)x));
+                geom.SetBoneWeightsV5(j, wso.Base.Vertices[j].BoneWeights);
+                try
+                {
+                    geom.SetTagValue(j, wso.Base.Vertices[j].TagValue);
+                }
+                catch (NullReferenceException)
+                {
+                }
+            }
+            return GEOMsFromOBJ(new OBJ(wso), geom, bumpMapTGI, false, false, updateProgressCallback);
         }
 
         public int GetBoneIndex(uint boneHash)
@@ -4462,12 +4481,6 @@ namespace Destrospean.CmarNYCBorrowed
         {
             mBoneHashArray = boneHashList;
             mBoneHashCount = boneHashList.Length;
-        }
-
-        public void SetBoneList(uint[] newBoneHashList)
-        {
-            mBoneHashArray = newBoneHashList;
-            mBoneHashCount = newBoneHashList.Length;
         }
 
         public void SetBones(int vertexSequenceNumber, byte bone0, byte bone1, byte bone2, byte bone3)

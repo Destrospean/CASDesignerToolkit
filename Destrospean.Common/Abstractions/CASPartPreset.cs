@@ -11,6 +11,22 @@ namespace Destrospean.Common.Abstractions
 {
     public class CASPartPreset : Preset
     {
+        public string SkinAmbientMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).SkinAmbientMap;
+            }
+        }
+
+        public string SkinSpecularMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).SkinSpecularMap;
+            }
+        }
+
         public StringReader XmlFile
         {
             get
@@ -41,6 +57,7 @@ namespace Destrospean.Common.Abstractions
                     uint[] controlMapArray = null,
                     maskArray = null;
                     Bitmap diffuseMap = null,
+                    faceOverlay = null,
                     multiplier = null,
                     overlay = null;
                     float[] diffuseColor = null,
@@ -103,6 +120,10 @@ namespace Destrospean.Common.Abstractions
                         {
                             switch (key)
                             {
+                                case "ambient":
+                                    AmbientMap = value;
+                                    SkinAmbientMap = value;
+                                    break;
                                 case "clothing ambient":
                                     AmbientMap = value;
                                     break;
@@ -118,6 +139,9 @@ namespace Destrospean.Common.Abstractions
                                 case "diffuse map":
                                     diffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
                                     break;
+                                case "face overlay":
+                                    faceOverlay = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                    break;
                                 case "highlight color":
                                     highlightColor = ParseCommaSeparatedValues(value);
                                     break;
@@ -132,6 +156,16 @@ namespace Destrospean.Common.Abstractions
                                     break;
                                 case "root color":
                                     rootColor = ParseCommaSeparatedValues(value);
+                                    break;
+                                case "skin ambient":
+                                    SkinAmbientMap = value;
+                                    break;
+                                case "skin specular":
+                                    SkinSpecularMap = value;
+                                    break;
+                                case "specular":
+                                    SpecularMap = value;
+                                    SkinSpecularMap = value;
                                     break;
                                 case "tip color":
                                     tipColor = ParseCommaSeparatedValues(value);
@@ -210,7 +244,8 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
-                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x => bool.Parse(GetValue(x.SlotName + " Enabled")) ? x.PatternImage : null);
+                    bool patternEnabled;
+                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x => bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled ? x.PatternImage : null);
                     if (maskArray != null)
                     {
                         if (multiplier != null)
@@ -249,6 +284,10 @@ namespace Destrospean.Common.Abstractions
                         {
                             graphics.DrawImage(overlay, 0, 0);
                         }
+                        if (faceOverlay != null)
+                        {
+                            graphics.DrawImage(faceOverlay, 0, 0);
+                        }
                         for (var i = 0; i < stencils.Count; i++)
                         {
                             if (stencilsEnabled[i])
@@ -276,6 +315,18 @@ namespace Destrospean.Common.Abstractions
                 {
                     return mPropertiesXmlNodes;
                 }
+            }
+
+            public string SkinAmbientMap
+            {
+                get;
+                protected set;
+            }
+
+            public string SkinSpecularMap
+            {
+                get;
+                protected set;
             }
 
             public PresetInternal(CASPartPreset preset, XmlNode complateXmlNode) : base()

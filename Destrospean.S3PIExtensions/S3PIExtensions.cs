@@ -124,6 +124,8 @@ namespace Destrospean.S3PIExtensions
     {
         static Dictionary<PackageTag, IPackage> sGameContentPackages, sGameImageResourcePackages;
 
+        static object sLock = new object();
+
         static List<string> sMissingResourceKeys;
 
         public static Dictionary<PackageTag, IPackage> GameContentPackages
@@ -178,20 +180,25 @@ namespace Destrospean.S3PIExtensions
             }
         }
 
-        static EvaluatedResourceKey EvaluateResourceKeyInternal(this IPackage package, string key)
+        static bool TryEvaluateResourceKeyInternal(this IPackage package, string key, out EvaluatedResourceKey evaluated)
         {
-            var tgi = new ulong[3];
-            var i = 0;
-            foreach (var hex in key.Substring(4).Split(':'))
+            lock (sLock)
             {
-                tgi[i++] = Convert.ToUInt64(hex, 16);
+                var tgi = new ulong[3];
+                var i = 0;
+                foreach (var hex in key.Substring(4).Split(':'))
+                {
+                    tgi[i++] = Convert.ToUInt64(hex, 16);
+                }
+                var results = package.FindAll(x => x.ResourceType == tgi[0] && x.ResourceGroup == tgi[1] && x.Instance == tgi[2]);
+                if (results.Count == 0)
+                {
+                    evaluated = new EvaluatedResourceKey(null, null);
+                    return false;
+                }
+                evaluated = new EvaluatedResourceKey(package, results[0]);
+                return true;
             }
-            var results = package.FindAll(x => x.ResourceType == tgi[0] && x.ResourceGroup == tgi[1] && x.Instance == tgi[2]);
-            if (results.Count == 0)
-            {
-                throw new ResourceIndexEntryNotFoundException();
-            }
-            return new EvaluatedResourceKey(package, results[0]);
         }
 
         public static IResourceIndexEntry AddResource(this IPackage package, string filename, IResourceKey resourceKey = null, bool rejectDups = true)
@@ -199,29 +206,33 @@ namespace Destrospean.S3PIExtensions
             return package.AddResource(resourceKey ?? new ResourceKey(0, 0, System.Security.Cryptography.FNV64.GetHash(Guid.NewGuid().ToString())), System.IO.File.OpenRead(filename), rejectDups);
         }
 
+        public static void ClearGamePackages()
+        {
+            sGameContentPackages = null;
+            sGameImageResourcePackages = null;
+        }
+
         public static EvaluatedResourceKey EvaluateImageResourceKey(this IPackage package, string key)
         {
             try
             {
-                return package.EvaluateResourceKeyInternal(key);
+                EvaluatedResourceKey evaluated;
+                if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
+                {
+                    return evaluated;
+                }
+                foreach (var gamePackage in GameImageResourcePackages.Values)
+                {
+                    if (gamePackage.TryEvaluateResourceKeyInternal(key, out evaluated))
+                    {
+                        return evaluated;
+                    }
+                }
+                throw new ResourceIndexEntryNotFoundException("No image resource with the given key, \"" + key + ",\" could be found.");
             }
             catch (FormatException)
             {
                 return EvaluateImageResourceKey(package, "key:" + GetResourceType("_IMG").ToString("X8") + ":00000000:" + System.Security.Cryptography.FNV64.GetHash(key.Substring(key.LastIndexOf("\\") + 1, key.LastIndexOf(".") - key.LastIndexOf("\\") - 1)).ToString("X16"));
-            }
-            catch (ResourceIndexEntryNotFoundException)
-            {
-                foreach (var gamePackage in GameImageResourcePackages.Values)
-                {
-                    try
-                    {
-                        return gamePackage.EvaluateResourceKeyInternal(key);
-                    }
-                    catch (ResourceIndexEntryNotFoundException)
-                    {
-                    }
-                }
-                throw new ResourceIndexEntryNotFoundException("No image resource with the given key could be found.");
             }
         }
 
@@ -229,21 +240,23 @@ namespace Destrospean.S3PIExtensions
         {   
             try
             {
-                return package.EvaluateResourceKeyInternal(key);
-            }
-            catch (ResourceIndexEntryNotFoundException)
-            {
+                EvaluatedResourceKey evaluated;
+                if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
+                {
+                    return evaluated;
+                }
                 foreach (var gamePackage in GameContentPackages.Values)
                 {
-                    try
+                    if (gamePackage.TryEvaluateResourceKeyInternal(key, out evaluated))
                     {
-                        return gamePackage.EvaluateResourceKeyInternal(key);
-                    }
-                    catch (ResourceIndexEntryNotFoundException)
-                    {
+                        return evaluated;
                     }
                 }
-                throw new ResourceIndexEntryNotFoundException("No resource with the given key could be found.");
+                throw new ResourceIndexEntryNotFoundException("No resource with the given key, \"" + key + ",\" could be found.");
+            }
+            catch (FormatException)
+            {
+                return EvaluateImageResourceKey(package, "key:" + GetResourceType("_IMG").ToString("X8") + ":00000000:" + System.Security.Cryptography.FNV64.GetHash(key.Substring(key.LastIndexOf("\\") + 1, key.LastIndexOf(".") - key.LastIndexOf("\\") - 1)).ToString("X16"));
             }
         }
 
@@ -254,24 +267,19 @@ namespace Destrospean.S3PIExtensions
                 throw new AttributeNotFoundException("The XML node given does not have the \"reskey\" attribute.");
             }
             var key = xmlNode.Attributes["reskey"].Value;
-            try
+            EvaluatedResourceKey evaluated;
+            if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
             {
-                return package.EvaluateResourceKeyInternal(key);
+                return evaluated;
             }
-            catch (ResourceIndexEntryNotFoundException)
+            foreach (var gamePackage in GameContentPackages.Values)
             {
-                foreach (var gamePackage in GameContentPackages.Values)
+                if (gamePackage.TryEvaluateResourceKeyInternal(key, out evaluated))
                 {
-                    try
-                    {
-                        return gamePackage.EvaluateResourceKeyInternal(key);
-                    }
-                    catch (ResourceIndexEntryNotFoundException)
-                    {
-                    }
+                    return evaluated;
                 }
-                throw new ResourceIndexEntryNotFoundException("No resource with the key referenced in the XML node could be found.");
             }
+            throw new ResourceIndexEntryNotFoundException("No resource with the key, \"" + key + ",\" referenced in the XML node could be found.");
         }
 
         public static IResourceIndexEntry GetResourceIndexEntry(this IPackage package, IResourceKey resourceKey)

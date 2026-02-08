@@ -15,6 +15,8 @@ namespace Destrospean.Graphics.OpenGL
         Shader = "",
         SpecularMap = "";
 
+        public bool HasTransparency = false;
+
         public float Opacity = 1,
         SpecularExponent = 1;
 
