@@ -232,7 +232,12 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
 
         public static void DeleteThumbnails()
         {
-            mThumbnails.Clear();
+            var keys = new System.Collections.Generic.List<string>(mThumbnails.Keys);
+            for (var i = keys.Count - 1; i > -1; i--)
+            {
+                mThumbnails[keys[i]].Dispose();
+                mThumbnails.Remove(keys[i]);
+            }
         }
     }
 }

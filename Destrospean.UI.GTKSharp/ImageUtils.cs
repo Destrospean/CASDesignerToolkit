@@ -67,6 +67,44 @@ namespace Destrospean.DestrospeanCASPEditor
             return checkerboard;
         }
 
+        public static void DeletePreloadedImages()
+        {
+            var keys = new List<string>(PreloadedGameImagePixbufs.Keys);
+            for (var i = keys.Count - 1; i > -1; i--)
+            {
+                var pixbufs = PreloadedGameImagePixbufs[keys[i]];
+                for (var j = pixbufs.Count - 1; j > -1; j--)
+                {
+                    pixbufs[j].Dispose();
+                    pixbufs.RemoveAt(j);
+                }
+                PreloadedGameImagePixbufs.Remove(keys[i]);
+            }
+            keys = new List<string>(PreloadedGameImages.Keys);
+            for (var i = keys.Count - 1; i > -1; i--)
+            {
+                PreloadedGameImages[keys[i]].Dispose();
+                PreloadedGameImages.Remove(keys[i]);
+            }
+            keys = new List<string>(PreloadedImagePixbufs.Keys);
+            for (var i = keys.Count - 1; i > -1; i--)
+            {
+                var pixbufs = PreloadedImagePixbufs[keys[i]];
+                for (var j = pixbufs.Count - 1; j > -1; j--)
+                {
+                    pixbufs[j].Dispose();
+                    pixbufs.RemoveAt(j);
+                }
+                PreloadedImagePixbufs.Remove(keys[i]);
+            }
+            keys = new List<string>(PreloadedImages.Keys);
+            for (var i = keys.Count - 1; i > -1; i--)
+            {
+                PreloadedImages[keys[i]].Dispose();
+                PreloadedImages.Remove(keys[i]);
+            }
+        }
+
         public static Bitmap GetInSquareCanvas(this Bitmap image)
         {
             if (image.Width == image.Height)
@@ -118,9 +156,9 @@ namespace Destrospean.DestrospeanCASPEditor
                             image.UnlockBits(bitmapData);
                         }
                     }
-                    catch (System.OverflowException)
+                    catch (Exception)
                     {
-                        image = new Bitmap(1024, 1024);
+                        return new Bitmap(1024, 1024);
                     }
                 }
                 return image;

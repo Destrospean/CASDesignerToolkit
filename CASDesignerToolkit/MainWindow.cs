@@ -18,6 +18,8 @@ public partial class MainWindow : RendererMainWindow
 {
     Gdk.Pixbuf mAlphaCheckerboardPixbuf;
 
+    bool mDisableUpdateModels = false;
+
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
     readonly string mOriginalWindowTitle;
@@ -38,33 +40,31 @@ public partial class MainWindow : RendererMainWindow
     {
         set
         {
-            if (value.HasFlag(NextStateOptions.UpdateModels))
+            if (value.HasFlag(NextStateOptions.UpdateModels) && !mDisableUpdateModels && GlobalState.GLInitialized)
             {
-                if (GlobalState.GLInitialized)
-                {
-                    new Thread(() =>
+                new Thread(() =>
+                    {
+                        lock (sLock)
                         {
-                            lock (sLock)
+                            lock (GlobalState.Lock)
                             {
-                                lock (GlobalState.Lock)
+                                GlobalState.Locked = true;
+                                GlobalState.Meshes.Clear();
+                                GlobalState.Materials.Clear();
+                                foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
                                 {
-                                    GlobalState.Locked = true;
-                                    GlobalState.Meshes.Clear();
-                                    GlobalState.Materials.Clear();
-                                    foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                                    if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
                                     {
-                                        if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
-                                        {
-                                            ImageUtils.PreloadedGameImages.Remove(imageKey);
-                                            Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
-                                        }
+                                        ImageUtils.PreloadedGameImages[imageKey].Dispose();
+                                        ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                        Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
                                     }
-                                    Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                    GlobalState.Locked = false;
                                 }
+                                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                GlobalState.Locked = false;
                             }
-                        }).Start();
-                }
+                        }
+                    }).Start();
                 /*
                 TreeIter iter;
                 TreeModel model;
@@ -124,7 +124,6 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            GlobalState.Meshes.Clear();
             var flagNotebook = new Notebook
                 {
                     ShowTabs = false
@@ -872,7 +871,7 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
-                    GlobalState.Meshes.Clear();
+                    mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();
                     DrawImage();
@@ -902,6 +901,7 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
+                                mDisableUpdateModels = false;
                                 RandomizeCASParts();
                                 break;
                             /*
@@ -956,6 +956,19 @@ public partial class MainWindow : RendererMainWindow
         Sim.CurrentCASPart = null;
         mSaveAsPath = null;
         GlobalState.Meshes.Clear();
+        foreach (var casPart in PreloadedData.CASParts.Values)
+        {
+            casPart.AllPresets.ForEach(x =>
+                {
+                    try
+                    {
+                        x.DisposeAll();
+                    }
+                    catch (ArgumentNullException)
+                    {
+                    }
+                });
+        }
         PreloadedData.CASParts.Clear();
         //PreloadedData.GameObjects.Clear();
         //PreloadedData.FTPTs.Clear();
@@ -966,10 +979,7 @@ public partial class MainWindow : RendererMainWindow
         PreloadedData.VPXYs.Clear();
         GlobalState.Materials.Clear();
         GlobalState.DeleteTextures();
-        ImageUtils.PreloadedGameImagePixbufs.Clear();
-        ImageUtils.PreloadedGameImages.Clear();
-        ImageUtils.PreloadedImagePixbufs.Clear();
-        ImageUtils.PreloadedImages.Clear();
+        ImageUtils.DeletePreloadedImages();
         ImageResourceComboBox.DeleteThumbnails();
     }
 

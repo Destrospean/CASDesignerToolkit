@@ -51,6 +51,14 @@ namespace Destrospean.Common.Abstractions
             }
             private set
             {
+                lock (Lock)
+                {
+                    var patternImageDisposable = mPatternImage as System.IDisposable;
+                    if (patternImageDisposable != null)
+                    {
+                        patternImageDisposable.Dispose();
+                    }
+                }
                 mPatternImage = value;
             }
         }

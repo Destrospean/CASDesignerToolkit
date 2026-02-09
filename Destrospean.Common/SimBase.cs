@@ -118,7 +118,11 @@ namespace Destrospean.Common
             {
                 foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
                 {
-                    mCASParts[clothingType] = null;
+                    if (mCASParts[clothingType] != null)
+                    {
+                        mCASParts[clothingType].AllPresets.ForEach(x => x.DisposeAll());
+                        mCASParts[clothingType] = null;
+                    }
                 }
                 var random = new System.Random();
                 foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
