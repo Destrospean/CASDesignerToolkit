@@ -147,6 +147,10 @@
                 }
                 set
                 {
+                    if (mTexture != null)
+                    {
+                        mTexture.Dispose();
+                    }
                     mTexture = value;
                 }
             }
@@ -175,6 +179,22 @@
 
         public abstract void AddPattern(string patternSlotName, string newComplateName);
 
+        public void DisposeAll()
+        {
+            lock (Lock)
+            {
+                mInternal.Texture = null;
+                foreach (var pattern in Patterns)
+                {
+                    var patternImageDisposable = pattern.PatternImage as System.IDisposable;
+                    if (patternImageDisposable != null)
+                    {
+                        patternImageDisposable.Dispose();
+                    }
+                }
+            }
+        }
+
         public override string GetValue(string propertyName)
         {
             return mInternal.GetValue(propertyName);
@@ -186,7 +206,10 @@
                 {
                     lock (CmarNYCBorrowed.TextureUtils.Lock)
                     {
-                        mInternal.Texture = mInternal.NewTexture;
+                        lock (Lock)
+                        {
+                            mInternal.Texture = mInternal.NewTexture;
+                        }
                         MarkModelsNeedUpdatedCallback();
                     }
                 }).Start();

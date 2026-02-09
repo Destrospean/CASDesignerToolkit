@@ -21,6 +21,8 @@ namespace Destrospean.Common.Abstractions
 
         public readonly string ID;
 
+        public static object Lock = new object();
+
         public static CmarNYCBorrowed.Action MarkModelsNeedUpdatedCallback, MarkUnsavedChangesCallback;
 
         public abstract s3pi.Interfaces.IPackage ParentPackage
