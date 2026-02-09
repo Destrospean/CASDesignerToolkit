@@ -1,6 +1,6 @@
 ﻿namespace Destrospean.Common.Abstractions
 {
-    public abstract class Preset : Complate
+    public abstract class Preset : Complate, System.IDisposable
     {
         protected CASTableObject mCASTableObject;
 
@@ -179,17 +179,23 @@
 
         public abstract void AddPattern(string patternSlotName, string newComplateName);
 
-        public void DisposeAll()
+        public void Dispose()
         {
             lock (Lock)
             {
                 mInternal.Texture = null;
                 foreach (var pattern in Patterns)
                 {
-                    var patternImageDisposable = pattern.PatternImage as System.IDisposable;
-                    if (patternImageDisposable != null)
+                    try
                     {
-                        patternImageDisposable.Dispose();
+                        var patternImageDisposable = pattern.PatternImage as System.IDisposable;
+                        if (patternImageDisposable != null)
+                        {
+                            patternImageDisposable.Dispose();
+                        }
+                    }
+                    catch (System.ArgumentNullException)
+                    {
                     }
                 }
             }

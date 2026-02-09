@@ -36,6 +36,28 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
+        static bool PreloadImage(this IPackage package, IResourceIndexEntry resourceIndexEntry, Gtk.Image imageWidget, Dictionary<string, Bitmap> preloadedImages, Dictionary<string, List<Pixbuf>> preloadedImagePixbufs)
+        {
+            try
+            {
+                var preloadVariables = new PreloadVariables(package, resourceIndexEntry, imageWidget);
+                preloadedImages[preloadVariables.ResourceKey] = preloadVariables.Image;
+                var imageCopy = (Bitmap)preloadVariables.Image.Clone();
+                var squareCanvasImage = imageCopy.GetInSquareCanvas();
+                preloadedImagePixbufs[preloadVariables.ResourceKey] = new List<Pixbuf>
+                    {
+                        squareCanvasImage.ToPixbuf().ScaleSimple((int)(squareCanvasImage.Width * preloadVariables.Scale), (int)(squareCanvasImage.Height * preloadVariables.Scale), InterpType.Bilinear)
+                    };
+                imageCopy.Dispose();
+                squareCanvasImage.Dispose();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static Bitmap Base64StringToBitmap(string base64String)
         {
             using (var stream = new System.IO.MemoryStream(Convert.FromBase64String(base64String)))
@@ -69,39 +91,35 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static void DeletePreloadedImages()
         {
-            var keys = new List<string>(PreloadedGameImagePixbufs.Keys);
-            for (var i = keys.Count - 1; i > -1; i--)
+            foreach (var key in new List<string>(PreloadedGameImagePixbufs.Keys))
             {
-                var pixbufs = PreloadedGameImagePixbufs[keys[i]];
-                for (var j = pixbufs.Count - 1; j > -1; j--)
+                var pixbufs = PreloadedGameImagePixbufs[key];
+                for (var i = pixbufs.Count - 1; i > -1; i--)
                 {
-                    pixbufs[j].Dispose();
-                    pixbufs.RemoveAt(j);
+                    pixbufs[i].Dispose();
+                    pixbufs.RemoveAt(i);
                 }
-                PreloadedGameImagePixbufs.Remove(keys[i]);
+                PreloadedGameImagePixbufs.Remove(key);
             }
-            keys = new List<string>(PreloadedGameImages.Keys);
-            for (var i = keys.Count - 1; i > -1; i--)
+            foreach (var key in new List<string>(PreloadedGameImages.Keys))
             {
-                PreloadedGameImages[keys[i]].Dispose();
-                PreloadedGameImages.Remove(keys[i]);
+                PreloadedGameImages[key].Dispose();
+                PreloadedGameImages.Remove(key);
             }
-            keys = new List<string>(PreloadedImagePixbufs.Keys);
-            for (var i = keys.Count - 1; i > -1; i--)
+            foreach (var key in new List<string>(PreloadedImagePixbufs.Keys))
             {
-                var pixbufs = PreloadedImagePixbufs[keys[i]];
-                for (var j = pixbufs.Count - 1; j > -1; j--)
+                var pixbufs = PreloadedImagePixbufs[key];
+                for (var i = pixbufs.Count - 1; i > -1; i--)
                 {
-                    pixbufs[j].Dispose();
-                    pixbufs.RemoveAt(j);
+                    pixbufs[i].Dispose();
+                    pixbufs.RemoveAt(i);
                 }
-                PreloadedImagePixbufs.Remove(keys[i]);
+                PreloadedImagePixbufs.Remove(key);
             }
-            keys = new List<string>(PreloadedImages.Keys);
-            for (var i = keys.Count - 1; i > -1; i--)
+            foreach (var key in new List<string>(PreloadedImages.Keys))
             {
-                PreloadedImages[keys[i]].Dispose();
-                PreloadedImages.Remove(keys[i]);
+                PreloadedImages[key].Dispose();
+                PreloadedImages.Remove(key);
             }
         }
 
@@ -156,8 +174,9 @@ namespace Destrospean.DestrospeanCASPEditor
                             image.UnlockBits(bitmapData);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Common.ProgramUtils.WriteError(ex);
                         return new Bitmap(1024, 1024);
                     }
                 }
@@ -167,54 +186,26 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static bool PreloadGameImage(this IPackage package, IResourceIndexEntry resourceIndexEntry, Gtk.Image imageWidget)
         {
-            try
-            {
-                var preloadVariables = new PreloadVariables(package, resourceIndexEntry, imageWidget);
-                PreloadedGameImages[preloadVariables.ResourceKey] = preloadVariables.Image;
-                var squareCanvasImage = preloadVariables.Image.GetInSquareCanvas();
-                PreloadedGameImagePixbufs[preloadVariables.ResourceKey] = new List<Pixbuf>
-                    {
-                        squareCanvasImage.ToPixbuf().ScaleSimple((int)(squareCanvasImage.Width * preloadVariables.Scale), (int)(squareCanvasImage.Height * preloadVariables.Scale), InterpType.Bilinear)
-                    };
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return package.PreloadImage(resourceIndexEntry, imageWidget, PreloadedGameImages, PreloadedGameImagePixbufs);
         }
 
         public static bool PreloadImage(this IPackage package, IResourceIndexEntry resourceIndexEntry, Gtk.Image imageWidget)
         {
-            try
-            {
-                var preloadVariables = new PreloadVariables(package, resourceIndexEntry, imageWidget);
-                PreloadedImages[preloadVariables.ResourceKey] = preloadVariables.Image;
-                var squareCanvasImage = preloadVariables.Image.GetInSquareCanvas();
-                PreloadedImagePixbufs[preloadVariables.ResourceKey] = new List<Pixbuf>
-                    {
-                        squareCanvasImage.ToPixbuf().ScaleSimple((int)(squareCanvasImage.Width * preloadVariables.Scale), (int)(squareCanvasImage.Height * preloadVariables.Scale), InterpType.Bilinear)
-                    };
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return package.PreloadImage(resourceIndexEntry, imageWidget, PreloadedImages, PreloadedImagePixbufs);
         }
 
         public static Bitmap Scale(this Bitmap image, int width, int height, System.Drawing.Drawing2D.InterpolationMode interpolationMode)
         {
-            var imageCopy = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            if (imageCopy != null)
+            var scaledImage = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            if (scaledImage != null)
             {
-                using (var graphics = System.Drawing.Graphics.FromImage(imageCopy))
+                using (var graphics = System.Drawing.Graphics.FromImage(scaledImage))
                 {
                     graphics.InterpolationMode = interpolationMode;
-                    graphics.DrawImage(image, new System.Drawing.Rectangle(0, 0, imageCopy.Width, imageCopy.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+                    graphics.DrawImage(image, new System.Drawing.Rectangle(0, 0, scaledImage.Width, scaledImage.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
                 }
             }
-            return imageCopy;
+            return scaledImage;
         }
 
         public static Bitmap ToBitmap(this Pixbuf pixbuf)

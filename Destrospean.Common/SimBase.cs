@@ -120,7 +120,7 @@ namespace Destrospean.Common
                 {
                     if (mCASParts[clothingType] != null)
                     {
-                        mCASParts[clothingType].AllPresets.ForEach(x => x.DisposeAll());
+                        mCASParts[clothingType].Dispose();
                         mCASParts[clothingType] = null;
                     }
                 }
