@@ -264,6 +264,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 deleteButton.Clicked += (sender, e) =>
                     {
                         mDisableSwitchPage = true;
+                        CASTableObject.Presets[pageIndex].Dispose();
                         CASTableObject.Presets.RemoveAt(pageIndex);
                         while (NPages > 0)
                         {

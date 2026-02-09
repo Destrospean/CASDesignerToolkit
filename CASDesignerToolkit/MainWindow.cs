@@ -956,20 +956,11 @@ public partial class MainWindow : RendererMainWindow
         Sim.CurrentCASPart = null;
         mSaveAsPath = null;
         GlobalState.Meshes.Clear();
-        foreach (var casPart in PreloadedData.CASParts.Values)
+        foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
         {
-            casPart.AllPresets.ForEach(x =>
-                {
-                    try
-                    {
-                        x.DisposeAll();
-                    }
-                    catch (ArgumentNullException)
-                    {
-                    }
-                });
+            PreloadedData.CASParts[key].Dispose();
+            PreloadedData.CASParts.Remove(key);
         }
-        PreloadedData.CASParts.Clear();
         //PreloadedData.GameObjects.Clear();
         //PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();

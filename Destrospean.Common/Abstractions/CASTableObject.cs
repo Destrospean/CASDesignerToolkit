@@ -4,7 +4,7 @@ using Destrospean.S3PIExtensions;
 
 namespace Destrospean.Common.Abstractions
 {
-    public abstract class CASTableObject
+    public abstract class CASTableObject : System.IDisposable
     {
         protected Rig mCurrentRig;
 
@@ -52,6 +52,11 @@ namespace Destrospean.Common.Abstractions
         public void ClearCurrentRig()
         {
             mCurrentRig = null;
+        }
+
+        public void Dispose()
+        {
+            AllPresets.ForEach(x => x.Dispose());
         }
 
         public void SaveDefaultPreset()
