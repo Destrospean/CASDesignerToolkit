@@ -303,9 +303,13 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec3 v_pos;
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
+                uniform bool hasAmbientMap;
+                uniform bool hasSkinAmbientMap;
                 uniform bool hasSpecularMap;
                 uniform bool hasSkinSpecularMap;
                 uniform bool hasTransparency;
+                uniform sampler2D map_ambient;
+                uniform sampler2D map_skin_ambient;
                 uniform sampler2D map_specular;
                 uniform sampler2D map_skin_specular;
                 uniform mat4 view;
@@ -314,6 +318,7 @@ namespace Destrospean.Graphics.OpenGL
                 uniform vec3 material_specular;
                 uniform float material_specExponent;
                 uniform Light lights[5];
+                uniform vec3 skin_color;
 
                 {0}
 
@@ -331,7 +336,7 @@ namespace Destrospean.Graphics.OpenGL
                         else
                         {{
                             isSkin = true;
-                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                            texcolor = vec4(skin_color, 1.0);
                         }}
                     }}
                     gl_FragColor = vec4(0.0, 0.0, 0.0, texcolor.a);
@@ -349,7 +354,18 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         vec4 light_ambient = lights[i].ambientIntensity * vec4(lights[i].color, 0.0);
                         vec4 light_diffuse = lights[i].diffuseIntensity * vec4(lights[i].color, 0.0);
-                        lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0);
+                        if (isSkin)
+                        {{
+                            lightcolor = lightcolor + texcolor * light_ambient * vec4(0.25, 0.25, 0.25, 0.0);
+                        }}
+                        else if (hasAmbientMap)
+                        {{
+                            lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0) * texture2D(map_ambient, f_texcoord).r;
+                        }}
+                        else
+                        {{
+                            lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0);
+                        }}
                         float lambertmaterial_diffuse = max(dot(n, lightvec), 0.0);
                         bool inConeOrNotSpotlight = lights[i].type != 2 || degrees(acos(dot(lightvec, lights[i].direction))) < lights[i].coneAngle;
                         if (inConeOrNotSpotlight)
@@ -450,6 +466,10 @@ namespace Destrospean.Graphics.OpenGL
                     {
                         GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 0);
                     }
+                    if (casPartVolume != null && Shaders[shader].GetUniform("skin_color") != -1)
+                    {
+                        GL.Uniform3(Shaders[shader].GetUniform("skin_color"), new Vector3(casPartVolume.ParentSim.SkinColor[0], casPartVolume.ParentSim.SkinColor[1], casPartVolume.ParentSim.SkinColor[2]));
+                    }
                     if (Shaders[shader].GetUniform("hasTransparency") != -1)
                     {
                         GL.Uniform1(Shaders[shader].GetUniform("hasTransparency"), Convert.ToInt32(mesh.Material.HasTransparency));
@@ -514,6 +534,37 @@ namespace Destrospean.Graphics.OpenGL
                     if (Shaders[shader].GetAttribute("maintexture") != -1)
                     {
                         GL.Uniform1(Shaders[shader].GetAttribute("maintexture"), mesh.MainTextureID);
+                    }
+
+                    if (Shaders[shader].GetUniform("map_ambient") != -1)
+                    {
+                        if (mesh.AmbientMapID == -1)
+                        {
+                            GL.Uniform1(Shaders[shader].GetUniform("hasAmbientMap"), 0);
+                        }
+                        else
+                        {
+                            GL.ActiveTexture(TextureUnit.Texture3);
+                            GL.BindTexture(TextureTarget.Texture2D, mesh.AmbientMapID);
+                            GL.Uniform1(Shaders[shader].GetUniform("map_ambient"), 3);
+                            GL.Uniform1(Shaders[shader].GetUniform("hasAmbientMap"), 1);
+                            GL.ActiveTexture(TextureUnit.Texture0);
+                        }
+                    }
+                    if (casPartVolume != null && Shaders[shader].GetUniform("map_skin_ambient") != -1)
+                    {
+                        if (casPartVolume.SkinAmbientMapID == -1)
+                        {
+                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinAmbientMap"), 0);
+                        }
+                        else
+                        {
+                            GL.ActiveTexture(TextureUnit.Texture4);
+                            GL.BindTexture(TextureTarget.Texture2D, casPartVolume.SkinAmbientMapID);
+                            GL.Uniform1(Shaders[shader].GetUniform("map_skin_ambient"), 4);
+                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinAmbientMap"), 1);
+                            GL.ActiveTexture(TextureUnit.Texture0);
+                        }
                     }
                     if (Shaders[shader].GetUniform("map_specular") != -1)
                     {

@@ -59,6 +59,13 @@ namespace Destrospean.Common
 
         public bool ShowMaternityPartsOnly = false;
 
+        public float[] SkinColor =
+            {
+                140f / byte.MaxValue,
+                100f / byte.MaxValue,
+                80f / byte.MaxValue
+            };
+
         public SimBase()
         {
             foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
@@ -172,6 +179,54 @@ namespace Destrospean.Common
                         }
                         SetCASPart(clothingType, validCurrentTypePartKeys[random.Next(0, validCurrentTypePartKeys.Count - 1)]);
                     }
+                }
+                switch (random.Next(0, 2))
+                {
+                    case 0:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(240, 255) / byte.MaxValue,
+                                    (float)random.Next(200, 230) / byte.MaxValue,
+                                    (float)random.Next(160, 200) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    case 1:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(180, 220) / byte.MaxValue,
+                                    (float)random.Next(130, 180) / byte.MaxValue,
+                                    (float)random.Next(90, 140) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    case 2:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(50, 150) / byte.MaxValue,
+                                    (float)random.Next(20, 100) / byte.MaxValue,
+                                    (float)random.Next(10, 70) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
                 }
             }
         }

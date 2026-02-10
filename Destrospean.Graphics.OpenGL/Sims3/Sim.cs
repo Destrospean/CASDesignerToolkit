@@ -12,15 +12,70 @@ namespace Destrospean.Graphics.OpenGL.Sims3
 {
     public class Sim : SimBase
     {
+        public int SkinAmbientMapID = -1,
+        SkinSpecularMapID = -1;
+
         public class CASPartVolume : Volume
         {
+            public int BodyAmbientMapID
+            {
+                set
+                {
+                    ParentSim.SkinAmbientMapID = value;
+                }
+                get
+                {
+                    return ParentSim.SkinAmbientMapID;
+                }
+            }
+
+            public int BodySpecularMapID
+            {
+                set
+                {
+                    ParentSim.SkinSpecularMapID = value;
+                }
+                get
+                {
+                    return ParentSim.SkinSpecularMapID;
+                }
+            }
+
             public List<Vector3> DeltaNormalsFat, DeltaNormalsFit, DeltaNormalsSpecial, DeltaNormalsThin, DeltaVerticesFat, DeltaVerticesFit, DeltaVerticesSpecial, DeltaVerticesThin;
 
             public string Key;
 
-            public SimBase ParentSim;
+            public Sim ParentSim;
 
-            public int SkinAmbientMapID, SkinSpecularMapID;
+            public int SkinAmbientMapID
+            {
+                set
+                {
+                    if (ParentSim.SkinAmbientMapID == -1)
+                    {
+                        ParentSim.SkinAmbientMapID = value;
+                    }
+                }
+                get
+                {
+                    return ParentSim.SkinAmbientMapID;
+                }
+            }
+
+            public int SkinSpecularMapID
+            {
+                set
+                {
+                    if (ParentSim.SkinSpecularMapID == -1)
+                    {
+                        ParentSim.SkinSpecularMapID = value;
+                    }
+                }
+                get
+                {
+                    return ParentSim.SkinSpecularMapID;
+                }
+            }
         }
 
         protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
@@ -273,8 +328,22 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             var materialCast = (Material)material;
             casPartVolumeCast.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
             casPartVolumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
-            casPartVolumeCast.SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap ?? materialCast.AmbientMap, null);
-            casPartVolumeCast.SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap ?? materialCast.SpecularMap, null);
+            if (!string.IsNullOrEmpty(currentPreset.BodyAmbientMap))
+            {
+                casPartVolumeCast.BodyAmbientMapID = loadTextureCallback(currentPreset.BodyAmbientMap, null);
+            }
+            if (!string.IsNullOrEmpty(currentPreset.BodySpecularMap))
+            {
+                casPartVolumeCast.BodySpecularMapID = loadTextureCallback(currentPreset.BodySpecularMap, null);
+            }
+            if (!string.IsNullOrEmpty(currentPreset.SkinAmbientMap))
+            {
+                casPartVolumeCast.SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap, null);
+            }
+            if (!string.IsNullOrEmpty(currentPreset.SkinSpecularMap))
+            {
+                casPartVolumeCast.SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap, null);
+            }
             casPartVolumeCast.MainTextureID = loadTextureCallback(casPartVolumeCast.Key, presetTexture);
             GlobalState.Meshes[casPartVolumeCast.Key] = casPartVolumeCast;
         }
