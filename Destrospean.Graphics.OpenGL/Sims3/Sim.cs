@@ -344,7 +344,10 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             {
                 casPartVolumeCast.SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap, null);
             }
-            casPartVolumeCast.MainTextureID = loadTextureCallback(casPartVolumeCast.Key, presetTexture);
+            if ((casPartVolumeCast.MainTextureID = loadTextureCallback(casPartVolumeCast.Key, presetTexture)) == -1)
+            {
+                Complate.MarkModelsNeedUpdatedCallback();
+            }
             GlobalState.Meshes[casPartVolumeCast.Key] = casPartVolumeCast;
         }
 
