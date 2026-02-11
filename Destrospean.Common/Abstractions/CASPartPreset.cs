@@ -91,16 +91,23 @@ namespace Destrospean.Common.Abstractions
                     float[] diffuseColor = null,
                     highlightColor = null,
                     rootColor = null,
-                    //tintColor = null,
+                    tintColor =
+                        {
+                            1,
+                            1,
+                            1
+                        },
                     tipColor = null;
                     int height = 1024,
                     width = 1024;
                     List<Bitmap> logos = new List<Bitmap>(),
                     stencils = new List<Bitmap>();
                     List<bool> logosEnabled = new List<bool>(),
-                    stencilsEnabled = new List<bool>();
+                    stencilsEnabled = new List<bool>(),
+                    tintColorsEnabled = new List<bool>();
                     List<float[]> logosLowerRight = new List<float[]>(),
-                    logosUpperLeft = new List<float[]>();
+                    logosUpperLeft = new List<float[]>(),
+                    tintColors = new List<float[]>();
                     List<float> logosRotation = new List<float>(),
                     stencilsRotation = new List<float>();
                     foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
@@ -143,6 +150,21 @@ namespace Destrospean.Common.Abstractions
                             else if (key.EndsWith("rotation"))
                             {
                                 stencilsRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+                            }
+                        }
+                        else if (key.StartsWith("tint color"))
+                        {
+                            if (key.Length == 10)
+                            {
+                                tintColor = ParseCommaSeparatedValues(value);
+                            }
+                            else if (key.Length == 12)
+                            {
+                                tintColors.Add(ParseCommaSeparatedValues(value));
+                            }
+                            else if (key.EndsWith("enabled"))
+                            {
+                                tintColorsEnabled.Add(bool.Parse(value));
                             }
                         }
                         else
@@ -204,90 +226,83 @@ namespace Destrospean.Common.Abstractions
                                 case "specular":
                                     SpecularMap = value;
                                     goto case "skin specular";
-                                /*
-                                case "tint color":
-                                    tintColor = ParseCommaSeparatedValues(value);
-                                    break;
-                                */
                                 case "tip color":
                                     tipColor = ParseCommaSeparatedValues(value);
                                     break;
                             }
                         }
                     }
-                    if (diffuseMap != null)
+                    var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
+
+                    if (diffuseMap != null && complateName == "hairuniversal")
                     {
-                        if (mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant() == "hairuniversal")
+                        float[][] hairMatrix =
+                            {
+                                new float[]
+                                {
+                                    diffuseColor[0],
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    diffuseColor[1],
+                                    0,
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    diffuseColor[2],
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1
+                                }
+                            };
+                        using (var graphics = Graphics.FromImage(diffuseMap))
                         {
-                            float[][] hairMatrix =
-                                {
-                                    new float[]
-                                    {
-                                        diffuseColor[0],
-                                        0,
-                                        0,
-                                        0,
-                                        0
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        diffuseColor[1],
-                                        0,
-                                        0,
-                                        0
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        diffuseColor[2],
-                                        0,
-                                        0
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        1,
-                                        0
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        1
-                                    }
-                                };
-                            using (var graphics = Graphics.FromImage(diffuseMap))
+                            var attributes = new ImageAttributes();
+                            var colorMatrix = new ColorMatrix(hairMatrix);
+                            attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                            graphics.DrawImage(diffuseMap, new Rectangle(0, 0, diffuseMap.Width, diffuseMap.Height), 0, 0, diffuseMap.Width, diffuseMap.Height, GraphicsUnit.Pixel, attributes);
+                        }
+                        if (controlMapArray != null && highlightColor != null && rootColor != null && tipColor != null)
+                        {
+                            try
                             {
-                                var attributes = new ImageAttributes();
-                                var colorMatrix = new ColorMatrix(hairMatrix);
-                                attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                                graphics.DrawImage(diffuseMap, new Rectangle(0, 0, diffuseMap.Width, diffuseMap.Height), 0, 0, diffuseMap.Width, diffuseMap.Height, GraphicsUnit.Pixel, attributes);
+                                diffuseMap = diffuseMap.GetWithPatternsApplied(controlMapArray, new List<object>
+                                    {
+                                        rootColor,
+                                        highlightColor,
+                                        tipColor
+                                    }, false);
                             }
-                            if (controlMapArray != null && highlightColor != null && rootColor != null && tipColor != null)
+                            catch (System.IndexOutOfRangeException)
                             {
-                                try
-                                {
-                                    diffuseMap = diffuseMap.GetWithPatternsApplied(controlMapArray, new List<object>
-                                        {
-                                            rootColor,
-                                            highlightColor,
-                                            tipColor
-                                        }, false);
-                                }
-                                catch (System.IndexOutOfRangeException)
-                                {
-                                }
                             }
                         }
                     }
-                    /*
-                    if (mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant().StartsWith("casskinoverlay"))
+                    if (complateName.StartsWith("casskinoverlay") || complateName.StartsWith("casoverlay"))
                     {
                         float[][] faceMatrix =
                             {
@@ -344,48 +359,28 @@ namespace Destrospean.Common.Abstractions
                             maskArray = new uint[faceOverlay.Height * faceOverlay.Width >> 2];
                             for (var i = 0; i < maskArray.Length; i++)
                             {
-                                maskArray[i] = 0xFF0000FF;
+                                maskArray[i] = 0;
+                            }
+                        }
+                        while (tintColorsEnabled.Count < tintColors.Count)
+                        {
+                            tintColorsEnabled.Add(false);
+                        }
+                        for (var i = 0; i < tintColors.Count; i++)
+                        {
+                            if (!tintColorsEnabled[i])
+                            {
+                                tintColors[i] = null;
                             }
                         }
                         try
                         {
-                            faceOverlay = faceOverlay.GetWithPatternsApplied(maskArray, new List<object>
-                                {
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        1
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        1
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        1
-                                    },
-                                    new float[]
-                                    {
-                                        0,
-                                        0,
-                                        0,
-                                        1
-                                    }
-                                }, true);
+                            faceOverlay = faceOverlay.GetWithPatternsApplied(maskArray, tintColors.ConvertAll(x => (object)x), true);
                         }
                         catch (System.IndexOutOfRangeException)
                         {
                         }
                     }
-                    */
                     bool patternEnabled;
                     var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x => bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled ? x.PatternImage : null);
                     if (maskArray != null)

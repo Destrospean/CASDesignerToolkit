@@ -11,6 +11,8 @@ namespace Destrospean.Common
 
         string mID;
 
+        System.Drawing.Bitmap mStackedFaceOverlayTexture;
+
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
             get
@@ -109,6 +111,26 @@ namespace Destrospean.Common
                     });
             }
             return newDeltas;
+        }
+
+        public System.Drawing.Bitmap GetStackedFaceOverlayTexture(int presetIndex)
+        {
+            if (mStackedFaceOverlayTexture != null)
+            {
+                mStackedFaceOverlayTexture.Dispose();
+            }
+            mStackedFaceOverlayTexture = new System.Drawing.Bitmap(1024, 1024);
+            using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceOverlayTexture))
+            {
+                foreach (var casPart in CASParts.Values)
+                {
+                    if (casPart != null && casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
+                    {
+                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
+                    }
+                }
+            }
+            return mStackedFaceOverlayTexture;
         }
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)

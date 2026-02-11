@@ -252,6 +252,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     switch ((CmarNYCBorrowed.Shader)geom.ShaderHash)
                     {
                         case CmarNYCBorrowed.Shader.SimAlphaBlended:
+                        case CmarNYCBorrowed.Shader.SimEyelashes:
                         case CmarNYCBorrowed.Shader.SimGlass:
                         case CmarNYCBorrowed.Shader.SimHair:
                             hasTransparency = true;
@@ -296,8 +297,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             };
                         GlobalState.Materials[geomAndKey.Key] = material;
                     }
-                    var currentPreset = (CASPartPreset)(casPart == CurrentCASPart ? casPart.AllPresets[presetIndex] : casPart.AllPresets[0]);
-                    var presetTexture = currentPreset.Texture;
+                    var currentPreset = (CASPartPreset)(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0]);
                     loadMeshesOnMainThreadCallback(new CASPartVolume
                         {
                             ColorData = colors.ConvertAll(ToVector3).ToArray(),
@@ -317,7 +317,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                        }, currentPreset, presetTexture, material, loadTextureCallback);
+                        }, currentPreset, casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceOverlayTexture(presetIndex) : currentPreset.Texture, material, loadTextureCallback);
                 }
             }
         }
