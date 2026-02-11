@@ -115,60 +115,66 @@ namespace Destrospean.Common
 
         public System.Drawing.Bitmap GetStackedFaceTexture(int presetIndex)
         {
-            if (mStackedFaceTexture != null)
+            lock (Lock)
             {
-                mStackedFaceTexture.Dispose();
-            }
-            mStackedFaceTexture = new System.Drawing.Bitmap(1024, 1024);
-            using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceTexture))
-            {
-                foreach (var casPart in CASParts.Values)
+                if (mStackedFaceTexture != null)
                 {
-                    if (casPart == null)
+                    mStackedFaceTexture.Dispose();
+                }
+                mStackedFaceTexture = new System.Drawing.Bitmap(1024, 1024);
+                using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceTexture))
+                {
+                    foreach (var casPart in CASParts.Values)
                     {
-                        continue;
-                    }
-                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
-                    {
-                        graphics.DrawImage(preset.Texture, 0, 0);
-                    }
-                    if (preset.FaceTexture != null)
-                    {
-                        graphics.DrawImage(preset.FaceTexture, 0, 0);
+                        if (casPart == null)
+                        {
+                            continue;
+                        }
+                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                        if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
+                        {
+                            graphics.DrawImage(preset.Texture, 0, 0);
+                        }
+                        if (preset.FaceTexture != null)
+                        {
+                            graphics.DrawImage(preset.FaceTexture, 0, 0);
+                        }
                     }
                 }
+                return mStackedFaceTexture;
             }
-            return mStackedFaceTexture;
         }
 
         public System.Drawing.Bitmap GetStackedScalpTexture(int presetIndex)
         {
-            if (mStackedScalpTexture != null)
+            lock (Lock)
             {
-                mStackedScalpTexture.Dispose();
-            }
-            mStackedScalpTexture = new System.Drawing.Bitmap(1024, 1024);
-            using (var graphics = System.Drawing.Graphics.FromImage(mStackedScalpTexture))
-            {
-                foreach (var casPart in CASParts.Values)
+                if (mStackedScalpTexture != null)
                 {
-                    if (casPart == null)
+                    mStackedScalpTexture.Dispose();
+                }
+                mStackedScalpTexture = new System.Drawing.Bitmap(1024, 1024);
+                using (var graphics = System.Drawing.Graphics.FromImage(mStackedScalpTexture))
+                {
+                    foreach (var casPart in CASParts.Values)
                     {
-                        continue;
-                    }
-                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.Scalp)
-                    {
-                        graphics.DrawImage(preset.Texture, 0, 0);
-                    }
-                    if (preset.ScalpTexture != null)
-                    {
-                        graphics.DrawImage(preset.ScalpTexture, 0, 0);
+                        if (casPart == null)
+                        {
+                            continue;
+                        }
+                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                        if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.Scalp)
+                        {
+                            graphics.DrawImage(preset.Texture, 0, 0);
+                        }
+                        if (preset.ScalpTexture != null)
+                        {
+                            graphics.DrawImage(preset.ScalpTexture, 0, 0);
+                        }
                     }
                 }
+                return mStackedScalpTexture;
             }
-            return mStackedScalpTexture;
         }
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
