@@ -11,6 +11,38 @@ namespace Destrospean.Common.Abstractions
 {
     public class CASPartPreset : Preset
     {
+        public string BodyAmbientMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).BodyAmbientMap;
+            }
+        }
+
+        public string BodySpecularMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).BodySpecularMap;
+            }
+        }
+
+        public Bitmap FaceTexture
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).FaceTexture;
+            }
+        }
+
+        public Bitmap ScalpTexture
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).ScalpTexture;
+            }
+        }
+
         public string SkinAmbientMap
         {
             get
@@ -44,34 +76,60 @@ namespace Destrospean.Common.Abstractions
 
         protected class PresetInternal : PresetInternalBase
         {
+            public string BodyAmbientMap
+            {
+                get;
+                protected set;
+            }
+
+            public string BodySpecularMap
+            {
+                get;
+                protected set;
+            }
+
             public XmlNode ComplateXmlNode
             {
                 get;
                 private set;
             }
 
+            public Bitmap FaceTexture, ScalpTexture;
+
             public override Bitmap NewTexture
             {
                 get
                 {
                     uint[] controlMapArray = null,
-                    maskArray = null;
+                    faceControlMapArray = null,
+                    maskArray = null,
+                    scalpControlMapArray = null;
                     Bitmap diffuseMap = null,
-                    faceOverlay = null,
+                    faceDiffuseMap = null,
                     multiplier = null,
-                    overlay = null;
+                    overlay = null,
+                    scalpDiffuseMap = null;
                     float[] diffuseColor = null,
                     highlightColor = null,
                     rootColor = null,
+                    tintColor =
+                        {
+                            1,
+                            1,
+                            1
+                        },
                     tipColor = null;
+                    bool drawsOnFace = false, drawsOnScalp = false;
                     int height = 1024,
                     width = 1024;
                     List<Bitmap> logos = new List<Bitmap>(),
                     stencils = new List<Bitmap>();
                     List<bool> logosEnabled = new List<bool>(),
-                    stencilsEnabled = new List<bool>();
+                    stencilsEnabled = new List<bool>(),
+                    tintColorsEnabled = new List<bool>();
                     List<float[]> logosLowerRight = new List<float[]>(),
-                    logosUpperLeft = new List<float[]>();
+                    logosUpperLeft = new List<float[]>(),
+                    tintColors = new List<float[]>();
                     List<float> logosRotation = new List<float>(),
                     stencilsRotation = new List<float>();
                     foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
@@ -116,13 +174,33 @@ namespace Destrospean.Common.Abstractions
                                 stencilsRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
                             }
                         }
+                        else if (key.StartsWith("tint color"))
+                        {
+                            if (key.Length == 10)
+                            {
+                                tintColor = ParseCommaSeparatedValues(value);
+                            }
+                            else if (key.Length == 12)
+                            {
+                                tintColors.Add(ParseCommaSeparatedValues(value));
+                            }
+                            else if (key.EndsWith("enabled"))
+                            {
+                                tintColorsEnabled.Add(bool.Parse(value));
+                            }
+                        }
                         else
                         {
                             switch (key)
                             {
                                 case "ambient":
                                     AmbientMap = value;
-                                    SkinAmbientMap = value;
+                                    goto case "skin ambient";
+                                case "body ambient":
+                                    BodyAmbientMap = value;
+                                    break;
+                                case "body specular":
+                                    BodySpecularMap = value;
                                     break;
                                 case "clothing ambient":
                                     AmbientMap = value;
@@ -139,9 +217,24 @@ namespace Destrospean.Common.Abstractions
                                 case "diffuse map":
                                     diffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
                                     break;
-                                case "face overlay":
-                                    faceOverlay = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                case "drawsonface":
+                                    drawsOnFace = bool.Parse(value);
                                     break;
+                                case "drawsonscalp":
+                                    drawsOnScalp = bool.Parse(value);
+                                    break;
+                                case "face ambient":
+                                    goto case "ambient";
+                                case "face control map":
+                                    faceControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                    break;
+                                case "face diffuse map":
+                                    faceDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                    break;
+                                case "face overlay":
+                                    goto case "overlay";
+                                case "face specular":
+                                    goto case "specular";
                                 case "highlight color":
                                     highlightColor = ParseCommaSeparatedValues(value);
                                     break;
@@ -157,6 +250,12 @@ namespace Destrospean.Common.Abstractions
                                 case "root color":
                                     rootColor = ParseCommaSeparatedValues(value);
                                     break;
+                                case "scalp control map":
+                                    scalpControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                    break;
+                                case "scalp diffuse map":
+                                    scalpDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                    break;
                                 case "skin ambient":
                                     SkinAmbientMap = value;
                                     break;
@@ -165,17 +264,29 @@ namespace Destrospean.Common.Abstractions
                                     break;
                                 case "specular":
                                     SpecularMap = value;
-                                    SkinSpecularMap = value;
-                                    break;
+                                    goto case "skin specular";
                                 case "tip color":
                                     tipColor = ParseCommaSeparatedValues(value);
                                     break;
                             }
                         }
                     }
-                    if (diffuseMap != null)
+                    var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
+                    var diffuseMaps = new Bitmap[]
+                        {
+                            diffuseMap,
+                            faceDiffuseMap,
+                            scalpDiffuseMap
+                        };
+                    var controlMapArrays = new uint[][]
+                        {
+                            controlMapArray,
+                            faceControlMapArray,
+                            scalpControlMapArray
+                        };
+                    for (var i = 0; i < diffuseMaps.Length; i++)
                     {
-                        if (mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant() == "hairuniversal")
+                        if (diffuseMaps[i] != null && complateName == "hairuniversal")
                         {
                             float[][] hairMatrix =
                                 {
@@ -220,18 +331,18 @@ namespace Destrospean.Common.Abstractions
                                         1
                                     }
                                 };
-                            using (var graphics = Graphics.FromImage(diffuseMap))
+                            using (var graphics = Graphics.FromImage(diffuseMaps[i]))
                             {
                                 var attributes = new ImageAttributes();
                                 var colorMatrix = new ColorMatrix(hairMatrix);
                                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                                graphics.DrawImage(diffuseMap, new Rectangle(0, 0, diffuseMap.Width, diffuseMap.Height), 0, 0, diffuseMap.Width, diffuseMap.Height, GraphicsUnit.Pixel, attributes);
+                                graphics.DrawImage(diffuseMaps[i], new Rectangle(0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height), 0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height, GraphicsUnit.Pixel, attributes);
                             }
-                            if (controlMapArray != null && highlightColor != null && rootColor != null && tipColor != null)
+                            if (controlMapArrays[i] != null && highlightColor != null && rootColor != null && tipColor != null)
                             {
                                 try
                                 {
-                                    diffuseMap = diffuseMap.GetWithPatternsApplied(controlMapArray, new List<object>
+                                    diffuseMaps[i] = diffuseMaps[i].GetWithPatternsApplied(controlMapArrays[i], new List<object>
                                         {
                                             rootColor,
                                             highlightColor,
@@ -242,6 +353,85 @@ namespace Destrospean.Common.Abstractions
                                 {
                                 }
                             }
+                        }
+                    }
+                    if (complateName.StartsWith("casoverlay") || complateName.StartsWith("casskinoverlay"))
+                    {
+                        float[][] faceMatrix =
+                            {
+                                new float[]
+                                {
+                                    tintColor[0],
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    tintColor[1],
+                                    0,
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    tintColor[2],
+                                    0,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0
+                                },
+                                new float[]
+                                {
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1
+                                }
+                            };
+                        using (var graphics = Graphics.FromImage(overlay))
+                        {
+                            var attributes = new ImageAttributes();
+                            var colorMatrix = new ColorMatrix(faceMatrix);
+                            attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                            graphics.DrawImage(overlay, new Rectangle(0, 0, overlay.Width, overlay.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel, attributes);
+                        }
+                        if (maskArray == null)
+                        {
+                            maskArray = new uint[overlay.Height * overlay.Width >> 2];
+                            for (var i = 0; i < maskArray.Length; i++)
+                            {
+                                maskArray[i] = 0;
+                            }
+                        }
+                        while (tintColorsEnabled.Count < tintColors.Count)
+                        {
+                            tintColorsEnabled.Add(false);
+                        }
+                        for (var i = 0; i < tintColors.Count; i++)
+                        {
+                            if (!tintColorsEnabled[i])
+                            {
+                                tintColors[i] = null;
+                            }
+                        }
+                        try
+                        {
+                            overlay = overlay.GetWithPatternsApplied(maskArray, tintColors.ConvertAll(x => (object)x), true);
+                        }
+                        catch (System.IndexOutOfRangeException)
+                        {
                         }
                     }
                     bool patternEnabled;
@@ -269,9 +459,31 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
-                    var texture = new Bitmap(width, height);
+                    Bitmap faceTexture = new Bitmap(width, height),
+                    scalpTexture = new Bitmap(width, height),
+                    texture = new Bitmap(width, height);
                     using (var graphics = Graphics.FromImage(texture))
                     {
+                        /*
+                        var casPart = CASTableObject as CASPart;
+                        if (multiplier == null && diffuseMap == null && casPart != null)
+                        {
+                            foreach (var geomAndKey in new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[0])
+                            {
+                                foreach (var field in geomAndKey.GEOM.Shader.GetFields())
+                                {
+                                    if (field != (uint)s3pi.GenericRCOLResource.FieldType.DiffuseMap)
+                                    {
+                                        continue;
+                                    }
+                                    int valueType;
+                                    var tgi = geomAndKey.GEOM.TGIList[(uint)geomAndKey.GEOM.Shader.GetFieldValue(field, out valueType)[0]];
+                                    graphics.DrawImage(ParentPackage.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), GetTextureCallback, width, height), 0, 0);
+                                    break;
+                                }
+                            }
+                        }
+                        */
                         if (diffuseMap != null)
                         {
                             graphics.DrawImage(diffuseMap, 0, 0);
@@ -283,10 +495,6 @@ namespace Destrospean.Common.Abstractions
                         if (overlay != null)
                         {
                             graphics.DrawImage(overlay, 0, 0);
-                        }
-                        if (faceOverlay != null)
-                        {
-                            graphics.DrawImage(faceOverlay, 0, 0);
                         }
                         for (var i = 0; i < stencils.Count; i++)
                         {
@@ -305,6 +513,30 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
+                    if (drawsOnFace && faceDiffuseMap != null)
+                    {
+                        using (var graphics = Graphics.FromImage(faceTexture))
+                        {
+                            graphics.DrawImage(faceDiffuseMap, 0, 0);
+                        }
+                        FaceTexture = faceTexture;
+                    }
+                    else
+                    {
+                        FaceTexture = null;
+                    }
+                    if (drawsOnScalp && scalpDiffuseMap != null)
+                    {
+                        using (var graphics = Graphics.FromImage(scalpTexture))
+                        {
+                            graphics.DrawImage(scalpDiffuseMap, 0, 0);
+                        }
+                        ScalpTexture = scalpTexture;
+                    }
+                    else
+                    {
+                        ScalpTexture = null;
+                    }
                     return texture;
                 }
             }
@@ -317,17 +549,7 @@ namespace Destrospean.Common.Abstractions
                 }
             }
 
-            public string SkinAmbientMap
-            {
-                get;
-                protected set;
-            }
-
-            public string SkinSpecularMap
-            {
-                get;
-                protected set;
-            }
+            public string SkinAmbientMap, SkinSpecularMap;
 
             public PresetInternal(CASPartPreset preset, XmlNode complateXmlNode) : base()
             {

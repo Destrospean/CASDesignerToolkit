@@ -11,6 +11,8 @@ namespace Destrospean.Common
 
         string mID;
 
+        System.Drawing.Bitmap mStackedFaceTexture, mStackedScalpTexture;
+
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
             get
@@ -59,6 +61,13 @@ namespace Destrospean.Common
 
         public bool ShowMaternityPartsOnly = false;
 
+        public float[] SkinColor =
+            {
+                140f / byte.MaxValue,
+                100f / byte.MaxValue,
+                80f / byte.MaxValue
+            };
+
         public SimBase()
         {
             foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
@@ -102,6 +111,64 @@ namespace Destrospean.Common
                     });
             }
             return newDeltas;
+        }
+
+        public System.Drawing.Bitmap GetStackedFaceTexture(int presetIndex)
+        {
+            if (mStackedFaceTexture != null)
+            {
+                mStackedFaceTexture.Dispose();
+            }
+            mStackedFaceTexture = new System.Drawing.Bitmap(1024, 1024);
+            using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceTexture))
+            {
+                foreach (var casPart in CASParts.Values)
+                {
+                    if (casPart == null)
+                    {
+                        continue;
+                    }
+                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
+                    {
+                        graphics.DrawImage(preset.Texture, 0, 0);
+                    }
+                    if (preset.FaceTexture != null)
+                    {
+                        graphics.DrawImage(preset.FaceTexture, 0, 0);
+                    }
+                }
+            }
+            return mStackedFaceTexture;
+        }
+
+        public System.Drawing.Bitmap GetStackedScalpTexture(int presetIndex)
+        {
+            if (mStackedScalpTexture != null)
+            {
+                mStackedScalpTexture.Dispose();
+            }
+            mStackedScalpTexture = new System.Drawing.Bitmap(1024, 1024);
+            using (var graphics = System.Drawing.Graphics.FromImage(mStackedScalpTexture))
+            {
+                foreach (var casPart in CASParts.Values)
+                {
+                    if (casPart == null)
+                    {
+                        continue;
+                    }
+                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.Scalp)
+                    {
+                        graphics.DrawImage(preset.Texture, 0, 0);
+                    }
+                    if (preset.ScalpTexture != null)
+                    {
+                        graphics.DrawImage(preset.ScalpTexture, 0, 0);
+                    }
+                }
+            }
+            return mStackedScalpTexture;
         }
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
@@ -172,6 +239,54 @@ namespace Destrospean.Common
                         }
                         SetCASPart(clothingType, validCurrentTypePartKeys[random.Next(0, validCurrentTypePartKeys.Count - 1)]);
                     }
+                }
+                switch (random.Next(0, 2))
+                {
+                    case 0:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(240, 255) / byte.MaxValue,
+                                    (float)random.Next(200, 230) / byte.MaxValue,
+                                    (float)random.Next(160, 200) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    case 1:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(180, 220) / byte.MaxValue,
+                                    (float)random.Next(130, 180) / byte.MaxValue,
+                                    (float)random.Next(90, 140) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    case 2:
+                        while (true)
+                        {
+                            SkinColor = new float[]
+                                {
+                                    (float)random.Next(50, 150) / byte.MaxValue,
+                                    (float)random.Next(20, 100) / byte.MaxValue,
+                                    (float)random.Next(10, 70) / byte.MaxValue
+                                };
+                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                            {
+                                break;
+                            }
+                        }
+                        break;
                 }
             }
         }
