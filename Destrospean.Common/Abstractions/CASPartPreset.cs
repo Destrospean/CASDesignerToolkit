@@ -233,7 +233,6 @@ namespace Destrospean.Common.Abstractions
                         }
                     }
                     var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
-
                     if (diffuseMap != null && complateName == "hairuniversal")
                     {
                         float[][] hairMatrix =
