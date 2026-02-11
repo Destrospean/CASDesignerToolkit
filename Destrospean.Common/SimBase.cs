@@ -11,7 +11,7 @@ namespace Destrospean.Common
 
         string mID;
 
-        System.Drawing.Bitmap mStackedFaceOverlayTexture;
+        System.Drawing.Bitmap mStackedFaceTexture, mStackedScalpTexture;
 
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
@@ -113,24 +113,62 @@ namespace Destrospean.Common
             return newDeltas;
         }
 
-        public System.Drawing.Bitmap GetStackedFaceOverlayTexture(int presetIndex)
+        public System.Drawing.Bitmap GetStackedFaceTexture(int presetIndex)
         {
-            if (mStackedFaceOverlayTexture != null)
+            if (mStackedFaceTexture != null)
             {
-                mStackedFaceOverlayTexture.Dispose();
+                mStackedFaceTexture.Dispose();
             }
-            mStackedFaceOverlayTexture = new System.Drawing.Bitmap(1024, 1024);
-            using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceOverlayTexture))
+            mStackedFaceTexture = new System.Drawing.Bitmap(1024, 1024);
+            using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceTexture))
             {
                 foreach (var casPart in CASParts.Values)
                 {
-                    if (casPart != null && casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
+                    if (casPart == null)
                     {
-                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
+                        continue;
+                    }
+                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.FaceOverlay)
+                    {
+                        graphics.DrawImage(preset.Texture, 0, 0);
+                    }
+                    if (preset.FaceTexture != null)
+                    {
+                        graphics.DrawImage(preset.FaceTexture, 0, 0);
                     }
                 }
             }
-            return mStackedFaceOverlayTexture;
+            return mStackedFaceTexture;
+        }
+
+        public System.Drawing.Bitmap GetStackedScalpTexture(int presetIndex)
+        {
+            if (mStackedScalpTexture != null)
+            {
+                mStackedScalpTexture.Dispose();
+            }
+            mStackedScalpTexture = new System.Drawing.Bitmap(1024, 1024);
+            using (var graphics = System.Drawing.Graphics.FromImage(mStackedScalpTexture))
+            {
+                foreach (var casPart in CASParts.Values)
+                {
+                    if (casPart == null)
+                    {
+                        continue;
+                    }
+                    var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    if (casPart.CASPartResource.DataType == CASPartResource.DataTypeFlags.Scalp)
+                    {
+                        graphics.DrawImage(preset.Texture, 0, 0);
+                    }
+                    if (preset.ScalpTexture != null)
+                    {
+                        graphics.DrawImage(preset.ScalpTexture, 0, 0);
+                    }
+                }
+            }
+            return mStackedScalpTexture;
         }
 
         public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
