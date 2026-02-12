@@ -452,9 +452,7 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
-                    Bitmap faceTexture = new Bitmap(width, height),
-                    scalpTexture = new Bitmap(width, height),
-                    texture = new Bitmap(width, height);
+                    var texture = new Bitmap(width, height);
                     using (var graphics = Graphics.FromImage(texture))
                     {
                         /*
@@ -506,25 +504,25 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
-                    if (drawsOnFace && faceDiffuseMap != null)
+                    if (FaceTexture != null)
                     {
-                        using (var graphics = Graphics.FromImage(faceTexture))
-                        {
-                            graphics.DrawImage(faceDiffuseMap, 0, 0);
-                        }
-                        FaceTexture = faceTexture;
+                        FaceTexture.Dispose();
+                    }
+                    if (ScalpTexture != null)
+                    {
+                        ScalpTexture.Dispose();
+                    }
+                    if (drawsOnFace)
+                    {
+                        FaceTexture = faceDiffuseMap;
                     }
                     else
                     {
                         FaceTexture = null;
                     }
-                    if (drawsOnScalp && scalpDiffuseMap != null)
+                    if (drawsOnScalp)
                     {
-                        using (var graphics = Graphics.FromImage(scalpTexture))
-                        {
-                            graphics.DrawImage(scalpDiffuseMap, 0, 0);
-                        }
-                        ScalpTexture = scalpTexture;
+                        ScalpTexture = scalpDiffuseMap;
                     }
                     else
                     {
