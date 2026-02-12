@@ -76,17 +76,7 @@ namespace Destrospean.Common.Abstractions
 
         protected class PresetInternal : PresetInternalBase
         {
-            public string BodyAmbientMap
-            {
-                get;
-                protected set;
-            }
-
-            public string BodySpecularMap
-            {
-                get;
-                protected set;
-            }
+            public string BodyAmbientMap, BodySpecularMap, SkinAmbientMap, SkinSpecularMap;
 
             public XmlNode ComplateXmlNode
             {
@@ -551,8 +541,6 @@ namespace Destrospean.Common.Abstractions
                     return mPropertiesXmlNodes;
                 }
             }
-
-            public string SkinAmbientMap, SkinSpecularMap;
 
             public PresetInternal(CASPartPreset preset, XmlNode complateXmlNode) : base()
             {
