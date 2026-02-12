@@ -338,7 +338,7 @@ namespace Destrospean.Common.Abstractions
                                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                                 graphics.DrawImage(diffuseMaps[i], new Rectangle(0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height), 0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height, GraphicsUnit.Pixel, attributes);
                             }
-                            if (controlMapArrays[i] != null && highlightColor != null && rootColor != null && tipColor != null)
+                            if (controlMapArrays[i] != null)
                             {
                                 try
                                 {
@@ -355,6 +355,9 @@ namespace Destrospean.Common.Abstractions
                             }
                         }
                     }
+                    diffuseMap = diffuseMaps[0];
+                    faceDiffuseMap = diffuseMaps[1];
+                    scalpDiffuseMap = diffuseMaps[2];
                     if (complateName.StartsWith("casoverlay") || complateName.StartsWith("casskinoverlay"))
                     {
                         float[][] faceMatrix =
