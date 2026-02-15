@@ -65,7 +65,7 @@ namespace Destrospean.Graphics.OpenGL
             GL.ShaderSource(address, code);
             GL.CompileShader(address);
             GL.AttachShader(ProgramID, address);
-            //System.Console.WriteLine(GL.GetShaderInfoLog(address));
+            System.Console.WriteLine(GL.GetShaderInfoLog(address));
         }
 
         public void DisableVertexAttribArrays()
@@ -125,7 +125,7 @@ namespace Destrospean.Graphics.OpenGL
         public void Link()
         {
             GL.LinkProgram(ProgramID);
-            //System.Console.WriteLine(GL.GetProgramInfoLog(ProgramID));
+            System.Console.WriteLine(GL.GetProgramInfoLog(ProgramID));
             GL.GetProgram(ProgramID, ProgramParameter.ActiveAttributes, out AttributeCount);
             GL.GetProgram(ProgramID, ProgramParameter.ActiveUniforms, out UniformCount);
             for (var i = 0; i < AttributeCount; i++)

@@ -6,7 +6,7 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public partial class AddMaterialPropertyDialog : Dialog
     {
-        public uint DataTypeUInt
+        public uint Field
         {
             get;
             private set;
@@ -18,13 +18,13 @@ namespace Destrospean.DestrospeanCASPEditor
             private set;
         }
 
-        public uint Field
+        public uint ValueCount
         {
             get;
             private set;
         }
 
-        public uint ValueCount
+        public CmarNYCBorrowed.MeshFormatDataType ValueType
         {
             get;
             private set;
@@ -72,27 +72,27 @@ namespace Destrospean.DestrospeanCASPEditor
                         switch (dataTypes[DataTypeComboBox.Active])
                         {
                             case "ElementFloat":
-                                DataTypeUInt = 1;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Float;
                                 ValueCount = 1;
                                 break;
                             case "ElementFloat2":
-                                DataTypeUInt = 1;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Float;
                                 ValueCount = 2;
                                 break;
                             case "ElementFloat3":
-                                DataTypeUInt = 1;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Float;
                                 ValueCount = 3;
                                 break;
                             case "ElementFloat4":
-                                DataTypeUInt = 1;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Float;
                                 ValueCount = 4;
                                 break;
                             case "ElementInt":
-                                DataTypeUInt = 2;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Byte4;
                                 ValueCount = 1;
                                 break;
                             case "ElementTextureRef":
-                                DataTypeUInt = 4;
+                                ValueType = CmarNYCBorrowed.MeshFormatDataType.Uint;
                                 ValueCount = 1;
                                 break;
                         }

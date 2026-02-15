@@ -23,9 +23,23 @@ namespace Destrospean.DestrospeanCASPEditor
             protected set;
         }
 
-        public bool ModelsNeedUpdated = false;
+        public OpenTK.Graphics.IGraphicsContext GraphicsContext
+        {
+            get
+            {
+                return (OpenTK.Graphics.IGraphicsContext)GLWidget.GetType().GetField("graphicsContext", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(GLWidget);
+            }
+        }
 
-        public readonly Destrospean.Graphics.OpenGL.Sims3.Sim Sim;
+        public readonly Graphics.OpenGL.Sims3.Sim Sim;
+
+        public OpenTK.Platform.IWindowInfo WindowInfo
+        {
+            get
+            {
+                return (OpenTK.Platform.IWindowInfo)GLWidget.GetType().GetField("windowInfo", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(GLWidget);
+            }
+        }
 
         [System.Flags]
         public enum MouseButtonsHeld : byte
@@ -38,21 +52,19 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public RendererMainWindow(Gtk.WindowType windowType) : base(windowType)
         {
-            Common.Abstractions.Complate.MarkModelsNeedUpdatedCallback = () => ModelsNeedUpdated = true;
+            Common.Abstractions.Complate.MarkModelsNeedUpdatedCallback = () => Gtk.Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
             Sim = new Graphics.OpenGL.Sims3.Sim();
         }
 
         protected bool OnIdleProcessMain()
         {
-            if (ModelsNeedUpdated)
-            {
-                ModelsNeedUpdated = false;
-                NextState = NextStateOptions.UpdateModels;
-            }
             if (GlobalState.GLInitialized)
             {
-                GlobalState.OnUpdateFrame(ProcessInput, mFOV, (float)GLWidget.Allocation.Width / GLWidget.Allocation.Height);
-                GlobalState.OnRenderFrame((int)(GLWidget.Allocation.Width * WidgetUtils.WineScaleDenominator), (int)(GLWidget.Allocation.Height * WidgetUtils.WineScaleDenominator));
+                if (!GlobalState.Locked)
+                {
+                    GlobalState.OnUpdateFrame(ProcessInput, mFOV, (float)GLWidget.Allocation.Width / GLWidget.Allocation.Height);
+                    GlobalState.OnRenderFrame((int)(GLWidget.Allocation.Width * WidgetUtils.WineScaleDenominator), (int)(GLWidget.Allocation.Height * WidgetUtils.WineScaleDenominator));
+                }
                 return true;
             }
             return false;

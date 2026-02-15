@@ -6,6 +6,14 @@ namespace Destrospean.Common
 {
     public static class Platform
     {
+        public static string CacheDirectoryPath
+        {
+            get
+            {
+                return IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            }
+        }
+
         public static bool IsLinux
         {
             get
@@ -114,18 +122,17 @@ namespace Destrospean.Common
 
         public static string GetCommandOutput(string command, string arguments = "")
         {
-            var startInfo = new ProcessStartInfo
-                {
-                    Arguments = arguments,
-                    CreateNoWindow = true,
-                    FileName = command,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false
-                };
             using (var process = new Process
                 {
-                    StartInfo = startInfo
+                    StartInfo = new ProcessStartInfo
+                        {
+                            Arguments = arguments,
+                            CreateNoWindow = true,
+                            FileName = command,
+                            RedirectStandardError = true,
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false
+                        }
                 })
             {
                 process.Start();

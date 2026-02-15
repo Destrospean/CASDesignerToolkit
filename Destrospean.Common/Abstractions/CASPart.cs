@@ -28,7 +28,11 @@ namespace Destrospean.Common.Abstractions
                 return species == 0 ? Species.Human : species;
             }
         }
+
+        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
             
+        public static Dictionary<string, Dictionary<string, uint>> CASPartLookupCache;
+
         public readonly CASPartResource.CASPartResource CASPartResource;
 
         public override Rig CurrentRig
@@ -43,19 +47,43 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public readonly Dictionary<int, List<GEOM>> LODs = new Dictionary<int, List<GEOM>>();
+        public readonly Dictionary<int, List<GEOMAndKey>> LODs = new Dictionary<int, List<GEOMAndKey>>();
+
+        public struct GEOMAndKey
+        {
+            public GEOM GEOM;
+
+            public string Key;
+
+            public GEOMAndKey(string key, GEOM geom)
+            {
+                GEOM = geom;
+                Key = key;
+            }
+        }
 
         public CASPart(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
-            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.ResourceGroup == resourceIndexEntry.ResourceGroup && x.Instance == resourceIndexEntry.Instance);
+            var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.Instance == resourceIndexEntry.Instance);
             if (defaultPresetResourceIndexEntries.Count > 0)
             {
-                DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
-                DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0])));
+                var stream = ((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0]);
+                if (stream != null)
+                {
+                    DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
+                    DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(stream));
+                }
             }
             CASPartResource = (CASPartResource.CASPartResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
             Presets.AddRange(CASPartResource.Presets.ConvertAll(x => new CASPartPreset(this, x.XmlFile) as Preset));
             LoadLODs(geometryResources, vpxyResources);
+            if (LODs.Count == 0)
+            {
+                for (var i = 0; i < 4; i++)
+                {
+                    LODs[i] = new List<CASPart.GEOMAndKey>();
+                }
+            }
         }
 
         public void AddMeshGroup(int lod, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
@@ -138,7 +166,7 @@ namespace Destrospean.Common.Abstractions
 
         public void ExportMeshGroup(int lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var geom = LODs[lod][groupIndex];
+            var geom = LODs[lod][groupIndex].GEOM;
             byte[] bblnIndices =
                 {
                     CASPartResource.BlendInfoFatIndex,
@@ -242,26 +270,74 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void ImportMesh(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public static void GenerateLookupCache()
         {
-            foreach (var geometryResourceKvp in geometryResources)
+            CASPartLookupCache = new Dictionary<string, Dictionary<string, uint>>();
+            foreach (var gamePackageKvp in ResourceUtils.GameContentPackages)
             {
-                if (geometryResourceKvp.Value == LODs[lod][groupIndex])
+                var resourceType = ResourceUtils.GetResourceType("CASP");
+                foreach (var casPartResourceIndexEntry in gamePackageKvp.Value.FindAll(x => x.ResourceType == resourceType))
                 {
-                    var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
-                    ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
-                    ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
-                    geometryResources[geometryResourceKvp.Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
-                    LoadLODs(geometryResources, vpxyResources);
-                    updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
-                    break;
+                    var key = casPartResourceIndexEntry.ReverseEvaluateResourceKey();
+                    var casPartResource = (CASPartResource.CASPartResource)WrapperDealer.GetResource(0, gamePackageKvp.Value, casPartResourceIndexEntry);
+                    if (CASPartLookupCache.ContainsKey(key))
+                    {
+                        continue;
+                    }
+                    CASPartLookupCache[key] = new Dictionary<string, uint>
+                    {
+                        {
+                            "Age",
+                            (uint)casPartResource.AgeGender.Age
+                        },
+                        {
+                            "Clothing",
+                            (uint)casPartResource.Clothing
+                        },
+                        {
+                            "ClothingCategory",
+                            (uint)casPartResource.ClothingCategory
+                        },
+                        {
+                            "DataType",
+                            (uint)casPartResource.DataType
+                        },
+                        {
+                            "Gender",
+                            (uint)casPartResource.AgeGender.Gender
+                        },
+                        {
+                            "Handedness",
+                            (uint)casPartResource.AgeGender.Handedness
+                        },
+                        {
+                            "Species",
+                            (uint)casPartResource.AgeGender.Species
+                        }
+                    };
                 }
             }
+            SaveLookupCache();
+        }
+
+        public static CASPartResource.SpeciesType GetAdjustedSpecies(CASPartResource.SpeciesType species)
+        {
+            return (uint)species == 0 ? (CASPartResource.SpeciesType)1 : species;
+        }
+
+        public void ImportMeshGroup(int lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        {
+            var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
+            ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
+            ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+            geometryResources[LODs[lod][groupIndex].Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
+            LoadLODs(geometryResources, vpxyResources);
+            updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
         }
 
         public void ImportMeshGroup(int lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var geom = LODs[lod][groupIndex];
+            var geom = LODs[lod][groupIndex].GEOM;
             byte[] bblnIndices =
                 {
                     CASPartResource.BlendInfoFatIndex,
@@ -314,26 +390,19 @@ namespace Destrospean.Common.Abstractions
             }
             using (var fileStream = File.OpenRead(filename))
             {
-                var newGEOMPlusMorphs = GEOM.GEOMsFromOBJ(meshFileType == MeshFileType.OBJ ? new OBJ(new StreamReader(fileStream)) : meshFileType == MeshFileType.WSO ? new OBJ(new WSO(new BinaryReader(fileStream))) : null, geom, new TGI(), false, false);
+                var newGEOMPlusMorphs = meshFileType == MeshFileType.OBJ ? GEOM.GEOMsFromOBJ(new OBJ(new StreamReader(fileStream)), geom, new TGI(), false, false) : meshFileType == MeshFileType.WSO ? GEOM.GEOMsFromWSO(new WSO(new BinaryReader(fileStream)), geom, new TGI()) : null;
                 for (var i = newGEOMPlusMorphs.Length - 1; i > -1 ; i--)
                 {
                     var stream = new MemoryStream();
                     newGEOMPlusMorphs[i].Write(new BinaryWriter(stream));
                     if (i == 0)
                     {
-                        foreach (var geometryResourceKvp in geometryResources)
-                        {
-                            if (geometryResourceKvp.Value == LODs[lod][groupIndex])
-                            {
-                                var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
-                                ParentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
-                                ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
-                                geometryResources[geometryResourceKvp.Key] = newGEOMPlusMorphs[i];
-                                LoadLODs(geometryResources, vpxyResources);
-                                updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
-                                break;
-                            }
-                        }
+                        var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
+                        ParentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
+                        ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+                        geometryResources[LODs[lod][groupIndex].Key] = newGEOMPlusMorphs[i];
+                        LoadLODs(geometryResources, vpxyResources);
+                        updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
                     }
                     else if (morphsEvaluated[i - 1].HasValue)
                     {
@@ -344,9 +413,9 @@ namespace Destrospean.Common.Abstractions
                         {
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] =  LODs.ContainsKey(j) ? new GEOM[]
+                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
                                     {
-                                        j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex], new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
+                                        j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
                                     } : new GEOM[0];
                             }
                         }
@@ -372,49 +441,22 @@ namespace Destrospean.Common.Abstractions
                                 }
                             }
                         }
-                        var geomTGIs = new TGI[lodMorphMeshes.Length][];
-                        var group = 0u;
-                        foreach (var j in CASPartResource.Diffuse1Indexes)
+                        var vpxyResourceKey = morphEvaluated.ResourceIndexEntry.ReverseEvaluateResourceKey();
+                        if (vpxyResources.ContainsKey(vpxyResourceKey))
                         {
-                            group = CASPartResource.TGIBlocks[j].ResourceGroup;
+                            vpxyResources.Remove(vpxyResourceKey);
                         }
-                        foreach (var j in CASPartResource.Specular1Indexes)
-                        {
-                            group = CASPartResource.TGIBlocks[j].ResourceGroup;
-                        }
-                        for (var j = 0; j < lodMorphMeshes.Length; j++)
-                        {
-                            geomTGIs[j] = new TGI[lodMorphMeshes[j].Length];
-                            for (var k = 0; k < geomTGIs[j].Length; k++)
-                            {
-                                var temp = "_lod" + j.ToString();
-                                if (k > 0)
-                                {
-                                    temp += "-" + (k + 1).ToString();
-                                }
-                                temp += morphName;
-                                geomTGIs[j][k] = new TGI(ResourceUtils.GetResourceType("GEOM"), group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + morphName + Environment.UserName + Environment.TickCount.ToString() + temp));
-                                var geomResourceKey = new TGIBlock(0, null, geomTGIs[j][k].Type, geomTGIs[j][k].Group, geomTGIs[j][k].Instance);
-                                var geomStream = new MemoryStream();
-                                lodMorphMeshes[j][k].Write(new BinaryWriter(geomStream));
-                                var geomResourceIndexEntry = ParentPackage.AddResource(geomResourceKey, geomStream, true);
-                                geometryResources[geomResourceIndexEntry.ReverseEvaluateResourceKey()] = new GEOM(lodMorphMeshes[j][k]);
-                            }
-                        }
-                        var vpxyTGI = new TGI(ResourceUtils.GetResourceType("VPXY"), 1, bblnResourceIndexEntries[i - 1].Instance);
-                        var newVPXY = new CmarNYCBorrowed.VPXY(vpxyTGI, geomTGIs);
-                        var newBBLN = new BBLN(7, CASPartResource.Unknown1 + morphName, vpxyTGI);
-                        var vpxyResourceKey = new TGIBlock(0, null, bblnResourceIndexEntries[i - 1].ResourceType, bblnResourceIndexEntries[i - 1].ResourceGroup, bblnResourceIndexEntries[i - 1].Instance);
-                        var vpxyStream = new MemoryStream();
-                        newBBLN.Write(new BinaryWriter(vpxyStream));
+                        var bgeoTGI = new TGI(ResourceUtils.GetResourceType("BGEO"), 0, bblnResourceIndexEntries[i - 1].Instance);
+                        var newBBLN = new BBLN(8, CASPartResource.Unknown1 + morphName, bgeoTGI);
+                        var newBGEO = new BGEO(lodMorphMeshes);
+                        var resourceStream = new MemoryStream();
+                        newBBLN.Write(new BinaryWriter(resourceStream));
                         ParentPackage.DeleteResource(morphEvaluated.ResourceIndexEntry);
                         ParentPackage.DeleteResource(bblnResourceIndexEntries[i - 1]);
-                        ParentPackage.AddResource(vpxyResourceKey, vpxyStream, true);
-                        vpxyResourceKey = new TGIBlock(0, null, vpxyTGI.Type, vpxyTGI.Group, vpxyTGI.Instance);
-                        vpxyStream = new MemoryStream();
-                        newVPXY.Write(new BinaryWriter(vpxyStream));
-                        var vpxyResourceIndexEntry = ParentPackage.AddResource(vpxyResourceKey, vpxyStream, true);
-                        vpxyResources[vpxyResourceIndexEntry.ReverseEvaluateResourceKey()] = (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry);
+                        ParentPackage.AddResource(bblnResourceIndexEntries[i - 1], resourceStream, true);
+                        resourceStream = new MemoryStream();
+                        newBGEO.Write(new BinaryWriter(resourceStream));
+                        ParentPackage.AddResource(new TGIBlock(0, null, bgeoTGI.Type, bgeoTGI.Group, bgeoTGI.Instance), resourceStream, true);
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].ResourceGroup = bblnResourceIndexEntries[i - 1].ResourceGroup;
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].Instance = bblnResourceIndexEntries[i - 1].Instance;
                     }
@@ -424,33 +466,64 @@ namespace Destrospean.Common.Abstractions
 
         public void LoadLODs(Dictionary<string, GEOM> geometryResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(CASPartResource.TGIBlocks[CASPartResource.VPXYIndexes[0]]);
-            var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
-            GenericRCOLResource vpxyResource;
-            if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+            foreach (var vpxyIndex in CASPartResource.VPXYIndexes)
             {
-                vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
-                vpxyResource = vpxyResources[vpxyKey];
-            }
-            foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
-            {
-                var entry00 = entry as s3pi.GenericRCOLResource.VPXY.Entry00;
-                if (entry00 != null)
+                var vpxyKey = CASPartResource.TGIBlocks[vpxyIndex].ReverseEvaluateResourceKey();
+                GenericRCOLResource vpxyResource;
+                if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
                 {
-                    LODs[entry00.EntryID] = new List<GEOM>();
-                    foreach (var tgiIndex in entry00.TGIIndexes)
+                    EvaluatedResourceKey evaluated;
+                    try
                     {
-                        var geometryResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry00.ParentTGIBlocks[tgiIndex]);
-                        var geometryResourceKey = geometryResourceIndexEntry.ReverseEvaluateResourceKey();
-                        GEOM geometryResource;
-                        if (!geometryResources.TryGetValue(geometryResourceKey, out geometryResource))
+                        evaluated = ParentPackage.EvaluateResourceKey(vpxyKey);
+                    }
+                    catch (ResourceIndexEntryNotFoundException)
+                    {
+                        continue;
+                    }
+                    vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry));
+                    vpxyResource = vpxyResources[vpxyKey];
+                }
+                foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
+                {
+                    var entry00 = entry as s3pi.GenericRCOLResource.VPXY.Entry00;
+                    if (entry00 != null)
+                    {
+                        LODs[entry00.EntryID] = new List<GEOMAndKey>();
+                        foreach (var tgiIndex in entry00.TGIIndexes)
                         {
-                            geometryResources.Add(geometryResourceKey, new GEOM(new BinaryReader(((APackage)ParentPackage).GetResource(geometryResourceIndexEntry))));
-                            geometryResource = geometryResources[geometryResourceKey];
+                            var geometryResourceKey = entry00.ParentTGIBlocks[tgiIndex].ReverseEvaluateResourceKey();
+                            GEOM geometryResource;
+                            if (!geometryResources.TryGetValue(geometryResourceKey, out geometryResource))
+                            {
+                                var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKey);
+                                geometryResources.Add(geometryResourceKey, new GEOM(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry))));
+                                geometryResource = geometryResources[geometryResourceKey];
+                            }
+                            LODs[entry00.EntryID].Add(new GEOMAndKey(geometryResourceKey, geometryResource));
                         }
-                        LODs[entry00.EntryID].Add(geometryResource);
                     }
                 }
+            }
+        }
+
+        public static void LoadLookupCache()
+        {
+            if (File.Exists(CacheFilePath))
+            {
+                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
+                {
+                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, uint>>>(reader);
+                }
+            }
+        }
+
+        public static void SaveLookupCache()
+        {
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(CacheFilePath));
+            using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(CacheFilePath, FileMode.Create)))
+            {
+                new Newtonsoft.Json.JsonSerializer().Serialize(writer, CASPartLookupCache);
             }
         }
 

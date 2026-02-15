@@ -21,6 +21,8 @@ namespace Destrospean.Common.Abstractions
 
         public readonly string ID;
 
+        public static object Lock = new object();
+
         public static CmarNYCBorrowed.Action MarkModelsNeedUpdatedCallback, MarkUnsavedChangesCallback;
 
         public abstract s3pi.Interfaces.IPackage ParentPackage
@@ -110,7 +112,7 @@ namespace Destrospean.Common.Abstractions
 
         public virtual string GetValue(string propertyName)
         {
-            return mPropertiesXmlNodes[propertyName].Attributes["value"].Value;
+            return mPropertiesXmlNodes.ContainsKey(propertyName) ? mPropertiesXmlNodes[propertyName].Attributes["value"].Value : "";
         }
 
         public static float[] ParseCommaSeparatedValues(string text)

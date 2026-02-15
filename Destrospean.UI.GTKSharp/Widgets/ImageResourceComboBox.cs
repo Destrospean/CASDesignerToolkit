@@ -151,7 +151,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                     entries.Add(new ImageResourceComboBoxEntry(missing ? null : pixbufs[1], currentValueKey.ToUpperInvariant().Replace("KEY", "key")));
                     listStore.AppendValues(entries[entries.Count - 1].Image, entries[entries.Count - 1].Label);
                 }
-                entries.Add(new ImageResourceComboBoxEntry(null, "<Specify key>"));
+                entries.Add(new ImageResourceComboBoxEntry(null, "Specify key..."));
                 listStore.AppendValues(entries[entries.Count - 1].Image, entries[entries.Count - 1].Label);
                 var comboBox = new ImageResourceComboBox(entries)
                     {
@@ -232,7 +232,11 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
 
         public static void DeleteThumbnails()
         {
-            mThumbnails.Clear();
+            foreach (var key in new System.Collections.Generic.List<string>(mThumbnails.Keys))
+            {
+                mThumbnails[key].Dispose();
+                mThumbnails.Remove(key);
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Destrospean.Common
         {
             get
             {
-                return Settings != null && Settings.ContainsKey(JSONNodeNames.UseAdvancedOpenGLShaders) ? (bool)Settings[JSONNodeNames.UseAdvancedOpenGLShaders] : !Platform.IsWindows || System.Environment.OSVersion.Version.Major > 5;
+                return Settings == null || !Settings.ContainsKey(JSONNodeNames.UseAdvancedOpenGLShaders) || (bool)Settings[JSONNodeNames.UseAdvancedOpenGLShaders];
             }
             set
             {
@@ -28,6 +28,14 @@ namespace Destrospean.Common
                 }
                 Settings[JSONNodeNames.UseAdvancedOpenGLShaders] = value;
                 SaveSettings();
+            }
+        }
+
+        public class GameFolderComparer : IComparer<string>
+        {
+            public int Compare(string a, string b)
+            {
+                return s3pi.Filetable.GameFolders.Games.IndexOf(s3pi.Filetable.GameFolders.byName(a)).CompareTo(s3pi.Filetable.GameFolders.Games.IndexOf(s3pi.Filetable.GameFolders.byName(b)));
             }
         }
 

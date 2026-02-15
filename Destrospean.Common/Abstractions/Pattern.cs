@@ -51,6 +51,14 @@ namespace Destrospean.Common.Abstractions
             }
             private set
             {
+                lock (Lock)
+                {
+                    var patternImageDisposable = mPatternImage as System.IDisposable;
+                    if (patternImageDisposable != null)
+                    {
+                        patternImageDisposable.Dispose();
+                    }
+                }
                 mPatternImage = value;
             }
         }
@@ -90,7 +98,7 @@ namespace Destrospean.Common.Abstractions
             mXmlDocument.LoadXml(new System.IO.StreamReader(s3pi.WrapperDealer.WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry).Stream).ReadToEnd());
             foreach (var complateOverride in patternMaterialBlockCast.ComplateOverrides)
             {
-                mProperties.Add(complateOverride.VariableName, complateOverride);
+                mProperties[complateOverride.VariableName] = complateOverride;
             }
             foreach (XmlNode childNode in mXmlDocument.SelectSingleNode("complate").ChildNodes)
             {
@@ -101,10 +109,10 @@ namespace Destrospean.Common.Abstractions
                         if (grandchildNode.Name == "param")
                         {
                             var key = grandchildNode.Attributes["name"].Value;
-                            PropertiesTyped.Add(key, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
+                            PropertiesTyped[key] = new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value);
                             if (!mProperties.ContainsKey(key))
                             {
-                                mProperties.Add(key, GameObjectPreset.CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock, ParentPackage));
+                                mProperties[key] = GameObjectPreset.CreateComplateOverrideInstance(key, PropertiesTyped[key].DefaultValue, PropertiesTyped[key].Type, (CatalogResource.CatalogResource.MaterialBlock)patternMaterialBlock, ParentPackage);
                             }
                         }
                     }
@@ -127,7 +135,7 @@ namespace Destrospean.Common.Abstractions
             {
                 if (childNode.Name == "value")
                 {
-                    mPropertiesXmlNodes.Add(childNode.Attributes["key"].Value, childNode);
+                    mPropertiesXmlNodes[childNode.Attributes["key"].Value] = childNode;
                 }
             }
             foreach (XmlNode childNode in mXmlDocument.SelectSingleNode("complate").ChildNodes)
@@ -138,7 +146,7 @@ namespace Destrospean.Common.Abstractions
                     {
                         if (grandchildNode.Name == "param")
                         {
-                            PropertiesTyped.Add(grandchildNode.Attributes["name"].Value, new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value));
+                            PropertiesTyped[grandchildNode.Attributes["name"].Value] = new PropertyMeta(grandchildNode.Attributes["type"].Value, grandchildNode.Attributes["default"].Value);
                         }
                     }
                 }

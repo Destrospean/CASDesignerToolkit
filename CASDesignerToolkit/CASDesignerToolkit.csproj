@@ -159,9 +159,6 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="GLWidget">
-      <HintPath>..\libs\GLWidget.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\libs\OpenTK.dll</HintPath>
     </Reference>
@@ -176,6 +173,9 @@
     </Reference>
     <Reference Include="Mono.Cairo">
       <HintPath>..\libs\Mono.Cairo.dll</HintPath>
+    </Reference>
+    <Reference Include="GLWidget">
+      <HintPath>..\libs\GLWidget.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

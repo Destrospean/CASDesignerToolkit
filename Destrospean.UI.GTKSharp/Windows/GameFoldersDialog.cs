@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Destrospean.Common;
 using Gtk;
 using s3pi.Filetable;
 
@@ -29,13 +30,27 @@ namespace Destrospean.DestrospeanCASPEditor
             this.RescaleAndReposition(parent);
             foreach (var game in GameFolders.Games)
             {
-                var path = "";
-                var entry = new Entry
+                var fileChooserButton = new FileChooserButton("Choose Folder for " + game.Longname, FileChooserAction.SelectFolder);
+                object installDirectories;
+                if (ApplicationSettings.Settings.TryGetValue(ApplicationSettings.JSONNodeNames.GameFolders, out installDirectories))
+                {
+                    var installDirectoriesDictionary = installDirectories as IDictionary<string, string>;
+                    if (installDirectoriesDictionary == null)
                     {
-                        Text = InstallDirectories.TryGetValue(game, out path) ? path.Replace('/', System.IO.Path.DirectorySeparatorChar) : ""
-                    };
-                entry.Changed += (sender, e) => SetInstallDirectory(game, entry.Text);
-                Alignment entryAlignment = new Alignment(0, .5f, 1, 0)
+                        Newtonsoft.Json.Linq.JToken path;
+                        fileChooserButton.SetCurrentFolder(((Newtonsoft.Json.Linq.JObject)installDirectories).TryGetValue(game.Name, out path) ? path.ToString().Replace('/', System.IO.Path.DirectorySeparatorChar) : "");
+                    }
+                    else
+                    {
+                        string path;
+                        fileChooserButton.SetCurrentFolder(installDirectoriesDictionary.TryGetValue(game.Name, out path) ? path.Replace('/', System.IO.Path.DirectorySeparatorChar) : "");
+                    }
+                }
+                else
+                {
+                    fileChooserButton.SetCurrentFolder("");
+                }
+                Alignment fileChooserButtonAlignment = new Alignment(0, .5f, 1, 0)
                     {
                         LeftPadding = (uint)WidgetUtils.SmallImageSize,
                     },
@@ -43,15 +58,22 @@ namespace Destrospean.DestrospeanCASPEditor
                     {
                         LeftPadding = (uint)WidgetUtils.SmallImageSize
                     };
-                entryAlignment.Add(entry);
+                fileChooserButtonAlignment.Add(fileChooserButton);
                 labelAlignment.Add(new Label(game.Name == "base" ? "Base Game" : game.Longname.Replace("The Sims 3 ", ""))
                     {
                         UseUnderline = false,
                         Xalign = 0
                     });
                 GameFolderTable.Attach(labelAlignment, 0, 1, GameFolderTable.NRows - 1, GameFolderTable.NRows, AttachOptions.Fill | AttachOptions.Shrink, 0, 0, 0);
-                GameFolderTable.Attach(entryAlignment, 1, 2, GameFolderTable.NRows - 1, GameFolderTable.NRows, AttachOptions.Expand | AttachOptions.Fill, 0, 0, 0);
+                GameFolderTable.Attach(fileChooserButtonAlignment, 1, 2, GameFolderTable.NRows - 1, GameFolderTable.NRows, AttachOptions.Expand | AttachOptions.Fill, 0, 0, 0);
                 GameFolderTable.NRows++;
+                Response += (o, args) =>
+                    {
+                        if (args.ResponseId == ResponseType.Ok)
+                        {
+                            SetInstallDirectory(game, fileChooserButton.Filename ?? "");
+                        }
+                    };
             }
             ShowAll();
         }
@@ -61,20 +83,22 @@ namespace Destrospean.DestrospeanCASPEditor
             var installDirectories = InstallDirectories;
             installDirectories[game] = path;
             var output = "";
-            var outputDictionary = new Dictionary<string, string>();
+            var outputDictionary = new SortedDictionary<string, string>(new ApplicationSettings.GameFolderComparer());
             foreach (var installDirectoryKvp in installDirectories)
             {
                 output += ";" + installDirectoryKvp.Key.Name + "=" + installDirectoryKvp.Value.Replace('\\', '/');
                 outputDictionary.Add(installDirectoryKvp.Key.Name, installDirectoryKvp.Value.Replace('\\', '/'));
             }
             GameFolders.InstallDirs = output.Substring(1);
-            Common.ApplicationSettings.Settings[Common.ApplicationSettings.JSONNodeNames.GameFolders] = outputDictionary;
-            Common.ApplicationSettings.SaveSettings();
+            ApplicationSettings.Settings[ApplicationSettings.JSONNodeNames.GameFolders] = outputDictionary;
+            ApplicationSettings.SaveSettings();
         }
 
         protected void OnOKButtonClicked(object sender, System.EventArgs e)
         {
             Destroy();
+            Destrospean.S3PIExtensions.ResourceUtils.ClearGamePackages();
+            new CacheGenerationWindow(MainWindowBase.Singleton, Icon);
         }
     }
 }

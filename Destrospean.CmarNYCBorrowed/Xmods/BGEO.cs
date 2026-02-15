@@ -638,7 +638,11 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     newSection2[i] = new Section2(hasPosition, hasNormals, offset);
                     offset = 0;
-                    if (hasNormals || hasPosition)
+                    if (hasNormals)
+                    {
+                        offset++;
+                    }
+                    if (hasPosition)
                     {
                         offset++;
                     }
@@ -795,7 +799,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public float[] GetSection3(int section3Index)
         {
-            return section3Index < mSection3.Length ? mSection3[section3Index].DeltaValues : new float[]
+            return -1 < section3Index && section3Index < mSection3.Length ? mSection3[section3Index].DeltaValues : new float[]
             {
                 0,
                 0,

@@ -268,7 +268,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void ImportMesh(LODId lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void ImportMeshGroup(LODId lod, int groupIndex, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             /*
             foreach (var geometryResourceKvp in geometryResources)
@@ -300,7 +300,7 @@ namespace Destrospean.Common.Abstractions
                     {
                         continue;
                     }
-                    var group = wso.Mesh(groupIndex == -1 ? i : 0);
+                    var group = wso.GetMesh(groupIndex == -1 ? i : 0);
                     var vertices = new List<meshExpImp.ModelBlocks.Vertex>();
                     foreach (var extendedVertex in group.GetExtendedVertices())
                     {

@@ -51,7 +51,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return mX == 0d && mY == 0d && mZ == 0d && (mW == 1d || mW == 0d);
+                return mX == 0 && mY == 0 && mZ == 0 && (mW == 1 || mW == 0);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return mX == 0d && mY == 0d && mZ == 0d && mW == 1d;
+                return mX == 0 && mY == 0 && mZ == 0 && mW == 1;
             }
         }
 
@@ -76,7 +76,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new Quaternion(0.7071068f, 0, 0, 0.7071068f);
+                return new Quaternion(.7071068f, 0, 0, .7071068f);
             }
         }
 
@@ -149,9 +149,9 @@ namespace Destrospean.CmarNYCBorrowed
         public void Balance()
         {
             double m = mX * mX - mY * mY - mZ * mZ;
-            if (m <= 1d)
+            if (m <= 1)
             {
-                mW = (float)Math.Sqrt(1d - m);
+                mW = (float)Math.Sqrt(1 - m);
             }
             else
             {
@@ -166,10 +166,10 @@ namespace Destrospean.CmarNYCBorrowed
 
         public Quaternion Inverse()
         {
-            float norm = mX * mX + mY * mY + mZ * mZ + mW * mW;
-            if (norm > 0f)
+            var norm = mX * mX + mY * mY + mZ * mZ + mW * mW;
+            if (norm > 0)
             {
-                Quaternion q = new Quaternion(-mX / norm, -mY / norm, -mZ / norm, mW / norm);
+                var q = new Quaternion(-mX / norm, -mY / norm, -mZ / norm, mW / norm);
                 q.Normalize();
                 return q;
             }
@@ -209,15 +209,15 @@ namespace Destrospean.CmarNYCBorrowed
         public Matrix3D ToMatrix3D()
         {
             var matrix = new float[3, 3];
-            matrix[0, 0] = 1 - (2 * mY * mY) - (2 * mZ * mZ);
-            matrix[0, 1] = (2 * mX * mY) - (2 * mZ * mW);
-            matrix[0, 2] = (2 * mX * mZ) + (2 * mY * mW);
-            matrix[1, 0] = (2 * mX * mY) + (2 * mZ * mW);
-            matrix[1, 1] = 1 - (2 * mX * mX) - (2 * mZ * mZ);
-            matrix[1, 2] = (2 * mY * mZ) - (2 * mX * mW);
-            matrix[2, 0] = (2 * mX * mZ) - (2 * mY * mW);
-            matrix[2, 1] = (2 * mY * mZ) + (2 * mX * mW);
-            matrix[2, 2] = 1 - (2 * mX * mX) - (2 * mY * mY);
+            matrix[0, 0] = 1 - 2 * mY * mY - 2 * mZ * mZ;
+            matrix[0, 1] = 2 * mX * mY - 2 * mZ * mW;
+            matrix[0, 2] = 2 * mX * mZ + 2 * mY * mW;
+            matrix[1, 0] = 2 * mX * mY + 2 * mZ * mW;
+            matrix[1, 1] = 1 - 2 * mX * mX - 2 * mZ * mZ;
+            matrix[1, 2] = 2 * mY * mZ - 2 * mX * mW;
+            matrix[2, 0] = 2 * mX * mZ - 2 * mY * mW;
+            matrix[2, 1] = 2 * mY * mZ + 2 * mX * mW;
+            matrix[2, 2] = 1 - 2 * mX * mX - 2 * mY * mY;
             return new Matrix3D(matrix);
         }
 
@@ -229,17 +229,17 @@ namespace Destrospean.CmarNYCBorrowed
         public Matrix4D ToMatrix4D(Vector3 offset)
         {
             var matrix = new double[4, 4];
-            matrix[0, 0] = 1 - (2d * mY * mY) - (2d * mZ * mZ);
-            matrix[0, 1] = (2d * mX * mY) - (2d * mZ * mW);
-            matrix[0, 2] = (2d * mX * mZ) + (2d * mY * mW);
+            matrix[0, 0] = 1 - 2d * mY * mY - 2d * mZ * mZ;
+            matrix[0, 1] = 2d * mX * mY - 2d * mZ * mW;
+            matrix[0, 2] = 2d * mX * mZ + 2d * mY * mW;
             matrix[0, 3] = offset.X;
-            matrix[1, 0] = (2d * mX * mY) + (2d * mZ * mW);
-            matrix[1, 1] = 1 - (2d * mX * mX) - (2d * mZ * mZ);
-            matrix[1, 2] = (2d * mY * mZ) - (2d * mX * mW);
+            matrix[1, 0] = 2d * mX * mY + 2d * mZ * mW;
+            matrix[1, 1] = 1 - 2d * mX * mX - 2d * mZ * mZ;
+            matrix[1, 2] = 2d * mY * mZ - 2d * mX * mW;
             matrix[1, 3] = offset.Y;
-            matrix[2, 0] = (2d * mX * mZ) - (2d * mY * mW);
-            matrix[2, 1] = (2d * mY * mZ) + (2d * mX * mW);
-            matrix[2, 2] = 1 - (2d * mX * mX) - (2d * mY * mY);
+            matrix[2, 0] = 2d * mX * mZ - 2d * mY * mW;
+            matrix[2, 1] = 2d * mY * mZ + 2d * mX * mW;
+            matrix[2, 2] = 1 - 2d * mX * mX - 2d * mY * mY;
             matrix[2, 3] = offset.Z;
             matrix[3, 0] = 0;
             matrix[3, 1] = 0;
@@ -251,17 +251,17 @@ namespace Destrospean.CmarNYCBorrowed
         public Matrix4D ToMatrix4D(Vector3 offset, Vector3 scale)
         {
             var matrix = new double[4, 4];
-            matrix[0, 0] = scale.X - (2d * mY * mY) - (2d * mZ * mZ);
-            matrix[0, 1] = (2d * mX * mY) - (2d * mZ * mW);
-            matrix[0, 2] = (2d * mX * mZ) + (2d * mY * mW);
+            matrix[0, 0] = scale.X - 2d * mY * mY - 2d * mZ * mZ;
+            matrix[0, 1] = 2d * mX * mY - 2d * mZ * mW;
+            matrix[0, 2] = 2d * mX * mZ + 2d * mY * mW;
             matrix[0, 3] = offset.X;
-            matrix[1, 0] = (2d * mX * mY) + (2d * mZ * mW);
-            matrix[1, 1] = scale.Y - (2d * mX * mX) - (2d * mZ * mZ);
-            matrix[1, 2] = (2d * mY * mZ) - (2d * mX * mW);
+            matrix[1, 0] = 2d * mX * mY + 2d * mZ * mW;
+            matrix[1, 1] = scale.Y - 2d * mX * mX - 2d * mZ * mZ;
+            matrix[1, 2] = 2d * mY * mZ - 2d * mX * mW;
             matrix[1, 3] = offset.Y;
-            matrix[2, 0] = (2d * mX * mZ) - (2d * mY * mW);
-            matrix[2, 1] = (2d * mY * mZ) + (2d * mX * mW);
-            matrix[2, 2] = scale.Z - (2d * mX * mX) - (2d * mY * mY);
+            matrix[2, 0] = 2d * mX * mZ - 2d * mY * mW;
+            matrix[2, 1] = 2d * mY * mZ + 2d * mX * mW;
+            matrix[2, 2] = scale.Z - 2d * mX * mX - 2d * mY * mY;
             matrix[2, 3] = offset.Z;
             matrix[3, 0] = 0;
             matrix[3, 1] = 0;
@@ -282,7 +282,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public Vector3 ToVector3()
         {
-            return new Vector3((float)mX, (float)mY, (float)mZ);
+            return new Vector3(mX, mY, mZ);
         }
     }
 }

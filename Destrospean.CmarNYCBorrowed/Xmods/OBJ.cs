@@ -647,7 +647,7 @@ namespace Destrospean.CmarNYCBorrowed
             var offset = 1;
             for (var i = 0; i < wso.MeshCount; i++)
             {
-                var extendedVertices = wso.Mesh(i).GetExtendedVertices();
+                var extendedVertices = wso.GetMesh(i).GetExtendedVertices();
                 for (var j = 0; j < extendedVertices.Length; j++)
                 {
                     var vertexExtended = extendedVertices[j];
@@ -655,8 +655,8 @@ namespace Destrospean.CmarNYCBorrowed
                     mNormalList.Add(new Normal(vertexExtended.GetNormals()));
                     mUVList.Add(new UV(vertexExtended.GetUVs(), true));
                 }
-                mGroupList.Add(new Group(wso.Mesh(i).MeshName));
-                var facePoints = wso.Mesh(i).FacePoints;
+                mGroupList.Add(new Group(wso.GetMesh(i).MeshName));
+                var facePoints = wso.GetMesh(i).FacePoints;
                 for (var j = 0; j < facePoints.Length; j += 3)
                 {
                     mGroupList[i].AddFace(new Face(new int[]

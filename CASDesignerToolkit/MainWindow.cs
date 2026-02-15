@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
 using Destrospean.Common.Abstractions;
@@ -17,6 +18,8 @@ public partial class MainWindow : RendererMainWindow
 {
     Gdk.Pixbuf mAlphaCheckerboardPixbuf;
 
+    bool mDisableUpdateModels = false;
+
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
     readonly string mOriginalWindowTitle;
@@ -27,6 +30,8 @@ public partial class MainWindow : RendererMainWindow
 
     string mSaveAsPath;
 
+    static object sLock = new object();
+
     public IPackage CurrentPackage;
 
     public Image Image = new Image();
@@ -35,14 +40,31 @@ public partial class MainWindow : RendererMainWindow
     {
         set
         {
-            if (value == NextStateOptions.UnsavedChangesAndUpdateModels)
+            if (value.HasFlag(NextStateOptions.UpdateModels) && !mDisableUpdateModels && GlobalState.GLInitialized)
             {
-                Sim.PreloadedLODsMorphed.Clear();
-            }
-            if (value.HasFlag(NextStateOptions.UpdateModels))
-            {
-                GlobalState.Meshes.Clear();
-                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture);
+                new Thread(() =>
+                    {
+                        lock (sLock)
+                        {
+                            lock (GlobalState.Lock)
+                            {
+                                GlobalState.Locked = true;
+                                GlobalState.Meshes.Clear();
+                                GlobalState.Materials.Clear();
+                                foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                                {
+                                    if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
+                                    {
+                                        ImageUtils.PreloadedGameImages[imageKey].Dispose();
+                                        ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                        Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
+                                    }
+                                }
+                                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                GlobalState.Locked = false;
+                            }
+                        }
+                    }).Start();
                 TreeIter iter;
                 TreeModel model;
                 if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "OBJD")
@@ -79,13 +101,15 @@ public partial class MainWindow : RendererMainWindow
         mOriginalWindowTitle = Title;
         RescaleAndReposition();
         BuildResourceTable();
-        new System.Threading.Thread(ChoosePatternDialog.LoadCache).Start();
-        if (!File.Exists(PatternUtils.CacheFilePath))
+        new Thread(ChoosePatternDialog.LoadCache).Start();
+        new Thread(CASPart.LoadLookupCache).Start();
+        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
-            new CacheGenerationWindow("Please wait as caches are being generated...", this, new Gdk.Pixbuf(System.Reflection.Assembly.GetExecutingAssembly(), "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png"));
+            new CacheGenerationWindow(this, Icon);
         }
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
-        ResourcePropertyNotebook.RemovePage(0);PrepareGLWidget();
+        ResourcePropertyNotebook.RemovePage(0);
+        PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
         ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
         Image.SetSizeRequest(1024, 1024);
@@ -98,7 +122,6 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            GlobalState.Meshes.Clear();
             var flagNotebook = new Notebook
                 {
                     ShowTabs = false
@@ -135,6 +158,10 @@ public partial class MainWindow : RendererMainWindow
                     Xalign = .5f
                 }),
             resetViewButton = new Button("Reset View");
+            var showMaternityPartsOnlyCheckButton = new CheckButton("Maternity Mode")
+                {
+                    Active = Sim.ShowMaternityPartsOnly
+                };
             addPresetButton.Clicked += (sender, e) => mPresetNotebook.AddPreset();
             exportTextureButton.Clicked += (sender, e) =>
                 {
@@ -160,6 +187,11 @@ public partial class MainWindow : RendererMainWindow
                     GlobalState.CurrentRotation = OpenTK.Vector3.Zero;
                     mFOV = OpenTK.MathHelper.DegreesToRadians(30);
                 };
+            showMaternityPartsOnlyCheckButton.Toggled += (sender, e) =>
+                {
+                    Sim.ShowMaternityPartsOnly = showMaternityPartsOnlyCheckButton.Active;
+                    RandomizeCASParts();
+                };
             flagNotebook.SwitchPage += (o, args) =>
                 {
                     nextButton.Sensitive = flagNotebook.CurrentPage < flagNotebook.NPages - 1;
@@ -167,22 +199,29 @@ public partial class MainWindow : RendererMainWindow
                 };
             Alignment addPresetButtonAlignment = new Alignment(.5f, .5f, 0, 0),
             nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            showMaternityPartsOnlyCheckButtonAlignment = new Alignment(0, 0, 0, 0)
+                {
+                    LeftPadding = (uint)(6 * WidgetUtils.Scale)
+                };
             addPresetButtonAlignment.Add(addPresetButton);
             nextButtonAlignment.Add(nextButton);
             prevButtonAlignment.Add(prevButton);
+            showMaternityPartsOnlyCheckButtonAlignment.Add(showMaternityPartsOnlyCheckButton);
             flagPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackEnd(resetViewButton, false, true, 4);
             flagPageButtonHBox.PackEnd(exportTextureButton, false, true, 4);
             buttonHBox.PackStart(flagPageButtonHBox, false, true, 0);
+            buttonHBox.PackStart(showMaternityPartsOnlyCheckButtonAlignment, false, true, 0);
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
+            var casPart = castableObject as CASPart;
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
+                    NextState = NextStateOptions.UnsavedChanges;
                     castableObject.ClearCurrentRig();
-                    NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    RandomizeCASParts();
                 };
-            var casPart = castableObject as CASPart;
             if (casPart != null)
             {
                 Sim.CurrentCASPart = casPart;
@@ -251,11 +290,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
             }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) =>
-                {
-                    Sim.PreloadedLODsMorphed.Clear();
-                    NextState = NextStateOptions.UpdateModels;
-                };
+            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in casPart.LODs)
             {
@@ -264,7 +299,10 @@ public partial class MainWindow : RendererMainWindow
                         ShowTabs = false
                     };
                 var actionGroup = new ActionGroup("Default");
-                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    },
                 deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
                     {
                         Sensitive = lodKvp.Value.Count > 1
@@ -275,8 +313,14 @@ public partial class MainWindow : RendererMainWindow
                 importGEOMAction = new Gtk.Action("ImportGEOMAction", "Import GEOM", null, Stock.Directory),
                 importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
                 importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
-                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
-                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
+                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    });
+                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory)
+                    {
+                        Sensitive = lodKvp.Value.Count > 0
+                    });
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
                 actionGroup.Add(addMeshGroupAction);
                 actionGroup.Add(deleteMeshGroupAction);
@@ -312,11 +356,17 @@ public partial class MainWindow : RendererMainWindow
                 Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
                     {
                         Xalign = .5f
-                    }),
+                    })
+                    {
+                        Sensitive = false
+                    },
                 prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
                     {
                         Xalign = .5f
-                    });
+                    })
+                    {
+                        Sensitive = false
+                    };
                 var pageIndexLabel = new Label
                     {
                         Xalign = .5f
@@ -386,7 +436,10 @@ public partial class MainWindow : RendererMainWindow
                             fileChooserDialog.AddFilter(fileFilter);
                             if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                             {
-                                casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                lock (SimBase.Lock)
+                                {
+                                    casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                }
                             }
                             fileChooserDialog.Destroy();
                         }
@@ -438,7 +491,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             try
                             {
-                                casPart.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
+                                casPart.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             catch (Exception ex)
                             {
@@ -462,7 +515,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         Value = Sim.Special
                     };
-                Destrospean.CmarNYCBorrowed.Action changeOtherSlidersAndUpdateModels = delegate
+                Destrospean.CmarNYCBorrowed.Action changeOtherSliders = delegate
                     {
                         for (var i = 0; i < casPart.LODs.Count; i++)
                         {
@@ -489,23 +542,22 @@ public partial class MainWindow : RendererMainWindow
                                 }
                             }
                         }
-                        ModelsNeedUpdated = true;
                     };
                 fatnessHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Fat = fatnessHScale.Value > 0 ? (float)fatnessHScale.Value : 0;
                         Sim.Thin = fatnessHScale.Value < 0 ? (float)-fatnessHScale.Value : 0;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 fitnessHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Fit = (float)fitnessHScale.Value;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 specialHScale.ValueChanged += (sender, e) =>
                     {
                         Sim.Special = (float)specialHScale.Value;
-                        changeOtherSlidersAndUpdateModels();
+                        changeOtherSliders();
                     };
                 var meshGroupPageButtonHBox = new HBox(false, 0);
                 meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
@@ -526,8 +578,8 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label("LOD " + lodKvp.Key.ToString()));
-                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x, casPart.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
-                if (lodKvp.Value == new List<List<GEOM>>(casPart.LODs.Values)[startLODPageIndex])
+                lodKvp.Value.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, x.GEOM, casPart.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
+                if (lodKvp.Value == new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[startLODPageIndex])
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
                     meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
@@ -813,7 +865,7 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
-                    GlobalState.Meshes.Clear();
+                    mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();
                     DrawImage();
@@ -843,6 +895,8 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
+                                mDisableUpdateModels = false;
+                                RandomizeCASParts();
                                 break;
                             case "OBJD":
                                 GLWidget.Show();
@@ -857,6 +911,18 @@ public partial class MainWindow : RendererMainWindow
             ProgramUtils.WriteError(ex);
             throw;
         }
+    }
+
+    void RandomizeCASParts()
+    {
+        new Thread(() =>
+            {
+                lock (sLock)
+                {
+                    Sim.RandomizeCASParts();
+                    Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
+                }
+            }).Start();
     }
 
     void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)
@@ -882,7 +948,11 @@ public partial class MainWindow : RendererMainWindow
         Sim.CurrentCASPart = null;
         mSaveAsPath = null;
         GlobalState.Meshes.Clear();
-        PreloadedData.CASParts.Clear();
+        foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
+        {
+            PreloadedData.CASParts[key].Dispose();
+            PreloadedData.CASParts.Remove(key);
+        }
         PreloadedData.GameObjects.Clear();
         PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
@@ -890,13 +960,9 @@ public partial class MainWindow : RendererMainWindow
         PreloadedData.MLODs.Clear();
         PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
-        Sim.PreloadedLODsMorphed.Clear();
         GlobalState.Materials.Clear();
         GlobalState.DeleteTextures();
-        ImageUtils.PreloadedGameImagePixbufs.Clear();
-        ImageUtils.PreloadedGameImages.Clear();
-        ImageUtils.PreloadedImagePixbufs.Clear();
-        ImageUtils.PreloadedImages.Clear();
+        ImageUtils.DeletePreloadedImages();
         ImageResourceComboBox.DeleteThumbnails();
     }
 
@@ -1118,9 +1184,12 @@ public partial class MainWindow : RendererMainWindow
             {
                 var stream = new MemoryStream();
                 PreloadedData.GEOMs[geometryResourceKvp.Key].Write(new BinaryWriter(stream));
-                var resourceIndexEntry = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key).ResourceIndexEntry;
-                CurrentPackage.AddResource(resourceIndexEntry, stream, false);
-                CurrentPackage.DeleteResource(resourceIndexEntry);
+                var evaluated = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
+                if (evaluated.Package == CurrentPackage)
+                {
+                    CurrentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
+                    CurrentPackage.DeleteResource(evaluated.ResourceIndexEntry);
+                }
             }
             foreach (var liteResourceKvp in PreloadedData.LITEs)
             {
@@ -1393,6 +1462,6 @@ public partial class MainWindow : RendererMainWindow
     protected void OnUseAdvancedShadersActionToggled(object sender, EventArgs e)
     {
         ApplicationSettings.UseAdvancedOpenGLShaders = UseAdvancedShadersAction.Active;
-        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "lit_advanced" : "textured";
+        GlobalState.ActiveShader = UseAdvancedShadersAction.Active ? "lit" : "textured";
     }
 }
