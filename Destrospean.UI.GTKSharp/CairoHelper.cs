@@ -64,9 +64,8 @@ namespace Destrospean.DestrospeanCASPEditor
 
             public Context Create(Gdk.Drawable drawable)
             {
-                var state = gdk_cairo_create(drawable == null ? IntPtr.Zero : drawable.Handle);
 #pragma warning disable 0612
-                return new Context(state);
+                return new Context(gdk_cairo_create(drawable == null ? IntPtr.Zero : drawable.Handle));
 #pragma warning restore 0612
             }
 
