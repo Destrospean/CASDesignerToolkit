@@ -788,7 +788,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             try
                             {
-                                gameObject.ImportMesh(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                             }
                             catch (Exception ex)
                             {
