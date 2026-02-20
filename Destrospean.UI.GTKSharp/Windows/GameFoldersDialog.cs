@@ -97,7 +97,7 @@ namespace Destrospean.DestrospeanCASPEditor
         protected void OnOKButtonClicked(object sender, System.EventArgs e)
         {
             Destroy();
-            Destrospean.S3PIExtensions.ResourceUtils.ClearGamePackages();
+            S3PIExtensions.ResourceUtils.ClearGamePackages();
             new CacheGenerationWindow(MainWindowBase.Singleton, Icon);
         }
     }
