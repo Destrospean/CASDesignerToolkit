@@ -251,6 +251,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     var hasTransparency = false;
                     switch ((CmarNYCBorrowed.Shader)geom.ShaderHash)
                     {
+                        case CmarNYCBorrowed.Shader.CasSimHair:
+                        case CmarNYCBorrowed.Shader.CasSimHairSimple:
                         case CmarNYCBorrowed.Shader.SimAlphaBlended:
                         case CmarNYCBorrowed.Shader.SimEyelashes:
                         case CmarNYCBorrowed.Shader.SimGlass:

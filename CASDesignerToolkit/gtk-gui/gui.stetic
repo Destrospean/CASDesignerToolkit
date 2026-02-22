@@ -78,9 +78,9 @@
         <property name="Sensitive">False</property>
         <property name="ShortLabel" translatable="yes">Resource</property>
       </action>
-      <action id="ImportResourceAction">
+      <action id="directoryAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Import</property>
+        <property name="Label" translatable="yes">Import DDS</property>
         <property name="ShortLabel" translatable="yes">Import</property>
         <property name="StockId">gtk-directory</property>
         <signal name="Activated" handler="OnImportResourceActionActivated" />
@@ -133,7 +133,7 @@
                 <node type="Menuitem" action="QuitAction" />
               </node>
               <node type="Menu" action="ResourceAction">
-                <node type="Menuitem" action="ImportResourceAction" />
+                <node type="Menuitem" action="directoryAction" />
                 <node type="Menuitem" action="ReplaceResourceAction" />
                 <node type="Menuitem" action="DeleteResourceAction" />
               </node>
@@ -204,6 +204,7 @@
                             <property name="WidthRequest">330</property>
                             <property name="CanFocus">True</property>
                             <property name="ShowScrollbars">True</property>
+                            <property name="EnableSearch">False</property>
                           </widget>
                         </child>
                       </widget>

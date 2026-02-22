@@ -25,7 +25,7 @@ public partial class MainWindow
 	
 	private global::Gtk.Action ResourceAction;
 	
-	private global::Gtk.Action ImportResourceAction;
+	private global::Gtk.Action directoryAction;
 	
 	private global::Gtk.Action ReplaceResourceAction;
 	
@@ -97,9 +97,9 @@ public partial class MainWindow
 		this.ResourceAction.Sensitive = false;
 		this.ResourceAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Resource");
 		w1.Add (this.ResourceAction, null);
-		this.ImportResourceAction = new global::Gtk.Action ("ImportResourceAction", global::Mono.Unix.Catalog.GetString ("Import"), null, "gtk-directory");
-		this.ImportResourceAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Import");
-		w1.Add (this.ImportResourceAction, null);
+		this.directoryAction = new global::Gtk.Action ("directoryAction", global::Mono.Unix.Catalog.GetString ("Import DDS"), null, "gtk-directory");
+		this.directoryAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Import");
+		w1.Add (this.directoryAction, null);
 		this.ReplaceResourceAction = new global::Gtk.Action ("ReplaceResourceAction", global::Mono.Unix.Catalog.GetString ("Replace"), null, "gtk-convert");
 		this.ReplaceResourceAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Replace");
 		w1.Add (this.ReplaceResourceAction, null);
@@ -124,7 +124,7 @@ public partial class MainWindow
 		this.MainVBox.Name = "MainVBox";
 		this.MainVBox.Spacing = 6;
 		// Container child MainVBox.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString (@"<ui><menubar name='MainMenuBar'><menu name='FileAction' action='FileAction'><menuitem name='OpenAction' action='OpenAction'/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><menuitem name='CloseAction' action='CloseAction'/><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='ResourceAction' action='ResourceAction'><menuitem name='ImportResourceAction' action='ImportResourceAction'/><menuitem name='ReplaceResourceAction' action='ReplaceResourceAction'/><menuitem name='DeleteResourceAction' action='DeleteResourceAction'/></menu><menu name='SettingsAction' action='SettingsAction'><menuitem name='GameFoldersAction' action='GameFoldersAction'/><menuitem name='UseAdvancedShadersAction' action='UseAdvancedShadersAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString (@"<ui><menubar name='MainMenuBar'><menu name='FileAction' action='FileAction'><menuitem name='OpenAction' action='OpenAction'/><menuitem name='SaveAction' action='SaveAction'/><menuitem name='SaveAsAction' action='SaveAsAction'/><menuitem name='CloseAction' action='CloseAction'/><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='ResourceAction' action='ResourceAction'><menuitem name='directoryAction' action='directoryAction'/><menuitem name='ReplaceResourceAction' action='ReplaceResourceAction'/><menuitem name='DeleteResourceAction' action='DeleteResourceAction'/></menu><menu name='SettingsAction' action='SettingsAction'><menuitem name='GameFoldersAction' action='GameFoldersAction'/><menuitem name='UseAdvancedShadersAction' action='UseAdvancedShadersAction'/></menu></menubar></ui>");
 		this.MainMenuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/MainMenuBar")));
 		this.MainMenuBar.Name = "MainMenuBar";
 		this.MainVBox.Add (this.MainMenuBar);
@@ -173,6 +173,7 @@ public partial class MainWindow
 		this.ResourceTreeView.WidthRequest = 330;
 		this.ResourceTreeView.CanFocus = true;
 		this.ResourceTreeView.Name = "ResourceTreeView";
+		this.ResourceTreeView.EnableSearch = false;
 		this.ScrolledWindow.Add (this.ResourceTreeView);
 		this.SecondHPaned.Add (this.ScrolledWindow);
 		global::Gtk.Paned.PanedChild w6 = ((global::Gtk.Paned.PanedChild)(this.SecondHPaned [this.ScrolledWindow]));
@@ -227,7 +228,7 @@ public partial class MainWindow
 		this.CloseAction.Activated += new global::System.EventHandler (this.OnCloseActionActivated);
 		this.QuitAction.Activated += new global::System.EventHandler (this.OnQuitActionActivated);
 		this.GameFoldersAction.Activated += new global::System.EventHandler (this.OnGameFoldersActionActivated);
-		this.ImportResourceAction.Activated += new global::System.EventHandler (this.OnImportResourceActionActivated);
+		this.directoryAction.Activated += new global::System.EventHandler (this.OnImportResourceActionActivated);
 		this.ReplaceResourceAction.Activated += new global::System.EventHandler (this.OnReplaceResourceActionActivated);
 		this.DeleteResourceAction.Activated += new global::System.EventHandler (this.OnDeleteResourceActionActivated);
 		this.UseAdvancedShadersAction.Toggled += new global::System.EventHandler (this.OnUseAdvancedShadersActionToggled);
