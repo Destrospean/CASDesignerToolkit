@@ -63,14 +63,19 @@ namespace Destrospean.Common.Abstractions
         {
             get
             {
-                var stream = new MemoryStream();
-                mXmlDocument.Save(new XmlTextWriter(stream, System.Text.Encoding.UTF8)
+                using (var stream = new MemoryStream())
+                {
+                    mXmlDocument.Save(new XmlTextWriter(stream, System.Text.Encoding.UTF8)
+                        {
+                            Formatting = Formatting.Indented
+                        });
+                    stream.Position = 0;
+                    using (var reader = new StreamReader(stream))
                     {
-                        Formatting = Formatting.Indented
-                    });
-                stream.Position = 0;
-                var text = new StreamReader(stream).ReadToEnd();
-                return new StringReader(text.Substring(text.IndexOf("<preset>")));
+                        var text = reader.ReadToEnd();
+                        return new StringReader(text.Substring(text.IndexOf("<preset>")));
+                    }
+                }
             }
         }
 

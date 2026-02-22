@@ -24,6 +24,7 @@
                     }
                     MainWindowBase.Singleton.Sensitive = true;
                     Destroy();
+                    Dispose();
                 }).Start();
         }
 

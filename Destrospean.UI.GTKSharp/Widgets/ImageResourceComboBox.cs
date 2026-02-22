@@ -203,6 +203,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                 comboBox.Active = comboBoxLastActive;
                             }
                             textEntryDialog.Destroy();
+                            textEntryDialog.Dispose();
                         }
                         else
                         {

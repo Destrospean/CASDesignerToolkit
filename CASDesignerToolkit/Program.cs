@@ -6,6 +6,7 @@
         {
             try
             {
+                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "error.log", true));
                 if (Common.Platform.IsWindows)
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))

@@ -99,6 +99,7 @@ namespace Destrospean.DestrospeanCASPEditor
             Destroy();
             S3PIExtensions.ResourceUtils.ClearGamePackages();
             new CacheGenerationWindow(MainWindowBase.Singleton, Icon);
+            Dispose();
         }
     }
 }

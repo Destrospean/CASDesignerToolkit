@@ -68,7 +68,10 @@ namespace Destrospean.Common.Abstractions
                 try
                 {   
                     var defaultPresetResourceEvaluated = ParentPackage.EvaluateResourceKey(DefaultPresetKey);
-                    DefaultPreset = new CASPartPreset(this, new System.IO.StreamReader(((s3pi.Interfaces.APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)));
+                    using (var reader = new StreamReader(((s3pi.Interfaces.APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)))
+                    {
+                        DefaultPreset = new CASPartPreset(this, reader);
+                    }
                 }
                 catch (ResourceIndexEntryNotFoundException)
                 {
@@ -207,7 +210,10 @@ namespace Destrospean.Common.Abstractions
                     }
                     using (var fileStream = File.Create(filename + extension))
                     {
-                        new BinaryWriter(fileStream).Write(LODs[lod].Resource.AsBytes);
+                        using (var writer = new BinaryWriter(fileStream))
+                        {
+                            writer.Write(LODs[lod].Resource.AsBytes);
+                        }
                     }
                     break;
                 case MeshFileType.OBJ:
@@ -257,10 +263,16 @@ namespace Destrospean.Common.Abstractions
                         switch (meshFileType)
                         {
                             case MeshFileType.OBJ:
-                                new OBJ(wso).Write(new StreamWriter(fileStream));
+                                using (var writer = new StreamWriter(fileStream))
+                                {
+                                    new OBJ(wso).Write(writer);
+                                }
                                 break;
                             case MeshFileType.WSO:
-                                wso.Write(new BinaryWriter(fileStream));
+                                using (var writer = new BinaryWriter(fileStream))
+                                {
+                                    wso.Write(writer);
+                                }
                                 break;
                         }
                     }
@@ -289,6 +301,7 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
+            /*
             var mlod = (MLOD)((GenericRCOLResource)LODs[lod].Resource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
@@ -325,6 +338,7 @@ namespace Destrospean.Common.Abstractions
                 LoadLODs(mlodResources, modlResources, vpxyResources);
                 updateUICallback(this, new List<LODId>(LODs.Keys).IndexOf(lod), groupIndex);
             }
+            */
         }
 
         public void LoadLODs(Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
@@ -355,7 +369,10 @@ namespace Destrospean.Common.Abstractions
                 {
                     case "_RIG":
                         var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
-                        mCurrentRig = new Rig(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                        using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
+                        {
+                            mCurrentRig = new Rig(reader);
+                        }
                         break;
                     case "MODL":
                         var modlResourceIndexEntry = ParentPackage.GetResourceIndexEntry(entry01.ParentTGIBlocks[entry01.TGIIndex]);

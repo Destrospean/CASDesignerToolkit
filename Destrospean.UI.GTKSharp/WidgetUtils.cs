@@ -418,6 +418,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         }
                         addMaterialPropertyDialog.Destroy();
+                        addMaterialPropertyDialog.Dispose();
                     };
                 table.Attach(addPropertyButton, 0, 2, table.NRows - 1, table.NRows, AttachOptions.Fill, 0, 0, 0);
                 table.NRows++;
@@ -714,6 +715,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         }
                         addMaterialPropertyDialog.Destroy();
+                        addMaterialPropertyDialog.Dispose();
                     };
                 table.Attach(addPropertyButton, 0, 2, table.NRows - 1, table.NRows, AttachOptions.Fill, 0, 0, 0);
                 table.NRows++;

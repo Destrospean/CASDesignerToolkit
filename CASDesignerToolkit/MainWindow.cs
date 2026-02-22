@@ -179,6 +179,7 @@ public partial class MainWindow : RendererMainWindow
                         castableObject.AllPresets[mPresetNotebook.CurrentPage].Texture.Save(fileChooserDialog.Filename + (fileChooserDialog.Filename.ToLowerInvariant().EndsWith(".png") ? "" : ".png"), System.Drawing.Imaging.ImageFormat.Png);
                     }
                     fileChooserDialog.Destroy();
+                    fileChooserDialog.Dispose();
                 };
             nextButton.Clicked += (sender, e) => flagNotebook.NextPage();
             prevButton.Clicked += (sender, e) => flagNotebook.PrevPage();
@@ -412,6 +413,7 @@ public partial class MainWindow : RendererMainWindow
                                 casPart.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
                         }
                         catch (Exception ex)
                         {
@@ -446,6 +448,7 @@ public partial class MainWindow : RendererMainWindow
                                 }
                             }
                             fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
                         }
                         catch (Exception ex)
                         {
@@ -462,6 +465,8 @@ public partial class MainWindow : RendererMainWindow
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
+                            child.Destroy();
+                            child.Dispose();
                         }
                         BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex + 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
@@ -475,6 +480,8 @@ public partial class MainWindow : RendererMainWindow
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
+                            child.Destroy();
+                            child.Dispose();
                         }
                         BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
@@ -504,6 +511,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                         }
                         fileChooserDialog.Destroy();
+                        fileChooserDialog.Dispose();
                     };
                 importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
                 importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
@@ -878,10 +886,14 @@ public partial class MainWindow : RendererMainWindow
                     foreach (var child in ResourcePropertyTable.Children)
                     {
                         ResourcePropertyTable.Remove(child);
+                        child.Destroy();
+                        child.Dispose();
                     }
-                    while (ResourcePropertyNotebook.NPages > 0)
+                    foreach (var child in ResourcePropertyNotebook.Children)
                     {
-                        ResourcePropertyNotebook.RemovePage(0);
+                        ResourcePropertyNotebook.Remove(child);
+                        child.Destroy();
+                        child.Dispose();
                     }
                     TreeIter iter;
                     TreeModel model;
@@ -938,6 +950,8 @@ public partial class MainWindow : RendererMainWindow
         foreach (var child in ResourcePropertyNotebook.Children)
         {
             ResourcePropertyNotebook.Remove(child);
+            child.Destroy();
+            child.Dispose();
         }
         var casPart = castableObject as CASPart;
         if (casPart == null)
@@ -1009,10 +1023,14 @@ public partial class MainWindow : RendererMainWindow
             foreach (var child in ResourcePropertyTable.Children)
             {
                 ResourcePropertyTable.Remove(child);
+                child.Destroy();
+                child.Dispose();
             }
-            while (ResourcePropertyNotebook.NPages > 0)
+            foreach (var child in ResourcePropertyNotebook.Children)
             {
-                ResourcePropertyNotebook.RemovePage(0);
+                ResourcePropertyNotebook.Remove(child);
+                child.Destroy();
+                child.Dispose();
             }
             foreach (var action in new Gtk.Action[]
                 {
@@ -1068,7 +1086,10 @@ public partial class MainWindow : RendererMainWindow
                     case "GEOM":
                         if (!PreloadedData.GEOMs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.GEOMs[key] = new GEOM(new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)));
+                            using (var reader = new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)))
+                            {
+                                PreloadedData.GEOMs[key] = new GEOM(reader);
+                            }
                         }
                         break;
                     /*
@@ -1203,7 +1224,10 @@ public partial class MainWindow : RendererMainWindow
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
                 var stream = new MemoryStream();
-                PreloadedData.GEOMs[geometryResourceKvp.Key].Write(new BinaryWriter(stream));
+                using (var writer = new BinaryWriter(stream))
+                {
+                    PreloadedData.GEOMs[geometryResourceKvp.Key].Write(writer);
+                }
                 var evaluated = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
                 if (evaluated.Package == CurrentPackage)
                 {
@@ -1331,6 +1355,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnOpenActionActivated(object sender, EventArgs e)
@@ -1374,6 +1399,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnQuitActionActivated(object sender, EventArgs e)
@@ -1430,6 +1456,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     [GLib.ConnectBefore]
@@ -1477,6 +1504,7 @@ public partial class MainWindow : RendererMainWindow
             AddFilePathToWindowTitle(path);
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnUseAdvancedShadersActionToggled(object sender, EventArgs e)
