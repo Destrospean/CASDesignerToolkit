@@ -177,6 +177,7 @@ public partial class MainWindow : RendererMainWindow
                         castableObject.AllPresets[mPresetNotebook.CurrentPage].Texture.Save(fileChooserDialog.Filename + (fileChooserDialog.Filename.ToLowerInvariant().EndsWith(".png") ? "" : ".png"), System.Drawing.Imaging.ImageFormat.Png);
                     }
                     fileChooserDialog.Destroy();
+                    fileChooserDialog.Dispose();
                 };
             nextButton.Clicked += (sender, e) => flagNotebook.NextPage();
             prevButton.Clicked += (sender, e) => flagNotebook.PrevPage();
@@ -408,6 +409,7 @@ public partial class MainWindow : RendererMainWindow
                                 casPart.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.GEOMs, PreloadedData.VPXYs);
                             }
                             fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
                         }
                         catch (Exception ex)
                         {
@@ -442,6 +444,7 @@ public partial class MainWindow : RendererMainWindow
                                 }
                             }
                             fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
                         }
                         catch (Exception ex)
                         {
@@ -458,6 +461,8 @@ public partial class MainWindow : RendererMainWindow
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
+                            child.Destroy();
+                            child.Dispose();
                         }
                         BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex + 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
@@ -471,6 +476,8 @@ public partial class MainWindow : RendererMainWindow
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
+                            child.Destroy();
+                            child.Dispose();
                         }
                         BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
@@ -500,6 +507,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                         }
                         fileChooserDialog.Destroy();
+                        fileChooserDialog.Dispose();
                     };
                 importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
                 importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
@@ -872,10 +880,14 @@ public partial class MainWindow : RendererMainWindow
                     foreach (var child in ResourcePropertyTable.Children)
                     {
                         ResourcePropertyTable.Remove(child);
+                        child.Destroy();
+                        child.Dispose();
                     }
-                    while (ResourcePropertyNotebook.NPages > 0)
+                    foreach (var child in ResourcePropertyNotebook.Children)
                     {
-                        ResourcePropertyNotebook.RemovePage(0);
+                        ResourcePropertyNotebook.Remove(child);
+                        child.Destroy();
+                        child.Dispose();
                     }
                     TreeIter iter;
                     TreeModel model;
@@ -930,6 +942,8 @@ public partial class MainWindow : RendererMainWindow
         foreach (var child in ResourcePropertyNotebook.Children)
         {
             ResourcePropertyNotebook.Remove(child);
+            child.Destroy();
+            child.Dispose();
         }
         var casPart = castableObject as CASPart;
         if (casPart == null)
@@ -1001,10 +1015,14 @@ public partial class MainWindow : RendererMainWindow
             foreach (var child in ResourcePropertyTable.Children)
             {
                 ResourcePropertyTable.Remove(child);
+                child.Destroy();
+                child.Dispose();
             }
-            while (ResourcePropertyNotebook.NPages > 0)
+            foreach (var child in ResourcePropertyNotebook.Children)
             {
-                ResourcePropertyNotebook.RemovePage(0);
+                ResourcePropertyNotebook.Remove(child);
+                child.Destroy();
+                child.Dispose();
             }
             foreach (var action in new Gtk.Action[]
                 {
@@ -1058,7 +1076,10 @@ public partial class MainWindow : RendererMainWindow
                     case "GEOM":
                         if (!PreloadedData.GEOMs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.GEOMs[key] = new GEOM(new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)));
+                            using (var reader = new BinaryReader(((APackage)CurrentPackage).GetResource(resourceIndexEntry)))
+                            {
+                                PreloadedData.GEOMs[key] = new GEOM(reader);
+                            }
                         }
                         break;
                     case "LITE":
@@ -1112,6 +1133,41 @@ public partial class MainWindow : RendererMainWindow
             ProgramUtils.WriteError(ex);
             throw;
         }
+    }
+
+    public void ReplaceResource(IResourceIndexEntry resourceIndexEntry)
+    {
+        var fileChooserDialog = new FileChooserDialog("Replace Resource", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+        {
+            try
+            {
+                var tempResourceIndexEntry = CurrentPackage.AddResource(fileChooserDialog.Filename, resourceIndexEntry, false);
+                CurrentPackage.ResolveResourceType(tempResourceIndexEntry);
+                CurrentPackage.ReplaceResource(resourceIndexEntry, WrapperDealer.GetResource(0, CurrentPackage, tempResourceIndexEntry));
+                CurrentPackage.DeleteResource(tempResourceIndexEntry);
+                ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
+                RefreshWidgets(false);
+                foreach (var casPartKvp in PreloadedData.CASParts)
+                {
+                    casPartKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
+                }
+                /*
+                foreach (var gameObjectKvp in PreloadedData.GameObjects)
+                {
+                    gameObjectKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
+                }
+                */
+                NextState = NextStateOptions.UnsavedChanges;
+            }
+            catch (Exception ex)
+            {
+                ProgramUtils.WriteError(ex);
+                throw;
+            }
+        }
+        fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     public override void RescaleAndReposition(bool skipRescale = false)
@@ -1183,7 +1239,10 @@ public partial class MainWindow : RendererMainWindow
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
                 var stream = new MemoryStream();
-                PreloadedData.GEOMs[geometryResourceKvp.Key].Write(new BinaryWriter(stream));
+                using (var writer = new BinaryWriter(stream))
+                {
+                    PreloadedData.GEOMs[geometryResourceKvp.Key].Write(writer);
+                }
                 var evaluated = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
                 if (evaluated.Package == CurrentPackage)
                 {
@@ -1297,7 +1356,13 @@ public partial class MainWindow : RendererMainWindow
 
     protected void OnImportResourceActionActivated(object sender, EventArgs e)
     {
-        var fileChooserDialog = new FileChooserDialog("Import Resource", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+        var fileChooserDialog = new FileChooserDialog("Import Image Resource", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+        var fileFilter = new FileFilter
+            {
+                Name = "DirectDraw Surface"
+            };
+        fileFilter.AddPattern("*.dds");
+        fileChooserDialog.AddFilter(fileFilter);
         if (fileChooserDialog.Run() == (int)ResponseType.Accept)
         {
             try
@@ -1313,6 +1378,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnOpenActionActivated(object sender, EventArgs e)
@@ -1356,6 +1422,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnQuitActionActivated(object sender, EventArgs e)
@@ -1378,38 +1445,10 @@ public partial class MainWindow : RendererMainWindow
 
     protected void OnReplaceResourceActionActivated(object sender, EventArgs e)
     {
-        var fileChooserDialog = new FileChooserDialog("Replace Resource", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-        {
-            try
-            {
-                TreeIter iter;
-                TreeModel model;
-                ResourceTreeView.Selection.GetSelected(out model, out iter);
-                IResourceIndexEntry resourceIndexEntry = CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)),
-                tempResourceIndexEntry = CurrentPackage.AddResource(fileChooserDialog.Filename, resourceIndexEntry, false);
-                CurrentPackage.ResolveResourceType(tempResourceIndexEntry);
-                CurrentPackage.ReplaceResource(resourceIndexEntry, WrapperDealer.GetResource(0, CurrentPackage, tempResourceIndexEntry));
-                CurrentPackage.DeleteResource(tempResourceIndexEntry);
-                ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
-                RefreshWidgets(false);
-                foreach (var casPartKvp in PreloadedData.CASParts)
-                {
-                    casPartKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
-                }
-                foreach (var gameObjectKvp in PreloadedData.GameObjects)
-                {
-                    gameObjectKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
-                }
-                NextState = NextStateOptions.UnsavedChanges;
-            }
-            catch (Exception ex)
-            {
-                ProgramUtils.WriteError(ex);
-                throw;
-            }
-        }
-        fileChooserDialog.Destroy();
+        TreeIter iter;
+        TreeModel model;
+        ResourceTreeView.Selection.GetSelected(out model, out iter);
+        ReplaceResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
     }
 
     [GLib.ConnectBefore]
@@ -1428,9 +1467,33 @@ public partial class MainWindow : RendererMainWindow
                     ResourceTreeView.Selection.SelectIter(iter);
                     break;
                 case 3:
-                    //var resourceIndexEntry = (IResourceIndexEntry)ResourceListStore.GetValue(iter, 4);
-                    //Console.WriteLine(resourceIndexEntry.ReverseEvaluateResourceKey());
-                    break;
+                    var uiManager = new UIManager();
+                    var actionGroup = new ActionGroup("Default");
+                    Gtk.Action deleteResourceAction = new Gtk.Action("DeleteResourceAction", "Delete", null, Stock.Delete),
+                    replaceResourceAction = new Gtk.Action("ReplaceResourceAction", "Replace", null, Stock.Convert);
+                    actionGroup.Add(deleteResourceAction);
+                    actionGroup.Add(replaceResourceAction);
+                    uiManager.InsertActionGroup(actionGroup, 0);
+                    uiManager.AddUiFromString(@"
+                        <ui>
+                            <popup name='ResourcePopup'>
+                                <menuitem name='ReplaceResourceAction' action='ReplaceResourceAction'/>
+                                <menuitem name='DeleteResourceAction' action='DeleteResourceAction'/>
+                            </popup>
+                        </ui>");
+                    var menu = (Menu)uiManager.GetWidget("/ResourcePopup");
+                    menu.ShowAll();
+                    var resourceIndexEntry = (IResourceIndexEntry)ResourceListStore.GetValue(iter, 4);
+                    deleteResourceAction.Activated += (sender, e) =>
+                        {
+                            CurrentPackage.DeleteResource(resourceIndexEntry);
+                            ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
+                            RefreshWidgets(false);
+                            NextState = NextStateOptions.UnsavedChanges;
+                        };
+                    replaceResourceAction.Activated += (sender, e) => ReplaceResource(resourceIndexEntry);
+                    menu.Popup();
+                    goto case 1;
             }
         }
         args.RetVal = true;
@@ -1457,6 +1520,7 @@ public partial class MainWindow : RendererMainWindow
             AddFilePathToWindowTitle(path);
         }
         fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     protected void OnUseAdvancedShadersActionToggled(object sender, EventArgs e)

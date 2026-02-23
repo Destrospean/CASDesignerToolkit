@@ -180,6 +180,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                         }
                                     }
                                     choosePatternDialog.Destroy();
+                                    choosePatternDialog.Dispose();
                                 };
                             valueWidget = button;
                             break;
@@ -398,6 +399,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     ShowAll();
                                 }
                                 choosePatternDialog.Destroy();
+                                choosePatternDialog.Dispose();
                             };
                         complateTable.Attach(addPatternButton, 0, 2, 0, 1);
                         complateTable.NRows++;

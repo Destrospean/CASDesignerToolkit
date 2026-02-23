@@ -75,7 +75,10 @@ namespace Destrospean.CmarNYCBorrowed
         {
             var rigName = GetRigPrefix(species, age, AgeGender.Unisex) + "Rig";
             var evaluated = package.EvaluateResourceKey(new ResourceKey(ResourceUtils.GetResourceType("_RIG"), 0, System.Security.Cryptography.FNV64.GetHash(rigName)).ReverseEvaluateResourceKey());
-            return new Rig(new System.IO.BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+            using (var reader = new System.IO.BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
+            {
+                return new Rig(reader);
+            }
         }
 
         public static string GetRigPrefix(Species species, AgeGender age, AgeGender gender)

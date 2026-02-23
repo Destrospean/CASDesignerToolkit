@@ -458,23 +458,4 @@
       </Folder>
     </Thumbnails>
   </game>
-  <game class="EP" rgversion="21">
-    <Name>Spare</Name>
-    <Longname>The Sims 3 Next Pack</Longname>
-    <GUID />
-    <DefaultInstallDir>Electronic Arts/The Sims 3 Whatever Next</DefaultInstallDir>
-    <Suppressed>false</Suppressed>
-    <GameContent>
-      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p22.package</Package>
-    </GameContent>
-    <DDSImages>
-      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p22.package</Package>
-    </DDSImages>
-    <Thumbnails>
-      <Folder path="Thumbnails">
-        <Package isPatch="false" priority="0">AllThumbnails.package</Package>
-        <Package isPatch="false" priority="0">CasThumbnails.package</Package>
-      </Folder>
-    </Thumbnails>
-  </game>
 </gamefolders>

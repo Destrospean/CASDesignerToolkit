@@ -57,6 +57,7 @@
             var unsavedChangesDialog = new UnsavedChangesDialog(this);
             var responseType = (Gtk.ResponseType)unsavedChangesDialog.Run();
             unsavedChangesDialog.Destroy();
+            unsavedChangesDialog.Dispose();
             return responseType;
         }
 

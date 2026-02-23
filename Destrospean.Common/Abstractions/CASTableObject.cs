@@ -54,9 +54,17 @@ namespace Destrospean.Common.Abstractions
             mCurrentRig = null;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            AllPresets.ForEach(x => x.Dispose());
+            AllPresets.ForEach(x =>
+                {
+                    var casPartPreset = x as CASPartPreset;
+                    if (casPartPreset != null)
+                    {
+                        casPartPreset.XmlFile.Close();
+                    }
+                    x.Dispose();
+                });
         }
 
         public void SaveDefaultPreset()
