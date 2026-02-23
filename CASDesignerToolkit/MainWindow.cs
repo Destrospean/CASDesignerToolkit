@@ -1259,10 +1259,8 @@ public partial class MainWindow : RendererMainWindow
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
                 var stream = new MemoryStream();
-                using (var writer = new BinaryWriter(stream))
-                {
-                    PreloadedData.GEOMs[geometryResourceKvp.Key].Write(writer);
-                }
+                var writer = new BinaryWriter(stream);
+                PreloadedData.GEOMs[geometryResourceKvp.Key].Write(writer);
                 var evaluated = CurrentPackage.EvaluateResourceKey(geometryResourceKvp.Key);
                 if (evaluated.Package == CurrentPackage)
                 {
