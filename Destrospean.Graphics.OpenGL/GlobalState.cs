@@ -454,20 +454,24 @@ namespace Destrospean.Graphics.OpenGL
                     }
                     var shader = mesh.Material.Shader == "" ? ActiveShader : mesh.Material.Shader;
                     GL.UseProgram(Shaders[shader].ProgramID);
-                    var casPartVolume = mesh as Sims3.Sim.CASPartVolume;
                     Shaders[shader].EnableVertexAttribArrays();
-                    if (casPartVolume != null && Shaders[shader].GetUniform("morphWeights") != -1)
+                    var casPartVolume = mesh as Sims3.Sim.CASPartVolume;
+                    if (Shaders[shader].GetUniform("morphWeights") != -1)
                     {
-                        GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 1);
-                        GL.Uniform4(Shaders[shader].GetUniform("morphWeights"), new Vector4(casPartVolume.ParentSim.Fat, casPartVolume.ParentSim.Fit, casPartVolume.ParentSim.Special, casPartVolume.ParentSim.Thin));
+                        if (casPartVolume == null)
+                        {
+                            GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 0);
+                            GL.Uniform4(Shaders[shader].GetUniform("morphWeights"), Vector4.Zero);
+                        }
+                        else
+                        {
+                            GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 1);
+                            GL.Uniform4(Shaders[shader].GetUniform("morphWeights"), new Vector4(casPartVolume.ParentSim.Fat, casPartVolume.ParentSim.Fit, casPartVolume.ParentSim.Special, casPartVolume.ParentSim.Thin));
+                        }
                     }
-                    else
+                    if (Shaders[shader].GetUniform("skin_color") != -1)
                     {
-                        GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 0);
-                    }
-                    if (casPartVolume != null && Shaders[shader].GetUniform("skin_color") != -1)
-                    {
-                        GL.Uniform3(Shaders[shader].GetUniform("skin_color"), new Vector3(casPartVolume.ParentSim.SkinColor[0], casPartVolume.ParentSim.SkinColor[1], casPartVolume.ParentSim.SkinColor[2]));
+                        GL.Uniform3(Shaders[shader].GetUniform("skin_color"), casPartVolume == null ? Vector3.One : new Vector3(casPartVolume.ParentSim.SkinColor[0], casPartVolume.ParentSim.SkinColor[1], casPartVolume.ParentSim.SkinColor[2]));
                     }
                     if (Shaders[shader].GetUniform("hasTransparency") != -1)
                     {
@@ -534,7 +538,6 @@ namespace Destrospean.Graphics.OpenGL
                     {
                         GL.Uniform1(Shaders[shader].GetAttribute("maintexture"), mesh.MainTextureID);
                     }
-
                     if (Shaders[shader].GetUniform("map_ambient") != -1)
                     {
                         if (mesh.AmbientMapID == -1)
@@ -550,9 +553,9 @@ namespace Destrospean.Graphics.OpenGL
                             GL.ActiveTexture(TextureUnit.Texture0);
                         }
                     }
-                    if (casPartVolume != null && Shaders[shader].GetUniform("map_skin_ambient") != -1)
+                    if (Shaders[shader].GetUniform("map_skin_ambient") != -1)
                     {
-                        if (casPartVolume.SkinAmbientMapID == -1)
+                        if (casPartVolume == null || casPartVolume.SkinAmbientMapID == -1)
                         {
                             GL.Uniform1(Shaders[shader].GetUniform("hasSkinAmbientMap"), 0);
                         }
@@ -580,9 +583,9 @@ namespace Destrospean.Graphics.OpenGL
                             GL.ActiveTexture(TextureUnit.Texture0);
                         }
                     }
-                    if (casPartVolume != null && Shaders[shader].GetUniform("map_skin_specular") != -1)
+                    if (Shaders[shader].GetUniform("map_skin_specular") != -1)
                     {
-                        if (casPartVolume.SkinSpecularMapID == -1)
+                        if (casPartVolume == null || casPartVolume.SkinSpecularMapID == -1)
                         {
                             GL.Uniform1(Shaders[shader].GetUniform("hasSkinSpecularMap"), 0);
                         }
@@ -658,7 +661,18 @@ namespace Destrospean.Graphics.OpenGL
                     textureCoordinates.AddRange(mesh.TextureCoordinates);
                     vertices.AddRange(mesh.Vertices);
                     var casPartVolume = mesh as Sims3.Sim.CASPartVolume;
-                    if (casPartVolume != null)
+                    if (casPartVolume == null)
+                    {
+                        deltaNormalsFat.AddRange(mesh.Normals);
+                        deltaNormalsFit.AddRange(mesh.Normals);
+                        deltaNormalsSpecial.AddRange(mesh.Normals);
+                        deltaNormalsThin.AddRange(mesh.Normals);
+                        deltaVerticesFat.AddRange(mesh.Vertices);
+                        deltaVerticesFit.AddRange(mesh.Vertices);
+                        deltaVerticesSpecial.AddRange(mesh.Vertices);
+                        deltaVerticesThin.AddRange(mesh.Vertices);
+                    }
+                    else
                     {
                         deltaNormalsFat.AddRange(casPartVolume.DeltaNormalsFat);
                         deltaNormalsFit.AddRange(casPartVolume.DeltaNormalsFit);
