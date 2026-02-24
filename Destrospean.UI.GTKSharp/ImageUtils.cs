@@ -66,6 +66,19 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
+        public static Gdk.Pixbuf Colorize(this Gdk.Pixbuf pixbuf, Gdk.Color color)
+        {
+            var bitmap = pixbuf.ToBitmap();
+            for (var x = 0; x < bitmap.Width; x++)
+            {
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    bitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(bitmap.GetPixel(x, y).A, color.Red >> 8, color.Green >> 8, color.Blue >> 8));
+                }
+            }
+            return bitmap.ToPixbuf();
+        }
+
         public static Bitmap CreateCheckerboard(int width, int height, int checkSize, System.Drawing.Color primary, System.Drawing.Color secondary)
         {
             var checkerboard = new Bitmap(width, height);

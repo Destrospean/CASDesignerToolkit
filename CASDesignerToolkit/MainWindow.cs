@@ -20,6 +20,8 @@ public partial class MainWindow : RendererMainWindow
 
     bool mDisableUpdateModels = false;
 
+    Gdk.Pixbuf mFatnessPixbuf, mFitnessPixbuf, mBabyBumpPixbuf;
+
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
     readonly string mOriginalWindowTitle;
@@ -109,6 +111,12 @@ public partial class MainWindow : RendererMainWindow
         {
             new CacheGenerationWindow(this, Icon);
         }
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var iconSize = (int)(32 * WidgetUtils.Scale);
+        var treeViewSelectionColor = ResourceTreeView.Style.Base(StateType.Selected);
+        mFatnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
+        mFitnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
+        mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
@@ -576,13 +584,11 @@ public partial class MainWindow : RendererMainWindow
                 meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
                 meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
                 meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                var iconSize = (int)(32 * WidgetUtils.Scale);
-                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(new Image(mFatnessPixbuf), false, true, 4);
                 meshGroupPageButtonHBox.PackStart(fatnessHScale, true, true, 4);
-                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(new Image(mFitnessPixbuf), false, true, 4);
                 meshGroupPageButtonHBox.PackStart(fitnessHScale, true, true, 4);
-                meshGroupPageButtonHBox.PackStart(new Image(new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize)), false, true, 4);
+                meshGroupPageButtonHBox.PackStart(new Image(mBabyBumpPixbuf), false, true, 4);
                 meshGroupPageButtonHBox.PackStart(specialHScale, true, true, 4);
                 meshGroupPageButtonHBox.ShowAll();
                 var lodPageVBox = new VBox(false, 0);
