@@ -20,7 +20,7 @@ public partial class MainWindow : RendererMainWindow
 
     bool mDisableUpdateModels = false;
 
-    Gdk.Pixbuf mFatnessPixbuf, mFitnessPixbuf, mBabyBumpPixbuf;
+    Gdk.Pixbuf mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
