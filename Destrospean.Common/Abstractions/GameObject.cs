@@ -197,6 +197,16 @@ namespace Destrospean.Common.Abstractions
             */
         }
 
+        public override void Dispose()
+        {
+            CatalogResource.Stream.Close();
+            if (ObjKeyResource != null)
+            {
+                ObjKeyResource.Stream.Close();
+            }
+            base.Dispose();
+        }
+
         public void ExportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
             var extension = "";
