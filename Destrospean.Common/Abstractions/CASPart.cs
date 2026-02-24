@@ -67,8 +67,7 @@ namespace Destrospean.Common.Abstractions
             var defaultPresetResourceIndexEntries = ParentPackage.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("_XML") && x.Instance == resourceIndexEntry.Instance);
             if (defaultPresetResourceIndexEntries.Count > 0)
             {
-                var stream = ((s3pi.Interfaces.APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0]);
-                if (stream != null)
+                var stream = ((APackage)ParentPackage).GetResource(defaultPresetResourceIndexEntries[0]);
                 {
                     DefaultPresetKey = defaultPresetResourceIndexEntries[0].ReverseEvaluateResourceKey();
                     using (var reader = new StreamReader(stream))

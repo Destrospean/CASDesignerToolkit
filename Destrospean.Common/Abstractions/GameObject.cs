@@ -68,7 +68,7 @@ namespace Destrospean.Common.Abstractions
                 try
                 {   
                     var defaultPresetResourceEvaluated = ParentPackage.EvaluateResourceKey(DefaultPresetKey);
-                    using (var reader = new StreamReader(((s3pi.Interfaces.APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)))
+                    using (var reader = new StreamReader(((APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)))
                     {
                         DefaultPreset = new CASPartPreset(this, reader);
                     }
