@@ -163,14 +163,14 @@ public partial class MainWindow
 		this.SecondHPaned = new global::Gtk.HPaned ();
 		this.SecondHPaned.CanFocus = true;
 		this.SecondHPaned.Name = "SecondHPaned";
-		this.SecondHPaned.Position = 352;
+		this.SecondHPaned.Position = 346;
 		// Container child SecondHPaned.Gtk.Paned+PanedChild
 		this.ScrolledWindow = new global::Gtk.ScrolledWindow ();
 		this.ScrolledWindow.Name = "ScrolledWindow";
 		this.ScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 		// Container child ScrolledWindow.Gtk.Container+ContainerChild
 		this.ResourceTreeView = new global::Gtk.TreeView ();
-		this.ResourceTreeView.WidthRequest = 330;
+		this.ResourceTreeView.WidthRequest = 324;
 		this.ResourceTreeView.CanFocus = true;
 		this.ResourceTreeView.Name = "ResourceTreeView";
 		this.ResourceTreeView.EnableSearch = false;
@@ -181,7 +181,7 @@ public partial class MainWindow
 		w6.Shrink = false;
 		// Container child SecondHPaned.Gtk.Paned+PanedChild
 		this.ResourcePropertyNotebook = new global::Gtk.Notebook ();
-		this.ResourcePropertyNotebook.WidthRequest = 480;
+		this.ResourcePropertyNotebook.WidthRequest = 486;
 		this.ResourcePropertyNotebook.CanFocus = true;
 		this.ResourcePropertyNotebook.Name = "ResourcePropertyNotebook";
 		this.ResourcePropertyNotebook.CurrentPage = 0;

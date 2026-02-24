@@ -8,7 +8,6 @@ using Destrospean.Common.Abstractions;
 using Destrospean.DestrospeanCASPEditor;
 using Destrospean.DestrospeanCASPEditor.Widgets;
 using Destrospean.Graphics.OpenGL;
-using Destrospean.Graphics.OpenGL.Sims3;
 using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.GenericRCOLResource;
@@ -63,25 +62,11 @@ public partial class MainWindow : RendererMainWindow
                                         Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
                                     }
                                 }
-                                TreeIter iter;
-                                TreeModel model;
-                                if (ResourceTreeView.Selection.GetSelected(out model, out iter))
-                                {
-                                    switch ((string)model.GetValue(iter, 0))
-                                    {
-                                        case "CASP":
-                                            Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Sim.LoadMeshesOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                            break;
-                                        case "OBJD":
-                                            PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()].LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => GameObjectUtils.LoadMeshesOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                            break;
-                                    }
-                                }
+                                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
                                 GlobalState.Locked = false;
                             }
                         }
                     }).Start();
-                
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
             {
@@ -175,6 +160,10 @@ public partial class MainWindow : RendererMainWindow
                     Xalign = .5f
                 }),
             resetViewButton = new Button("Reset View");
+            var showMaternityPartsOnlyCheckButton = new CheckButton("Maternity Mode")
+                {
+                    Active = Sim.ShowMaternityPartsOnly
+                };
             addPresetButton.Clicked += (sender, e) => mPresetNotebook.AddPreset();
             exportTextureButton.Clicked += (sender, e) =>
                 {
@@ -201,6 +190,11 @@ public partial class MainWindow : RendererMainWindow
                     GlobalState.CurrentRotation = OpenTK.Vector3.Zero;
                     mFOV = OpenTK.MathHelper.DegreesToRadians(30);
                 };
+            showMaternityPartsOnlyCheckButton.Toggled += (sender, e) =>
+                {
+                    Sim.ShowMaternityPartsOnly = showMaternityPartsOnlyCheckButton.Active;
+                    RandomizeCASParts();
+                };
             flagNotebook.SwitchPage += (o, args) =>
                 {
                     nextButton.Sensitive = flagNotebook.CurrentPage < flagNotebook.NPages - 1;
@@ -208,40 +202,31 @@ public partial class MainWindow : RendererMainWindow
                 };
             Alignment addPresetButtonAlignment = new Alignment(.5f, .5f, 0, 0),
             nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            showMaternityPartsOnlyCheckButtonAlignment = new Alignment(0, 0, 0, 0)
+                {
+                    LeftPadding = (uint)(6 * WidgetUtils.Scale)
+                };
             addPresetButtonAlignment.Add(addPresetButton);
             nextButtonAlignment.Add(nextButton);
             prevButtonAlignment.Add(prevButton);
+            showMaternityPartsOnlyCheckButtonAlignment.Add(showMaternityPartsOnlyCheckButton);
             flagPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
             flagPageButtonHBox.PackEnd(resetViewButton, false, true, 4);
             flagPageButtonHBox.PackEnd(exportTextureButton, false, true, 4);
             buttonHBox.PackStart(flagPageButtonHBox, false, true, 0);
+            buttonHBox.PackStart(showMaternityPartsOnlyCheckButtonAlignment, false, true, 0);
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
+            var casPart = castableObject as CASPart;
             Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
                 {
                     NextState = NextStateOptions.UnsavedChanges;
                     castableObject.ClearCurrentRig();
                     RandomizeCASParts();
                 };
-            var casPart = castableObject as CASPart;
             if (casPart != null)
             {
-                var showMaternityPartsOnlyCheckButton = new CheckButton("Maternity Mode")
-                    {
-                        Active = Sim.ShowMaternityPartsOnly
-                    };
-                showMaternityPartsOnlyCheckButton.Toggled += (sender, e) =>
-                    {
-                        Sim.ShowMaternityPartsOnly = showMaternityPartsOnlyCheckButton.Active;
-                        RandomizeCASParts();
-                    };
-                var showMaternityPartsOnlyCheckButtonAlignment = new Alignment(0, 0, 0, 0)
-                    {
-                        LeftPadding = (uint)(6 * WidgetUtils.Scale)
-                    };
-                showMaternityPartsOnlyCheckButtonAlignment.Add(showMaternityPartsOnlyCheckButton);
-                buttonHBox.PackStart(showMaternityPartsOnlyCheckButtonAlignment, false, true, 0);
                 Sim.CurrentCASPart = casPart;
                 for (var i = 0; i < 2; i++)
                 {
@@ -256,30 +241,6 @@ public partial class MainWindow : RendererMainWindow
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Species", additionalToggleAction, casPart.CASPartResource.AgeGender, "Species"), 2, 3, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Handedness", additionalToggleAction, casPart.CASPartResource.AgeGender, "Handedness"), 1, 2, 1, 2);
             }
-            var gameObject = castableObject as GameObject;
-            if (gameObject != null)
-            {
-                var frameCount = 3;
-                foreach (var property in gameObject.CatalogResource.GetType().GetProperties())
-                {
-                    if (frameCount == 3)
-                    {
-                        flagTables.Add(new Table(2, 3, true));
-                        flagNotebook.AppendPage(flagTables[flagTables.Count - 1], new Label());
-                        frameCount = 0;
-                    }
-                    if (property.Name.EndsWith("Flags"))
-                    {
-                        flagTables[flagTables.Count - 1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame(property.Name, additionalToggleAction, gameObject.CatalogResource, property.Name), (uint)frameCount, (uint)frameCount + 1, 0, 2);
-                        frameCount++;
-                    }
-                }
-                if (frameCount == 0)
-                {
-                    flagNotebook.RemovePage(flagNotebook.NPages - 1);
-                    flagTables.RemoveAt(flagTables.Count - 1);
-                }
-            }
             ResourcePropertyTable.Attach(flagPageVBox, 0, 1, 0, 1);
             mPresetNotebook = PresetNotebook.CreateInstance(castableObject, Image);
             mPresetNotebook.Scrollable = true;
@@ -287,7 +248,6 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.Attach(mPresetNotebook, 1, 2, 0, 1);
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
-            BuildLODNotebook(gameObject);
         }
         catch (Exception ex)
         {
@@ -616,241 +576,6 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
-    {
-        try
-        {
-            if (gameObject == null)
-            {
-                return;
-            }
-            if (mResourcePropertyNotebookSwitchPageHandler != null)
-            {
-                ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
-            }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
-            ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
-            foreach (var lodKvp in gameObject.LODs)
-            {
-                var meshGroupNotebook = new Notebook
-                    {
-                        ShowTabs = false
-                    };
-                var actionGroup = new ActionGroup("Default");
-                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
-                deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
-                    {
-                        Sensitive = lodKvp.Value.MeshGroups.Count > 1
-                    },
-                exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
-                exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
-                exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
-                importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
-                importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
-                importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
-                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
-                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
-                actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
-                actionGroup.Add(addMeshGroupAction);
-                actionGroup.Add(deleteMeshGroupAction);
-                actionGroup.Add(exportMLODAction);
-                actionGroup.Add(exportOBJAction);
-                actionGroup.Add(exportWSOAction);
-                actionGroup.Add(importMLODAction);
-                actionGroup.Add(importOBJAction);
-                actionGroup.Add(importWSOAction);
-                var uiManager = new UIManager();
-                uiManager.InsertActionGroup(actionGroup, 0);
-                uiManager.AddUiFromString(@"
-                    <ui>
-                        <menubar name='MLODPropertiesMenuBar'>
-                            <menu name='OptionsAction' action='OptionsAction'>
-                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
-                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
-                                <menu name='ImportAction' action='ImportAction'>
-                                    <menuitem name='ImportMLODAction' action='ImportMLODAction'/>
-                                    <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
-                                    <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
-                                </menu>                            
-                                <menu name='ExportAction' action='ExportAction'>
-                                    <menuitem name='ExportMLODAction' action='ExportMLODAction'/>
-                                    <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
-                                    <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
-                                </menu>
-                            </menu>
-                        </menubar>
-                    </ui>");
-                var menuBar = (MenuBar)uiManager.GetWidget("/MLODPropertiesMenuBar");
-                menuBar.PackDirection = PackDirection.Rtl;
-                Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
-                    {
-                        Xalign = .5f
-                    }),
-                prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
-                    {
-                        Xalign = .5f
-                    });
-                var pageIndexLabel = new Label
-                    {
-                        Xalign = .5f
-                    };
-                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
-                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
-                Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-                prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
-                nextButtonAlignment.Add(nextButton);
-                prevButtonAlignment.Add(prevButton);
-                meshGroupNotebook.SwitchPage += (o, args) =>
-                    {
-                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
-                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
-                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
-                    };
-                Action<MeshFileType> exportMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.MLOD:
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = meshFileType == MeshFileType.MLOD ? "The Sims 3 MLOD Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            ProgramUtils.WriteError(ex);
-                            throw;
-                        }
-                    },
-                importMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            ProgramUtils.WriteError(ex);
-                            throw;
-                        }
-                    };
-                addMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex + 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                deleteMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
-                exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
-                exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
-                importMLODAction.Activated += (sender, e) =>
-                    {
-                        var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-                        var fileFilter = new FileFilter
-                            {
-                                Name = "The Sims 3 MLOD Resource"
-                            };
-                        fileFilter.AddPattern("*.lod");
-                        fileChooserDialog.AddFilter(fileFilter);
-                        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                        {
-                            try
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            catch (Exception ex)
-                            {
-                                ProgramUtils.WriteError(ex);
-                                throw;
-                            }
-                        }
-                        fileChooserDialog.Destroy();
-                        fileChooserDialog.Dispose();
-                    };
-                importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
-                importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
-                var meshGroupPageButtonHBox = new HBox(false, 0);
-                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
-                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
-                var lodPageVBox = new VBox(false, 0);
-                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
-                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
-                lodPageVBox.ShowAll();
-                ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
-                if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
-                {
-                    ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
-                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ProgramUtils.WriteError(ex);
-            throw;
-        }
-    }
-
     void BuildResourceTable()
     {
         try
@@ -928,11 +653,6 @@ public partial class MainWindow : RendererMainWindow
                                 mDisableUpdateModels = false;
                                 RandomizeCASParts();
                                 break;
-                            case "OBJD":
-                                GLWidget.Show();
-                                AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
-                                mDisableUpdateModels = false;
-                                break;
                         }
                     }
                 };
@@ -965,11 +685,7 @@ public partial class MainWindow : RendererMainWindow
             child.Dispose();
         }
         var casPart = castableObject as CASPart;
-        if (casPart == null)
-        {
-            BuildLODNotebook((GameObject)castableObject, lodIndex, groupIndex);
-        }
-        else
+        if (casPart != null)
         {
             BuildLODNotebook(casPart, lodIndex, groupIndex);
         }
@@ -986,16 +702,7 @@ public partial class MainWindow : RendererMainWindow
             PreloadedData.CASParts[key].Dispose();
             PreloadedData.CASParts.Remove(key);
         }
-        foreach (var key in new List<string>(PreloadedData.GameObjects.Keys))
-        {
-            PreloadedData.GameObjects[key].Dispose();
-            PreloadedData.GameObjects.Remove(key);
-        }
-        PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
-        PreloadedData.LITEs.Clear();
-        PreloadedData.MLODs.Clear();
-        PreloadedData.MODLs.Clear();
         PreloadedData.VPXYs.Clear();
         GlobalState.Materials.Clear();
         GlobalState.DeleteTextures();
@@ -1070,7 +777,6 @@ public partial class MainWindow : RendererMainWindow
                 {
                     case "_IMG":
                     case "CASP":
-                    case "OBJD":
                         ResourceListStore.AppendValues(tag, "0x" + resourceIndexEntry.ResourceType.ToString("X8"), "0x" + resourceIndexEntry.ResourceGroup.ToString("X8"), "0x" + resourceIndexEntry.Instance.ToString("X16"), resourceIndexEntry);
                         break;
                 }
@@ -1090,12 +796,6 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.CASParts[key] = new CASPart(CurrentPackage, resourceIndexEntry, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         }
                         break;
-                    case "FTPT":
-                        if (!PreloadedData.FTPTs.ContainsKey(key) || missingResourceKeyIndex > -1)
-                        {
-                            PreloadedData.FTPTs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
-                        }
-                        break;
                     case "GEOM":
                         if (!PreloadedData.GEOMs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1103,30 +803,6 @@ public partial class MainWindow : RendererMainWindow
                             {
                                 PreloadedData.GEOMs[key] = new GEOM(reader);
                             }
-                        }
-                        break;
-                    case "LITE":
-                        if (!PreloadedData.LITEs.ContainsKey(key) || missingResourceKeyIndex > -1)
-                        {
-                            PreloadedData.LITEs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
-                        }
-                        break;
-                    case "MLOD":
-                        if (!PreloadedData.MLODs.ContainsKey(key) || missingResourceKeyIndex > -1)
-                        {
-                            PreloadedData.MLODs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
-                        }
-                        break;
-                    case "MODL":
-                        if (!PreloadedData.MODLs.ContainsKey(key) || missingResourceKeyIndex > -1)
-                        {
-                            PreloadedData.MODLs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
-                        }
-                        break;
-                    case "OBJD":
-                        if (!PreloadedData.GameObjects.ContainsKey(key) || missingResourceKeyIndex > -1)
-                        {
-                            PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         }
                         break;
                     case "VPXY":
@@ -1144,10 +820,6 @@ public partial class MainWindow : RendererMainWindow
             foreach (var casPart in PreloadedData.CASParts.Values)
             {
                 AddCASTableObjectWidgets(casPart);
-            }
-            foreach (var gameObject in PreloadedData.GameObjects.Values)
-            {
-                AddCASTableObjectWidgets(gameObject);
             }
             ResourceTreeView.Selection.SelectPath(new TreePath("0"));
         }
@@ -1174,10 +846,6 @@ public partial class MainWindow : RendererMainWindow
                 foreach (var casPartKvp in PreloadedData.CASParts)
                 {
                     casPartKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
-                }
-                foreach (var gameObjectKvp in PreloadedData.GameObjects)
-                {
-                    gameObjectKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
                 }
                 NextState = NextStateOptions.UnsavedChanges;
             }
@@ -1242,20 +910,11 @@ public partial class MainWindow : RendererMainWindow
                     continue;
                 }
                 casPartKvp.Value.SavePresets();
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
-            }
-            foreach (var ftptResourceKvp in PreloadedData.FTPTs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(ftptResourceKvp.Key).ResourceIndexEntry, ftptResourceKvp.Value);
-            }
-            foreach (var gameObjectKvp in PreloadedData.GameObjects)
-            {
-                if (ResourceUtils.MissingResourceKeys.Exists(x => x.ToLowerInvariant() == gameObjectKvp.Key.ToLowerInvariant()))
+                var evaluated = CurrentPackage.EvaluateResourceKey(casPartKvp.Key);
+                if (evaluated.Package == CurrentPackage)
                 {
-                    continue;
+                    CurrentPackage.ReplaceResource(evaluated.ResourceIndexEntry, casPartKvp.Value.CASPartResource);
                 }
-                gameObjectKvp.Value.SavePresets();
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(gameObjectKvp.Key).ResourceIndexEntry, gameObjectKvp.Value.CatalogResource);
             }
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
@@ -1268,22 +927,6 @@ public partial class MainWindow : RendererMainWindow
                     CurrentPackage.AddResource(evaluated.ResourceIndexEntry, stream, false);
                     CurrentPackage.DeleteResource(evaluated.ResourceIndexEntry);
                 }
-            }
-            foreach (var liteResourceKvp in PreloadedData.LITEs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(liteResourceKvp.Key).ResourceIndexEntry, liteResourceKvp.Value);
-            }
-            foreach (var mlodResourceKvp in PreloadedData.MLODs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(mlodResourceKvp.Key).ResourceIndexEntry, mlodResourceKvp.Value);
-            }
-            foreach (var modlResourceKvp in PreloadedData.MODLs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(modlResourceKvp.Key).ResourceIndexEntry, modlResourceKvp.Value);
-            }
-            foreach (var vpxyResourceKvp in PreloadedData.VPXYs)
-            {
-                CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
             }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
             if (string.IsNullOrEmpty(mSaveAsPath))
