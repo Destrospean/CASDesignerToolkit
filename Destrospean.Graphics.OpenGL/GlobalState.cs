@@ -461,6 +461,7 @@ namespace Destrospean.Graphics.OpenGL
                         if (casPartVolume == null)
                         {
                             GL.Uniform1(Shaders[shader].GetUniform("hasMorphs"), 0);
+                            GL.Uniform4(Shaders[shader].GetUniform("morphWeights"), Vector4.Zero);
                         }
                         else
                         {

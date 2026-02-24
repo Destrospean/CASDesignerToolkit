@@ -986,11 +986,7 @@ public partial class MainWindow : RendererMainWindow
             PreloadedData.CASParts[key].Dispose();
             PreloadedData.CASParts.Remove(key);
         }
-        foreach (var key in new List<string>(PreloadedData.GameObjects.Keys))
-        {
-            PreloadedData.GameObjects[key].Dispose();
-            PreloadedData.GameObjects.Remove(key);
-        }
+        PreloadedData.GameObjects.Clear();
         PreloadedData.FTPTs.Clear();
         PreloadedData.GEOMs.Clear();
         PreloadedData.LITEs.Clear();
