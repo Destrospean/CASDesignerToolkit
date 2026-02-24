@@ -452,7 +452,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 shaderComboBox.Changed += (sender, e) =>
                     {
 
-                        matd.Shader = (ShaderType)(uint)Enum.Parse(typeof(Shader), shaderComboBox.ActiveText.Split(' ')[0]);
+                        matd.Shader = (ShaderType)Enum.Parse(typeof(Shader), shaderComboBox.ActiveText.Split(' ')[0]);
                         mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 table.Attach(new Label("Shader")

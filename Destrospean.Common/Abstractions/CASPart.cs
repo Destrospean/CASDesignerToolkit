@@ -15,7 +15,7 @@ namespace Destrospean.Common.Abstractions
         {
             get
             {
-                var age = (AgeGender)(uint)CASPartResource.AgeGender.Age;
+                var age = (AgeGender)CASPartResource.AgeGender.Age;
                 return age >= AgeGender.Teen && age <= AgeGender.Elder ? AgeGender.Adult : age;
             }
         }
