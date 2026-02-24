@@ -53,9 +53,11 @@
     </Reference>
     <Reference Include="s3pi.CatalogResource">
       <HintPath>..\libs\s3pi.CatalogResource.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.ObjKeyResource">
       <HintPath>..\libs\s3pi.ObjKeyResource.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.Filetable">
       <HintPath>..\libs\s3pi.Filetable.dll</HintPath>
@@ -167,6 +169,7 @@
     </Reference>
     <Reference Include="s3pi.MeshChunks">
       <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
@@ -314,6 +317,7 @@
     <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>
