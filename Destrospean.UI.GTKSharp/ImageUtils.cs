@@ -153,10 +153,6 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static Bitmap GetTexture(this IPackage package, IResourceIndexEntry resourceIndexEntry)
         {
-            if (resourceIndexEntry.GetResourceTypeTag() != "_IMG")
-            {
-                return null;
-            }
             lock (CmarNYCBorrowed.TextureUtils.Lock)
             {
                 Bitmap image;

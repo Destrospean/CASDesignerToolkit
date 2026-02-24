@@ -43,6 +43,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
 
             public List<Vector3> DeltaNormalsFat, DeltaNormalsFit, DeltaNormalsSpecial, DeltaNormalsThin, DeltaVerticesFat, DeltaVerticesFit, DeltaVerticesSpecial, DeltaVerticesThin;
 
+            public string Key;
+
             public Sim ParentSim;
 
             public int SkinAmbientMapID
@@ -297,7 +299,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             };
                         GlobalState.Materials[geomAndKey.Key] = material;
                     }
-                    var currentPreset = casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    var currentPreset = (CASPartPreset)(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0]);
                     loadMeshesOnMainThreadCallback(new CASPartVolume
                         {
                             ColorData = colors.ConvertAll(ToVector3).ToArray(),
@@ -322,34 +324,33 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             }
         }
 
-        public static void LoadMeshesOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshesOnMainThread(object casPartVolume, CASPartPreset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
         {
-            var casPartVolume = (CASPartVolume)volume;
-            var casPartPreset = (CASPartPreset)currentPreset;
+            var casPartVolumeCast = (CASPartVolume)casPartVolume;
             var materialCast = (Material)material;
-            casPartVolume.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
-            casPartVolume.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
-            if (!string.IsNullOrEmpty(casPartPreset.BodyAmbientMap))
+            casPartVolumeCast.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
+            casPartVolumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
+            if (!string.IsNullOrEmpty(currentPreset.BodyAmbientMap))
             {
-                casPartVolume.BodyAmbientMapID = loadTextureCallback(casPartPreset.BodyAmbientMap, null);
+                casPartVolumeCast.BodyAmbientMapID = loadTextureCallback(currentPreset.BodyAmbientMap, null);
             }
-            if (!string.IsNullOrEmpty(casPartPreset.BodySpecularMap))
+            if (!string.IsNullOrEmpty(currentPreset.BodySpecularMap))
             {
-                casPartVolume.BodySpecularMapID = loadTextureCallback(casPartPreset.BodySpecularMap, null);
+                casPartVolumeCast.BodySpecularMapID = loadTextureCallback(currentPreset.BodySpecularMap, null);
             }
-            if (!string.IsNullOrEmpty(casPartPreset.SkinAmbientMap))
+            if (!string.IsNullOrEmpty(currentPreset.SkinAmbientMap))
             {
-                casPartVolume.SkinAmbientMapID = loadTextureCallback(casPartPreset.SkinAmbientMap, null);
+                casPartVolumeCast.SkinAmbientMapID = loadTextureCallback(currentPreset.SkinAmbientMap, null);
             }
-            if (!string.IsNullOrEmpty(casPartPreset.SkinSpecularMap))
+            if (!string.IsNullOrEmpty(currentPreset.SkinSpecularMap))
             {
-                casPartVolume.SkinSpecularMapID = loadTextureCallback(casPartPreset.SkinSpecularMap, null);
+                casPartVolumeCast.SkinSpecularMapID = loadTextureCallback(currentPreset.SkinSpecularMap, null);
             }
-            if ((casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture)) == -1)
+            if ((casPartVolumeCast.MainTextureID = loadTextureCallback(casPartVolumeCast.Key, presetTexture)) == -1)
             {
                 Complate.MarkModelsNeedUpdatedCallback();
             }
-            GlobalState.Meshes[casPartVolume.Key] = casPartVolume;
+            GlobalState.Meshes[casPartVolumeCast.Key] = casPartVolumeCast;
         }
 
         public static Vector3 ToVector3(float[] coordinates)
