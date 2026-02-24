@@ -66,7 +66,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static Gdk.Pixbuf Colorize(this Gdk.Pixbuf pixbuf, Gdk.Color color)
+        public static Gdk.Pixbuf Colorize(this Pixbuf pixbuf, Gdk.Color color)
         {
             var bitmap = pixbuf.ToBitmap();
             for (var x = 0; x < bitmap.Width; x++)
