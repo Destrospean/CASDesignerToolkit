@@ -84,7 +84,7 @@ namespace Destrospean.Common.Abstractions
             {
                 for (var i = 0; i < 4; i++)
                 {
-                    LODs[i] = new List<CASPart.GEOMAndKey>();
+                    LODs[i] = new List<GEOMAndKey>();
                 }
             }
         }
