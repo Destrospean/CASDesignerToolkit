@@ -168,15 +168,23 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     {
                                         ((Preset)complate).ReplacePattern(propertyName, choosePatternDialog.ResourceKey);
                                         complate[propertyName] = choosePatternDialog.PatternPath;
+                                        var patterns = new List<Pattern>(((Preset)complate).Patterns);
+                                        patterns.Sort((a, b) => a.SlotName == "Logo" && b.SlotName != "Logo" ? 1 : a.SlotName != "Logo" && b.SlotName == "Logo" ? -1 : a.SlotName.CompareTo(b.SlotName));
                                         for (var i = 0; i < (mIsSubNotebook ? this : (PresetNotebook)CurrentPageWidget).NPages; i++)
                                         {
                                             var patternTable = (Table)((Viewport)((ScrolledWindow)(mIsSubNotebook ? this : (PresetNotebook)CurrentPageWidget).GetNthPage(i)).Child).Child;
-                                            foreach (var child in patternTable.Children)
+                                            var times = patternTable.Children.Length == 0 ? 2 : 1;
+                                            for (var j = 0; j < times; j++)
                                             {
-                                                patternTable.Remove(child);
+                                                foreach (var child in patternTable.Children)
+                                                {
+                                                    patternTable.Remove(child);
+                                                    child.Destroy();
+                                                    child.Dispose();
+                                                }
+                                                patternTable.NRows = 1;
+                                                AddPropertiesToTable(patternTable, i == 0 ? complate : patterns[i - 1]);
                                             }
-                                            patternTable.NRows = 1;
-                                            AddPropertiesToTable(patternTable, i == 0 ? complate : ((Preset)complate).Patterns[i - 1]);
                                         }
                                     }
                                     choosePatternDialog.Destroy();
