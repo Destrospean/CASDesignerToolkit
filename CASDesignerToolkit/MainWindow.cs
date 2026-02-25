@@ -17,11 +17,9 @@ using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
-    Gdk.Pixbuf mAlphaCheckerboardPixbuf;
+    Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
     bool mDisableUpdateModels = false;
-
-    Gdk.Pixbuf mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 

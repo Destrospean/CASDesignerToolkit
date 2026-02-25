@@ -521,6 +521,7 @@
                   <widget class="Gtk.IconView" id="PatternIconView">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
+                    <property name="Margin">2</property>
                   </widget>
                 </child>
               </widget>
