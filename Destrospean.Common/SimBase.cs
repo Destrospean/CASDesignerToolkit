@@ -60,8 +60,7 @@ namespace Destrospean.Common
 
         public static object Lock = new object();
 
-        public bool Locked = false,
-        ShowMaternityPartsOnly = false;
+        public bool ShowMaternityPartsOnly = false;
 
         public float[] SkinColor =
             {
@@ -179,7 +178,7 @@ namespace Destrospean.Common
             }
         }
 
-        public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
+        public virtual void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
         {
             lock (Lock)
             {

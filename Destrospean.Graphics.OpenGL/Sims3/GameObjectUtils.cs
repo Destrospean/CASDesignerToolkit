@@ -107,6 +107,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             ColorData = colors.ToArray(),
                             Faces = faces,
                             Key = matd.MaterialNameHash.ToString(),
+                            LODIndex = lodIndex,
                             Material = material,
                             Normals = normals.ToArray(),
                             TextureCoordinates = textureCoordinates.ToArray(),
@@ -124,6 +125,20 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             volumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
             volumeCast.MainTextureID = materialCast.DiffuseMap.Length > 0 && Convert.ToUInt32(materialCast.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(materialCast.DiffuseMap, null) : loadTextureCallback(volumeCast.Key, presetTexture);
             GlobalState.Meshes[volumeCast.Key] = volumeCast;
+            var lodIndex = -1;
+            foreach (var mesh in GlobalState.Meshes.Values)
+            {
+                if (lodIndex == -1)
+                {
+                    lodIndex = mesh.LODIndex;
+                    continue;
+                }
+                if (lodIndex != mesh.LODIndex)
+                {
+                    Complate.MarkModelsNeedUpdatedCallback();
+                    break;
+                }
+            }
         }
     }
 }

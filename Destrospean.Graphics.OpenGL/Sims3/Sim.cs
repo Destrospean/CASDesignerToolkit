@@ -80,8 +80,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
         {
             lock (Complate.Lock)
             {
-                while (Locked);
-                Locked = true;
                 if (!CASParts.ContainsValue(casPart) || casPart.LODs.Count == 0)
                 {
                     return;
@@ -314,6 +312,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Faces = faces,
                             GroupID = ID,
                             Key = geomAndKey.Key,
+                            LODIndex = lodIndex,
                             Material = material,
                             ParentSim = this,
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
@@ -321,7 +320,6 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
                         }, currentPreset, (System.Drawing.Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), material, loadTextureCallback);
                 }
-                Locked = false;
             }
         }
 
@@ -351,6 +349,20 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture);
             GlobalState.Meshes[casPartVolume.Key] = casPartVolume;
             presetTexture.Dispose();
+            var lodIndex = -1;
+            foreach (var mesh in GlobalState.Meshes.Values)
+            {
+                if (lodIndex == -1)
+                {
+                    lodIndex = mesh.LODIndex;
+                    continue;
+                }
+                if (lodIndex != mesh.LODIndex)
+                {
+                    Complate.MarkModelsNeedUpdatedCallback();
+                    break;
+                }
+            }
         }
 
         public static Vector3 ToVector3(float[] coordinates)
