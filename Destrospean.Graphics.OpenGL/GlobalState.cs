@@ -430,8 +430,9 @@ namespace Destrospean.Graphics.OpenGL
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
                 return textureID;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Common.ProgramUtils.WriteError(ex);
                 return -1;
             }
         }

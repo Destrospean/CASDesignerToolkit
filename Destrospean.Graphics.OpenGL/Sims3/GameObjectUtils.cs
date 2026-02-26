@@ -122,10 +122,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             var volumeCast = (Volume)volume;
             volumeCast.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
             volumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
-            if ((volumeCast.MainTextureID = materialCast.DiffuseMap.Length > 0 && Convert.ToUInt32(materialCast.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(materialCast.DiffuseMap, null) : loadTextureCallback(volumeCast.Key, presetTexture)) == -1)
-            {
-                Complate.MarkModelsNeedUpdatedCallback();
-            }
+            volumeCast.MainTextureID = materialCast.DiffuseMap.Length > 0 && Convert.ToUInt32(materialCast.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(materialCast.DiffuseMap, null) : loadTextureCallback(volumeCast.Key, presetTexture);
             GlobalState.Meshes[volumeCast.Key] = volumeCast;
         }
     }

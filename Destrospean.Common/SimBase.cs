@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common.Abstractions;
 using Destrospean.S3PIExtensions;
@@ -11,7 +12,7 @@ namespace Destrospean.Common
 
         string mID;
 
-        System.Drawing.Bitmap mStackedFaceTexture, mStackedScalpTexture;
+        Bitmap mStackedFaceTexture, mStackedScalpTexture;
 
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
@@ -53,9 +54,9 @@ namespace Destrospean.Common
             }
         }
 
-        public delegate void LoadMeshesOnMainThreadDelegate(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
+        public delegate void LoadMeshesOnMainThreadDelegate(object volume, Preset currentPreset, Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
 
-        public delegate int LoadTextureDelegate(string key, System.Drawing.Bitmap image);
+        public delegate int LoadTextureDelegate(string key, Bitmap image);
 
         public static object Lock = new object();
 
@@ -113,7 +114,7 @@ namespace Destrospean.Common
             return newDeltas;
         }
 
-        public System.Drawing.Bitmap GetStackedFaceTexture(int presetIndex)
+        public Bitmap GetStackedFaceTexture(int presetIndex)
         {
             lock (Lock)
             {
@@ -121,8 +122,8 @@ namespace Destrospean.Common
                 {
                     mStackedFaceTexture.Dispose();
                 }
-                mStackedFaceTexture = new System.Drawing.Bitmap(1024, 1024);
-                using (var graphics = System.Drawing.Graphics.FromImage(mStackedFaceTexture))
+                mStackedFaceTexture = new Bitmap(1024, 1024);
+                using (var graphics = Graphics.FromImage(mStackedFaceTexture))
                 {
                     foreach (var casPart in CASParts.Values)
                     {
@@ -145,7 +146,7 @@ namespace Destrospean.Common
             }
         }
 
-        public System.Drawing.Bitmap GetStackedScalpTexture(int presetIndex)
+        public Bitmap GetStackedScalpTexture(int presetIndex)
         {
             lock (Lock)
             {
@@ -153,8 +154,8 @@ namespace Destrospean.Common
                 {
                     mStackedScalpTexture.Dispose();
                 }
-                mStackedScalpTexture = new System.Drawing.Bitmap(1024, 1024);
-                using (var graphics = System.Drawing.Graphics.FromImage(mStackedScalpTexture))
+                mStackedScalpTexture = new Bitmap(1024, 1024);
+                using (var graphics = Graphics.FromImage(mStackedScalpTexture))
                 {
                     foreach (var casPart in CASParts.Values)
                     {
