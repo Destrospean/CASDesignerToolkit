@@ -317,7 +317,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                        }, currentPreset, casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture, material, loadTextureCallback);
+                        }, currentPreset, (System.Drawing.Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), material, loadTextureCallback);
                 }
             }
         }
@@ -345,11 +345,9 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             {
                 casPartVolume.SkinSpecularMapID = loadTextureCallback(casPartPreset.SkinSpecularMap, null);
             }
-            if ((casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture)) == -1)
-            {
-                Complate.MarkModelsNeedUpdatedCallback();
-            }
+            casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture);
             GlobalState.Meshes[casPartVolume.Key] = casPartVolume;
+            presetTexture.Dispose();
         }
 
         public static Vector3 ToVector3(float[] coordinates)
