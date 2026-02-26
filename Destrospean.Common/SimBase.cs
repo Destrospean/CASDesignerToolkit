@@ -60,7 +60,8 @@ namespace Destrospean.Common
 
         public static object Lock = new object();
 
-        public bool ShowMaternityPartsOnly = false;
+        public bool Locked = false,
+        ShowMaternityPartsOnly = false;
 
         public float[] SkinColor =
             {

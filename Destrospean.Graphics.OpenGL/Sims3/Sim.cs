@@ -80,6 +80,8 @@ namespace Destrospean.Graphics.OpenGL.Sims3
         {
             lock (Complate.Lock)
             {
+                while (Locked);
+                Locked = true;
                 if (!CASParts.ContainsValue(casPart) || casPart.LODs.Count == 0)
                 {
                     return;
@@ -319,6 +321,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
                         }, currentPreset, (System.Drawing.Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), material, loadTextureCallback);
                 }
+                Locked = false;
             }
         }
 
