@@ -263,20 +263,20 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         var materialColors = new Dictionary<FieldType, Vector3>();
                         var materialMaps = new Dictionary<FieldType, string>();
-                        foreach (var field in geom.Shader.GetFields())
+                        for (var i = 0; i < geom.Shader.FieldCount; i++)
                         {
-                            int valueType;
-                            var element = geom.Shader.GetFieldValue(field, out valueType);
+                            uint fieldType, valueType;
+                            var field = geom.Shader.GetField(i, out fieldType, out valueType);
                             switch ((MeshFormatDataType)valueType)
                             {
                                 case MeshFormatDataType.Float:
-                                    if (element.Length > 2)
+                                    if (field.Length > 2)
                                     {
-                                        materialColors[(FieldType)field] = ToVector3(System.Array.ConvertAll(element, x => (float)x));
+                                        materialColors[(FieldType)fieldType] = ToVector3(System.Array.ConvertAll(field, x => (float)x));
                                     }
                                     break;
                                 case MeshFormatDataType.Uint:
-                                    materialMaps[(FieldType)field] = new ResourceKey(geom.TGIList[(uint)element[0]].Type, geom.TGIList[(uint)element[0]].Group, geom.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey();
+                                    materialMaps[(FieldType)fieldType] = new ResourceKey(geom.TGIList[(uint)field[0]].Type, geom.TGIList[(uint)field[0]].Group, geom.TGIList[(uint)field[0]].Instance).ReverseEvaluateResourceKey();
                                     break;
                             }
                         }
