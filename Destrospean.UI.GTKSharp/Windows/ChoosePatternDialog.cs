@@ -12,6 +12,8 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public partial class ChoosePatternDialog : Dialog
     {
+        public static int ColumnSpacing = 6;
+
         public string PatternPath
         {
             get;
@@ -33,6 +35,7 @@ namespace Destrospean.DestrospeanCASPEditor
         public ChoosePatternDialog(string title, Window parent, IPackage package) : base(title, parent, DialogFlags.Modal)
         {
             Build();
+            PatternIconView.ColumnSpacing = ColumnSpacing;
             if (parent != null)
             {
                 this.RescaleAndReposition(parent);

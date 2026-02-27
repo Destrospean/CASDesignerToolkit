@@ -20,9 +20,11 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             get
             {
-                return (uint)(6 * Scale);
+                return (uint)(DefaultTableColumnSpacingBase * Scale);
             }
         }
+
+        public static int DefaultTableColumnSpacingBase = 6, SmallImageSizeBase = 16;
 
         public static float Scale, WineScaleDenominator;
 
@@ -33,8 +35,6 @@ namespace Destrospean.DestrospeanCASPEditor
                 return (int)(SmallImageSizeBase * Scale);
             }
         }
-
-        public static int SmallImageSizeBase = 16;
 
         public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
@@ -333,7 +333,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             valueWidget = comboBox;
                             break;
                     }
-                    var deleteButton = new Button(new Gtk.Image(Stock.Delete, IconSize.Menu))
+                    var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
                             Relief = ReliefStyle.None,
                         };
@@ -660,7 +660,7 @@ namespace Destrospean.DestrospeanCASPEditor
                         valueWidget = comboBox;
                     }
                     AttachLabelAndValueWidget:
-                    var deleteButton = new Button(new Gtk.Image(Stock.Delete, IconSize.Menu))
+                    var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
                             Relief = ReliefStyle.None,
                         };

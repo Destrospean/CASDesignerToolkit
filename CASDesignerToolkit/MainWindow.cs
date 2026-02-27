@@ -114,6 +114,17 @@ public partial class MainWindow : RendererMainWindow
         ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
+        ScrolledWindow.SizeAllocated += (o, args) =>
+            {
+                if (ScrolledWindow.Hadjustment.Upper > ScrolledWindow.Hadjustment.PageSize)
+                {
+                    ResourceTreeView.Style.FontDescription.Size = (int)((ResourceTreeView.Style.FontDescription.Size / Pango.Scale.PangoScale - 1) * Pango.Scale.PangoScale);
+                    ChoosePatternDialog.ColumnSpacing -= 1;
+                    WidgetUtils.SmallImageSizeBase -= 1;
+                    WidgetUtils.DefaultTableColumnSpacingBase -= 1;
+                    AdjustFontSizes(this, ResourceTreeView.Style.FontDescription);
+                }
+            };
         MainHPaned.ShowAll();
         GLWidget.Hide();
     }
@@ -653,6 +664,7 @@ public partial class MainWindow : RendererMainWindow
                                 break;
                         }
                     }
+                    AdjustFontSizes(this, Style.FontDescription);
                 };
         }
         catch (Exception ex)
@@ -688,6 +700,23 @@ public partial class MainWindow : RendererMainWindow
             BuildLODNotebook(casPart, lodIndex, groupIndex);
         }
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+    }
+
+    public static void AdjustFontSizes(Container container, Pango.FontDescription fontDescription)
+    {
+        container.ModifyFont(fontDescription);
+        foreach (var child in container.Children)
+        {
+            var childContainer = child as Container;
+            if (childContainer == null)
+            {
+                child.ModifyFont(fontDescription);
+            }
+            else
+            {
+                AdjustFontSizes(childContainer, fontDescription);
+            }
+        }
     }
 
     public void ClearTemporaryData()
