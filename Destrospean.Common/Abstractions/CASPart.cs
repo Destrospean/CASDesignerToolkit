@@ -98,41 +98,29 @@ namespace Destrospean.Common.Abstractions
                 vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
                 vpxyResource = vpxyResources[vpxyKey];
             }
-            using (var reader = new BinaryReader(vpxyResource.Stream))
+            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
+            var geomTGIs = new TGI[4][];
+            for (var i = 0; i < geomTGIs.GetLength(0); i++)
             {
-                var vpxy = new CmarNYCBorrowed.VPXY(reader);
-                var geomTGIs = new TGI[4][];
-                for (var i = 0; i < geomTGIs.GetLength(0); i++)
+                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
+                if (i == lod || lod == -1)
                 {
-                    var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
-                    if (i == lod || lod == -1)
-                    {
-                        var temp = "_lod" + i.ToString() + "-" + (geomTGIList.Count + 1).ToString();
-                        var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount.ToString() + temp));
-                        var geomStream = new MemoryStream();
-                        var geom = geometryResources[new ResourceKey(geomTGIList[geomTGIList.Count - 1].Type, geomTGIList[geomTGIList.Count - 1].Group, geomTGIList[geomTGIList.Count - 1].Instance).ReverseEvaluateResourceKey()];
-                        using (var geomStreamWriter = new BinaryWriter(geomStream))
-                        {
-                            geom.Write(geomStreamWriter);
-                        }
-                        var newGEOMResourceIndexEntry = ParentPackage.AddResource(new ResourceKey(newGEOMTGI.Type, newGEOMTGI.Group, newGEOMTGI.Instance), geomStream, true);
-                        using (var geomStreamReader = new BinaryReader(geomStream))
-                        {
-                            geometryResources.Add(newGEOMResourceIndexEntry.ReverseEvaluateResourceKey(), new GEOM(geomStreamReader));
-                        }
-                        geomTGIList.Add(newGEOMTGI);
-                    }
-                    geomTGIs[i] = geomTGIList.ToArray();
+                    var temp = "_lod" + i.ToString() + "-" + (geomTGIList.Count + 1).ToString();
+                    var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount.ToString() + temp));
+                    var geomStream = new MemoryStream();
+                    var geom = geometryResources[new ResourceKey(geomTGIList[geomTGIList.Count - 1].Type, geomTGIList[geomTGIList.Count - 1].Group, geomTGIList[geomTGIList.Count - 1].Instance).ReverseEvaluateResourceKey()];
+                    geom.Write(new BinaryWriter(geomStream));
+                    var newGEOMResourceIndexEntry = ParentPackage.AddResource(new ResourceKey(newGEOMTGI.Type, newGEOMTGI.Group, newGEOMTGI.Instance), geomStream, true);
+                    geometryResources.Add(newGEOMResourceIndexEntry.ReverseEvaluateResourceKey(), new GEOM(new BinaryReader(geomStream)));
+                    geomTGIList.Add(newGEOMTGI);
                 }
-                var vpxyStream = new MemoryStream();
-                using (var vpxyStreamWriter = new BinaryWriter(vpxyStream))
-                {
-                    new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(vpxyStreamWriter);
-                }
-                vpxyResource = new GenericRCOLResource(0, vpxyStream);
-                ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
-                vpxyResources[vpxyKey] = vpxyResource;
+                geomTGIs[i] = geomTGIList.ToArray();
             }
+            var vpxyStream = new MemoryStream();
+            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
+            vpxyResource = new GenericRCOLResource(0, vpxyStream);
+            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
+            vpxyResources[vpxyKey] = vpxyResource;
         }
 
         public void AdjustPresetCount()
@@ -157,31 +145,25 @@ namespace Destrospean.Common.Abstractions
                 vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
                 vpxyResource = vpxyResources[vpxyKey];
             }
-            using (var reader = new BinaryReader(vpxyResource.Stream))
+            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
+            var geomTGIs = new TGI[4][];
+            for (var i = 0; i < geomTGIs.GetLength(0); i++)
             {
-                var vpxy = new CmarNYCBorrowed.VPXY(reader);
-                var geomTGIs = new TGI[4][];
-                for (var i = 0; i < geomTGIs.GetLength(0); i++)
+                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
+                if (i == lod || lod == -1)
                 {
-                    var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
-                    if (i == lod || lod == -1)
-                    {
-                        var geomKey = new ResourceKey(geomTGIList[groupIndex].Type, geomTGIList[groupIndex].Group, geomTGIList[groupIndex].Instance).ReverseEvaluateResourceKey();
-                        ParentPackage.DeleteResource(ParentPackage.EvaluateResourceKey(geomKey).ResourceIndexEntry);
-                        geometryResources.Remove(geomKey);
-                        geomTGIList.RemoveAt(groupIndex);
-                    }
-                    geomTGIs[i] = geomTGIList.ToArray();
+                    var geomKey = new ResourceKey(geomTGIList[groupIndex].Type, geomTGIList[groupIndex].Group, geomTGIList[groupIndex].Instance).ReverseEvaluateResourceKey();
+                    ParentPackage.DeleteResource(ParentPackage.EvaluateResourceKey(geomKey).ResourceIndexEntry);
+                    geometryResources.Remove(geomKey);
+                    geomTGIList.RemoveAt(groupIndex);
                 }
-                var vpxyStream = new MemoryStream();
-                using (var vpxyStreamWriter = new BinaryWriter(vpxyStream))
-                {
-                    new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(vpxyStreamWriter);
-                }
-                vpxyResource = new GenericRCOLResource(0, vpxyStream);
-                ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
-                vpxyResources[vpxyKey] = vpxyResource;
+                geomTGIs[i] = geomTGIList.ToArray();
             }
+            var vpxyStream = new MemoryStream();
+            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
+            vpxyResource = new GenericRCOLResource(0, vpxyStream);
+            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
+            vpxyResources[vpxyKey] = vpxyResource;
         }
 
         public override void Dispose()
@@ -208,10 +190,7 @@ namespace Destrospean.Common.Abstractions
                 try
                 {
                     evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey());
-                    using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
-                    {
-                        bbln = new BBLN(reader);
-                    }
+                    bbln = new BBLN(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
                 }
                 catch (ResourceIndexEntryNotFoundException)
                 {
@@ -222,10 +201,7 @@ namespace Destrospean.Common.Abstractions
                 try
                 {
                     evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.BGEOTGI.Type, bbln.BGEOTGI.Group, bbln.BGEOTGI.Instance).ReverseEvaluateResourceKey());
-                    using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
-                    {
-                        bgeo = new BGEO(reader);
-                    }
+                    bgeo = new BGEO(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
                 }
                 catch (ResourceIndexEntryNotFoundException)
                 {
@@ -243,26 +219,19 @@ namespace Destrospean.Common.Abstractions
                             try
                             {
                                 evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(bbln.TGIList[geomMorph.TGIIndex].Type, bbln.TGIList[geomMorph.TGIIndex].Group, bbln.TGIList[geomMorph.TGIIndex].Instance).ReverseEvaluateResourceKey());
-                                using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
+                                var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                                foreach (var link in vpxy.GetMeshLinks(lod))
                                 {
-                                    var vpxy = new CmarNYCBorrowed.VPXY(reader);
-                                    foreach (var link in vpxy.GetMeshLinks(lod))
+                                    try
                                     {
-                                        try
-                                        {
-                                            using (var geomStreamReader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
-                                            {
-                                                evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
-                                                morphs[i] = new GEOM(geomStreamReader);
-                                            }
-                                        }
-                                        catch (ResourceIndexEntryNotFoundException)
-                                        {
-                                            morphs[i] = null;
-                                        }
+                                        evaluated = ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
+                                        morphs[i] = new GEOM(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                                    }
+                                    catch (ResourceIndexEntryNotFoundException)
+                                    {
+                                        morphs[i] = null;
                                     }
                                 }
-
                             }
                             catch (ResourceIndexEntryNotFoundException)
                             {
@@ -281,10 +250,7 @@ namespace Destrospean.Common.Abstractions
                     }
                     using (var fileStream = File.Create(filename + ".simgeom"))
                     {
-                        using (var writer = new BinaryWriter(fileStream))
-                        {
-                            geom.Write(writer);
-                        }
+                        geom.Write(new BinaryWriter(fileStream));
                     }
                     for (var i = 0; i < Array.FindAll(morphs, x => x.IsValid).Length; i++)
                     {
@@ -292,10 +258,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             using (var fileStream = File.Create(filename + "_" + "fat fit thin special".Split(' ')[i] + ".simgeom"))
                             {
-                                using (var writer = new BinaryWriter(fileStream))
-                                {
-                                    morphs[i].Write(writer);
-                                }
+                                morphs[i].Write(new BinaryWriter(fileStream));
                             }
                         }
                     }
@@ -303,19 +266,13 @@ namespace Destrospean.Common.Abstractions
                 case MeshFileType.OBJ:
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".obj") ? "" : ".obj")))
                     {
-                        using (var writer = new StreamWriter(fileStream))
-                        {
-                            new OBJ(geom, Array.ConvertAll(morphs, x => x.IsValid ? x : null)).Write(writer);
-                        }
+                        new OBJ(geom, Array.ConvertAll(morphs, x => x.IsValid ? x : null)).Write(new StreamWriter(fileStream));
                     }
                     break;
                 case MeshFileType.WSO:
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".wso") ? "" : ".wso")))
                     {
-                        using (var writer = new BinaryWriter(fileStream))
-                        {
-                            new WSO(geom, morphs).Write(writer);
-                        }
+                        new WSO(geom, morphs).Write(new BinaryWriter(fileStream));
                     }
                     break;
             }
@@ -381,10 +338,7 @@ namespace Destrospean.Common.Abstractions
             var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
             ParentPackage.AddResource(filename, evaluated.ResourceIndexEntry, false);
             ParentPackage.DeleteResource(evaluated.ResourceIndexEntry);
-            using (var reader = new BinaryReader(File.OpenRead(filename)))
-            {
-                geometryResources[LODs[lod][groupIndex].Key] = new GEOM(reader);
-            }
+            geometryResources[LODs[lod][groupIndex].Key] = new GEOM(new BinaryReader(File.OpenRead(filename)));
             LoadLODs(geometryResources, vpxyResources);
             updateUICallback(this, new List<int>(LODs.Keys).IndexOf(lod), groupIndex);
         }
@@ -408,11 +362,8 @@ namespace Destrospean.Common.Abstractions
                 try
                 {
                     evaluated = ParentPackage.EvaluateResourceKey(CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey());
-                    using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
-                    {
-                        bbln = new BBLN(reader);
-                        bblnResourceIndexEntries[i] = evaluated.ResourceIndexEntry;
-                    }
+                    bbln = new BBLN(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
+                    bblnResourceIndexEntries[i] = evaluated.ResourceIndexEntry;
                 }
                 catch (ResourceIndexEntryNotFoundException)
                 {
@@ -451,25 +402,16 @@ namespace Destrospean.Common.Abstractions
                 switch (meshFileType)
                 {
                     case MeshFileType.OBJ:
-                        using (var reader = new StreamReader(fileStream))
-                        {
-                            newGEOMPlusMorphs = GEOM.GEOMsFromOBJ(new OBJ(reader), geom, new TGI(), false, false);
-                        }
+                        newGEOMPlusMorphs = GEOM.GEOMsFromOBJ(new OBJ(new StreamReader(fileStream)), geom, new TGI(), false, false);
                         break;
                     case MeshFileType.WSO:
-                        using (var reader = new BinaryReader(fileStream))
-                        {
-                            newGEOMPlusMorphs = GEOM.GEOMsFromWSO(new WSO(reader), geom, new TGI());
-                        }
+                        newGEOMPlusMorphs = GEOM.GEOMsFromWSO(new WSO(new BinaryReader(fileStream)), geom, new TGI());
                         break;
                 }
                 for (var i = newGEOMPlusMorphs.Length - 1; i > -1 ; i--)
                 {
                     var stream = new MemoryStream();
-                    using (var writer = new BinaryWriter(stream))
-                    {
-                        newGEOMPlusMorphs[i].Write(writer);
-                    }
+                    newGEOMPlusMorphs[i].Write(new BinaryWriter(stream));
                     if (i == 0)
                     {
                         var evaluated = ParentPackage.EvaluateResourceKey(LODs[lod][groupIndex].Key);
@@ -488,37 +430,31 @@ namespace Destrospean.Common.Abstractions
                         {
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                using (var reader = new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry)))
-                                {
-                                    lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
-                                        {
-                                            j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(reader), 0, j)
-                                        } : new GEOM[0];
-                                }
+                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
+                                    {
+                                        j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
+                                    } : new GEOM[0];
                             }
                         }
                         else
                         {
-                            using (var reader = new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry)))
+                            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry)));
+                            for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                var vpxy = new CmarNYCBorrowed.VPXY(reader);
-                                for (var j = 0; j < lodMorphMeshes.Length; j++)
-                                {
-                                    lodMorphMeshes[j] = j == lod ? new GEOM[]
-                                        {
-                                            newGEOMPlusMorphs[i]
-                                        } : Array.ConvertAll(vpxy.GetMeshLinks(j), x => geometryResources[new ResourceKey(x.Type, x.Group, x.Instance).ReverseEvaluateResourceKey()]);
-                                }
-                                for (var j = 0; j < lodMorphMeshes.Length; j++)
-                                {
-                                    var meshLinks = vpxy.GetMeshLinks(j);
-                                    for (var k = 0; k < meshLinks.Length; k++)
+                                lodMorphMeshes[j] = j == lod ? new GEOM[]
                                     {
-                                        var key = new ResourceKey(meshLinks[k].Type, meshLinks[k].Group, meshLinks[k].Instance).ReverseEvaluateResourceKey();
-                                        var evaluated = ParentPackage.EvaluateResourceKey(key);
-                                        evaluated.Package.DeleteResource(evaluated.ResourceIndexEntry);
-                                        geometryResources.Remove(key);
-                                    }
+                                        newGEOMPlusMorphs[i]
+                                    } : Array.ConvertAll(vpxy.GetMeshLinks(j), x => geometryResources[new ResourceKey(x.Type, x.Group, x.Instance).ReverseEvaluateResourceKey()]);
+                            }
+                            for (var j = 0; j < lodMorphMeshes.Length; j++)
+                            {
+                                var meshLinks = vpxy.GetMeshLinks(j);
+                                for (var k = 0; k < meshLinks.Length; k++)
+                                {
+                                    var key = new ResourceKey(meshLinks[k].Type, meshLinks[k].Group, meshLinks[k].Instance).ReverseEvaluateResourceKey();
+                                    var evaluated = ParentPackage.EvaluateResourceKey(key);
+                                    evaluated.Package.DeleteResource(evaluated.ResourceIndexEntry);
+                                    geometryResources.Remove(key);
                                 }
                             }
                         }
@@ -531,18 +467,12 @@ namespace Destrospean.Common.Abstractions
                         var newBBLN = new BBLN(8, CASPartResource.Unknown1 + morphName, bgeoTGI);
                         var newBGEO = new BGEO(lodMorphMeshes);
                         var resourceStream = new MemoryStream();
-                        using (var writer = new BinaryWriter(resourceStream))
-                        {
-                            newBBLN.Write(writer);
-                        } 
+                        newBBLN.Write(new BinaryWriter(resourceStream));
                         ParentPackage.DeleteResource(morphEvaluated.ResourceIndexEntry);
                         ParentPackage.DeleteResource(bblnResourceIndexEntries[i - 1]);
                         ParentPackage.AddResource(bblnResourceIndexEntries[i - 1], resourceStream, true);
                         resourceStream = new MemoryStream();
-                        using (var writer = new BinaryWriter(resourceStream))
-                        {
-                            newBGEO.Write(writer);
-                        } 
+                        newBGEO.Write(new BinaryWriter(resourceStream));
                         ParentPackage.AddResource(new TGIBlock(0, null, bgeoTGI.Type, bgeoTGI.Group, bgeoTGI.Instance), resourceStream, true);
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].ResourceGroup = bblnResourceIndexEntries[i - 1].ResourceGroup;
                         CASPartResource.TGIBlocks[bblnIndices[i - 1]].Instance = bblnResourceIndexEntries[i - 1].Instance;
@@ -584,11 +514,8 @@ namespace Destrospean.Common.Abstractions
                             if (!geometryResources.TryGetValue(geometryResourceKey, out geometryResource))
                             {
                                 var evaluated = ParentPackage.EvaluateResourceKey(geometryResourceKey);
-                                using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
-                                {
-                                    geometryResources.Add(geometryResourceKey, new GEOM(reader));
-                                    geometryResource = geometryResources[geometryResourceKey];
-                                }
+                                geometryResources.Add(geometryResourceKey, new GEOM(new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry))));
+                                geometryResource = geometryResources[geometryResourceKey];
                             }
                             LODs[entry00.EntryID].Add(new GEOMAndKey(geometryResourceKey, geometryResource));
                         }

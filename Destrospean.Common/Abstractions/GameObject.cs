@@ -220,10 +220,7 @@ namespace Destrospean.Common.Abstractions
                     }
                     using (var fileStream = File.Create(filename + extension))
                     {
-                        using (var writer = new BinaryWriter(fileStream))
-                        {
-                            writer.Write(LODs[lod].Resource.AsBytes);
-                        }
+                        new BinaryWriter(fileStream).Write(LODs[lod].Resource.AsBytes);
                     }
                     break;
                 case MeshFileType.OBJ:
@@ -273,16 +270,10 @@ namespace Destrospean.Common.Abstractions
                         switch (meshFileType)
                         {
                             case MeshFileType.OBJ:
-                                using (var writer = new StreamWriter(fileStream))
-                                {
-                                    new OBJ(wso).Write(writer);
-                                }
+                                new OBJ(wso).Write(new StreamWriter(fileStream));
                                 break;
                             case MeshFileType.WSO:
-                                using (var writer = new BinaryWriter(fileStream))
-                                {
-                                    wso.Write(writer);
-                                }
+                                wso.Write(new BinaryWriter(fileStream));
                                 break;
                         }
                     }
