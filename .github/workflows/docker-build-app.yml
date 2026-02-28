@@ -17,8 +17,7 @@ jobs:
         REPO: ${{ github.repository }}
     - name: Pull Docker image
       run: |
-        IMAGE_ID=ghcr.io/${REPO,,}
-        docker pull $IMAGE_ID
+        docker pull ghcr.io/${{env.REPO_LC}}
       env:
         REPO: ${{ github.repository }}
     - name: Build from Docker image
