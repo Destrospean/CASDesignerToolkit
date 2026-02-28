@@ -7,27 +7,31 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
+    container:
+      image: ghcr.io/${{ github.repository }}:latest
+      volumes:
+        - ${{ github.workspace }}:/CASDesignerToolkit
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v4
     - name: Build from Docker image
-      run: tools/build.sh
+      run: bash -c "/CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.Custom.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
+    - uses: actions/checkout@v4
     - name: Upload Linux amd64 artifact
       uses: actions/upload-artifact@v4
       with:
         name: CASDesignerToolkit-linux-amd64
-        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-linux-amd64.rar
+        path: /CASDesignerToolkit/CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-linux-amd64.rar
     - name: Upload Windows i386 artifact
       uses: actions/upload-artifact@v4
       with:
         name: CASDesignerToolkit-win32-i386
-        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386.rar
+        path: /CASDesignerToolkit/CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386.rar
     - name: Upload Windows i386 self-extractor artifact
       uses: actions/upload-artifact@v4
       with:
         name: CASDesignerToolkit-Self-Extractor
-        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-Self-Extractor.exe
+        path: /CASDesignerToolkit/CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-Self-Extractor.exe
