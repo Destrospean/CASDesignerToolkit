@@ -16,7 +16,7 @@ jobs:
       env:
         REPO: ${{ github.repository }}
     - name: Pull Docker image
-      run: docker pull ghcr.io/$REPO_LC:latest
+      run: docker pull ghcr.io/${REPO_LC}:latest
     - name: Build from Docker image
       run: docker run --rm --name casdesignertoolkit -v "$(pwd)":/CASDesignerToolkit casdesignertoolkit bash -c "/CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.Custom.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
     - uses: actions/checkout@v4
