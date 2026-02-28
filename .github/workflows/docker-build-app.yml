@@ -1,0 +1,40 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set lowercase owner name
+      run: |
+        echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
+      env:
+        REPO: ${{ github.repository }}
+    - name: Pull Docker image
+      run: |
+        docker pull ghcr.io/${{env.REPO_LC}}
+      env:
+        REPO: ${{ github.repository }}
+    - name: Build from Docker image
+      run: docker run --rm --name casdesignertoolkit -v "$(pwd)":/CASDesignerToolkit casdesignertoolkit bash -c "/CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.Custom.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
+    - uses: actions/checkout@v4
+    - name: Upload Linux amd64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CASDesignerToolkit-linux-amd64
+        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-linux-amd64.rar
+    - name: Upload Windows i386 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CASDesignerToolkit-win32-i386
+        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386.rar
+    - name: Upload Windows i386 self-extractor artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CASDesignerToolkit-Self-Extractor
+        path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-Self-Extractor.exe
