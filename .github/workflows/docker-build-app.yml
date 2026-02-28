@@ -15,11 +15,16 @@ jobs:
         echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
       env:
         REPO: ${{ github.repository }}
+    - name: Log into registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Docker image
       run: |
         docker pull ghcr.io/${{env.REPO_LC}}
-      env:
-        REPO: ${{ github.repository }}
     - name: Build from Docker image
       run: docker run --rm --name casdesignertoolkit -v "$(pwd)":/CASDesignerToolkit casdesignertoolkit bash -c "/CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.Custom.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
     - uses: actions/checkout@v4
