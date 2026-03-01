@@ -1,4 +1,4 @@
-name: Docker
+name: Docker Build Image
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -9,7 +9,7 @@ on:
   push:
     branches: [ "master" ]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    # tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "master" ]
 

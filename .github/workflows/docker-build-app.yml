@@ -1,10 +1,10 @@
-name: Docker Image CI
+name: Docker Build App
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_run:
+    workflows: ["Docker Build Image"]
+    types:
+      - completed
 
 jobs:
   build:
