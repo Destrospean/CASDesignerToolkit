@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set lowercase repository name
-      run: echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
+      run: echo "IMAGE_NAME=${REPO,,}" >> $GITHUB_ENV
       env:
         REPO: ${{ github.repository }}
     - name: Log into registry
@@ -21,10 +21,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Docker image
-      run: docker pull ghcr.io/${{env.REPO_LC}}:master
+      run: docker pull ghcr.io/${{env.IMAGE_NAME}}:master
     - uses: actions/checkout@v4
     - name: Build from Docker image
-      run: IMAGE_ID=ghcr.io/${{ env.REPO_LC }}:master tools/build.sh
+      run: IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:master tools/build.sh
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
