@@ -289,6 +289,9 @@
       <Link>OpenTK License.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="start.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
