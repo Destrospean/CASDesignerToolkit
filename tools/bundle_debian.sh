@@ -14,7 +14,7 @@ rm $RELEASE_DIR/CASDesignerToolkit.exe.Backup
 rm -rf $RELEASE_DIR/dist
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
 cp $RELEASE_DIR/* CASDesignerToolkit
-rm CASDesignerToolkit/*.log
+rm CASDesignerToolkit/*.log CASDesignerToolkit/*.sh
 unix2dos CASDesignerToolkit/*.config CASDesignerToolkit/*.md CASDesignerToolkit/*.txt CASDesignerToolkit/*.xml
 rar a -sfxwindows.sfx "CASDesignerToolkit-Self-Extractor.exe" CASDesignerToolkit/*
 rar a CASDesignerToolkit-win32-i386.rar CASDesignerToolkit/*
@@ -30,8 +30,8 @@ cp $RELEASE_DIR/GameFolders.xml CASDesignerToolkit
 cp $RELEASE_DIR/LICENSE.md CASDesignerToolkit
 cp $RELEASE_DIR/*License.txt CASDesignerToolkit
 cp $RELEASE_DIR/s3pi* CASDesignerToolkit
+cp $RELEASE_DIR/*.sh CASDesignerToolkit
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
-cp start.sh CASDesignerToolkit
 rar a CASDesignerToolkit-linux-amd64.rar CASDesignerToolkit/*
 mv CASDesignerToolkit-*.rar $RELEASE_DIR/dist
 rm -rf CASDesignerToolkit
