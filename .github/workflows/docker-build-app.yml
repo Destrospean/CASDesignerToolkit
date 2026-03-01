@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set lowercase repository name
-      run: |
-        echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
+      run: echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
       env:
         REPO: ${{ github.repository }}
     - name: Log into registry
@@ -23,10 +22,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Docker image
-      run: |
-        docker pull ghcr.io/${{env.REPO_LC}}:master
+      run: docker pull ghcr.io/${{env.REPO_LC}}:master
     - name: Build from Docker image
-      run: docker run --rm --name casdesignertoolkit -v ${{ github.workspace }}:/CASDesignerToolkit ghcr.io/${{ env.REPO_LC }}:master bash -c "ls /CASDesignerToolkit && /CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.Custom.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
+      run: IMAGE_ID=ghcr.io/${{ env.REPO_LC }}:master tools/build.sh
     - uses: actions/checkout@v4
     - name: Upload Linux amd64 artifact
       uses: actions/upload-artifact@v4
