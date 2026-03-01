@@ -178,7 +178,7 @@ namespace Destrospean.Common
             }
         }
 
-        public void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
+        public virtual void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
         {
             lock (Lock)
             {

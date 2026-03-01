@@ -1022,7 +1022,11 @@ namespace Destrospean.CmarNYCBorrowed
 
         public class MTNF
         {
+            object[][] mData;
+
             int mDataSize, mZero;
+
+            uint[][] mFields;
 
             char[] mMagic;
 
@@ -1034,11 +1038,11 @@ namespace Destrospean.CmarNYCBorrowed
                 }
             }
 
-            public object[][] Data;
-
-            public int FieldCount;
-
-            public uint[][] Fields;
+            public int FieldCount
+            {
+                get;
+                private set;
+            }
 
             public int EmissionIndex
             {
@@ -1046,9 +1050,9 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var i = 0; i < FieldCount; i++)
                     {
-                        if (Fields[i][0] == (uint)FieldType.EmissionMap)
+                        if (mFields[i][0] == (uint)FieldType.EmissionMap)
                         {
-                            return (int)(uint)Data[i][0];
+                            return (int)(uint)mData[i][0];
                         }
                     }
                     return -1;
@@ -1057,9 +1061,9 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var i = 0; i < FieldCount; i++)
                     {
-                        if (Fields[i][0] == (uint)FieldType.EmissionMap)
+                        if (mFields[i][0] == (uint)FieldType.EmissionMap)
                         {
-                            Data[i][0] = (uint)value;
+                            mData[i][0] = (uint)value;
                         }
                     }
 
@@ -1072,9 +1076,9 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var i = 0; i < FieldCount; i++)
                     {
-                        if (Fields[i][0] == (uint)FieldType.NormalMap)
+                        if (mFields[i][0] == (uint)FieldType.NormalMap)
                         {
-                            return (int)(uint)Data[i][0];
+                            return (int)(uint)mData[i][0];
                         }
                     }
                     return -1;
@@ -1083,9 +1087,9 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var i = 0; i < FieldCount; i++)
                     {
-                        if (Fields[i][0] == (uint)FieldType.NormalMap)
+                        if (mFields[i][0] == (uint)FieldType.NormalMap)
                         {
-                            Data[i][0] = (uint)value;
+                            mData[i][0] = (uint)value;
                         }
                     }
 
@@ -1102,38 +1106,38 @@ namespace Destrospean.CmarNYCBorrowed
                 mZero = reader.ReadInt32();
                 mDataSize = reader.ReadInt32();
                 FieldCount = reader.ReadInt32();
-                Fields = new uint[FieldCount][];
+                mFields = new uint[FieldCount][];
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    Fields[i] = new uint[4];
+                    mFields[i] = new uint[4];
                     for (var j = 0; j < 4; j++)
                     {
-                        Fields[i][j] = reader.ReadUInt32();
+                        mFields[i][j] = reader.ReadUInt32();
                     }
                 }
-                Data = new object[FieldCount][];
+                mData = new object[FieldCount][];
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    Data[i] = new object[Fields[i][2]];
-                    if (Fields[i][1] == 1)
+                    mData[i] = new object[mFields[i][2]];
+                    if (mFields[i][1] == 1)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = reader.ReadSingle();
+                            mData[i][j] = reader.ReadSingle();
                         }
                     }
-                    else if (Fields[i][1] == 2)
+                    else if (mFields[i][1] == 2)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = reader.ReadInt32();
+                            mData[i][j] = reader.ReadInt32();
                         }
                     }
                     else
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = reader.ReadUInt32();
+                            mData[i][j] = reader.ReadUInt32();
                         }
                     }
                 }
@@ -1145,42 +1149,42 @@ namespace Destrospean.CmarNYCBorrowed
                 mZero = (int)shaderDataArray[1];
                 mDataSize = (int)shaderDataArray[2];
                 FieldCount = (int)shaderDataArray[3];
-                Fields = new uint[FieldCount][];
-                Data = new object[FieldCount][];
+                mFields = new uint[FieldCount][];
+                mData = new object[FieldCount][];
                 var index = 4;
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    Fields[i] = new uint[4];
+                    mFields[i] = new uint[4];
                     for (var j = 0; j < 4; j++)
                     {
-                        Fields[i][j] = shaderDataArray[index];
+                        mFields[i][j] = shaderDataArray[index];
                         index++;
                     }
                 }
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    Data[i] = new object[Fields[i][2]];
-                    if (Fields[i][1] == 1)
+                    mData[i] = new object[mFields[i][2]];
+                    if (mFields[i][1] == 1)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = BitConverter.ToSingle(BitConverter.GetBytes(shaderDataArray[index]), 0);
+                            mData[i][j] = BitConverter.ToSingle(BitConverter.GetBytes(shaderDataArray[index]), 0);
                             index++;
                         }
                     }
-                    else if (Fields[i][1] == 2)
+                    else if (mFields[i][1] == 2)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = (int)shaderDataArray[index];
+                            mData[i][j] = (int)shaderDataArray[index];
                             index++;
                         }
                     }
                     else
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            Data[i][j] = shaderDataArray[index];
+                            mData[i][j] = shaderDataArray[index];
                             index++;
                         }
                     }
@@ -1193,54 +1197,78 @@ namespace Destrospean.CmarNYCBorrowed
                 mZero = source.mZero;
                 mDataSize = source.mDataSize;
                 FieldCount = source.FieldCount;
-                Fields = new uint[source.Fields.Length][];
-                for (var i = 0; i < source.Fields.Length; i++)
+                mFields = new uint[source.mFields.Length][];
+                for (var i = 0; i < source.mFields.Length; i++)
                 {
-                    Fields[i] = new uint[source.Fields[i].Length];
-                    for (var j = 0; j < source.Fields[i].Length; j++)
+                    mFields[i] = new uint[source.mFields[i].Length];
+                    for (var j = 0; j < source.mFields[i].Length; j++)
                     {
-                        Fields[i][j] = source.Fields[i][j];
+                        mFields[i][j] = source.mFields[i][j];
                     }
                 }
-                Data = new object[source.Data.Length][];
-                for (var i = 0; i < source.Data.Length; i++)
+                mData = new object[source.mData.Length][];
+                for (var i = 0; i < source.mData.Length; i++)
                 {
-                    Data[i] = new object[source.Data[i].Length];
-                    for (var j = 0; j < source.Data[i].Length; j++)
+                    mData[i] = new object[source.mData[i].Length];
+                    for (var j = 0; j < source.mData[i].Length; j++)
                     {
-                        Data[i][j] = source.Data[i][j];
+                        mData[i][j] = source.mData[i][j];
                     }
                 }
             }
 
-            public uint[] GetFields()
+            public void AddField(uint fieldType, uint valueType, uint valueCount)
             {
-                var temp = new uint[FieldCount];
-                for (var i = 0; i < FieldCount; i++)
-                {
-                    temp[i] = Fields[i][0];
-                }
-                return temp;
+                InsertField(FieldCount, fieldType, valueType, valueCount);
             }
 
-            public object[] GetFieldValue(uint field, out int valueType)
+            public object[] GetField(int index, out uint fieldType, out uint valueType)
             {
-                object[] temp = null;
-                for (var i = 0; i < FieldCount; i++)
-                {
-                    if (Fields[i][0] == field)
+                fieldType = mFields[index][0];
+                valueType = mFields[index][1];
+                return mData[index];
+            }
+
+            public void InsertField(int index, uint fieldType, uint valueType, uint valueCount)
+            {
+                var elementList = new List<object[]>(mData);
+                var fieldList = new List<uint[]>(mFields);
+                fieldList.Insert(index, new uint[]
                     {
-                        temp = new object[Fields[i][2]];
-                        for (var j = 0; j < temp.Length; j++)
-                        {
-                            temp[j] = Data[i][j];
-                        }
-                        valueType = (int)Fields[i][1];
-                        return temp;
+                        fieldType,
+                        valueType,
+                        valueCount
+                    });
+                elementList.Insert(index, new object[valueCount]);
+                for (var i = 0; i < valueCount; i++)
+                {
+                    switch (valueType)
+                    {
+                        case 1:
+                            elementList[index][i] = 0f;
+                            break;
+                        case 2:
+                            elementList[index][i] = 0;
+                            break;
+                        default:
+                            elementList[index][i] = 0u;
+                            break;
                     }
                 }
-                valueType = 0;
-                return null;
+                mData = elementList.ToArray();
+                mFields = fieldList.ToArray();
+                FieldCount++;
+            }
+
+            public void RemoveField(int index)
+            {
+                var elementList = new List<object[]>(mData);
+                var fieldList = new List<uint[]>(mFields);
+                elementList.RemoveAt(index);
+                fieldList.RemoveAt(index);
+                mData = elementList.ToArray();
+                mFields = fieldList.ToArray();
+                FieldCount--;
             }
 
             public uint[] ToDataArray()
@@ -1254,30 +1282,30 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var j = 0; j < 4; j++)
                     {
-                        temp.Add(Fields[i][j]);
+                        temp.Add(mFields[i][j]);
                     }
                 }
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    if (Fields[i][1] == 1)
+                    if (mFields[i][1] == 1)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            temp.Add(BitConverter.ToUInt32(BitConverter.GetBytes((float)Data[i][j]), 0));
+                            temp.Add(BitConverter.ToUInt32(BitConverter.GetBytes((float)mData[i][j]), 0));
                         }
                     }
-                    else if (Fields[i][1] == 2)
+                    else if (mFields[i][1] == 2)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            temp.Add((uint)(int)Data[i][j]);
+                            temp.Add((uint)(int)mData[i][j]);
                         }
                     }
                     else
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            temp.Add((uint)Data[i][j]);
+                            temp.Add((uint)mData[i][j]);
                         }
                     }
                 }
@@ -1294,30 +1322,30 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     for (var j = 0; j < 4; j++)
                     {
-                        writer.Write(Fields[i][j]);
+                        writer.Write(mFields[i][j]);
                     }
                 }
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    if (Fields[i][1] == 1)
+                    if (mFields[i][1] == 1)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            writer.Write((float)Data[i][j]);
+                            writer.Write((float)mData[i][j]);
                         }
                     }
-                    else if (Fields[i][1] == 2)
+                    else if (mFields[i][1] == 2)
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            writer.Write((int)Data[i][j]);
+                            writer.Write((int)mData[i][j]);
                         }
                     }
                     else
                     {
-                        for (var j = 0; j < Fields[i][2]; j++)
+                        for (var j = 0; j < mFields[i][2]; j++)
                         {
-                            writer.Write((uint)Data[i][j]);
+                            writer.Write((uint)mData[i][j]);
                         }
                     }
                 }

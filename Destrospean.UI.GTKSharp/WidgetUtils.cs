@@ -20,9 +20,11 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             get
             {
-                return (uint)(6 * Scale);
+                return (uint)(DefaultTableColumnSpacingBase * Scale);
             }
         }
+
+        public static int DefaultTableColumnSpacingBase = 6, SmallImageSizeBase = 16;
 
         public static float Scale, WineScaleDenominator;
 
@@ -33,8 +35,6 @@ namespace Destrospean.DestrospeanCASPEditor
                 return (int)(SmallImageSizeBase * Scale);
             }
         }
-
-        public static int SmallImageSizeBase = 16;
 
         public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
@@ -139,25 +139,23 @@ namespace Destrospean.DestrospeanCASPEditor
                     }, 0, 1, table.NRows - 1, table.NRows, AttachOptions.Fill, 0, 0, 0);
                 table.Attach(shaderComboBoxAlignment, 1, 2, table.NRows - 1, table.NRows, AttachOptions.Expand | AttachOptions.Fill, 0, 0, 0);
                 table.NRows++;
-                var fieldIndex = -1;
-                foreach (var field in geometryResource.Shader.GetFields())
+                for (var i = 0; i < geometryResource.Shader.FieldCount; i++)
                 {
                     Widget valueWidget = null;
                     var alignment = new Alignment(0, .5f, 0, 0);
-                    int valueType;
-                    geometryResource.Shader.GetFieldValue(field, out valueType);
-                    var element = geometryResource.Shader.Data[++fieldIndex];
-                    var elementIndex = fieldIndex;
+                    uint fieldType, valueType;
+                    var field = geometryResource.Shader.GetField(i, out fieldType, out valueType);
+                    var fieldIndex = i;
                     switch ((MeshFormatDataType)valueType)
                     {
                         case MeshFormatDataType.Float:
-                            switch (element.Length)
+                            switch (field.Length)
                             {
                                 case 1:
-                                    var spinButtonFloat = new SpinButton(new Adjustment((float)element[0], -1, 1, .0001, 10, 0), 0, 4);
+                                    var spinButtonFloat = new SpinButton(new Adjustment((float)field[0], -1, 1, .0001, 10, 0), 0, 4);
                                     spinButtonFloat.ValueChanged += (sender, e) =>
                                         {
-                                            element[0] = (float)spinButtonFloat.Value;
+                                            field[0] = (float)spinButtonFloat.Value;
                                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                         };
                                     valueWidget = spinButtonFloat;
@@ -166,17 +164,17 @@ namespace Destrospean.DestrospeanCASPEditor
                                     var hBox = new HBox();
                                     var spinButtons = new List<SpinButton>
                                         {
-                                            new SpinButton(new Adjustment((float)element[0], -1, 1, .0001, 10, 0), 0, 4),
-                                            new SpinButton(new Adjustment((float)element[1], -1, 1, .0001, 10, 0), 0, 4)
+                                            new SpinButton(new Adjustment((float)field[0], -1, 1, .0001, 10, 0), 0, 4),
+                                            new SpinButton(new Adjustment((float)field[1], -1, 1, .0001, 10, 0), 0, 4)
                                         };
                                     spinButtons[0].ValueChanged += (sender, e) =>
                                         {
-                                            element[0] = (float)spinButtons[0].Value;
+                                            field[0] = (float)spinButtons[0].Value;
                                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                         };
                                     spinButtons[1].ValueChanged += (sender, e) =>
                                         {
-                                            element[1] = (float)spinButtons[1].Value;
+                                            field[1] = (float)spinButtons[1].Value;
                                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                         };
                                     spinButtons.ForEach(x => hBox.PackStart(x, false, false, 0));
@@ -187,17 +185,17 @@ namespace Destrospean.DestrospeanCASPEditor
                                         {
                                             Color = new Color
                                                 {
-                                                    Blue = (ushort)((float)element[2] * ushort.MaxValue),
-                                                    Green = (ushort)((float)element[1] * ushort.MaxValue),
-                                                    Red = (ushort)((float)element[0] * ushort.MaxValue)
+                                                    Blue = (ushort)((float)field[2] * ushort.MaxValue),
+                                                    Green = (ushort)((float)field[1] * ushort.MaxValue),
+                                                    Red = (ushort)((float)field[0] * ushort.MaxValue)
                                                 }
                                         };
                                     colorButton.ColorSet += (sender, e) =>
                                         {
-                                            element[0] = (float)colorButton.Color.Red / ushort.MaxValue;
-                                            element[1] = (float)colorButton.Color.Green / ushort.MaxValue;
-                                            element[2] = (float)colorButton.Color.Blue / ushort.MaxValue;
-                                            var color = new OpenTK.Vector3((float)element[0], (float)element[1], (float)element[2]);
+                                            field[0] = (float)colorButton.Color.Red / ushort.MaxValue;
+                                            field[1] = (float)colorButton.Color.Green / ushort.MaxValue;
+                                            field[2] = (float)colorButton.Color.Blue / ushort.MaxValue;
+                                            var color = new OpenTK.Vector3((float)field[0], (float)field[1], (float)field[2]);
                                             Material material;
                                             if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                             {
@@ -206,7 +204,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                             }
                                             lock (GlobalState.Lock)
                                             {
-                                                switch ((FieldType)field)
+                                                switch ((FieldType)fieldType)
                                                 {
 #pragma warning disable 0618
                                                     case FieldType.Ambient:
@@ -228,22 +226,22 @@ namespace Destrospean.DestrospeanCASPEditor
                                 case 4:
                                     var colorButtonWithAlpha = new ColorButton
                                         {
-                                            Alpha = (ushort)((float)element[3] * ushort.MaxValue),
+                                            Alpha = (ushort)((float)field[3] * ushort.MaxValue),
                                             Color = new Color
                                                 {
-                                                    Blue = (ushort)((float)element[2] * ushort.MaxValue),
-                                                    Green = (ushort)((float)element[1] * ushort.MaxValue),
-                                                    Red = (ushort)((float)element[0] * ushort.MaxValue)
+                                                    Blue = (ushort)((float)field[2] * ushort.MaxValue),
+                                                    Green = (ushort)((float)field[1] * ushort.MaxValue),
+                                                    Red = (ushort)((float)field[0] * ushort.MaxValue)
                                                 },
                                             UseAlpha = true
                                         };
                                     colorButtonWithAlpha.ColorSet += (sender, e) =>
                                         {
-                                            element[0] = (float)colorButtonWithAlpha.Color.Red / ushort.MaxValue;
-                                            element[1] = (float)colorButtonWithAlpha.Color.Green / ushort.MaxValue;
-                                            element[2] = (float)colorButtonWithAlpha.Color.Blue / ushort.MaxValue;
-                                            element[3] = (float)colorButtonWithAlpha.Alpha / ushort.MaxValue;
-                                            var color = new OpenTK.Vector3((float)element[0], (float)element[1], (float)element[2]);
+                                            field[0] = (float)colorButtonWithAlpha.Color.Red / ushort.MaxValue;
+                                            field[1] = (float)colorButtonWithAlpha.Color.Green / ushort.MaxValue;
+                                            field[2] = (float)colorButtonWithAlpha.Color.Blue / ushort.MaxValue;
+                                            field[3] = (float)colorButtonWithAlpha.Alpha / ushort.MaxValue;
+                                            var color = new OpenTK.Vector3((float)field[0], (float)field[1], (float)field[2]);
                                             Material material;
                                             if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                             {
@@ -252,7 +250,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                             }
                                             lock (GlobalState.Lock)
                                             {
-                                                switch ((FieldType)field)
+                                                switch ((FieldType)fieldType)
                                                 {
 #pragma warning disable 0618
                                                     case FieldType.Ambient:
@@ -274,17 +272,17 @@ namespace Destrospean.DestrospeanCASPEditor
                             }
                             break;
                         case MeshFormatDataType.Byte4:
-                            var spinButtonInt = new SpinButton(new Adjustment((int)element[0], int.MinValue, int.MaxValue, 1, 10, 0), 0, 0);
+                            var spinButtonInt = new SpinButton(new Adjustment((int)field[0], int.MinValue, int.MaxValue, 1, 10, 0), 0, 0);
                             spinButtonInt.ValueChanged += (sender, e) =>
                                 {
-                                    element[0] = spinButtonInt.ValueAsInt;
+                                    field[0] = spinButtonInt.ValueAsInt;
                                     mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                                 };
                             valueWidget = spinButtonInt;
                             break;
                         case MeshFormatDataType.Uint:
                             alignment.Xscale = 1;
-                            var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)element[0]].Type, geometryResource.TGIList[(uint)element[0]].Group, geometryResource.TGIList[(uint)element[0]].Instance).ReverseEvaluateResourceKey(), preset, imageWidget);
+                            var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)field[0]].Type, geometryResource.TGIList[(uint)field[0]].Group, geometryResource.TGIList[(uint)field[0]].Instance).ReverseEvaluateResourceKey(), preset, imageWidget);
                             var comboBoxLastActive = comboBox.Active;
                             comboBox.Changed += (sender, e) =>
                                 {
@@ -303,7 +301,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                         geometryResource.TGIList = temp.ToArray();
                                         index = geometryResource.TGIList.Length - 1;
                                     }
-                                    element[0] = (uint)index;
+                                    field[0] = (uint)index;
                                     Material material;
                                     if (!GlobalState.Materials.TryGetValue(geometryResourceKey, out material))
                                     {
@@ -312,7 +310,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                     }
                                     lock (GlobalState.Lock)
                                     {
-                                        switch ((FieldType)field)
+                                        switch ((FieldType)fieldType)
                                         {
                                             case FieldType.AmbientOcclusionMap:
                                                 material.AmbientMap = key;
@@ -333,19 +331,13 @@ namespace Destrospean.DestrospeanCASPEditor
                             valueWidget = comboBox;
                             break;
                     }
-                    var deleteButton = new Button(new Gtk.Image(Stock.Delete, IconSize.Menu))
+                    var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
                             Relief = ReliefStyle.None,
                         };
                     deleteButton.Clicked += (sender, e) =>
                         {
-                            var elementList = new List<object[]>(geometryResource.Shader.Data);
-                            var fieldList = new List<uint[]>(geometryResource.Shader.Fields);
-                            elementList.RemoveAt(elementIndex);
-                            fieldList.RemoveAt(elementIndex);
-                            geometryResource.Shader.Data = elementList.ToArray();
-                            geometryResource.Shader.Fields = fieldList.ToArray();
-                            geometryResource.Shader.FieldCount--;
+                            geometryResource.Shader.RemoveField(fieldIndex);
                             foreach (var child in table.Children)
                             {
                                 table.Remove(child);
@@ -355,7 +347,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         };
                     var labelHBox = new HBox(false, 6);
-                    labelHBox.PackStart(new Label(((FieldType)field).ToString())
+                    labelHBox.PackStart(new Label(((FieldType)fieldType).ToString())
                         {
                             UseUnderline = false,
                             Xalign = 0
@@ -385,33 +377,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             {
                                 table.Remove(child);
                             }
-                            var elementList = new List<object[]>(geometryResource.Shader.Data);
-                            var fieldList = new List<uint[]>(geometryResource.Shader.Fields);
-                            elementList.Add(new object[addMaterialPropertyDialog.ValueCount]);
-                            for (var i = 0; i < addMaterialPropertyDialog.ValueCount; i++)
-                            {
-                                switch (addMaterialPropertyDialog.ValueType)
-                                {
-                                    case MeshFormatDataType.Float:
-                                        elementList[elementList.Count - 1][i] = 0f;
-                                        break;
-                                    case MeshFormatDataType.Byte4:
-                                        elementList[elementList.Count - 1][i] = 0;
-                                        break;
-                                    default:
-                                        elementList[elementList.Count - 1][i] = 0u;
-                                        break;
-                                }
-                            }
-                            fieldList.Add(new uint[]
-                                {
-                                    addMaterialPropertyDialog.Field,
-                                    (uint)addMaterialPropertyDialog.ValueType,
-                                    addMaterialPropertyDialog.ValueCount
-                                });
-                            geometryResource.Shader.Data = elementList.ToArray();
-                            geometryResource.Shader.Fields = fieldList.ToArray();
-                            geometryResource.Shader.FieldCount++;
+                            geometryResource.Shader.AddField(addMaterialPropertyDialog.Field, (uint)addMaterialPropertyDialog.ValueType, addMaterialPropertyDialog.ValueCount);
                             table.AddProperties(package, geometryResource, preset, scrolledWindow, imageWidget);
                             table.ShowAll();
                             scrolledWindow.Vadjustment.Value = scrolledWindow.Vadjustment.Upper;
@@ -660,7 +626,7 @@ namespace Destrospean.DestrospeanCASPEditor
                         valueWidget = comboBox;
                     }
                     AttachLabelAndValueWidget:
-                    var deleteButton = new Button(new Gtk.Image(Stock.Delete, IconSize.Menu))
+                    var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
                             Relief = ReliefStyle.None,
                         };

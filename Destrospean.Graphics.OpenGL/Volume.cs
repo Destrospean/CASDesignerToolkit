@@ -151,6 +151,8 @@ namespace Destrospean.Graphics.OpenGL
             }
         }
 
+        public string GroupID, Key;
+
         public override int IndexCount
         {
             get
@@ -159,7 +161,7 @@ namespace Destrospean.Graphics.OpenGL
             }
         }
 
-        public string Key;
+        public int LODIndex;
 
         public Material Material = new Material();
 
@@ -202,8 +204,6 @@ namespace Destrospean.Graphics.OpenGL
                 mVertices = value;
             }
         }
-
-        public string GroupID;
 
         public override void CalculateModelMatrix()
         {
