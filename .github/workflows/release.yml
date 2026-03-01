@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set lowercase repository name
+      run: echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
+      env:
+        REPO: ${{ github.repository }}
+    - name: Log into registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull Docker image
+      run: docker pull ghcr.io/${{env.REPO_LC}}:master
+    - uses: actions/checkout@v4
+    - name: Build from Docker image
+      run: IMAGE_ID=ghcr.io/${{ env.REPO_LC }}:master tools/build.sh
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+            CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-linux-amd64.rar
+            CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386.rar
+            CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-Self-Extractor.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
