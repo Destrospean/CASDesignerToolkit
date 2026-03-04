@@ -14,8 +14,6 @@ rm $RELEASE_DIR/CASDesignerToolkit.exe.Backup
 rm -rf $RELEASE_DIR/dist
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
 cp $RELEASE_DIR/* CASDesignerToolkit
-cp ../libs/libvlc* CASDesignerToolkit
-cp -r ../libs/plugins CASDesignerToolkit
 rm CASDesignerToolkit/*.log CASDesignerToolkit/*.sh
 unix2dos CASDesignerToolkit/*.config CASDesignerToolkit/*.md CASDesignerToolkit/*.txt CASDesignerToolkit/*.xml
 rar a -sfxwindows.sfx "CASDesignerToolkit-Self-Extractor.exe" CASDesignerToolkit/*

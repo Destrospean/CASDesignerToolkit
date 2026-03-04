@@ -110,6 +110,7 @@
     </Reference>
     <Reference Include="s3pi.NameMapResource">
       <HintPath>..\libs\s3pi.NameMapResource.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.NGMPHashMapResource">
       <HintPath>..\libs\s3pi.NGMPHashMapResource.dll</HintPath>
@@ -178,15 +179,6 @@
     </Reference>
     <Reference Include="GLWidget">
       <HintPath>..\libs\GLWidget.dll</HintPath>
-    </Reference>
-    <Reference Include="s3piwrappers.AudioResources">
-      <HintPath>..\libs\s3piwrappers.AudioResources.dll</HintPath>
-    </Reference>
-    <Reference Include="s3piwrappers.Helpers">
-      <HintPath>..\libs\s3piwrappers.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="LibVLCSharp">
-      <HintPath>..\libs\LibVLCSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -107,13 +107,6 @@
         <property name="Active">False</property>
         <signal name="Toggled" handler="OnUseAdvancedShadersActionToggled" />
       </action>
-      <action id="PlayMusicAction">
-        <property name="Type">Toggle</property>
-        <property name="Label" translatable="yes">Play Music</property>
-        <property name="ShortLabel" translatable="yes">Play Music</property>
-        <property name="DrawAsRadio">False</property>
-        <property name="Active">False</property>
-      </action>
     </action-group>
     <property name="MemberName" />
     <property name="WidthRequest">1080</property>
@@ -147,7 +140,6 @@
               <node type="Menu" action="SettingsAction">
                 <node type="Menuitem" action="GameFoldersAction" />
                 <node type="Menuitem" action="UseAdvancedShadersAction" />
-                <node type="Menuitem" action="PlayMusicAction" />
               </node>
             </node>
           </widget>
