@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Destrospean.CmarNYCBorrowed;
@@ -18,9 +19,17 @@ public partial class MainWindow : RendererMainWindow
 {
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
+    List<EvaluatedResourceKey> mAudioResources = new List<EvaluatedResourceKey>();
+
     bool mDisableUpdateModels = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
+
+    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--no-audio-time-stretch", "--aout=alsa");
+
+    LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
+
+    Thread mMusicThread;
 
     readonly string mOriginalWindowTitle;
 
@@ -97,6 +106,7 @@ public partial class MainWindow : RendererMainWindow
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
+        new Thread(() => AddMusic("music_mode_cas")).Start();
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow(this, Icon);
@@ -107,7 +117,30 @@ public partial class MainWindow : RendererMainWindow
         mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFatnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFitnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
+        mMediaPlayer = new LibVLCSharp.Shared.MediaPlayer(mLibVLC);
+        PlayMusicAction.Active = ApplicationSettings.PlayMusic;
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
+        PlayMusicAction.Toggled += (sender, e) =>
+            {
+                ApplicationSettings.PlayMusic = PlayMusicAction.Active;
+                TreeIter iter;
+                TreeModel model;
+                if (ApplicationSettings.PlayMusic)
+                {
+                    if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
+                    {
+                        (mMusicThread = new Thread(PlayMusic)).Start();
+                    }
+                }
+                else
+                {
+                    mMediaPlayer.Stop();
+                    if (mMusicThread != null)
+                    {
+                        mMusicThread.Abort();
+                    }
+                }
+            };
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
@@ -262,6 +295,35 @@ public partial class MainWindow : RendererMainWindow
         {
             ProgramUtils.WriteError(ex);
             throw;
+        }
+    }
+
+    void AddMusic(string musicMode)
+    {
+        foreach (var package in ResourceUtils.GameContentPackages.Values)
+        {
+            foreach (var nameMapResource in package.GetNameMapResources())
+            {
+                foreach (var nameMapKvp in nameMapResource.ToDictionary())
+                {
+                    if (nameMapKvp.Value == musicMode)
+                    {
+                        foreach (var resourceIndexEntry in package.FindAll(x => x.Instance == nameMapKvp.Key))
+                        {
+                            foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                            {
+                                if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
+                                {
+                                    foreach (var item in block.Items)
+                                    {
+                                        mAudioResources.AddRange(package.FindAll(x => x.ResourceType == 0x01EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -625,6 +687,11 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
+                    mMediaPlayer.Stop();
+                    if (mMusicThread != null)
+                    {
+                        mMusicThread.Abort();
+                    }
                     mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();
@@ -657,6 +724,10 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 break;
                             case "CASP":
+                                if (ApplicationSettings.PlayMusic)
+                                {
+                                    (mMusicThread = new Thread(PlayMusic)).Start();
+                                }
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
                                 mDisableUpdateModels = false;
@@ -671,6 +742,44 @@ public partial class MainWindow : RendererMainWindow
         {
             ProgramUtils.WriteError(ex);
             throw;
+        }
+    }
+
+    void PlayMusic()
+    {
+        Shuffle(mAudioResources);
+        while (true)
+        {
+            foreach (var audioResource in mAudioResources)
+            {
+                var startInfo = new ProcessStartInfo
+                    {
+                        Arguments = "-pi -po",
+                        CreateNoWindow = true,
+                        FileName = "ealayer3",
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
+                using (var process = Process.Start(startInfo))
+                {
+                    if (process == null)
+                    {
+                        Console.WriteLine("Failed to start the executable.");
+                        return;
+                    }
+                    using (var standardInput = process.StandardInput.BaseStream)
+                    {
+                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
+                    }
+                    var wait = true;
+                    mMediaPlayer.EndReached += (sender, e) => wait = false;
+                    mMediaPlayer.Play(new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream)));
+                    while (wait);
+                    process.WaitForExit();
+                }
+            }
         }
     }
 
@@ -700,6 +809,20 @@ public partial class MainWindow : RendererMainWindow
             BuildLODNotebook(casPart, lodIndex, groupIndex);
         }
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+    }
+
+    static void Shuffle<T>(IList<T> list)
+    {
+        var random = new Random();
+        var count = list.Count;
+        while (count > 1)
+        {
+            count--;
+            var n = random.Next(count + 1);
+            T value = list[n];
+            list[n] = list[count];
+            list[count] = value;
+        }
     }
 
     public static void AdjustFontSizes(Container container, Pango.FontDescription fontDescription)
@@ -1022,6 +1145,8 @@ public partial class MainWindow : RendererMainWindow
                     return;
             }
         }
+        mMediaPlayer.Stop();
+        mMusicThread.Abort();
         Application.Quit();
     }
 
@@ -1128,6 +1253,8 @@ public partial class MainWindow : RendererMainWindow
                     return;
             }
         }
+        mMediaPlayer.Stop();
+        mMusicThread.Abort();
         Application.Quit();
     }
 
