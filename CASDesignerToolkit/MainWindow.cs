@@ -1146,7 +1146,10 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         mMediaPlayer.Stop();
-        mMusicThread.Abort();
+        if (mMusicThread != null)
+        {
+            mMusicThread.Abort();
+        }
         Application.Quit();
     }
 
@@ -1254,7 +1257,10 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         mMediaPlayer.Stop();
-        mMusicThread.Abort();
+        if (mMusicThread != null)
+        {
+            mMusicThread.Abort();
+        }
         Application.Quit();
     }
 
