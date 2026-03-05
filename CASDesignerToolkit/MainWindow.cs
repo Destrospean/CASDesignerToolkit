@@ -25,7 +25,7 @@ public partial class MainWindow : RendererMainWindow
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
-    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--no-audio-time-stretch", "--aout=alsa");
+    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--no-audio-time-stretch", "--file-caching=0", "--network-caching=0", "--aout=" + (Platform.IsWindows ? "waveout" : Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : "dummy"));
 
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
@@ -752,7 +752,7 @@ public partial class MainWindow : RendererMainWindow
         {
             foreach (var audioResource in mAudioResources)
             {
-                var startInfo = new ProcessStartInfo
+                using (var process = Process.Start(new ProcessStartInfo
                     {
                         Arguments = "-pi -po",
                         CreateNoWindow = true,
@@ -761,8 +761,7 @@ public partial class MainWindow : RendererMainWindow
                         RedirectStandardInput = true,
                         RedirectStandardOutput = true,
                         UseShellExecute = false
-                    };
-                using (var process = Process.Start(startInfo))
+                    }))
                 {
                     if (process == null)
                     {
@@ -775,8 +774,14 @@ public partial class MainWindow : RendererMainWindow
                     }
                     var wait = true;
                     mMediaPlayer.EndReached += (sender, e) => wait = false;
-                    mMediaPlayer.Play(new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream)));
-                    while (wait);
+                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
+                    Thread.Sleep(1000);
+                    mMediaPlayer.Play(media);
+                    mMediaPlayer.Position = 0;
+                    while (wait)
+                    {
+                        Thread.Sleep(1);
+                    }
                     process.WaitForExit();
                 }
             }
