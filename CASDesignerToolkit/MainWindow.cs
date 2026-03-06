@@ -775,7 +775,6 @@ public partial class MainWindow : RendererMainWindow
                     var wait = true;
                     mMediaPlayer.EndReached += (sender, e) => wait = false;
                     var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                    Thread.Sleep(1000);
                     mMediaPlayer.Play(media);
                     mMediaPlayer.Position = 0;
                     while (wait)
