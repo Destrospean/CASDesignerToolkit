@@ -110,7 +110,6 @@
     </Reference>
     <Reference Include="s3pi.NameMapResource">
       <HintPath>..\libs\s3pi.NameMapResource.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.NGMPHashMapResource">
       <HintPath>..\libs\s3pi.NGMPHashMapResource.dll</HintPath>
@@ -179,6 +178,18 @@
     </Reference>
     <Reference Include="GLWidget">
       <HintPath>..\libs\GLWidget.dll</HintPath>
+    </Reference>
+    <Reference Include="s3piwrappers.AudioResources">
+      <HintPath>..\libs\s3piwrappers.AudioResources.dll</HintPath>
+    </Reference>
+    <Reference Include="s3piwrappers.Helpers">
+      <HintPath>..\libs\s3piwrappers.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="LibVLCSharp">
+      <HintPath>..\libs\LibVLCSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\libs\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +304,26 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="start.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ealayer3 License.txt">
+      <Link>ealayer3 License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\libVLC License.txt">
+      <Link>libVLC License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\mpg123 License.txt">
+      <Link>mpg123 License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Newtonsoft.Json License.txt">
+      <Link>Newtonsoft.Json License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\TeximpNet License.txt">
+      <Link>TeximpNet License.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

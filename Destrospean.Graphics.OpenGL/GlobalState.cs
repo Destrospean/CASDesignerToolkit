@@ -195,6 +195,7 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
                 uniform bool hasTransparency;
+                uniform vec3 skin_color;
      
                 void main()
                 {
@@ -207,7 +208,7 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         else
                         {{
-                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                            texcolor = vec4(skin_color, 1.0);
                         }}
                     }}
                     gl_FragColor = texcolor;

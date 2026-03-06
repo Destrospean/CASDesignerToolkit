@@ -282,6 +282,11 @@ namespace Destrospean.S3PIExtensions
             throw new ResourceIndexEntryNotFoundException("No resource with the key, \"" + key + ",\" referenced in the XML node could be found.");
         }
 
+        public static NameMapResource.NameMapResource[] GetNameMapResources(this IPackage package)
+        {
+            return package.FindAll(x => x.GetResourceTypeTag() == "_KEY").ConvertAll(x => (NameMapResource.NameMapResource)s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, x)).ToArray();
+        }
+
         public static IResourceIndexEntry GetResourceIndexEntry(this IPackage package, IResourceKey resourceKey)
         {
             return package.Find(x => x.ResourceType == resourceKey.ResourceType && x.ResourceGroup == resourceKey.ResourceGroup && x.Instance == resourceKey.Instance);
@@ -407,6 +412,17 @@ namespace Destrospean.S3PIExtensions
         public static string ReverseEvaluateResourceKey(this IResourceKey resourceKey)
         {   
             return "key:" + resourceKey.ResourceType.ToString("X8") + ":" + resourceKey.ResourceGroup.ToString("X8") + ":" + resourceKey.Instance.ToString("X16");
+        }
+
+        public static Dictionary<ulong, string> ToDictionary(this NameMapResource.NameMapResource nameMapResource)
+        {
+            var nameMapDictionary = new Dictionary<ulong, string>();
+            var enumerator = nameMapResource.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                nameMapDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
+            }
+            return nameMapDictionary;
         }
     }
 }

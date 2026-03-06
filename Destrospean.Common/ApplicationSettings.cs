@@ -14,6 +14,23 @@ namespace Destrospean.Common
 
         public static readonly string SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);
 
+        public static bool PlayMusic
+        {
+            get
+            {
+                return Settings == null || !Settings.ContainsKey(JSONNodeNames.PlayMusic) || (bool)Settings[JSONNodeNames.PlayMusic];
+            }
+            set
+            {
+                if (Settings == null)
+                {
+                    Settings = new Dictionary<string, object>();
+                }
+                Settings[JSONNodeNames.PlayMusic] = value;
+                SaveSettings();
+            }
+        }
+
         public static bool UseAdvancedOpenGLShaders
         {
             get
@@ -42,6 +59,7 @@ namespace Destrospean.Common
         public static class JSONNodeNames
         {
             public const string GameFolders = "The Sims 3 Installation Directories",
+            PlayMusic = "Play Music",
             UseAdvancedOpenGLShaders = "Use Advanced OpenGL Shaders";
         }
 
