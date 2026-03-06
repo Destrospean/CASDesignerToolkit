@@ -25,7 +25,7 @@ public partial class MainWindow : RendererMainWindow
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
-    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--no-audio-time-stretch", "--file-caching=0", "--network-caching=0", "--aout=" + (Platform.IsWindows ? "waveout" : Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : "dummy"));
+    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsWindows ? "waveout" : Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : "oss"));
 
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
