@@ -21,7 +21,8 @@ namespace Destrospean.Graphics.OpenGL
         public static bool GLInitialized = false,
         Locked = false;
 
-        public static int IBOElements;
+        public static int CurrentLODIndex = 0,
+        IBOElements;
 
         public static int[] IndexData;
 
@@ -29,9 +30,11 @@ namespace Destrospean.Graphics.OpenGL
 
         public static object Lock = new object();
 
-        public static readonly Dictionary<string, Material> Materials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase);
+        public static readonly Dictionary<string, Material> LockedMaterials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase),
+        Materials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase);
 
-        public static readonly Dictionary<string, Volume> Meshes = new Dictionary<string, Volume>();
+        public static readonly Dictionary<string, Volume> LockedMeshes = new Dictionary<string, Volume>(),
+        Meshes = new Dictionary<string, Volume>();
 
         public static readonly Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>();
 
@@ -440,17 +443,17 @@ namespace Destrospean.Graphics.OpenGL
 
         public static void OnRenderFrame(int width, int height)
         {
-            try
+            lock (Lock)
             {
                 GL.Viewport(0, 0, width, height);
                 GL.ClearColor(System.Drawing.Color.CornflowerBlue);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 GL.Enable(EnableCap.DepthTest);
                 var indexAt = 0;
-                foreach (var meshKey in new List<string>(Meshes.Keys))
+                foreach (var meshKey in new List<string>((Locked ? LockedMeshes : Meshes).Keys))
                 {
                     Volume mesh;
-                    if (!Meshes.TryGetValue(meshKey, out mesh))
+                    if (!(Locked ? LockedMeshes : Meshes).TryGetValue(meshKey, out mesh))
                     {
                         continue;
                     }
@@ -630,14 +633,11 @@ namespace Destrospean.Graphics.OpenGL
                 GL.Flush();
                 OpenTK.Graphics.GraphicsContext.CurrentContext.SwapBuffers();
             }
-            catch (ArgumentException)
-            {
-            }
         }
 
         public static void OnUpdateFrame(CmarNYCBorrowed.Action processInputCallback, float fov, float aspectRatio)
         {
-            try
+            lock (Lock)
             {
                 processInputCallback();
                 List<Vector3> colors = new List<Vector3>(),
@@ -654,7 +654,7 @@ namespace Destrospean.Graphics.OpenGL
                 var indices = new List<int>();
                 var textureCoordinates = new List<Vector2>();
                 var vertexCount = 0;
-                foreach (var mesh in new List<Volume>(Meshes.Values))
+                foreach (var mesh in new List<Volume>((Locked ? LockedMeshes : Meshes).Values))
                 {
                     colors.AddRange(mesh.ColorData);
                     indices.AddRange(mesh.GetIndices(vertexCount));
@@ -768,7 +768,7 @@ namespace Destrospean.Graphics.OpenGL
                     GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataThin.Length * Vector3.SizeInBytes), VertexDeltaDataThin, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionThin"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
-                foreach (var mesh in new List<Volume>(Meshes.Values))
+                foreach (var mesh in new List<Volume>((Locked ? LockedMeshes : Meshes).Values))
                 {
                     mesh.Rotation = CurrentRotation;
                     mesh.CalculateModelMatrix();
@@ -781,9 +781,6 @@ namespace Destrospean.Graphics.OpenGL
                 GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(IndexData.Length * sizeof(int)), IndexData, BufferUsageHint.StaticDraw);
                 ViewMatrix = Camera.ViewMatrix;
                 System.Threading.Thread.Sleep(1);
-            }
-            catch (ArgumentException)
-            {
             }
         }
     }

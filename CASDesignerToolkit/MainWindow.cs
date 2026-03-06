@@ -27,9 +27,9 @@ public partial class MainWindow : RendererMainWindow
 
     LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsWindows ? "waveout" : Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : "oss"));
 
-    LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
+    Thread mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
-    Thread mMusicThread;
+    LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
     readonly string mOriginalWindowTitle;
 
@@ -51,29 +51,44 @@ public partial class MainWindow : RendererMainWindow
         {
             if (value.HasFlag(NextStateOptions.UpdateModels) && !mDisableUpdateModels && GlobalState.GLInitialized)
             {
-                new Thread(() =>
+                GlobalState.CurrentLODIndex = ResourcePropertyNotebook.CurrentPage;
+                if (mLoadMeshesThread != null)
+                {
+                    mLoadMeshesThread.Abort();
+                }
+                (mLoadMeshesThread = new Thread(() =>
                     {
                         lock (sLock)
                         {
+                            foreach (var materialKvp in GlobalState.Materials)
+                            {
+                                GlobalState.LockedMaterials[materialKvp.Key] = materialKvp.Value;
+                            }
+                            foreach (var meshKvp in GlobalState.Meshes)
+                            {
+                                GlobalState.LockedMeshes[meshKvp.Key] = meshKvp.Value;
+                            }
+                            GlobalState.Locked = true;
                             lock (GlobalState.Lock)
                             {
-                                GlobalState.Locked = true;
                                 GlobalState.Meshes.Clear();
                                 GlobalState.Materials.Clear();
-                                foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
-                                {
-                                    if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
-                                    {
-                                        ImageUtils.PreloadedGameImages[imageKey].Dispose();
-                                        ImageUtils.PreloadedGameImages.Remove(imageKey);
-                                        Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
-                                    }
-                                }
-                                Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshesOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                GlobalState.Locked = false;
                             }
+                            Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                            GlobalState.Locked = false;
+                            foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                            {
+                                if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
+                                {
+                                    ImageUtils.PreloadedGameImages[imageKey].Dispose();
+                                    ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                    Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
+                                }
+                            }
+                            GlobalState.LockedMaterials.Clear();
+                            GlobalState.LockedMeshes.Clear();
                         }
-                    }).Start();
+                    })).Start();
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
             {
@@ -129,15 +144,15 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
                     {
-                        (mMusicThread = new Thread(PlayMusic)).Start();
+                        (mPlayMusicThread = new Thread(PlayMusic)).Start();
                     }
                 }
                 else
                 {
                     mMediaPlayer.Stop();
-                    if (mMusicThread != null)
+                    if (mPlayMusicThread != null)
                     {
-                        mMusicThread.Abort();
+                        mPlayMusicThread.Abort();
                     }
                 }
             };
@@ -688,9 +703,9 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
                     mMediaPlayer.Stop();
-                    if (mMusicThread != null)
+                    if (mPlayMusicThread != null)
                     {
-                        mMusicThread.Abort();
+                        mPlayMusicThread.Abort();
                     }
                     mDisableUpdateModels = true;
                     GLWidget.Hide();
@@ -726,7 +741,7 @@ public partial class MainWindow : RendererMainWindow
                             case "CASP":
                                 if (ApplicationSettings.PlayMusic)
                                 {
-                                    (mMusicThread = new Thread(PlayMusic)).Start();
+                                    (mPlayMusicThread = new Thread(PlayMusic)).Start();
                                 }
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
@@ -765,7 +780,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (process == null)
                     {
-                        Console.WriteLine("Failed to start the executable.");
+                        ProgramUtils.WriteError(new Exception("Failed to start the executable."));
                         return;
                     }
                     using (var standardInput = process.StandardInput.BaseStream)
@@ -789,14 +804,18 @@ public partial class MainWindow : RendererMainWindow
 
     void RandomizeCASParts()
     {
-        new Thread(() =>
+        if (mRandomizeCASPartsThread != null)
+        {
+            mRandomizeCASPartsThread.Abort();
+        }
+        (mRandomizeCASPartsThread = new Thread(() =>
             {
                 lock (sLock)
                 {
                     Sim.RandomizeCASParts();
                     Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
                 }
-            }).Start();
+            })).Start();
     }
 
     void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)
@@ -1150,9 +1169,9 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         mMediaPlayer.Stop();
-        if (mMusicThread != null)
+        if (mPlayMusicThread != null)
         {
-            mMusicThread.Abort();
+            mPlayMusicThread.Abort();
         }
         Application.Quit();
     }
@@ -1261,9 +1280,9 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         mMediaPlayer.Stop();
-        if (mMusicThread != null)
+        if (mPlayMusicThread != null)
         {
-            mMusicThread.Abort();
+            mPlayMusicThread.Abort();
         }
         Application.Quit();
     }

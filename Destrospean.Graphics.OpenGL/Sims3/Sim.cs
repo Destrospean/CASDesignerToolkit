@@ -76,7 +76,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             }
         }
 
-        protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
+        protected override void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshOnMainThreadDelegate loadMeshOnMainThreadCallback)
         {
             lock (Complate.Lock)
             {
@@ -298,7 +298,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         GlobalState.Materials[geomAndKey.Key] = material;
                     }
                     var currentPreset = casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                    loadMeshesOnMainThreadCallback(new CASPartVolume
+                    loadMeshOnMainThreadCallback(new CASPartVolume
                         {
                             ColorData = colors.ConvertAll(ToVector3).ToArray(),
                             DeltaNormalsFat = FillMissingDeltas(normals, deltaNormalsFat).ConvertAll(ToVector3),
@@ -314,6 +314,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Key = geomAndKey.Key,
                             LODIndex = lodIndex,
                             Material = material,
+                            Object = casPart,
                             ParentSim = this,
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
@@ -323,10 +324,10 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             }
         }
 
-        public static void LoadMeshesOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
         {
-            var casPartVolume = (CASPartVolume)volume;
             var casPartPreset = (CASPartPreset)currentPreset;
+            var casPartVolume = (CASPartVolume)volume;
             var materialCast = (Material)material;
             casPartVolume.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
             casPartVolume.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
@@ -349,18 +350,15 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture);
             GlobalState.Meshes[casPartVolume.Key] = casPartVolume;
             presetTexture.Dispose();
-            var lodIndex = -1;
-            foreach (var mesh in GlobalState.Meshes.Values)
+            foreach (var meshKey in new List<string>(GlobalState.Meshes.Keys))
             {
-                if (lodIndex == -1)
+                Volume mesh;
+                if (GlobalState.Meshes.TryGetValue(meshKey, out mesh) && mesh.LODIndex != GlobalState.CurrentLODIndex)
                 {
-                    lodIndex = mesh.LODIndex;
-                    continue;
-                }
-                if (lodIndex != mesh.LODIndex)
-                {
-                    Complate.MarkModelsNeedUpdatedCallback();
-                    break;
+                    lock (GlobalState.Lock)
+                    {
+                        GlobalState.Meshes.Remove(meshKey);
+                    }
                 }
             }
         }

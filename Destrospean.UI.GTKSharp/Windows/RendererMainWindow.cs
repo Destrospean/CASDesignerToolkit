@@ -60,11 +60,8 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             if (GlobalState.GLInitialized)
             {
-                if (!GlobalState.Locked)
-                {
-                    GlobalState.OnUpdateFrame(ProcessInput, mFOV, (float)GLWidget.Allocation.Width / GLWidget.Allocation.Height);
-                    GlobalState.OnRenderFrame((int)(GLWidget.Allocation.Width * WidgetUtils.WineScaleDenominator), (int)(GLWidget.Allocation.Height * WidgetUtils.WineScaleDenominator));
-                }
+                GlobalState.OnUpdateFrame(ProcessInput, mFOV, (float)GLWidget.Allocation.Width / GLWidget.Allocation.Height);
+                GlobalState.OnRenderFrame((int)(GLWidget.Allocation.Width * WidgetUtils.WineScaleDenominator), (int)(GLWidget.Allocation.Height * WidgetUtils.WineScaleDenominator));
                 return true;
             }
             return false;

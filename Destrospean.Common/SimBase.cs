@@ -54,7 +54,7 @@ namespace Destrospean.Common
             }
         }
 
-        public delegate void LoadMeshesOnMainThreadDelegate(object volume, Preset currentPreset, Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
+        public delegate void LoadMeshOnMainThreadDelegate(object volume, Preset currentPreset, Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
 
         public delegate int LoadTextureDelegate(string key, Bitmap image);
 
@@ -77,7 +77,7 @@ namespace Destrospean.Common
             }
         }
 
-        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback);
+        protected abstract void LoadMeshes(CASPart casPart, int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshOnMainThreadDelegate loadMeshOnMainThreadCallback);
 
         public static bool CASPartsConflict(CASPart a, CASPart b)
         {
@@ -178,11 +178,11 @@ namespace Destrospean.Common
             }
         }
 
-        public virtual void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshesOnMainThreadDelegate loadMeshesOnMainThreadCallback)
+        public virtual void LoadMeshes(int presetIndex, int lodIndex, LoadTextureDelegate loadTextureCallback, LoadMeshOnMainThreadDelegate loadMeshOnMainThreadCallback)
         {
             lock (Lock)
             {
-                new List<CASPart>(CASParts.Values).FindAll(x => x != null && !CASPartsConflict(x, CurrentCASPart)).ForEach(x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback, loadMeshesOnMainThreadCallback));
+                new List<CASPart>(CASParts.Values).FindAll(x => x != null && !CASPartsConflict(x, CurrentCASPart)).ForEach(x => LoadMeshes(x, presetIndex, lodIndex, loadTextureCallback, loadMeshOnMainThreadCallback));
             }
         }
 
@@ -315,7 +315,8 @@ namespace Destrospean.Common
                 return;
             }
             var evaluated = package.EvaluateResourceKey(key);
-            mCASParts[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>());
+            (mCASParts[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>())).AllPresets[0].RegenerateTexture();
+
         }
 
         public void SetCASPart(CASPartResource.ClothingType clothingType, uint type, uint group, ulong instance)
