@@ -16,13 +16,13 @@ namespace Destrospean.Graphics.OpenGL
 
         public static Vector3[] ColorData, NormalData, NormalDeltaDataFat, NormalDeltaDataFit, NormalDeltaDataSpecial, NormalDeltaDataThin, VertexData, VertexDeltaDataFat, VertexDeltaDataFit, VertexDeltaDataSpecial, VertexDeltaDataThin;
 
+        public static int CurrentLODIndex = 0,
+        IBOElements;
+
         public static Vector3 CurrentRotation = Vector3.Zero;
 
         public static bool GLInitialized = false,
         Locked = false;
-
-        public static int CurrentLODIndex = 0,
-        IBOElements;
 
         public static int[] IndexData;
 
