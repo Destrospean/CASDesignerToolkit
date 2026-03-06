@@ -867,20 +867,23 @@ public partial class MainWindow : RendererMainWindow
 
     public void ClearTemporaryData()
     {
-        Sim.CurrentCASPart = null;
-        mSaveAsPath = null;
-        GlobalState.Meshes.Clear();
-        foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
+        lock (GlobalState.Lock)
         {
-            PreloadedData.CASParts[key].Dispose();
-            PreloadedData.CASParts.Remove(key);
+            Sim.CurrentCASPart = null;
+            mSaveAsPath = null;
+            GlobalState.Meshes.Clear();
+            foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
+            {
+                PreloadedData.CASParts[key].Dispose();
+                PreloadedData.CASParts.Remove(key);
+            }
+            PreloadedData.GEOMs.Clear();
+            PreloadedData.VPXYs.Clear();
+            GlobalState.Materials.Clear();
+            GlobalState.DeleteTextures();
+            ImageUtils.DeletePreloadedImages();
+            ImageResourceComboBox.DeleteThumbnails();
         }
-        PreloadedData.GEOMs.Clear();
-        PreloadedData.VPXYs.Clear();
-        GlobalState.Materials.Clear();
-        GlobalState.DeleteTextures();
-        ImageUtils.DeletePreloadedImages();
-        ImageResourceComboBox.DeleteThumbnails();
     }
 
     public override void DrawImage()
