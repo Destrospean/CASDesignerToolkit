@@ -6,14 +6,6 @@ namespace Destrospean.Common
 {
     public static class ApplicationSettings
     {
-        public static Dictionary<string, object> Settings
-        {
-            get;
-            private set;
-        }
-
-        public static readonly string SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);
-
         public static bool PlayMusic
         {
             get
@@ -30,6 +22,14 @@ namespace Destrospean.Common
                 SaveSettings();
             }
         }
+
+        public static Dictionary<string, object> Settings
+        {
+            get;
+            private set;
+        }
+
+        public static readonly string SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);
 
         public static bool UseAdvancedOpenGLShaders
         {
