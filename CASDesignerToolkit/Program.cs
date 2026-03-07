@@ -6,7 +6,7 @@
         {
             try
             {
-                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "error.log", true));
+                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
                 if (Common.Platform.IsWindows)
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
@@ -15,14 +15,7 @@
                     }
                 }
                 Gtk.Application.Init();
-                new MainWindow();
-                if (args.Length > 0)
-                {
-                    var mainWindow = (MainWindow)MainWindow.Singleton;
-                    mainWindow.CurrentPackage = s3pi.Package.Package.OpenPackage(0, args[0], true);
-                    mainWindow.RefreshWidgets();
-                    mainWindow.AddFilePathToWindowTitle(args[0]);
-                }
+                new MainWindow(args.Length > 0 ? args[0] : null);
                 Gtk.Application.Run();
             }
             catch (System.Exception ex)

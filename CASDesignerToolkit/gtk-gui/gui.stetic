@@ -114,6 +114,13 @@
         <property name="DrawAsRadio">False</property>
         <property name="Active">False</property>
       </action>
+      <action id="CreateShortcutAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Create Shortcut</property>
+        <property name="ShortLabel" translatable="yes">Create Shortcut</property>
+        <property name="StockId">gtk-jump-to</property>
+        <signal name="Activated" handler="OnCreateShortcutActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="WidthRequest">1080</property>
@@ -148,6 +155,7 @@
                 <node type="Menuitem" action="GameFoldersAction" />
                 <node type="Menuitem" action="UseAdvancedShadersAction" />
                 <node type="Menuitem" action="PlayMusicAction" />
+                <node type="Menuitem" action="CreateShortcutAction" />
               </node>
             </node>
           </widget>

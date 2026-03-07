@@ -134,13 +134,16 @@ namespace Destrospean.S3PIExtensions
             {
                 if (sGameContentPackages == null)
                 {
-                    sGameContentPackages = new Dictionary<PackageTag, IPackage>();
-                    foreach (var game in GameFolders.Games)
+                    lock (sLock)
                     {
-                        var enumerator = game.GameContent.GetEnumerator();
-                        while (enumerator.MoveNext())
+                        sGameContentPackages = new Dictionary<PackageTag, IPackage>();
+                        foreach (var game in GameFolders.Games)
                         {
-                            sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            var enumerator = game.GameContent.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            }
                         }
                     }
                 }
@@ -154,13 +157,16 @@ namespace Destrospean.S3PIExtensions
             {
                 if (sGameImageResourcePackages == null)
                 {
-                    sGameImageResourcePackages = new Dictionary<PackageTag, IPackage>();
-                    foreach (var game in GameFolders.Games)
+                    lock (sLock)
                     {
-                        var enumerator = game.DDSImages.GetEnumerator();
-                        while (enumerator.MoveNext())
+                        sGameImageResourcePackages = new Dictionary<PackageTag, IPackage>();
+                        foreach (var game in GameFolders.Games)
                         {
-                            sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            var enumerator = game.DDSImages.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            }
                         }
                     }
                 }

@@ -25,7 +25,7 @@ public partial class MainWindow : RendererMainWindow
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
-    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsWindows ? "waveout" : Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : "oss"));
+    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
 
     Thread mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
@@ -113,7 +113,23 @@ public partial class MainWindow : RendererMainWindow
 
     public readonly ListStore ResourceListStore = new ListStore(typeof(string), typeof(string), typeof(string), typeof(string), typeof(IResourceIndexEntry));
 
-    public MainWindow() : base(WindowType.Toplevel)
+    public string ShortcutPath
+    {
+        get
+        {
+            if (Platform.IsLinux)
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
+            }
+            if (Platform.IsWindows)
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
+            }
+            return null;
+        }
+    }
+
+    public MainWindow(string packagePath = null) : base(WindowType.Toplevel)
     {
         Build();
         mOriginalWindowTitle = Title;
@@ -121,7 +137,8 @@ public partial class MainWindow : RendererMainWindow
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
-        new Thread(() => AddMusic("music_mode_cas")).Start();
+        var addMusicThread = new Thread(() => AddMusic("music_mode_cas"));
+        addMusicThread.Start();
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow(this, Icon);
@@ -173,8 +190,20 @@ public partial class MainWindow : RendererMainWindow
                     AdjustFontSizes(this, ResourceTreeView.Style.FontDescription);
                 }
             };
+        if (File.Exists(ShortcutPath))
+        {
+            CreateShortcutAction.Label = "Delete Shortcut";
+            CreateShortcutAction.StockId = Stock.Delete;
+        }
         MainHPaned.ShowAll();
         GLWidget.Hide();
+        if (packagePath != null)
+        {
+            addMusicThread.Join();
+            CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
+            RefreshWidgets();
+            AddFilePathToWindowTitle(packagePath);
+        }
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
@@ -760,6 +789,16 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    void CreateWindowsShortcut()
+    {
+        var shell = new IWshRuntimeLibrary.WshShell();
+        var shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(ShortcutPath);
+        shortcut.TargetPath = System.Reflection.Assembly.GetEntryAssembly().Location;
+        shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        shortcut.Description = "Create wearable items for Sims in The Sims 3";
+        shortcut.Save();
+    }
+
     void PlayMusic()
     {
         Shuffle(mAudioResources);
@@ -1153,6 +1192,33 @@ public partial class MainWindow : RendererMainWindow
         RefreshWidgets();
         NextState = NextStateOptions.NoUnsavedChanges;
         Title = OriginalWindowTitle;
+    }
+
+    protected void OnCreateShortcutActionActivated(object sender, EventArgs e)
+    {
+        if (File.Exists(ShortcutPath))
+        {
+            File.Delete(ShortcutPath);
+            CreateShortcutAction.Label = "Create Shortcut";
+            CreateShortcutAction.StockId = Stock.JumpTo;
+            return;
+        }
+        if (Platform.IsLinux)
+        {
+            File.WriteAllText(ShortcutPath, string.Format(@"[Desktop Entry]
+Type=Application
+Categories=Game;Utility
+Name={0}
+Exec='{1}'
+Icon={2}
+Comment={3}", OriginalWindowTitle, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit"), AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", "Create wearable items for Sims in The Sims 3"));
+        }
+        if (Platform.IsWindows)
+        {
+            CreateWindowsShortcut();
+        }
+        CreateShortcutAction.Label = "Delete Shortcut";
+        CreateShortcutAction.StockId = Stock.Delete;
     }
 
     protected void OnDeleteEvent(object sender, DeleteEventArgs a)
