@@ -222,6 +222,7 @@
     <Compile Include="Windows\MainWindowBase.cs" />
     <Compile Include="Windows\RendererMainWindow.cs" />
     <Compile Include="CairoHelper.cs" />
+    <Compile Include="FileTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

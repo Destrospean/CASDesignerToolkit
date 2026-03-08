@@ -11,7 +11,7 @@
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
                     {
-                        Common.Platform.UnblockFile(filename);
+                        Common.Platform.Windows.Unblock(filename);
                     }
                 }
                 Gtk.Application.Init();

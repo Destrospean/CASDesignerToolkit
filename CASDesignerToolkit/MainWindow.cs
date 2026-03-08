@@ -113,11 +113,13 @@ public partial class MainWindow : RendererMainWindow
 
     public readonly ListStore ResourceListStore = new ListStore(typeof(string), typeof(string), typeof(string), typeof(string), typeof(IResourceIndexEntry));
 
+    public const string ShortcutDescription = "Create wearable items for Sims in The Sims 3";
+
     public string ShortcutPath
     {
         get
         {
-            if (Platform.IsLinux)
+            if (Platform.IsUnix && !Platform.IsMacOS)
             {
                 return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
             }
@@ -134,6 +136,11 @@ public partial class MainWindow : RendererMainWindow
         Build();
         mOriginalWindowTitle = Title;
         RescaleAndReposition();
+        if (ShortcutPath != null && File.Exists(ShortcutPath))
+        {
+            CreateShortcutAction.Label = "Delete Shortcut";
+            CreateShortcutAction.StockId = Stock.Delete;
+        }
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
@@ -190,11 +197,6 @@ public partial class MainWindow : RendererMainWindow
                     AdjustFontSizes(this, ResourceTreeView.Style.FontDescription);
                 }
             };
-        if (File.Exists(ShortcutPath))
-        {
-            CreateShortcutAction.Label = "Delete Shortcut";
-            CreateShortcutAction.StockId = Stock.Delete;
-        }
         MainHPaned.ShowAll();
         GLWidget.Hide();
         if (packagePath != null)
@@ -492,7 +494,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.GEOM ? "The Sims 3 GEOM Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.GEOM ? "*.simgeom" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -524,7 +526,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -582,7 +584,7 @@ public partial class MainWindow : RendererMainWindow
                         var fileChooserDialog = new FileChooserDialog("Import GEOM", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter
                             {
-                                Name = "The Sims 3 GEOM Resource"
+                                Name = FileTypes.GEOM
                             };
                         fileFilter.AddPattern("*.simgeom");
                         fileChooserDialog.AddFilter(fileFilter);
@@ -793,10 +795,11 @@ public partial class MainWindow : RendererMainWindow
     {
         var shell = new IWshRuntimeLibrary.WshShell();
         var shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(ShortcutPath);
-        shortcut.TargetPath = System.Reflection.Assembly.GetEntryAssembly().Location;
+        shortcut.TargetPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        shortcut.Description = "Create wearable items for Sims in The Sims 3";
+        shortcut.Description = ShortcutDescription;
         shortcut.Save();
+        Platform.Windows.SetFileAssociation(OriginalWindowTitle, ".package");
     }
 
     void PlayMusic()
@@ -1203,15 +1206,18 @@ public partial class MainWindow : RendererMainWindow
             CreateShortcutAction.StockId = Stock.JumpTo;
             return;
         }
-        if (Platform.IsLinux)
+        if (Platform.IsUnix && !Platform.IsMacOS)
         {
-            File.WriteAllText(ShortcutPath, string.Format(@"[Desktop Entry]
-Type=Application
-Categories=Game;Utility
-Name={0}
-Exec='{1}'
-Icon={2}
-Comment={3}", OriginalWindowTitle, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit"), AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", "Create wearable items for Sims in The Sims 3"));
+            string mimePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/mime",
+            mimeType = "x-dbpf",
+            mimeTypePath = mimePath + "/packages/" + mimeType + ".xml";
+            File.WriteAllText(ShortcutPath, string.Format("[Desktop Entry]\nType=Application\nCategories=Game\nName={0}\nMimeType={1};\nExec='{2}' %f\nIcon={3}\nComment={4}", OriginalWindowTitle, "application/" + mimeType, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit"), AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", ShortcutDescription));
+            if (!File.Exists(mimeTypePath))
+            {
+                //File.Copy(AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/icons/hicolor/scalable/apps/application-x-dbpf.svg");
+                File.WriteAllText(mimeTypePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><mime-info xmlns=\"http://www.freedesktop.org/standards/shared-mime-info\"><mime-type type=\"application/" + mimeType + "\"><comment>" + FileTypes.DBPFPackage + "</comment><glob pattern=\"*.package\"/></mime-type></mime-info>");
+                Platform.GetCommandOutput("update-mime-database", mimePath);
+            }
         }
         if (Platform.IsWindows)
         {
@@ -1307,7 +1313,7 @@ Comment={3}", OriginalWindowTitle, AppDomain.CurrentDomain.BaseDirectory + (Envi
         var fileChooserDialog = new FileChooserDialog("Open Package", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
         var fileFilter = new FileFilter
             {
-                Name = "The Sims 3 DBPF Package"
+                Name = FileTypes.DBPFPackage
             };
         fileFilter.AddPattern("*.package");
         fileChooserDialog.AddFilter(fileFilter);
@@ -1422,7 +1428,7 @@ Comment={3}", OriginalWindowTitle, AppDomain.CurrentDomain.BaseDirectory + (Envi
         var fileChooserDialog = new FileChooserDialog("Save Package As", this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
         var fileFilter = new FileFilter
             {
-                Name = "The Sims 3 DBPF Package"
+                Name = FileTypes.DBPFPackage
             };
         fileFilter.AddPattern("*.package");
         fileChooserDialog.AddFilter(fileFilter);

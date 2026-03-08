@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace Destrospean.Common
 {
@@ -34,7 +35,7 @@ namespace Destrospean.Common
         {
             get
             {
-                return IsWindows && WineDetector.IsRunningUnderWine;
+                return IsWindows && Windows.IsRunningUnderWine;
             }
         }
 
@@ -87,24 +88,19 @@ namespace Destrospean.Common
             Darwin = 8
         }
 
-        static class FileUnblocker
+        public static class Windows
         {
             [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             static extern bool DeleteFile(string name);
 
-            public static bool Unblock(string filename)
-            {
-                return DeleteFile(filename + ":Zone.Identifier");
-            }
-        }
+            [System.Runtime.InteropServices.DllImport("Shell32.dll")]
+            static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
 
-        static class WineDetector
-        {
             [DllImport("ntdll.dll", EntryPoint = "wine_get_version")]
             static extern IntPtr WineGetVersion();
 
-            public static bool IsRunningUnderWine
+            internal static bool IsRunningUnderWine
             {
                 get
                 {
@@ -117,6 +113,23 @@ namespace Destrospean.Common
                         return false;
                     }
                 }
+            }
+
+            public static void SetFileAssociation(string friendlyTypeName, string extension)
+            {
+                var assembly = System.Reflection.Assembly.GetEntryAssembly();
+                string assemblyName = assembly.GetName().Name,
+                classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";
+                Registry.SetValue(classesRegistryPath + assemblyName, "", "My File Type");
+                Registry.SetValue(classesRegistryPath + assemblyName, "FriendlyTypeName", friendlyTypeName);
+                Registry.SetValue(classesRegistryPath + assemblyName + "\\shell\\open\\command", "", assembly.Location + " \"%1\"");
+                Registry.SetValue(classesRegistryPath + extension, "", assemblyName);
+                SHChangeNotify(0x8000000, 0x2000, IntPtr.Zero, IntPtr.Zero);
+            }
+
+            public static bool Unblock(string filename)
+            {
+                return DeleteFile(filename + ":Zone.Identifier");
             }
         }
 
@@ -141,11 +154,6 @@ namespace Destrospean.Common
                 process.WaitForExit();
                 return string.IsNullOrEmpty(error) ? output : string.Format("Error: {0}\nOutput: {1}", error, output);
             }
-        }
-
-        public static bool UnblockFile(string filename)
-        {
-            return FileUnblocker.Unblock(filename);
         }
     }
 }
