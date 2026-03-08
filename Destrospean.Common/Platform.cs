@@ -115,15 +115,13 @@ namespace Destrospean.Common
                 }
             }
 
-            public static void SetFileAssociation(string friendlyTypeName, string fileType, string extension)
+            public static void SetFileAssociation(string fileType, string fileTypeName, string extension)
             {
                 var assembly = System.Reflection.Assembly.GetEntryAssembly();
-                string assemblyName = assembly.GetName().Name,
-                classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";
-                Registry.SetValue(classesRegistryPath + assemblyName, "", fileType);
-                Registry.SetValue(classesRegistryPath + assemblyName, "FriendlyTypeName", friendlyTypeName);
-                Registry.SetValue(classesRegistryPath + assemblyName + "\\shell\\open\\command", "", assembly.Location + " \"%1\"");
-                Registry.SetValue(classesRegistryPath + extension, "", assemblyName);
+                var classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";
+                Registry.SetValue(classesRegistryPath + fileType, "", fileTypeName);
+                Registry.SetValue(classesRegistryPath + fileType + "\\shell\\open\\command", "", assembly.Location + " \"%1\"");
+                Registry.SetValue(classesRegistryPath + extension, "", fileType);
                 SHChangeNotify(0x8000000, 0x2000, IntPtr.Zero, IntPtr.Zero);
             }
 
