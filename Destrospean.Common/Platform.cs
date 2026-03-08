@@ -94,7 +94,7 @@ namespace Destrospean.Common
             [return: MarshalAs(UnmanagedType.Bool)]
             static extern bool DeleteFile(string name);
 
-            [System.Runtime.InteropServices.DllImport("Shell32.dll")]
+            [DllImport("Shell32.dll")]
             static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
 
             [DllImport("ntdll.dll", EntryPoint = "wine_get_version")]
