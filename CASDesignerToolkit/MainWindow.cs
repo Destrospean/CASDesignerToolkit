@@ -799,7 +799,7 @@ public partial class MainWindow : RendererMainWindow
         shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
         shortcut.Description = ShortcutDescription;
         shortcut.Save();
-        Platform.Windows.SetFileAssociation(OriginalWindowTitle, ".package");
+        Platform.Windows.SetFileAssociation(OriginalWindowTitle, FileTypes.DBPFPackage, ".package");
     }
 
     void PlayMusic()
