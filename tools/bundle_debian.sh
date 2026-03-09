@@ -20,7 +20,7 @@ cp -r ../libs/Windows/* CASDesignerToolkit
 rm CASDesignerToolkit/*.log CASDesignerToolkit/*.sh
 unix2dos CASDesignerToolkit/*.config CASDesignerToolkit/*.md CASDesignerToolkit/*.txt CASDesignerToolkit/*.xml
 rar a -sfxwindows.sfx CASDesignerToolkit-win32-i386-Self-Extractor.exe CASDesignerToolkit/*
-rar a CASDesignerToolkit-win32-i386.rar CASDesignerToolkit/*
+zip -r CASDesignerToolkit-win32-i386.zip CASDesignerToolkit/*
 mkdir $RELEASE_DIR/dist
 mv CASDesignerToolkit-* $RELEASE_DIR/dist
 rm -rf CASDesignerToolkit/*
@@ -36,6 +36,6 @@ cp $RELEASE_DIR/s3pi* CASDesignerToolkit
 cp $RELEASE_DIR/*.sh CASDesignerToolkit
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
 rar a -sfxlinux.sfx CASDesignerToolkit-linux-amd64-Self-Extractor CASDesignerToolkit/*
-rar a CASDesignerToolkit-linux-amd64.rar CASDesignerToolkit/*
+zip -r CASDesignerToolkit-linux-amd64.zip CASDesignerToolkit/*
 mv CASDesignerToolkit-* $RELEASE_DIR/dist
 rm -rf CASDesignerToolkit
