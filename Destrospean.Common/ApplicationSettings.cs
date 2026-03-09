@@ -6,7 +6,7 @@ namespace Destrospean.Common
 {
     public class ApplicationSettings
     {
-        protected Dictionary<string, object> mSettings;
+        Dictionary<string, object> mSettings;
 
         public static readonly string GameFoldersKey = "The Sims 3 Installation Directories",
         SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);

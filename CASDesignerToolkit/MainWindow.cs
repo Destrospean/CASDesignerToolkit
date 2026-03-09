@@ -124,11 +124,11 @@ public partial class MainWindow : RendererMainWindow
             {
                 return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
             }
-            if (!Platform.IsMacOS)
+            if (Platform.IsMacOS)
             {
-                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
+                return null;
             }
-            return null;
+            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
         }
     }
 
@@ -229,6 +229,7 @@ public partial class MainWindow : RendererMainWindow
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
+        /*
         string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
         if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "1.4.5", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
@@ -240,6 +241,7 @@ public partial class MainWindow : RendererMainWindow
                 File.WriteAllBytes(latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
             }
         }
+        */
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
