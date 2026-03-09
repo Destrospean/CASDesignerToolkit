@@ -132,6 +132,28 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    public class ApplicationSettings : GlobalState.ApplicationSettings
+    {
+        const string kPlayMusicKey = "Play Music";
+
+        public static bool PlayMusic
+        {
+            get
+            {
+                return Settings == null || !Settings.ContainsKey(kPlayMusicKey) || (bool)Settings[kPlayMusicKey];
+            }
+            set
+            {
+                if (Settings == null)
+                {
+                    Settings = new Dictionary<string, object>();
+                }
+                Settings[kPlayMusicKey] = value;
+                SaveSettings();
+            }
+        }
+    }
+
     public MainWindow(string packagePath = null) : base(WindowType.Toplevel)
     {
         Build();

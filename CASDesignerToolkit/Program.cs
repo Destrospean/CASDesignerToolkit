@@ -14,6 +14,7 @@
                         System.Destrospean.Platform.Windows.Unblock(filename);
                     }
                 }
+                Common.ApplicationSettings.Singleton = new MainWindow.ApplicationSettings();
                 Gtk.Application.Init();
                 new MainWindow(args.Length > 0 ? args[0] : null);
                 Gtk.Application.Run();

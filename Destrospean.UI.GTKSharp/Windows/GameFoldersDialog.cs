@@ -32,7 +32,7 @@ namespace Destrospean.DestrospeanCASPEditor
             {
                 var fileChooserButton = new FileChooserButton("Choose Folder for " + game.Longname, FileChooserAction.SelectFolder);
                 object installDirectories;
-                if (ApplicationSettings.Settings.TryGetValue(ApplicationSettings.JSONNodeNames.GameFolders, out installDirectories))
+                if (ApplicationSettings.Settings.TryGetValue(ApplicationSettings.GameFoldersKey, out installDirectories))
                 {
                     var installDirectoriesDictionary = installDirectories as IDictionary<string, string>;
                     if (installDirectoriesDictionary == null)
@@ -90,7 +90,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 outputDictionary.Add(installDirectoryKvp.Key.Name, installDirectoryKvp.Value.Replace('\\', '/'));
             }
             GameFolders.InstallDirs = output.Substring(1);
-            ApplicationSettings.Settings[ApplicationSettings.JSONNodeNames.GameFolders] = outputDictionary;
+            ApplicationSettings.Settings[ApplicationSettings.GameFoldersKey] = outputDictionary;
             ApplicationSettings.SaveSettings();
         }
 
