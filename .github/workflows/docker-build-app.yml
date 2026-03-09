@@ -109,8 +109,14 @@ jobs:
           name: CASDesignerToolkit-win32-i386
           path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386.rar
 
+      - name: Upload Linux amd64 self-extractor artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CASDesignerToolkit-Self-Extractor
+          path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-linux-amd64-Self-Extractor.sfx
+
       - name: Upload Windows i386 self-extractor artifact
         uses: actions/upload-artifact@v4
         with:
           name: CASDesignerToolkit-Self-Extractor
-          path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-Self-Extractor.exe
+          path: CASDesignerToolkit/bin/Release/dist/CASDesignerToolkit-win32-i386-Self-Extractor.exe
