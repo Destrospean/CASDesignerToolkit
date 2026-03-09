@@ -323,5 +323,10 @@
       <Name>Destrospean.zoeoeBorrowed</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -191,8 +191,9 @@
     <Reference Include="System.ValueTuple">
       <HintPath>..\libs\System.ValueTuple.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
+    <Reference Include="System.Net.Http">
+      <HintPath>..\libs\System.Net.Http.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +356,15 @@
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Destrospean.Updates\Destrospean.Updates.csproj">
+      <Project>{05ED9D73-E007-4B3C-AF08-D9689CF7398C}</Project>
+      <Name>Destrospean.Updates</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

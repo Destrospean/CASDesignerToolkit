@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Destrospean;
 using System.Globalization;
 using Destrospean.Common.Abstractions;
 using Gdk;
@@ -96,7 +97,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -255,7 +256,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -308,7 +309,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -437,7 +438,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -463,7 +464,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }

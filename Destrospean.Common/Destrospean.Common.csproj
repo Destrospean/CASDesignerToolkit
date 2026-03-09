@@ -7,8 +7,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Destrospean.Common</RootNamespace>
     <AssemblyName>Destrospean.Common</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -91,10 +91,6 @@
       <HintPath>..\libs\s3pi.TxtcResource.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -104,11 +100,9 @@
     <Compile Include="Abstractions\Pattern.cs" />
     <Compile Include="ApplicationSettings.cs" />
     <Compile Include="PreloadedData.cs" />
-    <Compile Include="Platform.cs" />
     <Compile Include="PatternUtils.cs" />
     <Compile Include="SimBase.cs" />
     <Compile Include="MeshFileType.cs" />
-    <Compile Include="ProgramUtils.cs" />
     <Compile Include="Abstractions\GameObject.cs" />
     <Compile Include="Abstractions\CASPartPreset.cs" />
     <Compile Include="Abstractions\GameObjectPreset.cs" />
@@ -129,6 +123,11 @@
     <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
