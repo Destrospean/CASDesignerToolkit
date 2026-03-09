@@ -436,7 +436,7 @@ namespace Destrospean.Graphics.OpenGL
             }
             catch (Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 return -1;
             }
         }

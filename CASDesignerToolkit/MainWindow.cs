@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Destrospean;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -119,13 +120,13 @@ public partial class MainWindow : RendererMainWindow
     {
         get
         {
-            if (Platform.IsUnix && !Platform.IsMacOS)
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
-            }
             if (Platform.IsWindows)
             {
                 return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
+            }
+            if (!Platform.IsMacOS)
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
             }
             return null;
         }
@@ -150,7 +151,7 @@ public partial class MainWindow : RendererMainWindow
         {
             new CacheGenerationWindow(this, Icon);
         }
-        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var assembly = System.Reflection.Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);
         var treeViewSelectionColor = ResourceTreeView.Style.Base(StateType.Selected);
         mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
@@ -205,6 +206,17 @@ public partial class MainWindow : RendererMainWindow
             CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
+        }
+        string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
+        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "1.4.5", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        {
+            Console.WriteLine(latestReleaseName);
+            Console.WriteLine(latestReleaseDescription);
+            Console.WriteLine(latestReleaseDownloadUrl);
+            using (var client = new System.Net.Http.HttpClient())
+            {
+                File.WriteAllBytes(latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
+            }
         }
     }
 
@@ -339,7 +351,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -507,7 +519,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     },
@@ -542,7 +554,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     };
@@ -596,7 +608,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                             catch (Exception ex)
                             {
-                                ProgramUtils.WriteError(ex);
+                                Logger.WriteError(ex);
                                 throw;
                             }
                         }
@@ -688,7 +700,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -786,20 +798,9 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
-    }
-
-    void CreateWindowsShortcut()
-    {
-        var shell = new IWshRuntimeLibrary.WshShell();
-        var shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(ShortcutPath);
-        shortcut.TargetPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        shortcut.Description = ShortcutDescription;
-        shortcut.Save();
-        Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package");
     }
 
     void PlayMusic()
@@ -822,7 +823,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (process == null)
                     {
-                        ProgramUtils.WriteError(new Exception("Failed to start the executable."));
+                        Logger.WriteError(new Exception("Failed to start the executable."));
                         return;
                     }
                     using (var standardInput = process.StandardInput.BaseStream)
@@ -1043,7 +1044,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1069,7 +1070,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -1108,7 +1109,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1158,7 +1159,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1199,32 +1200,46 @@ public partial class MainWindow : RendererMainWindow
 
     protected void OnCreateShortcutActionActivated(object sender, EventArgs e)
     {
-        if (File.Exists(ShortcutPath))
+        try
         {
-            File.Delete(ShortcutPath);
-            CreateShortcutAction.Label = "Create Shortcut";
-            CreateShortcutAction.StockId = Stock.JumpTo;
-            return;
-        }
-        if (Platform.IsUnix && !Platform.IsMacOS)
-        {
-            string mimePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/mime",
-            mimeType = "x-dbpf",
-            mimeTypePath = mimePath + "/packages/" + mimeType + ".xml";
-            File.WriteAllText(ShortcutPath, string.Format("[Desktop Entry]\nType=Application\nCategories=Game\nName={0}\nMimeType={1};\nExec='{2}' %f\nIcon={3}\nComment={4}", OriginalWindowTitle, "application/" + mimeType, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit"), AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", ShortcutDescription));
-            if (!File.Exists(mimeTypePath))
+            if (File.Exists(ShortcutPath))
             {
-                //File.Copy(AppDomain.CurrentDomain.BaseDirectory + "CASDesignerToolkit.svg", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/icons/hicolor/scalable/apps/application-x-dbpf.svg");
-                File.WriteAllText(mimeTypePath, "<?xml version=\"1.0\" encoding=\"utf-8\"?><mime-info xmlns=\"http://www.freedesktop.org/standards/shared-mime-info\"><mime-type type=\"application/" + mimeType + "\"><comment>" + FileTypes.DBPFPackage + "</comment><glob pattern=\"*.package\"/></mime-type></mime-info>");
-                Platform.GetCommandOutput("update-mime-database", mimePath);
+                File.Delete(ShortcutPath);
+                CreateShortcutAction.Label = "Create Shortcut";
+                CreateShortcutAction.StockId = Stock.JumpTo;
+                return;
             }
+            var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (Platform.IsWindows)
+            {
+                Platform.Windows.CreateShortcut(ShortcutPath, assembly.Location, AppDomain.CurrentDomain.BaseDirectory, null, ShortcutDescription);
+                Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly);
+            }
+            else if (Platform.IsMacOS)
+            {
+                return;
+            }
+            else
+            {
+                var mimeType = "x-wine-extension-package";
+                var assemblyName = assembly.GetName().Name;
+                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new string[]
+                    {
+                        "Game"
+                    },
+                    new string[]
+                    {
+                        mimeType
+                    });
+                Platform.FreeDesktop.SetFileAssociation(mimeType, FileTypes.DBPFPackage, "*.package");
+            }
+            CreateShortcutAction.Label = "Delete Shortcut";
+            CreateShortcutAction.StockId = Stock.Delete;
         }
-        if (Platform.IsWindows)
+        catch (Exception ex)
         {
-            CreateWindowsShortcut();
+            Logger.WriteError(ex);
         }
-        CreateShortcutAction.Label = "Delete Shortcut";
-        CreateShortcutAction.StockId = Stock.Delete;
     }
 
     protected void OnDeleteEvent(object sender, DeleteEventArgs a)
@@ -1287,7 +1302,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -1331,7 +1346,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }

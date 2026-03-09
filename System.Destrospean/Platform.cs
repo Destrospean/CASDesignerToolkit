@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace Destrospean.Common
+namespace System.Destrospean
 {
     public static class Platform
     {
@@ -51,7 +51,7 @@ namespace Destrospean.Common
         {
             get
             {
-                return (OS & OSFlags.Windows) != 0;
+                return (OS & OSFlags.Win32) != 0;
             }
         }
 
@@ -74,18 +74,51 @@ namespace Destrospean.Common
                         }
                         return os;
                     default:
-                        return OSFlags.Windows;
+                        return OSFlags.Win32;
                 }
             }
         }
 
         [Flags]
-        public enum OSFlags
+        public enum OSFlags : byte
         {
-            Windows = 1,
+            Win32 = 1,
             Unix,
             Linux = 4,
             Darwin = 8
+        }
+
+        public static class FreeDesktop
+        {
+            public static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory = "", string iconPath = "", string name = "", string description = "", string[] categories = null, string[] mimeTypes = null)
+            {
+                System.IO.File.WriteAllText(shortcutPath, string.Format(@"[Desktop Entry]
+Type=Application
+Name={0}
+Exec='{1}' %f
+Path={2}
+Icon={3}
+Comment={4}
+Categories={5}
+MimeType={6}", name, targetPath, workingDirectory, iconPath, description, string.Join(";", categories ?? new string[0]), string.Join(";", mimeTypes ?? new string[0])));
+            }
+
+            public static void SetFileAssociation(string mimeType, string description, string pattern)
+            {
+                string mimeDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/mime",
+                mimeTypePath = mimeDirectoryPath + "/packages/" + mimeType + ".xml";
+                if (!System.IO.File.Exists(mimeTypePath))
+                {
+                    System.IO.File.WriteAllText(mimeTypePath, string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<mime-info xmlns=""http://www.freedesktop.org/standards/shared-mime-info"">
+  <mime-type type=""application/{0}"">
+    <comment>{1}</comment>
+    <glob pattern=""{2}""/>
+  </mime-type>
+</mime-info>", mimeType, description, pattern));
+                    GetCommandOutput("update-mime-database", mimeDirectoryPath);
+                }
+            }
         }
 
         public static class Windows
@@ -115,11 +148,20 @@ namespace Destrospean.Common
                 }
             }
 
-            public static void SetFileAssociation(string fileType, string fileTypeName, string extension)
+            public static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory = null, string iconPath = null, string description = null)
             {
-                var assembly = System.Reflection.Assembly.GetEntryAssembly();
+                var shortcut = (IWshRuntimeLibrary.IWshShortcut)new IWshRuntimeLibrary.WshShell().CreateShortcut(shortcutPath);
+                shortcut.Description = description;
+                shortcut.IconLocation = iconPath;
+                shortcut.TargetPath = targetPath;
+                shortcut.WorkingDirectory = workingDirectory;
+                shortcut.Save();
+            }
+
+            public static void SetFileAssociation(string fileType, string description, string extension, System.Reflection.Assembly assembly)
+            {
                 var classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";
-                Registry.SetValue(classesRegistryPath + fileType, "", fileTypeName);
+                Registry.SetValue(classesRegistryPath + fileType, "", description);
                 Registry.SetValue(classesRegistryPath + fileType + "\\shell\\open\\command", "", assembly.Location + " \"%1\"");
                 Registry.SetValue(classesRegistryPath + extension, "", fileType);
                 SHChangeNotify(0x8000000, 0x2000, IntPtr.Zero, IntPtr.Zero);

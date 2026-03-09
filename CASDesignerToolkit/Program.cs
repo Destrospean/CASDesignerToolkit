@@ -7,11 +7,11 @@
             try
             {
                 System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
-                if (Common.Platform.IsWindows)
+                if (System.Destrospean.Platform.IsWindows)
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
                     {
-                        Common.Platform.Windows.Unblock(filename);
+                        System.Destrospean.Platform.Windows.Unblock(filename);
                     }
                 }
                 Gtk.Application.Init();
@@ -20,7 +20,7 @@
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }

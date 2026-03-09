@@ -64,7 +64,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -97,7 +97,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -391,7 +391,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -688,7 +688,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -797,7 +797,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -818,7 +818,7 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             try
             {
-                var scale = WidgetUtils.Scale > minScale || Platform.IsWindows ? WidgetUtils.Scale : minScale;
+                var scale = WidgetUtils.Scale > minScale || System.Destrospean.Platform.IsWindows ? WidgetUtils.Scale : minScale;
                 self.SetSizeRequest(self.WidthRequest == -1 ? -1 : (int)(self.WidthRequest * scale), self.HeightRequest == -1 ? -1 : (int)(self.HeightRequest * scale));
                 int parentHeight, parentWidth, parentX, parentY;
                 parent.GetPosition(out parentX, out parentY);
@@ -827,7 +827,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }

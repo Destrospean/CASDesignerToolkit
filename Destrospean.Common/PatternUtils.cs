@@ -12,7 +12,7 @@ namespace Destrospean.Common
 {
     public static class PatternUtils
     {
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
+        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
 
         public static readonly Dictionary<string, Bitmap> PreloadedPatternImages = new Dictionary<string, Bitmap>();
 
