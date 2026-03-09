@@ -193,6 +193,7 @@
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\libs\System.Net.Http.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
