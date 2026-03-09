@@ -359,6 +359,7 @@
     <ProjectReference Include="..\Destrospean.Updates\Destrospean.Updates.csproj">
       <Project>{05ED9D73-E007-4B3C-AF08-D9689CF7398C}</Project>
       <Name>Destrospean.Updates</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
       <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>

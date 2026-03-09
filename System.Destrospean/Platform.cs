@@ -7,11 +7,49 @@ namespace System.Destrospean
 {
     public static class Platform
     {
+        static bool? sIsBSD, sIsRunningUnderWine;
+
+        static string sCacheDirectoryPath;
+
+        static OSFlags? sOS;
+
         public static string CacheDirectoryPath
         {
             get
             {
-                return IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                if (sCacheDirectoryPath == null)
+                {
+                    sCacheDirectoryPath = IsMacOS ? Environment.GetFolderPath(Environment.SpecialFolder.InternetCache) : IsUnix ? Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.cache" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                }
+                return sCacheDirectoryPath;
+            }
+        }
+
+        public static bool IsBSD
+        {
+            get
+            {
+                if (sIsBSD == null)
+                {
+                    foreach (OSFlags flag in Enum.GetValues(typeof(OSFlags)))
+                    {
+                        if (flag.ToString().Contains("BSD") && (OS & flag) != 0)
+                        {
+                            sIsBSD = true;
+                            break;
+                        }
+                    }
+                    sIsBSD = IsMacOS;
+                }
+                return sIsBSD.Value;
+            }
+        }
+
+        public static bool IsFreeBSD
+        {
+            get
+            {
+                return (OS & OSFlags.FreeBSD) != 0;
             }
         }
 
@@ -31,11 +69,31 @@ namespace System.Destrospean
             }
         }
 
+        public static bool IsNetBSD
+        {
+            get
+            {
+                return (OS & OSFlags.NetBSD) != 0;
+            }
+        }
+
+        public static bool IsOpenBSD
+        {
+            get
+            {
+                return (OS & OSFlags.OpenBSD) != 0;
+            }
+        }
+
         public static bool IsRunningUnderWine
         {
             get
             {
-                return IsWindows && Windows.IsRunningUnderWine;
+                if (sIsRunningUnderWine == null)
+                {
+                    sIsRunningUnderWine = IsWindows && Windows.IsRunningUnderWine;
+                }
+                return sIsRunningUnderWine.Value;
             }
         }
 
@@ -59,33 +117,41 @@ namespace System.Destrospean
         {
             get
             {
-                switch ((int)Environment.OSVersion.Platform)
+                if (sOS == null)
                 {
-                    case 4:
-                    case 128:
-                        var os = OSFlags.Unix;
-                        var uname = GetCommandOutput("uname").TrimEnd('\n');
-                        switch (uname)
-                        {
-                            case "Darwin":
-                            case "Linux":
-                                os |= (OSFlags)Enum.Parse(typeof(OSFlags), uname);
-                                break;
-                        }
-                        return os;
-                    default:
-                        return OSFlags.Win32;
+                    switch ((int)Environment.OSVersion.Platform)
+                    {
+                        case 4:
+                        case 128:
+                            sOS = OSFlags.Unix;
+                            var uname = GetCommandOutput("uname").TrimEnd('\n');
+                            try
+                            {
+                                sOS |= (OSFlags)Enum.Parse(typeof(OSFlags), uname);
+                            }
+                            catch
+                            {
+                            }
+                            break;
+                        default:
+                            sOS = OSFlags.Win32;
+                            break;
+                    }
                 }
+                return sOS.Value;
             }
         }
 
         [Flags]
-        public enum OSFlags : byte
+        public enum OSFlags
         {
             Win32 = 1,
             Unix,
             Linux = 4,
-            Darwin = 8
+            Darwin = 8,
+            FreeBSD = 0x10,
+            NetBSD = 0x20,
+            OpenBSD = 0x40
         }
 
         public static class FreeDesktop
@@ -100,7 +166,7 @@ Path={2}
 Icon={3}
 Comment={4}
 Categories={5}
-MimeType={6}", name, targetPath, workingDirectory, iconPath, description, string.Join(";", categories ?? new string[0]), string.Join(";", mimeTypes ?? new string[0])));
+MimeType=application/{6}", name, targetPath, workingDirectory, iconPath, description, string.Join(";", categories ?? new string[0]), string.Join(";", mimeTypes ?? new string[0])));
             }
 
             public static void SetFileAssociation(string mimeType, string description, string pattern)
