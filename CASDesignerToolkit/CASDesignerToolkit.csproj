@@ -194,6 +194,9 @@
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
