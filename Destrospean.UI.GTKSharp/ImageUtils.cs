@@ -193,7 +193,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                     catch (Exception ex)
                     {
-                        Common.ProgramUtils.WriteError(ex);
+                        System.Destrospean.Logger.WriteError(ex);
                         return new Bitmap(1024, 1024);
                     }
                 }

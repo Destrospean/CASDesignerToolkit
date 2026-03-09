@@ -7,7 +7,7 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public class CairoHelper
     {
-        static readonly ICairoHelperInternal sSingleton = Common.Platform.IsWindows ? (ICairoHelperInternal)new CairoHelperInternalWindows() : (ICairoHelperInternal)new CairoHelperInternalOther();
+        static readonly ICairoHelperInternal sSingleton = System.Destrospean.Platform.IsWindows ? (ICairoHelperInternal)new CairoHelperInternalWindows() : (ICairoHelperInternal)new CairoHelperInternalOther();
 
         class CairoHelperInternalOther : ICairoHelperInternal
         {

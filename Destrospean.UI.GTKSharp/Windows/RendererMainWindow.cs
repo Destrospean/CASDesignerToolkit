@@ -133,7 +133,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }
@@ -188,7 +188,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }

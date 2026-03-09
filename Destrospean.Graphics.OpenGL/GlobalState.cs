@@ -44,6 +44,28 @@ namespace Destrospean.Graphics.OpenGL
 
         public static Matrix4 ViewMatrix = Matrix4.Identity;
 
+        public class ApplicationSettings : Common.ApplicationSettings
+        {
+            const string kUseAdvancedOpenGLShadersKey = "Use Advanced OpenGL Shaders";
+
+            public static bool UseAdvancedOpenGLShaders
+            {
+                get
+                {
+                    return Settings == null || !Settings.ContainsKey(kUseAdvancedOpenGLShadersKey) || (bool)Settings[kUseAdvancedOpenGLShadersKey];
+                }
+                set
+                {
+                    if (Settings == null)
+                    {
+                        Settings = new Dictionary<string, object>();
+                    }
+                    Settings[kUseAdvancedOpenGLShadersKey] = value;
+                    SaveSettings();
+                }
+            }
+        }
+
         public static void DeleteTexture(string key)
         {
             int textureID;
@@ -396,7 +418,7 @@ namespace Destrospean.Graphics.OpenGL
                         gl_FragColor.a = texcolor.a;
                     }}
                 }}", backportedFunctions)));
-            ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "lit" : "textured";
+            ActiveShader = ApplicationSettings.UseAdvancedOpenGLShaders ? "lit" : "textured";
             Lights.Add(new Light(new Vector3(0, 1, 3), Vector3.One)
                 {
                     QuadraticAttenuation = .05f
@@ -436,7 +458,7 @@ namespace Destrospean.Graphics.OpenGL
             }
             catch (Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 return -1;
             }
         }
