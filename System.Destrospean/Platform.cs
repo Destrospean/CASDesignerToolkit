@@ -39,7 +39,7 @@ namespace System.Destrospean
                             break;
                         }
                     }
-                    sIsBSD = IsMacOS;
+                    sIsBSD = sIsBSD ?? IsMacOS;
                 }
                 return sIsBSD.Value;
             }
