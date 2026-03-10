@@ -165,6 +165,8 @@ namespace Destrospean.Graphics.OpenGL
 
         public Material Material = new Material();
 
+        public object Object;
+
         public override int TextureCoordinateCount
         {
             get

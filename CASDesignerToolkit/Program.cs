@@ -6,28 +6,22 @@
         {
             try
             {
-                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar + "error.log", true));
-                if (Common.Platform.IsWindows)
+                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
+                if (System.Destrospean.Platform.IsWindows)
                 {
                     foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
                     {
-                        Common.Platform.UnblockFile(filename);
+                        System.Destrospean.Platform.Windows.Unblock(filename);
                     }
                 }
+                Common.ApplicationSettings.Singleton = new MainWindow.ApplicationSettings();
                 Gtk.Application.Init();
-                new MainWindow();
-                if (args.Length > 0)
-                {
-                    var mainWindow = (MainWindow)MainWindow.Singleton;
-                    mainWindow.CurrentPackage = s3pi.Package.Package.OpenPackage(0, args[0], true);
-                    mainWindow.RefreshWidgets();
-                    mainWindow.AddFilePathToWindowTitle(args[0]);
-                }
+                new MainWindow(args.Length > 0 ? args[0] : null);
                 Gtk.Application.Run();
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }

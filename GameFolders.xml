@@ -35,6 +35,8 @@
       <Folder path="GameData/Shared/Packages">
         <Package isPatch="true" priority="2">DeltaBuild0.package</Package>
         <Package isPatch="false" priority="0">FullBuild0.package</Package>
+        <Package isPatch="true" priority="2">DeltaBuild1.package</Package>
+        <Package isPatch="false" priority="0">FullBuild1.package</Package>
       </Folder>
     </GameContent>
     <DDSImages>
@@ -238,6 +240,7 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild1_p10.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>

@@ -226,7 +226,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             }
             catch (System.Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 throw;
             }
         }

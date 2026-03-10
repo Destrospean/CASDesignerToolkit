@@ -108,7 +108,6 @@
     </Reference>
     <Reference Include="s3pi.NameMapResource">
       <HintPath>..\libs\s3pi.NameMapResource.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="s3pi.NGMPHashMapResource">
       <HintPath>..\libs\s3pi.NGMPHashMapResource.dll</HintPath>
@@ -176,6 +175,25 @@
     </Reference>
     <Reference Include="GLWidget">
       <HintPath>..\libs\GLWidget.dll</HintPath>
+    </Reference>
+    <Reference Include="s3piwrappers.AudioResources">
+      <HintPath>..\libs\s3piwrappers.AudioResources.dll</HintPath>
+    </Reference>
+    <Reference Include="s3piwrappers.Helpers">
+      <HintPath>..\libs\s3piwrappers.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="LibVLCSharp">
+      <HintPath>..\libs\LibVLCSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\libs\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>..\libs\System.Net.Http.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +310,26 @@
     <None Include="start.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ealayer3 License.txt">
+      <Link>ealayer3 License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\libVLC License.txt">
+      <Link>libVLC License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\mpg123 License.txt">
+      <Link>mpg123 License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Newtonsoft.Json License.txt">
+      <Link>Newtonsoft.Json License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\TeximpNet License.txt">
+      <Link>TeximpNet License.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
@@ -317,6 +355,15 @@
     <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Destrospean.Updates\Destrospean.Updates.csproj">
+      <Project>{05ED9D73-E007-4B3C-AF08-D9689CF7398C}</Project>
+      <Name>Destrospean.Updates</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

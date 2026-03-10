@@ -29,7 +29,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
+        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
             
         public static Dictionary<string, Dictionary<string, uint>> CASPartLookupCache;
 

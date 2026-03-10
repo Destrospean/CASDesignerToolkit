@@ -16,12 +16,13 @@ namespace Destrospean.Graphics.OpenGL
 
         public static Vector3[] ColorData, NormalData, NormalDeltaDataFat, NormalDeltaDataFit, NormalDeltaDataSpecial, NormalDeltaDataThin, VertexData, VertexDeltaDataFat, VertexDeltaDataFit, VertexDeltaDataSpecial, VertexDeltaDataThin;
 
+        public static int CurrentLODIndex = 0,
+        IBOElements;
+
         public static Vector3 CurrentRotation = Vector3.Zero;
 
         public static bool GLInitialized = false,
         Locked = false;
-
-        public static int IBOElements;
 
         public static int[] IndexData;
 
@@ -29,9 +30,11 @@ namespace Destrospean.Graphics.OpenGL
 
         public static object Lock = new object();
 
-        public static readonly Dictionary<string, Material> Materials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase);
+        public static readonly Dictionary<string, Material> LockedMaterials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase),
+        Materials = new Dictionary<string, Material>(StringComparer.InvariantCultureIgnoreCase);
 
-        public static readonly Dictionary<string, Volume> Meshes = new Dictionary<string, Volume>();
+        public static readonly Dictionary<string, Volume> LockedMeshes = new Dictionary<string, Volume>(),
+        Meshes = new Dictionary<string, Volume>();
 
         public static readonly Dictionary<string, Shader> Shaders = new Dictionary<string, Shader>();
 
@@ -40,6 +43,28 @@ namespace Destrospean.Graphics.OpenGL
         public static readonly Dictionary<string, int> TextureIDs = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
 
         public static Matrix4 ViewMatrix = Matrix4.Identity;
+
+        public class ApplicationSettings : Common.ApplicationSettings
+        {
+            const string kUseAdvancedOpenGLShadersKey = "Use Advanced OpenGL Shaders";
+
+            public static bool UseAdvancedOpenGLShaders
+            {
+                get
+                {
+                    return Settings == null || !Settings.ContainsKey(kUseAdvancedOpenGLShadersKey) || (bool)Settings[kUseAdvancedOpenGLShadersKey];
+                }
+                set
+                {
+                    if (Settings == null)
+                    {
+                        Settings = new Dictionary<string, object>();
+                    }
+                    Settings[kUseAdvancedOpenGLShadersKey] = value;
+                    SaveSettings();
+                }
+            }
+        }
 
         public static void DeleteTexture(string key)
         {
@@ -195,6 +220,7 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
                 uniform bool hasTransparency;
+                uniform vec3 skin_color;
      
                 void main()
                 {
@@ -207,7 +233,7 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         else
                         {{
-                            texcolor = vec4(1.0, 1.0, 1.0, 1.0);
+                            texcolor = vec4(skin_color, 1.0);
                         }}
                     }}
                     gl_FragColor = texcolor;
@@ -392,7 +418,7 @@ namespace Destrospean.Graphics.OpenGL
                         gl_FragColor.a = texcolor.a;
                     }}
                 }}", backportedFunctions)));
-            ActiveShader = Common.ApplicationSettings.UseAdvancedOpenGLShaders ? "lit" : "textured";
+            ActiveShader = ApplicationSettings.UseAdvancedOpenGLShaders ? "lit" : "textured";
             Lights.Add(new Light(new Vector3(0, 1, 3), Vector3.One)
                 {
                     QuadraticAttenuation = .05f
@@ -432,24 +458,24 @@ namespace Destrospean.Graphics.OpenGL
             }
             catch (Exception ex)
             {
-                Common.ProgramUtils.WriteError(ex);
+                System.Destrospean.Logger.WriteError(ex);
                 return -1;
             }
         }
 
         public static void OnRenderFrame(int width, int height)
         {
-            try
+            lock (Lock)
             {
                 GL.Viewport(0, 0, width, height);
                 GL.ClearColor(System.Drawing.Color.CornflowerBlue);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 GL.Enable(EnableCap.DepthTest);
                 var indexAt = 0;
-                foreach (var meshKey in new List<string>(Meshes.Keys))
+                foreach (var meshKey in new List<string>((Locked ? LockedMeshes : Meshes).Keys))
                 {
                     Volume mesh;
-                    if (!Meshes.TryGetValue(meshKey, out mesh))
+                    if (!(Locked ? LockedMeshes : Meshes).TryGetValue(meshKey, out mesh))
                     {
                         continue;
                     }
@@ -629,14 +655,11 @@ namespace Destrospean.Graphics.OpenGL
                 GL.Flush();
                 OpenTK.Graphics.GraphicsContext.CurrentContext.SwapBuffers();
             }
-            catch (ArgumentException)
-            {
-            }
         }
 
         public static void OnUpdateFrame(CmarNYCBorrowed.Action processInputCallback, float fov, float aspectRatio)
         {
-            try
+            lock (Lock)
             {
                 processInputCallback();
                 List<Vector3> colors = new List<Vector3>(),
@@ -653,7 +676,7 @@ namespace Destrospean.Graphics.OpenGL
                 var indices = new List<int>();
                 var textureCoordinates = new List<Vector2>();
                 var vertexCount = 0;
-                foreach (var mesh in new List<Volume>(Meshes.Values))
+                foreach (var mesh in new List<Volume>((Locked ? LockedMeshes : Meshes).Values))
                 {
                     colors.AddRange(mesh.ColorData);
                     indices.AddRange(mesh.GetIndices(vertexCount));
@@ -767,7 +790,7 @@ namespace Destrospean.Graphics.OpenGL
                     GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataThin.Length * Vector3.SizeInBytes), VertexDeltaDataThin, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionThin"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
-                foreach (var mesh in new List<Volume>(Meshes.Values))
+                foreach (var mesh in new List<Volume>((Locked ? LockedMeshes : Meshes).Values))
                 {
                     mesh.Rotation = CurrentRotation;
                     mesh.CalculateModelMatrix();
@@ -780,9 +803,6 @@ namespace Destrospean.Graphics.OpenGL
                 GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(IndexData.Length * sizeof(int)), IndexData, BufferUsageHint.StaticDraw);
                 ViewMatrix = Camera.ViewMatrix;
                 System.Threading.Thread.Sleep(1);
-            }
-            catch (ArgumentException)
-            {
             }
         }
     }

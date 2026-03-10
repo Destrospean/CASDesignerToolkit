@@ -4,32 +4,26 @@ using Newtonsoft.Json;
 
 namespace Destrospean.Common
 {
-    public static class ApplicationSettings
+    public class ApplicationSettings
     {
+        Dictionary<string, object> mSettings;
+
+        public static readonly string GameFoldersKey = "The Sims 3 Installation Directories",
+        SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);
+
         public static Dictionary<string, object> Settings
-        {
-            get;
-            private set;
-        }
-
-        public static readonly string SettingsFilePath = string.Format("{0}{1}Destrospean{1}UserSettings.json", System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), Path.DirectorySeparatorChar);
-
-        public static bool UseAdvancedOpenGLShaders
         {
             get
             {
-                return Settings == null || !Settings.ContainsKey(JSONNodeNames.UseAdvancedOpenGLShaders) || (bool)Settings[JSONNodeNames.UseAdvancedOpenGLShaders];
+                return Singleton.mSettings;
             }
             set
             {
-                if (Settings == null)
-                {
-                    Settings = new Dictionary<string, object>();
-                }
-                Settings[JSONNodeNames.UseAdvancedOpenGLShaders] = value;
-                SaveSettings();
+                Singleton.mSettings = value;
             }
         }
+
+        public static ApplicationSettings Singleton;
 
         public class GameFolderComparer : IComparer<string>
         {
@@ -39,22 +33,20 @@ namespace Destrospean.Common
             }
         }
 
-        public static class JSONNodeNames
-        {
-            public const string GameFolders = "The Sims 3 Installation Directories",
-            UseAdvancedOpenGLShaders = "Use Advanced OpenGL Shaders";
-        }
-
         public static void LoadSettings()
         {
+            if (Singleton == null)
+            {
+                Singleton = new ApplicationSettings();
+            }
             if (File.Exists(SettingsFilePath))
             {
                 var installDirs = "";
                 using (var stream = File.OpenText(SettingsFilePath))
                 {
-                    Settings = JsonConvert.DeserializeObject<Dictionary<string, object>>(stream.ReadToEnd());
+                    Singleton.mSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(stream.ReadToEnd());
                     object installDirectories;
-                    if (Settings.TryGetValue(JSONNodeNames.GameFolders, out installDirectories))
+                    if (Settings.TryGetValue(GameFoldersKey, out installDirectories))
                     {
                         foreach (var installDirectoryKvp in (Newtonsoft.Json.Linq.JObject)installDirectories)
                         {
@@ -65,7 +57,7 @@ namespace Destrospean.Common
                 }
                 return;
             }
-            Settings = new Dictionary<string, object>();
+            Singleton.mSettings = new Dictionary<string, object>();
         }
 
         public static void SaveSettings()

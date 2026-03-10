@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Destrospean;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Destrospean.CmarNYCBorrowed;
@@ -19,9 +21,17 @@ public partial class MainWindow : RendererMainWindow
 {
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
+    List<EvaluatedResourceKey> mAudioResources = new List<EvaluatedResourceKey>();
+
     bool mDisableUpdateModels = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
+
+    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
+
+    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
+
+    LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
     readonly string mOriginalWindowTitle;
 
@@ -43,43 +53,57 @@ public partial class MainWindow : RendererMainWindow
         {
             if (value.HasFlag(NextStateOptions.UpdateModels) && !mDisableUpdateModels && GlobalState.GLInitialized)
             {
-                new Thread(() =>
+                GlobalState.CurrentLODIndex = ResourcePropertyNotebook.CurrentPage;
+                if (mLoadMeshesThread != null)
+                {
+                    mLoadMeshesThread.Abort();
+                }
+                (mLoadMeshesThread = new Thread(() =>
                     {
                         lock (sLock)
                         {
+                            foreach (var materialKvp in GlobalState.Materials)
+                            {
+                                GlobalState.LockedMaterials[materialKvp.Key] = materialKvp.Value;
+                            }
+                            foreach (var meshKvp in GlobalState.Meshes)
+                            {
+                                GlobalState.LockedMeshes[meshKvp.Key] = meshKvp.Value;
+                            }
+                            GlobalState.Locked = true;
                             lock (GlobalState.Lock)
                             {
-                                GlobalState.Locked = true;
                                 GlobalState.Meshes.Clear();
                                 GlobalState.Materials.Clear();
-                                foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
-                                {
-                                    if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
-                                    {
-                                        ImageUtils.PreloadedGameImages[imageKey].Dispose();
-                                        ImageUtils.PreloadedGameImages.Remove(imageKey);
-                                        Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
-                                    }
-                                }
-                                TreeIter iter;
-                                TreeModel model;
-                                if (ResourceTreeView.Selection.GetSelected(out model, out iter))
-                                {
-                                    switch ((string)model.GetValue(iter, 0))
-                                    {
-                                        case "CASP":
-                                            Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Sim.LoadMeshesOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                            break;
-                                        case "OBJD":
-                                            PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()].LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => GameObjectUtils.LoadMeshesOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
-                                            break;
-                                    }
-                                }
-                                GlobalState.Locked = false;
                             }
+                            TreeIter iter;
+                            TreeModel model;
+                            if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+                            {
+                                switch ((string)model.GetValue(iter, 0))
+                                {
+                                    case "CASP":
+                                        Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                        break;
+                                    case "OBJD":
+                                        PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()].LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => GameObjectUtils.LoadMeshOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                        break;
+                                }
+                            }
+                            GlobalState.Locked = false;
+                            foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
+                            {
+                                if (!ImageUtils.PreloadedGameImagePixbufs.ContainsKey(imageKey))
+                                {
+                                    ImageUtils.PreloadedGameImages[imageKey].Dispose();
+                                    ImageUtils.PreloadedGameImages.Remove(imageKey);
+                                    Application.Invoke((sender, e) => GlobalState.DeleteTexture(imageKey));
+                                }
+                            }
+                            GlobalState.LockedMaterials.Clear();
+                            GlobalState.LockedMeshes.Clear();
                         }
-                    }).Start();
-                
+                    })).Start();
             }
             if (value.HasFlag(NextStateOptions.UnsavedChanges))
             {
@@ -104,25 +128,115 @@ public partial class MainWindow : RendererMainWindow
 
     public readonly ListStore ResourceListStore = new ListStore(typeof(string), typeof(string), typeof(string), typeof(string), typeof(IResourceIndexEntry));
 
-    public MainWindow() : base(WindowType.Toplevel)
+    public const string ShortcutDescription = "Create wearable items for Sims in The Sims 3";
+
+    public string ShortcutPath
+    {
+        get
+        {
+            if (Platform.IsWindows)
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
+            }
+            if (Platform.IsMacOS)
+            {
+                return null;
+            }
+            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
+        }
+    }
+
+    public class ApplicationSettings : GlobalState.ApplicationSettings
+    {
+        const string kPlayMusicKey = "Play Music";
+
+        public static bool PlayMusic
+        {
+            get
+            {
+                return Settings == null || !Settings.ContainsKey(kPlayMusicKey) || (bool)Settings[kPlayMusicKey];
+            }
+            set
+            {
+                if (Settings == null)
+                {
+                    Settings = new Dictionary<string, object>();
+                }
+                Settings[kPlayMusicKey] = value;
+                SaveSettings();
+            }
+        }
+    }
+
+    public MainWindow(string packagePath = null) : base(WindowType.Toplevel)
     {
         Build();
         mOriginalWindowTitle = Title;
         RescaleAndReposition();
+        if (ShortcutPath != null && File.Exists(ShortcutPath))
+        {
+            CreateShortcutAction.Label = "Delete Shortcut";
+            CreateShortcutAction.StockId = Stock.Delete;
+        }
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
+        (mAddMusicThread = new Thread(() => AddMusic("music_mode_cas"))).Start();
+        CacheGenerationWindow.GenerateCachesAction = () =>
+            {
+                RescaleAndReposition(true);
+                Sensitive = false;
+                try
+                {
+                    if (mAddMusicThread != null && mAddMusicThread.IsAlive)
+                    {
+                        mAddMusicThread.Join();
+                    }
+                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    CASPart.GenerateLookupCache();
+                    mAudioResources.Clear();
+                    AddMusic("music_mode_cas");
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.WriteError(ex);
+                }
+                Sensitive = true;
+            };
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow(this, Icon);
         }
-        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var assembly = System.Reflection.Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);
         var treeViewSelectionColor = ResourceTreeView.Style.Base(StateType.Selected);
         mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFatnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFitnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
+        mMediaPlayer = new LibVLCSharp.Shared.MediaPlayer(mLibVLC);
+        PlayMusicAction.Active = ApplicationSettings.PlayMusic;
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
+        PlayMusicAction.Toggled += (sender, e) =>
+            {
+                ApplicationSettings.PlayMusic = PlayMusicAction.Active;
+                TreeIter iter;
+                TreeModel model;
+                if (ApplicationSettings.PlayMusic)
+                {
+                    if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
+                    {
+                        (mPlayMusicThread = new Thread(PlayMusic)).Start();
+                    }
+                }
+                else
+                {
+                    mMediaPlayer.Stop();
+                    if (mPlayMusicThread != null)
+                    {
+                        mPlayMusicThread.Abort();
+                    }
+                }
+            };
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
@@ -142,6 +256,26 @@ public partial class MainWindow : RendererMainWindow
             };
         MainHPaned.ShowAll();
         GLWidget.Hide();
+        if (packagePath != null)
+        {
+            mAddMusicThread.Join();
+            CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
+            RefreshWidgets();
+            AddFilePathToWindowTitle(packagePath);
+        }
+        /*
+        string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
+        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "0.0.0", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        {
+            Console.WriteLine(latestReleaseName);
+            Console.WriteLine(latestReleaseDescription);
+            Console.WriteLine(latestReleaseDownloadUrl);
+            using (var client = new System.Net.Http.HttpClient())
+            {
+                File.WriteAllBytes(latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
+            }
+        }
+        */
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
@@ -300,8 +434,37 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
+        }
+    }
+
+    void AddMusic(string musicMode)
+    {
+        foreach (var package in ResourceUtils.GameContentPackages.Values)
+        {
+            foreach (var nameMapResource in package.GetNameMapResources())
+            {
+                foreach (var nameMapKvp in nameMapResource.ToDictionary())
+                {
+                    if (nameMapKvp.Value == musicMode)
+                    {
+                        foreach (var resourceIndexEntry in package.FindAll(x => x.Instance == nameMapKvp.Key))
+                        {
+                            foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                            {
+                                if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
+                                {
+                                    foreach (var item in block.Items)
+                                    {
+                                        mAudioResources.AddRange(package.FindAll(x => x.ResourceType == 0x01EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -426,7 +589,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.GEOM ? "The Sims 3 GEOM Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.GEOM ? "*.simgeom" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -439,7 +602,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     },
@@ -458,7 +621,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -474,7 +637,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     };
@@ -516,7 +679,7 @@ public partial class MainWindow : RendererMainWindow
                         var fileChooserDialog = new FileChooserDialog("Import GEOM", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter
                             {
-                                Name = "The Sims 3 GEOM Resource"
+                                Name = FileTypes.GEOM
                             };
                         fileFilter.AddPattern("*.simgeom");
                         fileChooserDialog.AddFilter(fileFilter);
@@ -528,7 +691,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                             catch (Exception ex)
                             {
-                                ProgramUtils.WriteError(ex);
+                                Logger.WriteError(ex);
                                 throw;
                             }
                         }
@@ -620,7 +783,242 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
+            throw;
+        }
+    }
+
+    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
+    {
+        try
+        {
+            if (gameObject == null)
+            {
+                return;
+            }
+            if (mResourcePropertyNotebookSwitchPageHandler != null)
+            {
+                ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
+            }
+            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
+            ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
+            foreach (var lodKvp in gameObject.LODs)
+            {
+                var meshGroupNotebook = new Notebook
+                    {
+                        ShowTabs = false
+                    };
+                var actionGroup = new ActionGroup("Default");
+                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
+                    {
+                        Sensitive = lodKvp.Value.MeshGroups.Count > 1
+                    },
+                exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
+                exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
+                exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
+                importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
+                importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
+                importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
+                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
+                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
+                actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
+                actionGroup.Add(addMeshGroupAction);
+                actionGroup.Add(deleteMeshGroupAction);
+                actionGroup.Add(exportMLODAction);
+                actionGroup.Add(exportOBJAction);
+                actionGroup.Add(exportWSOAction);
+                actionGroup.Add(importMLODAction);
+                actionGroup.Add(importOBJAction);
+                actionGroup.Add(importWSOAction);
+                var uiManager = new UIManager();
+                uiManager.InsertActionGroup(actionGroup, 0);
+                uiManager.AddUiFromString(@"
+                    <ui>
+                        <menubar name='MLODPropertiesMenuBar'>
+                            <menu name='OptionsAction' action='OptionsAction'>
+                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
+                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
+                                <menu name='ImportAction' action='ImportAction'>
+                                    <menuitem name='ImportMLODAction' action='ImportMLODAction'/>
+                                    <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
+                                    <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
+                                </menu>                            
+                                <menu name='ExportAction' action='ExportAction'>
+                                    <menuitem name='ExportMLODAction' action='ExportMLODAction'/>
+                                    <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
+                                    <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
+                                </menu>
+                            </menu>
+                        </menubar>
+                    </ui>");
+                var menuBar = (MenuBar)uiManager.GetWidget("/MLODPropertiesMenuBar");
+                menuBar.PackDirection = PackDirection.Rtl;
+                Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
+                    {
+                        Xalign = .5f
+                    }),
+                prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
+                    {
+                        Xalign = .5f
+                    });
+                var pageIndexLabel = new Label
+                    {
+                        Xalign = .5f
+                    };
+                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
+                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
+                Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+                prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+                nextButtonAlignment.Add(nextButton);
+                prevButtonAlignment.Add(prevButton);
+                meshGroupNotebook.SwitchPage += (o, args) =>
+                    {
+                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
+                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
+                    };
+                Action<MeshFileType> exportMeshGroup = (meshFileType) =>
+                    {
+                        try
+                        {
+                            switch (meshFileType)
+                            {
+                                case MeshFileType.MLOD:
+                                case MeshFileType.OBJ:
+                                case MeshFileType.WSO:
+                                    break;
+                                default:
+                                    return;
+                            }
+                            var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
+                            var fileFilter = new FileFilter
+                                {
+                                    Name = meshFileType == MeshFileType.MLOD ? "The Sims 3 MLOD Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                };
+                            fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                            fileChooserDialog.AddFilter(fileFilter);
+                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                            {
+                                gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                            }
+                            fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            ProgramUtils.WriteError(ex);
+                            throw;
+                        }
+                    },
+                importMeshGroup = (meshFileType) =>
+                    {
+                        try
+                        {
+                            switch (meshFileType)
+                            {
+                                case MeshFileType.OBJ:
+                                case MeshFileType.WSO:
+                                    break;
+                                default:
+                                    return;
+                            }
+                            var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                            var fileFilter = new FileFilter
+                                {
+                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                };
+                            fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                            fileChooserDialog.AddFilter(fileFilter);
+                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                            {
+                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                            }
+                            fileChooserDialog.Destroy();
+                            fileChooserDialog.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            ProgramUtils.WriteError(ex);
+                            throw;
+                        }
+                    };
+                addMeshGroupAction.Activated += (sender, e) =>
+                    {
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                        gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        foreach (var child in ResourcePropertyNotebook.Children)
+                        {
+                            ResourcePropertyNotebook.Remove(child);
+                        }
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex + 1);
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    };
+                deleteMeshGroupAction.Activated += (sender, e) =>
+                    {
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                        gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        foreach (var child in ResourcePropertyNotebook.Children)
+                        {
+                            ResourcePropertyNotebook.Remove(child);
+                        }
+                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                    };
+                exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
+                exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
+                exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
+                importMLODAction.Activated += (sender, e) =>
+                    {
+                        var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                        var fileFilter = new FileFilter
+                            {
+                                Name = "The Sims 3 MLOD Resource"
+                            };
+                        fileFilter.AddPattern("*.lod");
+                        fileChooserDialog.AddFilter(fileFilter);
+                        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                        {
+                            try
+                            {
+                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                            }
+                            catch (Exception ex)
+                            {
+                                ProgramUtils.WriteError(ex);
+                                throw;
+                            }
+                        }
+                        fileChooserDialog.Destroy();
+                        fileChooserDialog.Dispose();
+                    };
+                importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
+                importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
+                var meshGroupPageButtonHBox = new HBox(false, 0);
+                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
+                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
+                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
+                var lodPageVBox = new VBox(false, 0);
+                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
+                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
+                lodPageVBox.ShowAll();
+                ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
+                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
+                if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
+                {
+                    ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
+                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -900,6 +1298,11 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
+                    mMediaPlayer.Stop();
+                    if (mPlayMusicThread != null)
+                    {
+                        mPlayMusicThread.Abort();
+                    }
                     mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();
@@ -932,6 +1335,10 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 break;
                             case "CASP":
+                                if (ApplicationSettings.PlayMusic)
+                                {
+                                    (mPlayMusicThread = new Thread(PlayMusic)).Start();
+                                }
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
                                 mDisableUpdateModels = false;
@@ -949,21 +1356,67 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
+        }
+    }
+
+    void PlayMusic()
+    {
+        Shuffle(mAudioResources);
+        while (true)
+        {
+            foreach (var audioResource in mAudioResources)
+            {
+                using (var process = Process.Start(new ProcessStartInfo
+                    {
+                        Arguments = "-pi -po",
+                        CreateNoWindow = true,
+                        FileName = "ealayer3",
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    }))
+                {
+                    if (process == null)
+                    {
+                        Logger.WriteError(new Exception("Failed to start the executable."));
+                        return;
+                    }
+                    using (var standardInput = process.StandardInput.BaseStream)
+                    {
+                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
+                    }
+                    var wait = true;
+                    mMediaPlayer.EndReached += (sender, e) => wait = false;
+                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
+                    mMediaPlayer.Play(media);
+                    mMediaPlayer.Position = 0;
+                    while (wait)
+                    {
+                        Thread.Sleep(1);
+                    }
+                    process.WaitForExit();
+                }
+            }
         }
     }
 
     void RandomizeCASParts()
     {
-        new Thread(() =>
+        if (mRandomizeCASPartsThread != null)
+        {
+            mRandomizeCASPartsThread.Abort();
+        }
+        (mRandomizeCASPartsThread = new Thread(() =>
             {
                 lock (sLock)
                 {
                     Sim.RandomizeCASParts();
                     Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
                 }
-            }).Start();
+            })).Start();
     }
 
     void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)
@@ -986,6 +1439,20 @@ public partial class MainWindow : RendererMainWindow
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
     }
 
+    static void Shuffle<T>(IList<T> list)
+    {
+        var random = new Random();
+        var count = list.Count;
+        while (count > 1)
+        {
+            count--;
+            var n = random.Next(count + 1);
+            T value = list[n];
+            list[n] = list[count];
+            list[count] = value;
+        }
+    }
+
     public static void AdjustFontSizes(Container container, Pango.FontDescription fontDescription)
     {
         container.ModifyFont(fontDescription);
@@ -1005,29 +1472,32 @@ public partial class MainWindow : RendererMainWindow
 
     public void ClearTemporaryData()
     {
-        Sim.CurrentCASPart = null;
-        mSaveAsPath = null;
-        GlobalState.Meshes.Clear();
-        foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
+        lock (GlobalState.Lock)
         {
-            PreloadedData.CASParts[key].Dispose();
-            PreloadedData.CASParts.Remove(key);
+            Sim.CurrentCASPart = null;
+            mSaveAsPath = null;
+            GlobalState.Meshes.Clear();
+            foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
+            {
+                PreloadedData.CASParts[key].Dispose();
+                PreloadedData.CASParts.Remove(key);
+            }
+            foreach (var key in new List<string>(PreloadedData.GameObjects.Keys))
+            {
+                PreloadedData.GameObjects[key].Dispose();
+                PreloadedData.GameObjects.Remove(key);
+            }
+            PreloadedData.FTPTs.Clear();
+            PreloadedData.GEOMs.Clear();
+            PreloadedData.LITEs.Clear();
+            PreloadedData.MLODs.Clear();
+            PreloadedData.MODLs.Clear();
+            PreloadedData.VPXYs.Clear();
+            GlobalState.Materials.Clear();
+            GlobalState.DeleteTextures();
+            ImageUtils.DeletePreloadedImages();
+            ImageResourceComboBox.DeleteThumbnails();
         }
-        foreach (var key in new List<string>(PreloadedData.GameObjects.Keys))
-        {
-            PreloadedData.GameObjects[key].Dispose();
-            PreloadedData.GameObjects.Remove(key);
-        }
-        PreloadedData.FTPTs.Clear();
-        PreloadedData.GEOMs.Clear();
-        PreloadedData.LITEs.Clear();
-        PreloadedData.MLODs.Clear();
-        PreloadedData.MODLs.Clear();
-        PreloadedData.VPXYs.Clear();
-        GlobalState.Materials.Clear();
-        GlobalState.DeleteTextures();
-        ImageUtils.DeletePreloadedImages();
-        ImageResourceComboBox.DeleteThumbnails();
     }
 
     public override void DrawImage()
@@ -1180,7 +1650,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1210,7 +1680,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -1249,7 +1719,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1324,7 +1794,7 @@ public partial class MainWindow : RendererMainWindow
         }
         catch (Exception ex)
         {
-            ProgramUtils.WriteError(ex);
+            Logger.WriteError(ex);
             throw;
         }
     }
@@ -1363,6 +1833,50 @@ public partial class MainWindow : RendererMainWindow
         Title = OriginalWindowTitle;
     }
 
+    protected void OnCreateShortcutActionActivated(object sender, EventArgs e)
+    {
+        try
+        {
+            if (File.Exists(ShortcutPath))
+            {
+                File.Delete(ShortcutPath);
+                CreateShortcutAction.Label = "Create Shortcut";
+                CreateShortcutAction.StockId = Stock.JumpTo;
+                return;
+            }
+            var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (Platform.IsWindows)
+            {
+                Platform.Windows.CreateShortcut(ShortcutPath, assembly.Location, AppDomain.CurrentDomain.BaseDirectory, null, ShortcutDescription);
+                Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly.Location);
+            }
+            else if (Platform.IsMacOS)
+            {
+                return;
+            }
+            else
+            {
+                var mimeType = "x-wine-extension-package";
+                var assemblyName = assembly.GetName().Name;
+                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new string[]
+                    {
+                        "Game"
+                    },
+                    new string[]
+                    {
+                        mimeType
+                    });
+                Platform.FreeDesktop.SetFileAssociation(mimeType, FileTypes.DBPFPackage, "*.package");
+            }
+            CreateShortcutAction.Label = "Delete Shortcut";
+            CreateShortcutAction.StockId = Stock.Delete;
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteError(ex);
+        }
+    }
+
     protected void OnDeleteEvent(object sender, DeleteEventArgs a)
     {
         if (HasUnsavedChanges)
@@ -1378,6 +1892,11 @@ public partial class MainWindow : RendererMainWindow
                     a.RetVal = true;
                     return;
             }
+        }
+        mMediaPlayer.Stop();
+        if (mPlayMusicThread != null)
+        {
+            mPlayMusicThread.Abort();
         }
         Application.Quit();
     }
@@ -1418,7 +1937,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -1444,7 +1963,7 @@ public partial class MainWindow : RendererMainWindow
         var fileChooserDialog = new FileChooserDialog("Open Package", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
         var fileFilter = new FileFilter
             {
-                Name = "The Sims 3 DBPF Package"
+                Name = FileTypes.DBPFPackage
             };
         fileFilter.AddPattern("*.package");
         fileChooserDialog.AddFilter(fileFilter);
@@ -1452,6 +1971,10 @@ public partial class MainWindow : RendererMainWindow
         {
             try
             {
+                if (mAddMusicThread != null && mAddMusicThread.IsAlive)
+                {
+                    mAddMusicThread.Join();
+                }
                 var package = s3pi.Package.Package.OpenPackage(0, fileChooserDialog.Filename, true);
                 s3pi.Package.Package.ClosePackage(0, CurrentPackage);
                 CurrentPackage = package;
@@ -1462,7 +1985,7 @@ public partial class MainWindow : RendererMainWindow
             }
             catch (Exception ex)
             {
-                ProgramUtils.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -1484,6 +2007,12 @@ public partial class MainWindow : RendererMainWindow
                 default:
                     return;
             }
+        }
+        Destroy();
+        mMediaPlayer.Stop();
+        if (mPlayMusicThread != null)
+        {
+            mPlayMusicThread.Abort();
         }
         Application.Quit();
     }
@@ -1554,7 +2083,7 @@ public partial class MainWindow : RendererMainWindow
         var fileChooserDialog = new FileChooserDialog("Save Package As", this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
         var fileFilter = new FileFilter
             {
-                Name = "The Sims 3 DBPF Package"
+                Name = FileTypes.DBPFPackage
             };
         fileFilter.AddPattern("*.package");
         fileChooserDialog.AddFilter(fileFilter);

@@ -134,13 +134,16 @@ namespace Destrospean.S3PIExtensions
             {
                 if (sGameContentPackages == null)
                 {
-                    sGameContentPackages = new Dictionary<PackageTag, IPackage>();
-                    foreach (var game in GameFolders.Games)
+                    lock (sLock)
                     {
-                        var enumerator = game.GameContent.GetEnumerator();
-                        while (enumerator.MoveNext())
+                        sGameContentPackages = new Dictionary<PackageTag, IPackage>();
+                        foreach (var game in GameFolders.Games)
                         {
-                            sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            var enumerator = game.GameContent.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            }
                         }
                     }
                 }
@@ -154,13 +157,16 @@ namespace Destrospean.S3PIExtensions
             {
                 if (sGameImageResourcePackages == null)
                 {
-                    sGameImageResourcePackages = new Dictionary<PackageTag, IPackage>();
-                    foreach (var game in GameFolders.Games)
+                    lock (sLock)
                     {
-                        var enumerator = game.DDSImages.GetEnumerator();
-                        while (enumerator.MoveNext())
+                        sGameImageResourcePackages = new Dictionary<PackageTag, IPackage>();
+                        foreach (var game in GameFolders.Games)
                         {
-                            sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            var enumerator = game.DDSImages.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            }
                         }
                     }
                 }
@@ -280,6 +286,11 @@ namespace Destrospean.S3PIExtensions
                 }
             }
             throw new ResourceIndexEntryNotFoundException("No resource with the key, \"" + key + ",\" referenced in the XML node could be found.");
+        }
+
+        public static NameMapResource.NameMapResource[] GetNameMapResources(this IPackage package)
+        {
+            return package.FindAll(x => x.GetResourceTypeTag() == "_KEY").ConvertAll(x => (NameMapResource.NameMapResource)s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, x)).ToArray();
         }
 
         public static IResourceIndexEntry GetResourceIndexEntry(this IPackage package, IResourceKey resourceKey)
@@ -407,6 +418,17 @@ namespace Destrospean.S3PIExtensions
         public static string ReverseEvaluateResourceKey(this IResourceKey resourceKey)
         {   
             return "key:" + resourceKey.ResourceType.ToString("X8") + ":" + resourceKey.ResourceGroup.ToString("X8") + ":" + resourceKey.Instance.ToString("X16");
+        }
+
+        public static Dictionary<ulong, string> ToDictionary(this NameMapResource.NameMapResource nameMapResource)
+        {
+            var nameMapDictionary = new Dictionary<ulong, string>();
+            var enumerator = nameMapResource.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                nameMapDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
+            }
+            return nameMapDictionary;
         }
     }
 }

@@ -222,6 +222,7 @@
     <Compile Include="Windows\MainWindowBase.cs" />
     <Compile Include="Windows\RendererMainWindow.cs" />
     <Compile Include="CairoHelper.cs" />
+    <Compile Include="FileTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -320,6 +321,11 @@
     <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

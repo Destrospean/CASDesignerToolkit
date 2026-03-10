@@ -2,6 +2,8 @@
 {
     public partial class CacheGenerationWindow : Gtk.Window
     {
+        public static CmarNYCBorrowed.Action GenerateCachesAction;
+
         public CacheGenerationWindow(Gtk.Window parent, Gdk.Pixbuf icon) : base(Gtk.WindowType.Toplevel)
         {
             Build();
@@ -10,19 +12,7 @@
             Reposition();
             new System.Threading.Thread(() =>
                 {
-                    MainWindowBase.Singleton.RescaleAndReposition(true);
-                    MainWindowBase.Singleton.Sensitive = false;
-                    try
-                    {
-                        ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
-                        Common.Abstractions.CASPart.GenerateLookupCache();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Common.ProgramUtils.WriteError(ex);
-                        throw;
-                    }
-                    MainWindowBase.Singleton.Sensitive = true;
+                    GenerateCachesAction();
                     Destroy();
                     Dispose();
                 }).Start();
