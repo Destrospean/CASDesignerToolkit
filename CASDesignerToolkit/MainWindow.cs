@@ -894,7 +894,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.MLOD ? "The Sims 3 MLOD Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -907,7 +907,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     },
@@ -926,7 +926,7 @@ public partial class MainWindow : RendererMainWindow
                             var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                             var fileFilter = new FileFilter
                                 {
-                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
+                                    Name = FileTypes.GetName(meshFileType)
                                 };
                             fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                             fileChooserDialog.AddFilter(fileFilter);
@@ -939,7 +939,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                         catch (Exception ex)
                         {
-                            ProgramUtils.WriteError(ex);
+                            Logger.WriteError(ex);
                             throw;
                         }
                     };
@@ -977,7 +977,7 @@ public partial class MainWindow : RendererMainWindow
                         var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter
                             {
-                                Name = "The Sims 3 MLOD Resource"
+                                Name = FileTypes.MLOD
                             };
                         fileFilter.AddPattern("*.lod");
                         fileChooserDialog.AddFilter(fileFilter);
@@ -989,7 +989,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                             catch (Exception ex)
                             {
-                                ProgramUtils.WriteError(ex);
+                                Logger.WriteError(ex);
                                 throw;
                             }
                         }
@@ -1019,241 +1019,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
-        }
-    }
-
-    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
-    {
-        try
-        {
-            if (gameObject == null)
-            {
-                return;
-            }
-            if (mResourcePropertyNotebookSwitchPageHandler != null)
-            {
-                ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
-            }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
-            ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
-            foreach (var lodKvp in gameObject.LODs)
-            {
-                var meshGroupNotebook = new Notebook
-                    {
-                        ShowTabs = false
-                    };
-                var actionGroup = new ActionGroup("Default");
-                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
-                deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
-                    {
-                        Sensitive = lodKvp.Value.MeshGroups.Count > 1
-                    },
-                exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
-                exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
-                exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
-                importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
-                importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
-                importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
-                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
-                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
-                actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
-                actionGroup.Add(addMeshGroupAction);
-                actionGroup.Add(deleteMeshGroupAction);
-                actionGroup.Add(exportMLODAction);
-                actionGroup.Add(exportOBJAction);
-                actionGroup.Add(exportWSOAction);
-                actionGroup.Add(importMLODAction);
-                actionGroup.Add(importOBJAction);
-                actionGroup.Add(importWSOAction);
-                var uiManager = new UIManager();
-                uiManager.InsertActionGroup(actionGroup, 0);
-                uiManager.AddUiFromString(@"
-                    <ui>
-                        <menubar name='MLODPropertiesMenuBar'>
-                            <menu name='OptionsAction' action='OptionsAction'>
-                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
-                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
-                                <menu name='ImportAction' action='ImportAction'>
-                                    <menuitem name='ImportMLODAction' action='ImportMLODAction'/>
-                                    <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
-                                    <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
-                                </menu>                            
-                                <menu name='ExportAction' action='ExportAction'>
-                                    <menuitem name='ExportMLODAction' action='ExportMLODAction'/>
-                                    <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
-                                    <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
-                                </menu>
-                            </menu>
-                        </menubar>
-                    </ui>");
-                var menuBar = (MenuBar)uiManager.GetWidget("/MLODPropertiesMenuBar");
-                menuBar.PackDirection = PackDirection.Rtl;
-                Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
-                    {
-                        Xalign = .5f
-                    }),
-                prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
-                    {
-                        Xalign = .5f
-                    });
-                var pageIndexLabel = new Label
-                    {
-                        Xalign = .5f
-                    };
-                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
-                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
-                Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-                prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
-                nextButtonAlignment.Add(nextButton);
-                prevButtonAlignment.Add(prevButton);
-                meshGroupNotebook.SwitchPage += (o, args) =>
-                    {
-                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
-                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
-                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
-                    };
-                Action<MeshFileType> exportMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.MLOD:
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = meshFileType == MeshFileType.MLOD ? "The Sims 3 MLOD Resource" : meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            ProgramUtils.WriteError(ex);
-                            throw;
-                        }
-                    },
-                importMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = meshFileType == MeshFileType.OBJ ? "Wavefront OBJ" : meshFileType == MeshFileType.WSO ? "The Sims Resource Workshop Object" : null
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            ProgramUtils.WriteError(ex);
-                            throw;
-                        }
-                    };
-                addMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex + 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                deleteMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
-                exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
-                exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
-                importMLODAction.Activated += (sender, e) =>
-                    {
-                        var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-                        var fileFilter = new FileFilter
-                            {
-                                Name = "The Sims 3 MLOD Resource"
-                            };
-                        fileFilter.AddPattern("*.lod");
-                        fileChooserDialog.AddFilter(fileFilter);
-                        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                        {
-                            try
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            catch (Exception ex)
-                            {
-                                ProgramUtils.WriteError(ex);
-                                throw;
-                            }
-                        }
-                        fileChooserDialog.Destroy();
-                        fileChooserDialog.Dispose();
-                    };
-                importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
-                importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
-                var meshGroupPageButtonHBox = new HBox(false, 0);
-                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
-                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
-                var lodPageVBox = new VBox(false, 0);
-                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
-                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
-                lodPageVBox.ShowAll();
-                ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
-                if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
-                {
-                    ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
-                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ProgramUtils.WriteError(ex);
             throw;
         }
     }
