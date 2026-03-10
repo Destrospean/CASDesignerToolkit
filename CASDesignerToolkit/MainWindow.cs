@@ -1257,7 +1257,7 @@ public partial class MainWindow : RendererMainWindow
             if (Platform.IsWindows)
             {
                 Platform.Windows.CreateShortcut(ShortcutPath, assembly.Location, AppDomain.CurrentDomain.BaseDirectory, null, ShortcutDescription);
-                Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly);
+                Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly.Location);
             }
             else if (Platform.IsMacOS)
             {

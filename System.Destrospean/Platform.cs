@@ -245,11 +245,11 @@ MimeType=application/{6}", name, targetPath, workingDirectory, iconPath, descrip
                 shortcut.Save();
             }
 
-            public static void SetFileAssociation(string fileType, string description, string extension, System.Reflection.Assembly assembly)
+            public static void SetFileAssociation(string fileType, string description, string extension, string executablePath)
             {
                 var classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";
                 Registry.SetValue(classesRegistryPath + fileType, "", description);
-                Registry.SetValue(classesRegistryPath + fileType + "\\shell\\open\\command", "", assembly.Location + " \"%1\"");
+                Registry.SetValue(classesRegistryPath + fileType + "\\shell\\open\\command", "", executablePath + " \"%1\"");
                 Registry.SetValue(classesRegistryPath + extension, "", fileType);
                 SHChangeNotify(0x8000000, 0x2000, IntPtr.Zero, IntPtr.Zero);
             }
