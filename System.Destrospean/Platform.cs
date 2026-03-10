@@ -217,10 +217,19 @@ MimeType=application/{6}", name, targetPath, workingDirectory, iconPath, descrip
             public static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory = null, string iconPath = null, string description = null)
             {
                 var shortcut = (IWshRuntimeLibrary.IWshShortcut)new IWshRuntimeLibrary.WshShell().CreateShortcut(shortcutPath);
-                shortcut.Description = description;
-                shortcut.IconLocation = iconPath;
+                if (description != null)
+                {
+                    shortcut.Description = description;
+                }
+                if (iconPath != null)
+                {
+                    shortcut.IconLocation = iconPath;
+                }
                 shortcut.TargetPath = targetPath;
-                shortcut.WorkingDirectory = workingDirectory;
+                if (workingDirectory != null)
+                {
+                    shortcut.WorkingDirectory = workingDirectory;
+                }
                 shortcut.Save();
             }
 
