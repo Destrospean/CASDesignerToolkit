@@ -65,7 +65,7 @@ namespace System.Destrospean
         {
             get
             {
-                return (OS & OSFlags.Darwin) != 0;
+                return (OS & OSFlags.MacOS) != 0;
             }
         }
 
@@ -105,11 +105,19 @@ namespace System.Destrospean
             }
         }
 
+        public static bool IsSolaris
+        {
+            get
+            {
+                return (OS & OSFlags.Solaris) != 0;
+            }
+        }
+
         public static bool IsWindows
         {
             get
             {
-                return (OS & OSFlags.Win32) != 0;
+                return (OS & OSFlags.Windows) != 0;
             }
         }
 
@@ -134,7 +142,7 @@ namespace System.Destrospean
                             }
                             break;
                         default:
-                            sOS = OSFlags.Win32;
+                            sOS = OSFlags.Windows;
                             break;
                     }
                 }
@@ -146,12 +154,16 @@ namespace System.Destrospean
         public enum OSFlags
         {
             Win32 = 1,
+            Windows = 1,
             Unix,
             Linux = 4,
             Darwin = 8,
+            MacOS = 8,
             FreeBSD = 0x10,
             NetBSD = 0x20,
-            OpenBSD = 0x40
+            OpenBSD = 0x40,
+            Solaris = 0x80,
+            SunOS = 0x80
         }
 
         public static class FreeDesktop

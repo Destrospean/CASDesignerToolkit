@@ -28,7 +28,7 @@ public partial class MainWindow : RendererMainWindow
 
     LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
 
-    Thread mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
+    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
@@ -167,8 +167,28 @@ public partial class MainWindow : RendererMainWindow
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
-        var addMusicThread = new Thread(() => AddMusic("music_mode_cas"));
-        addMusicThread.Start();
+        (mAddMusicThread = new Thread(() => AddMusic("music_mode_cas"))).Start();
+        CacheGenerationWindow.GenerateCachesAction = () =>
+            {
+                RescaleAndReposition(true);
+                Sensitive = false;
+                try
+                {
+                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    CASPart.GenerateLookupCache();
+                    if (mAddMusicThread != null && mAddMusicThread.IsAlive)
+                    {
+                        mAddMusicThread.Join();
+                    }
+                    mAudioResources.Clear();
+                    AddMusic("music_mode_cas");
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.WriteError(ex);
+                }
+                Sensitive = true;
+            };
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
             new CacheGenerationWindow(this, Icon);
@@ -224,14 +244,14 @@ public partial class MainWindow : RendererMainWindow
         GLWidget.Hide();
         if (packagePath != null)
         {
-            addMusicThread.Join();
+            mAddMusicThread.Join();
             CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
         /*
         string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
-        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "1.4.5", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "0.0.0", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
             Console.WriteLine(latestReleaseName);
             Console.WriteLine(latestReleaseDescription);
@@ -1360,6 +1380,10 @@ public partial class MainWindow : RendererMainWindow
         {
             try
             {
+                if (mAddMusicThread != null && mAddMusicThread.IsAlive)
+                {
+                    mAddMusicThread.Join();
+                }
                 var package = s3pi.Package.Package.OpenPackage(0, fileChooserDialog.Filename, true);
                 s3pi.Package.Package.ClosePackage(0, CurrentPackage);
                 CurrentPackage = package;
@@ -1393,6 +1417,7 @@ public partial class MainWindow : RendererMainWindow
                     return;
             }
         }
+        Destroy();
         mMediaPlayer.Stop();
         if (mPlayMusicThread != null)
         {
