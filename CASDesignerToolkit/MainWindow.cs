@@ -174,12 +174,12 @@ public partial class MainWindow : RendererMainWindow
                 Sensitive = false;
                 try
                 {
-                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
-                    CASPart.GenerateLookupCache();
                     if (mAddMusicThread != null && mAddMusicThread.IsAlive)
                     {
                         mAddMusicThread.Join();
                     }
+                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    CASPart.GenerateLookupCache();
                     mAudioResources.Clear();
                     AddMusic("music_mode_cas");
                 }
