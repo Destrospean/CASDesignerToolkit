@@ -97,19 +97,19 @@ namespace System.Destrospean
             }
         }
 
-        public static bool IsUnix
-        {
-            get
-            {
-                return (OS & OSFlags.Unix) != 0;
-            }
-        }
-
         public static bool IsSolaris
         {
             get
             {
                 return (OS & OSFlags.Solaris) != 0;
+            }
+        }
+
+        public static bool IsUnix
+        {
+            get
+            {
+                return (OS & OSFlags.Unix) != 0;
             }
         }
 
