@@ -221,11 +221,14 @@ public partial class MainWindow : RendererMainWindow
                 ApplicationSettings.PlayMusic = PlayMusicAction.Active;
                 TreeIter iter;
                 TreeModel model;
-                if (ApplicationSettings.PlayMusic)
+                if (ApplicationSettings.PlayMusic && ResourceTreeView.Selection.GetSelected(out model, out iter))
                 {
-                    if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
+                    switch ((string)model.GetValue(iter, 0))
                     {
-                        (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
+                        case "CASP":
+                        case "OBJD":
+                            (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
+                            break;
                     }
                 }
                 else
@@ -1116,6 +1119,11 @@ public partial class MainWindow : RendererMainWindow
                                 RandomizeCASParts();
                                 break;
                             case "OBJD":
+                                mCurrentMusicMode = "music_mode_buy";
+                                if (ApplicationSettings.PlayMusic)
+                                {
+                                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
+                                }
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
                                 mDisableUpdateModels = false;
