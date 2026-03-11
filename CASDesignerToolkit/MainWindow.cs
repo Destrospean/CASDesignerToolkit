@@ -220,7 +220,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 TreeIter iter;
                 TreeModel model;
-                if ((PlayMusicAction.Active = ApplicationSettings.PlayMusic) && ResourceTreeView.Selection.GetSelected(out model, out iter))
+                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && ResourceTreeView.Selection.GetSelected(out model, out iter))
                 {
                     switch ((string)model.GetValue(iter, 0))
                     {
