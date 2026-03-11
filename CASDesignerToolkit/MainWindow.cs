@@ -204,15 +204,11 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
             {
-                ApplicationSettings.PlayMusic = PlayMusicAction.Active;
                 TreeIter iter;
                 TreeModel model;
-                if (ApplicationSettings.PlayMusic)
+                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
                 {
-                    if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
-                    {
-                        (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
-                    }
+                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
                 }
                 else
                 {
