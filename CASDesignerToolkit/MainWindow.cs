@@ -1103,7 +1103,7 @@ public partial class MainWindow : RendererMainWindow
                                 RandomizeCASParts();
                                 goto case forAllValidCasesCase;
                             case "OBJD":
-                                musicMode = "music_mode_buy";
+                                musicMode = "music_mode_build,music_mode_buy";
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
                                 mDisableUpdateModels = false;
