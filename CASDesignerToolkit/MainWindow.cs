@@ -183,7 +183,7 @@ public partial class MainWindow : RendererMainWindow
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     Logger.WriteError(ex);
                 }
