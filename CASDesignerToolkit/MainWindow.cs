@@ -21,7 +21,7 @@ public partial class MainWindow : RendererMainWindow
 {
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
-    List<EvaluatedResourceKey> mAudioResources = new List<EvaluatedResourceKey>();
+    Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
     bool mDisableUpdateModels = false;
 
@@ -39,7 +39,7 @@ public partial class MainWindow : RendererMainWindow
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
-    string mSaveAsPath;
+    string mCurrentMusicMode, mSaveAsPath;
 
     static object sLock = new object();
 
@@ -181,7 +181,7 @@ public partial class MainWindow : RendererMainWindow
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(CASPart.LoadLookupCache).Start();
-        (mAddMusicThread = new Thread(() => AddMusic("music_mode_cas"))).Start();
+        (mAddMusicThread = new Thread(() => AddMusic())).Start();
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
                 RescaleAndReposition(true);
@@ -194,8 +194,8 @@ public partial class MainWindow : RendererMainWindow
                     }
                     ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
                     CASPart.GenerateLookupCache();
-                    mAudioResources.Clear();
-                    AddMusic("music_mode_cas");
+                    mAudioResourcesByMode.Clear();
+                    AddMusic();
                 }
                 catch (System.Exception ex)
                 {
@@ -225,7 +225,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (ResourceTreeView.Selection.GetSelected(out model, out iter) && (string)model.GetValue(iter, 0) == "CASP")
                     {
-                        (mPlayMusicThread = new Thread(PlayMusic)).Start();
+                        (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
                     }
                 }
                 else
@@ -439,17 +439,22 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void AddMusic(string musicMode)
+    void AddMusic()
     {
+        var audioTunerType = ResourceUtils.GetResourceType("AUDT");
         foreach (var package in ResourceUtils.GameContentPackages.Values)
         {
             foreach (var nameMapResource in package.GetNameMapResources())
             {
                 foreach (var nameMapKvp in nameMapResource.ToDictionary())
                 {
-                    if (nameMapKvp.Value == musicMode)
+                    if (nameMapKvp.Value.ToLowerInvariant().StartsWith("music_"))
                     {
-                        foreach (var resourceIndexEntry in package.FindAll(x => x.Instance == nameMapKvp.Key))
+                        if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
+                        {
+                            mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
+                        }
+                        foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
                         {
                             foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
                             {
@@ -457,7 +462,7 @@ public partial class MainWindow : RendererMainWindow
                                 {
                                     foreach (var item in block.Items)
                                     {
-                                        mAudioResources.AddRange(package.FindAll(x => x.ResourceType == 0x01EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
+                                        mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
                                     }
                                 }
                             }
@@ -1100,9 +1105,10 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 break;
                             case "CASP":
+                                mCurrentMusicMode = "music_mode_cas";
                                 if (ApplicationSettings.PlayMusic)
                                 {
-                                    (mPlayMusicThread = new Thread(PlayMusic)).Start();
+                                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode))).Start();
                                 }
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
@@ -1126,43 +1132,59 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void PlayMusic()
+    void PlayMusic(string mode = null)
     {
-        Shuffle(mAudioResources);
+        if (string.IsNullOrEmpty(mode))
+        {
+            foreach (var audioResources in mAudioResourcesByMode.Values)
+            {
+                Shuffle(audioResources);
+            }
+        }
+        else
+        {
+            Shuffle(mAudioResourcesByMode[mode]);
+        }
         while (true)
         {
-            foreach (var audioResource in mAudioResources)
+            foreach (var audioResourcesKvp in mAudioResourcesByMode)
             {
-                using (var process = Process.Start(new ProcessStartInfo
-                    {
-                        Arguments = "-pi -po",
-                        CreateNoWindow = true,
-                        FileName = "ealayer3",
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    }))
+                if (string.IsNullOrEmpty(mode) || audioResourcesKvp.Key == mode)
                 {
-                    if (process == null)
+                    foreach (var audioResource in audioResourcesKvp.Value)
                     {
-                        Logger.WriteError(new Exception("Failed to start the executable."));
-                        return;
+                        using (var process = Process.Start(new ProcessStartInfo
+                            {
+                                Arguments = "-pi -po",
+                                CreateNoWindow = true,
+                                FileName = "ealayer3",
+                                RedirectStandardError = true,
+                                RedirectStandardInput = true,
+                                RedirectStandardOutput = true,
+                                UseShellExecute = false
+                            }))
+                        {
+                            if (process == null)
+                            {
+                                Logger.WriteError(new Exception("Failed to start the executable."));
+                                return;
+                            }
+                            using (var standardInput = process.StandardInput.BaseStream)
+                            {
+                                ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
+                            }
+                            var wait = true;
+                            mMediaPlayer.EndReached += (sender, e) => wait = false;
+                            var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
+                            mMediaPlayer.Play(media);
+                            mMediaPlayer.Position = 0;
+                            while (wait)
+                            {
+                                Thread.Sleep(1);
+                            }
+                            process.WaitForExit();
+                        }
                     }
-                    using (var standardInput = process.StandardInput.BaseStream)
-                    {
-                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
-                    }
-                    var wait = true;
-                    mMediaPlayer.EndReached += (sender, e) => wait = false;
-                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                    mMediaPlayer.Play(media);
-                    mMediaPlayer.Position = 0;
-                    while (wait)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    process.WaitForExit();
                 }
             }
         }
