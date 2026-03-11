@@ -218,10 +218,9 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
             {
-                ApplicationSettings.PlayMusic = PlayMusicAction.Active;
                 TreeIter iter;
                 TreeModel model;
-                if (ApplicationSettings.PlayMusic && ResourceTreeView.Selection.GetSelected(out model, out iter))
+                if ((PlayMusicAction.Active = ApplicationSettings.PlayMusic) && ResourceTreeView.Selection.GetSelected(out model, out iter))
                 {
                     switch ((string)model.GetValue(iter, 0))
                     {
