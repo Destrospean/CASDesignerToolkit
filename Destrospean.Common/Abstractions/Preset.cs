@@ -157,7 +157,7 @@
 
             public abstract void ReplacePresetComplate();
 
-            public void ReplacePresetComplate(Destrospean.S3PIExtensions.EvaluatedResourceKey evaluated)
+            public void ReplacePresetComplate(S3PIExtensions.EvaluatedResourceKey evaluated)
             {
                 mXmlDocument.LoadXml(new System.IO.StreamReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)).ReadToEnd());
                 PropertiesTyped.Clear();

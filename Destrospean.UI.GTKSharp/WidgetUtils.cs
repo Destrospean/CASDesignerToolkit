@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Destrospean;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
 using Destrospean.DestrospeanCASPEditor.Widgets;
@@ -64,7 +65,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -97,7 +98,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -152,7 +153,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             switch (field.Length)
                             {
                                 case 1:
-                                    var spinButtonFloat = new SpinButton(new Adjustment((float)field[0], -1, 1, .0001, 10, 0), 0, 4);
+                                    var spinButtonFloat = new SpinButton(new Adjustment((float)field[0], -1, 1, 1, 10, 0), 0, 4);
                                     spinButtonFloat.ValueChanged += (sender, e) =>
                                         {
                                             field[0] = (float)spinButtonFloat.Value;
@@ -164,8 +165,8 @@ namespace Destrospean.DestrospeanCASPEditor
                                     var hBox = new HBox();
                                     var spinButtons = new List<SpinButton>
                                         {
-                                            new SpinButton(new Adjustment((float)field[0], -1, 1, .0001, 10, 0), 0, 4),
-                                            new SpinButton(new Adjustment((float)field[1], -1, 1, .0001, 10, 0), 0, 4)
+                                            new SpinButton(new Adjustment((float)field[0], -1, 1, 1, 10, 0), 0, 4),
+                                            new SpinButton(new Adjustment((float)field[1], -1, 1, 1, 10, 0), 0, 4)
                                         };
                                     spinButtons[0].ValueChanged += (sender, e) =>
                                         {
@@ -391,7 +392,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -434,7 +435,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     var elementFloat = element as ElementFloat;
                     if (elementFloat != null)
                     {
-                        var spinButton = new SpinButton(new Adjustment(elementFloat.Data, -1, 1, .0001, 10, 0), 0, 4);
+                        var spinButton = new SpinButton(new Adjustment(elementFloat.Data, -1, 1, 1, 10, 0), 0, 4);
                         spinButton.ValueChanged += (sender, e) =>
                             {
                                 elementFloat.Data = (float)spinButton.Value;
@@ -449,8 +450,8 @@ namespace Destrospean.DestrospeanCASPEditor
                         var hBox = new HBox();
                         var spinButtons = new SpinButton[]
                             {
-                                new SpinButton(new Adjustment(elementFloat2.Data0, -1, 1, .0001, 10, 0), 0, 4),
-                                new SpinButton(new Adjustment(elementFloat2.Data1, -1, 1, .0001, 10, 0), 0, 4)
+                                new SpinButton(new Adjustment(elementFloat2.Data0, -1, 1, 1, 10, 0), 0, 4),
+                                new SpinButton(new Adjustment(elementFloat2.Data1, -1, 1, 1, 10, 0), 0, 4)
                             };
                         spinButtons[0].ValueChanged += (sender, e) =>
                             {
@@ -688,7 +689,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -797,7 +798,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
@@ -818,7 +819,7 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             try
             {
-                var scale = WidgetUtils.Scale > minScale || System.Destrospean.Platform.IsWindows ? WidgetUtils.Scale : minScale;
+                var scale = WidgetUtils.Scale > minScale || Platform.IsWindows ? WidgetUtils.Scale : minScale;
                 self.SetSizeRequest(self.WidthRequest == -1 ? -1 : (int)(self.WidthRequest * scale), self.HeightRequest == -1 ? -1 : (int)(self.HeightRequest * scale));
                 int parentHeight, parentWidth, parentX, parentY;
                 parent.GetPosition(out parentX, out parentY);
@@ -827,7 +828,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }

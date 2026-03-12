@@ -29,14 +29,15 @@ namespace Destrospean.Common.Abstractions
             {
                 get
                 {
+                    int height = 1024,
+                    width = 1024;
                     uint[] maskArray = null;
                     Bitmap multiplier = null,
                     overlay = null;
-                    int height = 1024,
-                    width = 1024;
                     var stencils = new List<Bitmap>();
                     var stencilsEnabled = new List<bool>();
                     var stencilsRotation = new List<float>();
+                    var stencilsTiling = new List<CatalogResource.CatalogResource.TC05_XY>();
                     foreach (var propertyTypedKvp in PropertiesTyped)
                     {
                         var key = propertyTypedKvp.Key.ToLowerInvariant();
@@ -54,6 +55,10 @@ namespace Destrospean.Common.Abstractions
                             else if (key.EndsWith("rotation"))
                             {
                                 stencilsRotation.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                            }
+                            else if (key.EndsWith("tiling"))
+                            {
+                                stencilsTiling.Add((CatalogResource.CatalogResource.TC05_XY)value);
                             }
                         }
                         else
@@ -79,7 +84,20 @@ namespace Destrospean.Common.Abstractions
                         }
                     }
                     bool patternEnabled;
-                    var patternImages = Patterns.ConvertAll(x => bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled ? x.PatternImage : null);
+                    var patternImages = Patterns.ConvertAll(x =>
+                        {
+                            if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
+                            {
+                                var patternImage = x.PatternImage as Bitmap;
+                                if (patternImage == null)
+                                {
+                                    return x.PatternImage;
+                                }
+                                var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
+                                return GetTiled(patternImage, tiling[0], tiling[1]);
+                            }
+                            return null;
+                        });
                     if (maskArray != null)
                     {
                         if (multiplier != null)
@@ -108,7 +126,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (stencilsEnabled[i])
                             {
-                                graphics.DrawImage(RotateImage(QuadrupleCanvasSize(stencils[i]), stencilsRotation[i] * 360), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
+                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i].Unknown1, stencilsTiling[i].Unknown2)), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
                             }
                         }
                     }

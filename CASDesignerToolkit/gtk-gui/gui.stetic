@@ -121,6 +121,13 @@
         <property name="StockId">gtk-jump-to</property>
         <signal name="Activated" handler="OnCreateShortcutActionActivated" />
       </action>
+      <action id="ExportResourceAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Export</property>
+        <property name="ShortLabel" translatable="yes">Export</property>
+        <property name="StockId">gtk-save-as</property>
+        <signal name="Activated" handler="OnExportResourceActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="WidthRequest">1080</property>
@@ -148,6 +155,7 @@
               </node>
               <node type="Menu" action="ResourceAction">
                 <node type="Menuitem" action="directoryAction" />
+                <node type="Menuitem" action="ExportResourceAction" />
                 <node type="Menuitem" action="ReplaceResourceAction" />
                 <node type="Menuitem" action="DeleteResourceAction" />
               </node>

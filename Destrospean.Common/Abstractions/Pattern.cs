@@ -340,6 +340,10 @@ namespace Destrospean.Common.Abstractions
             }
             foreach (var propertyXmlNodeKvp in mPropertiesXmlNodes)
             {
+                if (!PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key))
+                {
+                    continue;
+                }
                 string key = propertyXmlNodeKvp.Key.ToLowerInvariant(),
                 value = propertyXmlNodeKvp.Value.Attributes["value"].Value;
                 if (key.StartsWith("channel"))

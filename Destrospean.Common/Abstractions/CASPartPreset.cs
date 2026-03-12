@@ -124,11 +124,16 @@ namespace Destrospean.Common.Abstractions
                     tintColorsEnabled = new List<bool>();
                     List<float[]> logosLowerRight = new List<float[]>(),
                     logosUpperLeft = new List<float[]>(),
+                    stencilsTiling = new List<float[]>(),
                     tintColors = new List<float[]>();
                     List<float> logosRotation = new List<float>(),
                     stencilsRotation = new List<float>();
                     foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
                     {
+                        if (!PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key))
+                        {
+                            continue;
+                        }
                         string key = propertyXmlNodeKvp.Key.ToLowerInvariant(),
                         value = propertyXmlNodeKvp.Value.Attributes["value"].Value;
                         if (key.StartsWith("logo"))
@@ -167,6 +172,10 @@ namespace Destrospean.Common.Abstractions
                             else if (key.EndsWith("rotation"))
                             {
                                 stencilsRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+                            }
+                            else if (key.EndsWith("tiling"))
+                            {
+                                stencilsTiling.Add(ParseCommaSeparatedValues(value));
                             }
                         }
                         else if (key.StartsWith("tint color"))
@@ -433,7 +442,20 @@ namespace Destrospean.Common.Abstractions
                         }
                     }
                     bool patternEnabled;
-                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x => bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled ? x.PatternImage : null);
+                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x =>
+                        {
+                            if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
+                            {
+                                var patternImage = x.PatternImage as Bitmap;
+                                if (patternImage == null)
+                                {
+                                    return x.PatternImage;
+                                }
+                                var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
+                                return GetTiled(patternImage, tiling[0], tiling[1]);
+                            }
+                            return null;
+                        });
                     if (maskArray != null)
                     {
                         if (multiplier != null)
@@ -466,16 +488,16 @@ namespace Destrospean.Common.Abstractions
                         {
                             foreach (var geomAndKey in new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[0])
                             {
-                                foreach (var field in geomAndKey.GEOM.Shader.GetFields())
+                                for (var i = 0; i < geomAndKey.GEOM.Shader.FieldCount; i++)
                                 {
-                                    if (field != (uint)s3pi.GenericRCOLResource.FieldType.DiffuseMap)
+                                    uint fieldType, valueType;
+                                    var field = geomAndKey.GEOM.Shader.GetField(i, out fieldType, out valueType);
+                                    if (fieldType == (uint)s3pi.GenericRCOLResource.FieldType.DiffuseMap)
                                     {
-                                        continue;
+                                        var tgi = geomAndKey.GEOM.TGIList[(uint)field[0]];
+                                        graphics.DrawImage(ParentPackage.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), GetTextureCallback, width, height), 0, 0);
+                                        break;
                                     }
-                                    int valueType;
-                                    var tgi = geomAndKey.GEOM.TGIList[(uint)geomAndKey.GEOM.Shader.GetFieldValue(field, out valueType)[0]];
-                                    graphics.DrawImage(ParentPackage.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), GetTextureCallback, width, height), 0, 0);
-                                    break;
                                 }
                             }
                         }
@@ -496,7 +518,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (stencilsEnabled[i])
                             {
-                                graphics.DrawImage(RotateImage(QuadrupleCanvasSize(stencils[i]), stencilsRotation[i] * 360), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
+                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i][0], stencilsTiling[i][1])), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
                             }
                         }
                         for (var i = 0; i < logos.Count; i++)
@@ -505,7 +527,7 @@ namespace Destrospean.Common.Abstractions
                             {
                                 int logoHeight = (int)((logosLowerRight[i][1] - logosUpperLeft[i][1]) * height),
                                 logoWidth = (int)((logosLowerRight[i][0] - logosUpperLeft[i][0]) * width);
-                                graphics.DrawImage(RotateImage(QuadrupleCanvasSize(logos[i]), logosRotation[i] * 360), logosUpperLeft[i][0] * width - (logoWidth >> 1), logosUpperLeft[i][1] * height - (logoHeight >> 1), logoWidth << 1, logoHeight << 1);
+                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(logos[i]), logosRotation[i]), logosUpperLeft[i][0] * width - (logoWidth >> 1), logosUpperLeft[i][1] * height - (logoHeight >> 1), logoWidth << 1, logoHeight << 1);
                             }
                         }
                     }
@@ -517,22 +539,8 @@ namespace Destrospean.Common.Abstractions
                     {
                         ScalpTexture.Dispose();
                     }
-                    if (drawsOnFace)
-                    {
-                        FaceTexture = faceDiffuseMap;
-                    }
-                    else
-                    {
-                        FaceTexture = null;
-                    }
-                    if (drawsOnScalp)
-                    {
-                        ScalpTexture = scalpDiffuseMap;
-                    }
-                    else
-                    {
-                        ScalpTexture = null;
-                    }
+                    FaceTexture = drawsOnFace ? faceDiffuseMap : null;
+                    ScalpTexture = drawsOnScalp ? scalpDiffuseMap : null;
                     return texture;
                 }
             }

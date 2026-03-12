@@ -39,7 +39,7 @@ public partial class MainWindow : RendererMainWindow
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
-    string mCurrentMusicMode, mSaveAsPath;
+    string mCurrentMusicModes, mSaveAsPath;
 
     static object sLock = new object();
 
@@ -218,9 +218,9 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
             {
-                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mCurrentMusicMode))
+                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mCurrentMusicModes))
                 {
-                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode.Split(',')))).Start();
+                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicModes.Split(',')))).Start();
                 }
                 else
                 {
@@ -1082,9 +1082,9 @@ public partial class MainWindow : RendererMainWindow
                     TreeModel model;
                     if (ResourceTreeView.Selection.GetSelected(out model, out iter))
                     {
-                        const string forAllValidCasesCase = "for all valid cases";
+                        const string forAllMusicModeCasesCase = "for all music mode cases";
                         string key = ((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey(),
-                        musicMode = null;
+                        musicModes = null;
                         switch ((string)model.GetValue(iter, 0))
                         {
                             case "_IMG":
@@ -1096,27 +1096,28 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 break;
                             case "CASP":
-                                musicMode = "music_mode_cas";
+                                musicModes = "music_mode_cas";
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
                                 mDisableUpdateModels = false;
                                 RandomizeCASParts();
-                                goto case forAllValidCasesCase;
+                                goto case forAllMusicModeCasesCase;
                             case "OBJD":
-                                musicMode = "music_mode_build,music_mode_buy";
+                                musicModes = "music_mode_build,music_mode_buy";
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.GameObjects[key]);
                                 mDisableUpdateModels = false;
-                                goto case forAllValidCasesCase;
-                            case forAllValidCasesCase:
-                                if (ApplicationSettings.PlayMusic && musicMode != mCurrentMusicMode)
+                                goto case forAllMusicModeCasesCase;
+                            case forAllMusicModeCasesCase:
+                                if (ApplicationSettings.PlayMusic && musicModes != mCurrentMusicModes)
                                 {
                                     if (mPlayMusicThread != null)
                                     {
                                         mPlayMusicThread.Abort();
                                     }
-                                    (mPlayMusicThread = new Thread(() => PlayMusic((mCurrentMusicMode = musicMode).Split(',')))).Start();
+                                    (mPlayMusicThread = new Thread(() => PlayMusic(musicModes.Split(',')))).Start();
                                 }
+                                mCurrentMusicModes = musicModes;
                                 break;
                         }
                     }
@@ -1251,7 +1252,7 @@ public partial class MainWindow : RendererMainWindow
     {
         lock (GlobalState.Lock)
         {
-            mCurrentMusicMode = null;
+            mCurrentMusicModes = null;
             Sim.CurrentCASPart = null;
             mSaveAsPath = null;
             GlobalState.Meshes.Clear();
@@ -1298,6 +1299,28 @@ public partial class MainWindow : RendererMainWindow
                 }
             }
         }
+    }
+
+    public void ExportResource(IResourceIndexEntry resourceIndexEntry)
+    {
+        var fileChooserDialog = new FileChooserDialog("Export Resource", this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+        {
+            try
+            {
+                using (var fileStream = File.Create(fileChooserDialog.Filename))
+                {
+                    ((APackage)CurrentPackage).GetResource(resourceIndexEntry).CopyTo(fileStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(ex);
+                throw;
+            }
+        }
+        fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
     }
 
     public void RefreshWidgets(bool clearTemporaryData = true)
@@ -1704,6 +1727,16 @@ public partial class MainWindow : RendererMainWindow
         NextState = NextStateOptions.UnsavedChanges;
     }
 
+    protected void OnExportResourceActionActivated(object sender, EventArgs e)
+    {
+        TreeIter iter;
+        TreeModel model;
+        if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+        {
+            ExportResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        }
+    }
+
     protected void OnGameFoldersActionActivated(object sender, EventArgs e)
     {
         new GameFoldersDialog(this);
@@ -1825,8 +1858,10 @@ public partial class MainWindow : RendererMainWindow
     {
         TreeIter iter;
         TreeModel model;
-        ResourceTreeView.Selection.GetSelected(out model, out iter);
-        ReplaceResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+        {
+            ReplaceResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        }
     }
 
     [GLib.ConnectBefore]
@@ -1848,13 +1883,16 @@ public partial class MainWindow : RendererMainWindow
                     var uiManager = new UIManager();
                     var actionGroup = new ActionGroup("Default");
                     Gtk.Action deleteResourceAction = new Gtk.Action("DeleteResourceAction", "Delete", null, Stock.Delete),
+                    exportResourceAction = new Gtk.Action("ExportResourceAction", "Export", null, Stock.SaveAs),
                     replaceResourceAction = new Gtk.Action("ReplaceResourceAction", "Replace", null, Stock.Convert);
                     actionGroup.Add(deleteResourceAction);
+                    actionGroup.Add(exportResourceAction);
                     actionGroup.Add(replaceResourceAction);
                     uiManager.InsertActionGroup(actionGroup, 0);
                     uiManager.AddUiFromString(@"
                         <ui>
                             <popup name='ResourcePopup'>
+                                <menuitem name='ExportResourceAction' action='ExportResourceAction'/>
                                 <menuitem name='ReplaceResourceAction' action='ReplaceResourceAction'/>
                                 <menuitem name='DeleteResourceAction' action='DeleteResourceAction'/>
                             </popup>
@@ -1869,6 +1907,7 @@ public partial class MainWindow : RendererMainWindow
                             RefreshWidgets(false);
                             NextState = NextStateOptions.UnsavedChanges;
                         };
+                    exportResourceAction.Activated += (sender, e) => ExportResource(resourceIndexEntry);
                     replaceResourceAction.Activated += (sender, e) => ReplaceResource(resourceIndexEntry);
                     menu.Popup();
                     goto case 1;

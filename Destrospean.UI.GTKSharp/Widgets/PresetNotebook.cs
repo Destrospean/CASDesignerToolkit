@@ -69,7 +69,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     Xalign = Platform.IsWindows ? 1 : .5f
                                 });
                             ShowAll();
-                            MainWindow.Singleton.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                            MainWindowBase.Singleton.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                         }
                         */
                         LastSelectedPage = CurrentPage;
@@ -152,7 +152,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             break;
                         case "float":
                             alignment.Xscale = 0;
-                            var spinButton = new SpinButton(new Adjustment(float.Parse(value, CultureInfo.InvariantCulture), float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4);
+                            var spinButton = new SpinButton(new Adjustment(float.Parse(value, CultureInfo.InvariantCulture), float.MinValue, float.MaxValue, 1, 10, 0), 0, 4);
                             spinButton.ValueChanged += (sender, e) => complate[propertyName] = spinButton.Value.ToString("F4", CultureInfo.InvariantCulture);
                             valueWidget = spinButton;
                             break;
@@ -220,8 +220,8 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             var coordinates = System.Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
                             var spinButtons = new List<SpinButton>
                                 {
-                                    new SpinButton(new Adjustment(coordinates[0], float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4),
-                                    new SpinButton(new Adjustment(coordinates[1], float.MinValue, float.MaxValue, .0001, 10, 0), 0, 4)
+                                    new SpinButton(new Adjustment(coordinates[0], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4),
+                                    new SpinButton(new Adjustment(coordinates[1], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4)
                                 };
                             spinButtons.ForEach(x =>
                                 {
