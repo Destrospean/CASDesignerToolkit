@@ -38,7 +38,7 @@ public partial class MainWindow : RendererMainWindow
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
-    string mCurrentMusicMode, mSaveAsPath;
+    string mCurrentMusicModes, mSaveAsPath;
 
     static object sLock = new object();
 
@@ -204,9 +204,9 @@ public partial class MainWindow : RendererMainWindow
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
             {
-                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mCurrentMusicMode))
+                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mCurrentMusicModes))
                 {
-                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicMode.Split(',')))).Start();
+                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicModes.Split(',')))).Start();
                 }
                 else
                 {
@@ -808,9 +808,9 @@ public partial class MainWindow : RendererMainWindow
                     TreeModel model;
                     if (ResourceTreeView.Selection.GetSelected(out model, out iter))
                     {
-                        const string forAllValidCasesCase = "for all valid cases";
+                        const string forAllMusicModeCasesCase = "for all music mode cases";
                         string key = ((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey(),
-                        musicMode = null;
+                        musicModes = null;
                         switch ((string)model.GetValue(iter, 0))
                         {
                             case "_IMG":
@@ -822,21 +822,22 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 break;
                             case "CASP":
-                                musicMode = "music_mode_cas";
+                                musicModes = "music_mode_cas";
                                 GLWidget.Show();
                                 AddCASTableObjectWidgets(PreloadedData.CASParts[key]);
                                 mDisableUpdateModels = false;
                                 RandomizeCASParts();
-                                goto case forAllValidCasesCase;
-                            case forAllValidCasesCase:
-                                if (ApplicationSettings.PlayMusic && musicMode != mCurrentMusicMode)
+                                goto case forAllMusicModeCasesCase;
+                            case forAllMusicModeCasesCase:
+                                if (ApplicationSettings.PlayMusic && musicModes != mCurrentMusicModes)
                                 {
                                     if (mPlayMusicThread != null)
                                     {
                                         mPlayMusicThread.Abort();
                                     }
-                                    (mPlayMusicThread = new Thread(() => PlayMusic((mCurrentMusicMode = musicMode).Split(',')))).Start();
+                                    (mPlayMusicThread = new Thread(() => PlayMusic(musicModes.Split(',')))).Start();
                                 }
+                                mCurrentMusicModes = musicModes;
                                 break;
                         }
                     }
@@ -967,7 +968,7 @@ public partial class MainWindow : RendererMainWindow
     {
         lock (GlobalState.Lock)
         {
-            mCurrentMusicMode = null;
+            mCurrentMusicModes = null;
             Sim.CurrentCASPart = null;
             mSaveAsPath = null;
             GlobalState.Meshes.Clear();
