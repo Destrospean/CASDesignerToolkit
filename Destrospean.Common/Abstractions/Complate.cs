@@ -120,7 +120,7 @@ namespace Destrospean.Common.Abstractions
             return System.Array.ConvertAll(text.Split(','), x => float.Parse(x, System.Globalization.CultureInfo.InvariantCulture));
         }
 
-        public static Bitmap QuadrupleCanvasSize(Bitmap image)
+        public static Bitmap GetInQuadrupleSizeCanvas(Bitmap image)
         {
             var imageCopy = new Bitmap(image.Width << 1, image.Height << 1); 
             using (var graphics = Graphics.FromImage(imageCopy))
@@ -131,7 +131,7 @@ namespace Destrospean.Common.Abstractions
             return imageCopy;
         }
 
-        public static Bitmap RotateImage(Bitmap image, float angle)
+        public static Bitmap GetRotated(Bitmap image, float angle)
         {
             var imageCopy = new Bitmap(image.Width, image.Height); 
             using (var graphics = Graphics.FromImage(imageCopy))
@@ -143,6 +143,22 @@ namespace Destrospean.Common.Abstractions
                 graphics.DrawImage(image, 0, 0);
             }
             return imageCopy;
+        }
+
+        public static Bitmap GetTiled(Bitmap image, float width, float height)
+        {
+            var imageCopy = new Bitmap((int)(image.Width * width * .25f), (int)(image.Height * height * .25f));
+            using (var graphics = Graphics.FromImage(imageCopy))
+            {
+                for (var x = 0; x < (width > 0 ? width : 1); x++)
+                {
+                    for (var y = 0; y < (height > 0 ? height : 1); y++)
+                    {
+                        graphics.DrawImage(image, image.Width * x, image.Height * y);
+                    }
+                }
+            }
+            return new Bitmap(imageCopy, image.Width, image.Height);
         }
 
         public virtual void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
