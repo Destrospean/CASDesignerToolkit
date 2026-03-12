@@ -521,22 +521,8 @@ namespace Destrospean.Common.Abstractions
                     {
                         ScalpTexture.Dispose();
                     }
-                    if (drawsOnFace)
-                    {
-                        FaceTexture = faceDiffuseMap;
-                    }
-                    else
-                    {
-                        FaceTexture = null;
-                    }
-                    if (drawsOnScalp)
-                    {
-                        ScalpTexture = scalpDiffuseMap;
-                    }
-                    else
-                    {
-                        ScalpTexture = null;
-                    }
+                    FaceTexture = drawsOnFace ? faceDiffuseMap : null;
+                    ScalpTexture = drawsOnScalp ? scalpDiffuseMap : null;
                     return texture;
                 }
             }
