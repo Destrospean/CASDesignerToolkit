@@ -129,6 +129,10 @@ namespace Destrospean.Common.Abstractions
                     stencilsRotation = new List<float>();
                     foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
                     {
+                        if (!PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key))
+                        {
+                            continue;
+                        }
                         string key = propertyXmlNodeKvp.Key.ToLowerInvariant(),
                         value = propertyXmlNodeKvp.Value.Attributes["value"].Value;
                         if (key.StartsWith("logo"))
