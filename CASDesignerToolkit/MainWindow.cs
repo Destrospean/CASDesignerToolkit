@@ -1008,6 +1008,28 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    public void ExportResource(IResourceIndexEntry resourceIndexEntry)
+    {
+        var fileChooserDialog = new FileChooserDialog("Export Resource", this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+        {
+            try
+            {
+                using (var fileStream = File.Create(fileChooserDialog.Filename))
+                {
+                    ((APackage)CurrentPackage).GetResource(resourceIndexEntry).CopyTo(fileStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(ex);
+                throw;
+            }
+        }
+        fileChooserDialog.Destroy();
+        fileChooserDialog.Dispose();
+    }
+
     public void RefreshWidgets(bool clearTemporaryData = true)
     {
         try
@@ -1348,6 +1370,16 @@ public partial class MainWindow : RendererMainWindow
         NextState = NextStateOptions.UnsavedChanges;
     }
 
+    protected void OnExportResourceActionActivated(object sender, EventArgs e)
+    {
+        TreeIter iter;
+        TreeModel model;
+        if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+        {
+            ExportResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        }
+    }
+
     protected void OnGameFoldersActionActivated(object sender, EventArgs e)
     {
         new GameFoldersDialog(this);
@@ -1469,8 +1501,10 @@ public partial class MainWindow : RendererMainWindow
     {
         TreeIter iter;
         TreeModel model;
-        ResourceTreeView.Selection.GetSelected(out model, out iter);
-        ReplaceResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        if (ResourceTreeView.Selection.GetSelected(out model, out iter))
+        {
+            ReplaceResource(CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4)));
+        }
     }
 
     [GLib.ConnectBefore]
@@ -1492,13 +1526,16 @@ public partial class MainWindow : RendererMainWindow
                     var uiManager = new UIManager();
                     var actionGroup = new ActionGroup("Default");
                     Gtk.Action deleteResourceAction = new Gtk.Action("DeleteResourceAction", "Delete", null, Stock.Delete),
+                    exportResourceAction = new Gtk.Action("ExportResourceAction", "Export", null, Stock.SaveAs),
                     replaceResourceAction = new Gtk.Action("ReplaceResourceAction", "Replace", null, Stock.Convert);
                     actionGroup.Add(deleteResourceAction);
+                    actionGroup.Add(exportResourceAction);
                     actionGroup.Add(replaceResourceAction);
                     uiManager.InsertActionGroup(actionGroup, 0);
                     uiManager.AddUiFromString(@"
                         <ui>
                             <popup name='ResourcePopup'>
+                                <menuitem name='ExportResourceAction' action='ExportResourceAction'/>
                                 <menuitem name='ReplaceResourceAction' action='ReplaceResourceAction'/>
                                 <menuitem name='DeleteResourceAction' action='DeleteResourceAction'/>
                             </popup>
@@ -1513,6 +1550,7 @@ public partial class MainWindow : RendererMainWindow
                             RefreshWidgets(false);
                             NextState = NextStateOptions.UnsavedChanges;
                         };
+                    exportResourceAction.Activated += (sender, e) => ExportResource(resourceIndexEntry);
                     replaceResourceAction.Activated += (sender, e) => ReplaceResource(resourceIndexEntry);
                     menu.Popup();
                     goto case 1;
