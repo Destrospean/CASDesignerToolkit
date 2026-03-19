@@ -1024,7 +1024,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             object[][] mData;
 
-            int mDataSize, mZero;
+            int mZero;
 
             uint[][] mFields;
 
@@ -1034,7 +1034,20 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return 16 + FieldCount * 16 + mDataSize;
+                    return 16 + FieldCount * 16 + DataSize;
+                }
+            }
+
+            public int DataSize
+            {
+                get
+                {
+                    var dataSize = 0;
+                    foreach (var element in mData)
+                    {
+                        dataSize += element.Length * 4;
+                    }
+                    return dataSize;
                 }
             }
 
@@ -1104,7 +1117,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 mMagic = reader.ReadChars(4);
                 mZero = reader.ReadInt32();
-                mDataSize = reader.ReadInt32();
+                reader.ReadInt32();
                 FieldCount = reader.ReadInt32();
                 mFields = new uint[FieldCount][];
                 for (var i = 0; i < FieldCount; i++)
@@ -1147,7 +1160,6 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 mMagic = System.Text.Encoding.UTF8.GetString(BitConverter.GetBytes(shaderDataArray[0])).ToCharArray();
                 mZero = (int)shaderDataArray[1];
-                mDataSize = (int)shaderDataArray[2];
                 FieldCount = (int)shaderDataArray[3];
                 mFields = new uint[FieldCount][];
                 mData = new object[FieldCount][];
@@ -1195,7 +1207,6 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 mMagic = source.mMagic;
                 mZero = source.mZero;
-                mDataSize = source.mDataSize;
                 FieldCount = source.FieldCount;
                 mFields = new uint[source.mFields.Length][];
                 for (var i = 0; i < source.mFields.Length; i++)
@@ -1276,7 +1287,7 @@ namespace Destrospean.CmarNYCBorrowed
                 var temp = new List<uint>();
                 temp.Add(BitConverter.ToUInt32(System.Text.Encoding.UTF8.GetBytes(mMagic), 0));
                 temp.Add((uint)mZero);
-                temp.Add((uint)mDataSize);
+                temp.Add((uint)DataSize);
                 temp.Add((uint)FieldCount);
                 for (var i = 0; i < FieldCount; i++)
                 {
@@ -1316,7 +1327,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 writer.Write(mMagic);
                 writer.Write(mZero);
-                writer.Write(mDataSize);
+                writer.Write(DataSize);
                 writer.Write(FieldCount);
                 for (var i = 0; i < FieldCount; i++)
                 {
