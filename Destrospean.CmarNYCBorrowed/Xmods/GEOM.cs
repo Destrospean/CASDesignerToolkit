@@ -1024,11 +1024,11 @@ namespace Destrospean.CmarNYCBorrowed
         {
             object[][] mData;
 
-            int mZero;
-
             uint[][] mFields;
 
             char[] mMagic;
+
+            int mZero;
 
             public int ChunkSize
             {
