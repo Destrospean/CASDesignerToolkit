@@ -21,7 +21,7 @@
                         foreach (Platform.OSFlags flag in System.Enum.GetValues(typeof(Platform.OSFlags)))
                         {
                             var filename = asset["name"].ToString();
-                            if (Platform.OS.HasFlag(flag) && filename.Contains(flag.ToString().ToLower()))
+                            if (Platform.OS.HasFlag(flag) && filename.Contains(flag.ToString().ToLowerInvariant()))
                             {
                                 latestReleaseFilename = filename;
                                 latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync(asset["url"].ToString()).Result))["browser_download_url"].ToString();

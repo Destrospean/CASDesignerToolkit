@@ -508,6 +508,7 @@ namespace Destrospean.CmarNYCBorrowed
         PickWalls = 0xB81AD379,
         PickWater = 0xC107590F,
         Plumbob = 0xDEF16564,
+        Plumbot = 0x1C608236,
         Ponds = 0x79C38597,
         PoolWindowTranslucent = 0x399E51FC,
         PreviewWallsAndFloors = 0x213D6300,
