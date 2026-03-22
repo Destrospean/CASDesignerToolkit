@@ -234,7 +234,7 @@ namespace Destrospean.DestrospeanCASPEditor
         {
             using (var stream = new System.IO.MemoryStream())
             {
-                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                bitmap.Save(stream, ImageFormat.Png);
                 stream.Seek(0, System.IO.SeekOrigin.Begin);
                 return new Pixbuf(stream);
             }
