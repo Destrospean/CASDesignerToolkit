@@ -91,8 +91,7 @@ namespace Destrospean.S3PIExtensions
             {
                 return result;
             }
-            result = ResourceGroup.CompareTo(other.ResourceGroup);
-            if (result != 0)
+            if ((result = ResourceGroup.CompareTo(other.ResourceGroup)) != 0)
             {
                 return result;
             }
