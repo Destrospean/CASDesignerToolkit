@@ -18,10 +18,10 @@
                     latestReleaseName = latestRelease["name"].ToString();
                     foreach (var asset in latestRelease["assets"])
                     {
-                        foreach (Platform.OSFlags flag in System.Enum.GetValues(typeof(Platform.OSFlags)))
+                        foreach (var flag in System.Enum.GetNames(typeof(Platform.OSFlags)))
                         {
                             var filename = asset["name"].ToString();
-                            if (Platform.OS.HasFlag(flag) && filename.Contains(flag.ToString().ToLowerInvariant()))
+                            if (Platform.OS.HasFlag((Platform.OSFlags)Enum.Parse(typeof(Platform.OSFlags), flag)) && filename.Contains(flag.ToString().ToLowerInvariant()) && filename.Contains("Self-Extractor"))
                             {
                                 latestReleaseFilename = filename;
                                 latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync(asset["url"].ToString()).Result))["browser_download_url"].ToString();

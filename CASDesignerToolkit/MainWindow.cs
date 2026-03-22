@@ -243,19 +243,6 @@ public partial class MainWindow : RendererMainWindow
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
-        /*
-        string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
-        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "0.0.0", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
-        {
-            Console.WriteLine(latestReleaseName);
-            Console.WriteLine(latestReleaseDescription);
-            Console.WriteLine(latestReleaseDownloadUrl);
-            using (var client = new System.Net.Http.HttpClient())
-            {
-                File.WriteAllBytes(latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
-            }
-        }
-        */
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
@@ -961,6 +948,120 @@ public partial class MainWindow : RendererMainWindow
             {
                 AdjustFontSizes(childContainer, fontDescription);
             }
+        }
+    }
+
+    public static void CheckForUpdates()
+    {
+        if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+        {
+            return;
+        }
+        string latestReleaseDescription,
+        latestReleaseDownloadUrl,
+        latestReleaseFilename,
+        latestReleaseName,
+        localVersion = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", localVersion.Remove(localVersion.LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        {
+            Console.WriteLine(latestReleaseName);
+            Console.WriteLine(latestReleaseDescription);
+            Console.WriteLine(latestReleaseDownloadUrl);
+            string executablePath = System.AppDomain.CurrentDomain.BaseDirectory,
+            tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
+            Directory.CreateDirectory(tempPath);
+            using (var client = new System.Net.Http.HttpClient())
+            {
+                File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
+            }
+            if (Platform.IsUnix)
+            {
+                Platform.GetCommandOutput("chmod", "755 \"" + tempPath + latestReleaseFilename + "\"");
+            }
+            using (var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                        {
+                            CreateNoWindow = true,
+                            FileName = tempPath + latestReleaseFilename,
+                            RedirectStandardError = false,
+                            RedirectStandardOutput = false,
+                            UseShellExecute = false,
+                            WorkingDirectory = tempPath,
+                        }
+                })
+            {
+                process.Start();
+                process.WaitForExit();
+            }
+            string updaterFilename = "CASDTKUpdater.exe",
+            downloadedUpdaterPath = tempPath + "CASDesignerToolkit" + System.IO.Path.DirectorySeparatorChar + updaterFilename;
+            if (File.Exists(downloadedUpdaterPath))
+            {
+                if (File.Exists(executablePath + updaterFilename))
+                {
+                    File.Delete(executablePath + updaterFilename);
+                }
+                File.Move(downloadedUpdaterPath, executablePath + updaterFilename);
+            }
+            if (Platform.IsWindows)
+            {
+                if (File.Exists(executablePath + updaterFilename))
+                {
+                    using (var process = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                                {
+                                    Arguments = Process.GetCurrentProcess().Id.ToString(),
+                                    CreateNoWindow = true,
+                                    FileName = updaterFilename,
+                                    RedirectStandardError = true,
+                                    RedirectStandardOutput = true,
+                                    UseShellExecute = false,
+                                    WorkingDirectory = executablePath,
+                                }
+                        })
+                    {
+                        process.Start();
+                    }
+                }
+                return;
+            }
+            foreach (var directoryName in Directory.GetDirectories(executablePath))
+            {
+                if (!directoryName.EndsWith("Update"))
+                {
+                    Directory.Delete(directoryName, true);
+                }
+            }
+            foreach (var filename in Directory.GetFiles(executablePath))
+            {
+                File.Delete(filename);
+            }
+            foreach (var directoryName in Directory.GetDirectories(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + "CASDesignerToolkit"))
+            {
+                Directory.Move(directoryName, executablePath + directoryName.Substring(directoryName.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
+            }
+            foreach (var filename in Directory.GetFiles(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + "CASDesignerToolkit"))
+            {
+                File.Move(filename, executablePath + filename.Substring(filename.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
+            }
+            Directory.Delete(executablePath + "Update", true);
+            using (var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                        {
+                            CreateNoWindow = true,
+                            FileName = Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit",
+                            RedirectStandardError = true,
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false
+                        }
+                })
+            {
+                process.Start();
+            }
+            Environment.Exit(0);
         }
     }
 

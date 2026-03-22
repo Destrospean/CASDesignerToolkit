@@ -6,6 +6,7 @@
         {
             try
             {
+                MainWindow.CheckForUpdates();
                 System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
                 if (System.Destrospean.Platform.IsWindows)
                 {

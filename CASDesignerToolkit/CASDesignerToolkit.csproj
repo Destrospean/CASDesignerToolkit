@@ -193,7 +193,6 @@
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\libs\System.Net.Http.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
@@ -333,6 +332,9 @@
       <Link>TeximpNet License.txt</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="noupdate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Destrospean.CmarNYCBorrowed\Destrospean.CmarNYCBorrowed.csproj">
@@ -363,11 +365,14 @@
     <ProjectReference Include="..\Destrospean.Updates\Destrospean.Updates.csproj">
       <Project>{05ED9D73-E007-4B3C-AF08-D9689CF7398C}</Project>
       <Name>Destrospean.Updates</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
       <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
       <Name>System.Destrospean</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CASDTKUpdater\CASDTKUpdater.csproj">
+      <Project>{0FDDBF11-11B3-452D-AAB3-11F6B9EAC7C7}</Project>
+      <Name>CASDTKUpdater</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
