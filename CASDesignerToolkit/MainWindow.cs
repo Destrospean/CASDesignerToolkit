@@ -975,8 +975,8 @@ public partial class MainWindow : RendererMainWindow
             {
                 using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, latestReleaseDownloadUrl))
                 {
-                    request.Headers.Add("Accept", "*/*");
-                    request.Headers.Add("User-Agent", assemblyName.Name + "/" + localVersion);
+                    request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
+                    request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(assemblyName.Name, localVersion));;
                     using (var response = bsn.HttpClientSync.HttpClientSyncExtensions.Send(client, request))
                     {
                         File.WriteAllBytes(tempPath + latestReleaseFilename, bsn.HttpClientSync.HttpClientSyncExtensions.ReadAsByteArray(response.Content));

@@ -14,8 +14,8 @@ namespace System.Destrospean
             using (var client = new HttpClient(new HttpClientSyncHandler()))
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/" + username + "/" + repository + "/releases");
-                request.Headers.Add("Accept", "*/*");
-                request.Headers.Add("User-Agent", repository + "/" + localVersion);
+                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
+                request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(repository, localVersion));
                 var response = client.Send(request);
                 var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))[0];
                 request.Dispose();
@@ -32,8 +32,8 @@ namespace System.Destrospean
                             if (Platform.OS.HasFlag((Platform.OSFlags)Enum.Parse(typeof(Platform.OSFlags), flag)) && filename.Contains(flag.ToString().ToLowerInvariant()) && filename.Contains("Self-Extractor"))
                             {
                                 request = new HttpRequestMessage(HttpMethod.Get, asset["url"].ToString());
-                                request.Headers.Add("Accept", "*/*");
-                                request.Headers.Add("User-Agent", repository + "/" + localVersion);
+                                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
+                                request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(repository, localVersion));
                                 response = client.Send(request);
                                 latestReleaseFilename = filename;
                                 latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))["browser_download_url"].ToString();
