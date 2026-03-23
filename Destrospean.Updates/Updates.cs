@@ -32,6 +32,8 @@ namespace System.Destrospean
                             if (Platform.OS.HasFlag((Platform.OSFlags)Enum.Parse(typeof(Platform.OSFlags), flag)) && filename.Contains(flag.ToString().ToLowerInvariant()) && filename.Contains("Self-Extractor"))
                             {
                                 request = new HttpRequestMessage(HttpMethod.Get, asset["url"].ToString());
+                                request.Headers.Add("Accept", "*/*");
+                                request.Headers.Add("User-Agent", repository + "/" + localVersion);
                                 response = client.Send(request);
                                 latestReleaseFilename = filename;
                                 latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))["browser_download_url"].ToString();
