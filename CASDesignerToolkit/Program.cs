@@ -22,10 +22,6 @@ namespace Destrospean.DestrospeanCASPEditor
             try
             {
                 MainWindow.CheckForUpdates();
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe"))
-                {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe");
-                }
             }
             catch (Exception ex)
             {
