@@ -973,10 +973,10 @@ public partial class MainWindow : RendererMainWindow
             Directory.CreateDirectory(tempPath);
             using (var client = new System.Net.Http.HttpClient(new bsn.HttpClientSync.HttpClientSyncHandler()))
             {
-                client.DefaultRequestHeaders.Add("Accept", "*/*");
-                client.DefaultRequestHeaders.Add("User-Agent", assemblyName.Name + "/" + localVersion);
                 using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, latestReleaseDownloadUrl))
                 {
+                    request.Headers.Add("Accept", "*/*");
+                    request.Headers.Add("User-Agent", assemblyName.Name + "/" + localVersion);
                     using (var response = bsn.HttpClientSync.HttpClientSyncExtensions.Send(client, request))
                     {
                         File.WriteAllBytes(tempPath + latestReleaseFilename, bsn.HttpClientSync.HttpClientSyncExtensions.ReadAsByteArray(response.Content));
