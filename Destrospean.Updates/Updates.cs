@@ -1,4 +1,7 @@
-﻿namespace System.Destrospean
+﻿using System.Net.Http;
+using bsn.HttpClientSync;
+
+namespace System.Destrospean
 {
     public class Updates
     {
@@ -8,10 +11,14 @@
             latestReleaseDownloadUrl = null;
             latestReleaseFilename = null;
             latestReleaseName = null;
-            using (var client = new System.Net.Http.HttpClient())
+            using (var client = new HttpClient(new HttpClientSyncHandler()))
             {
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(repository); 
-                var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync("https://api.github.com/repos/" + username + "/" + repository + "/releases").Result))[0];
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/" + username + "/" + repository + "/releases");
+                var response = client.Send(request);
+                var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))[0];
+                request.Dispose();
+                response.Dispose();
                 if (localVersion.CompareTo(latestRelease["tag_name"].ToString().TrimStart('v')) < 0)
                 {
                     latestReleaseDescription = latestRelease["body"].ToString();
@@ -23,8 +30,12 @@
                             var filename = asset["name"].ToString();
                             if (Platform.OS.HasFlag((Platform.OSFlags)Enum.Parse(typeof(Platform.OSFlags), flag)) && filename.Contains(flag.ToString().ToLowerInvariant()) && filename.Contains("Self-Extractor"))
                             {
+                                request = new HttpRequestMessage(HttpMethod.Get, asset["url"].ToString());
+                                response = client.Send(request);
                                 latestReleaseFilename = filename;
-                                latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync(asset["url"].ToString()).Result))["browser_download_url"].ToString();
+                                latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))["browser_download_url"].ToString();
+                                request.Dispose();
+                                response.Dispose();
                                 return true;
                             }
                         }

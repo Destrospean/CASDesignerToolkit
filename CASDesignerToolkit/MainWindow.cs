@@ -964,15 +964,21 @@ public partial class MainWindow : RendererMainWindow
         latestReleaseName;
         if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
-            //Console.WriteLine(latestReleaseName);
-            //Console.WriteLine(latestReleaseDescription);
-            //Console.WriteLine(latestReleaseDownloadUrl);
+            Console.WriteLine(latestReleaseName);
+            Console.WriteLine(latestReleaseDescription);
+            Console.WriteLine(latestReleaseDownloadUrl);
             string executablePath = System.AppDomain.CurrentDomain.BaseDirectory,
             tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
             Directory.CreateDirectory(tempPath);
-            using (var client = new System.Net.Http.HttpClient())
+            using (var client = new System.Net.Http.HttpClient(new bsn.HttpClientSync.HttpClientSyncHandler()))
             {
-                File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
+                using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, latestReleaseDownloadUrl))
+                {
+                    using (var response = bsn.HttpClientSync.HttpClientSyncExtensions.Send(client, request))
+                    {
+                        File.WriteAllBytes(tempPath + latestReleaseFilename, bsn.HttpClientSync.HttpClientSyncExtensions.ReadAsByteArray(response.Content));
+                    }
+                }
             }
             if (Platform.IsUnix)
             {

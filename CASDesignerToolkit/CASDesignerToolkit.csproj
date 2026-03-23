@@ -197,6 +197,12 @@
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="bsn.HttpClientSync">
+      <HintPath>..\libs\bsn.HttpClientSync.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\libs\NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
