@@ -13,7 +13,8 @@ namespace System.Destrospean
             latestReleaseName = null;
             using (var client = new HttpClient(new HttpClientSyncHandler()))
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(repository); 
+                client.DefaultRequestHeaders.Add("Accept", "*/*");
+                client.DefaultRequestHeaders.Add("User-Agent", repository + "/" + localVersion);
                 var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/" + username + "/" + repository + "/releases");
                 var response = client.Send(request);
                 var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))[0];

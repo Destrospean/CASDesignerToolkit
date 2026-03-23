@@ -961,17 +961,20 @@ public partial class MainWindow : RendererMainWindow
         string latestReleaseDescription,
         latestReleaseDownloadUrl,
         latestReleaseFilename,
-        latestReleaseName;
-        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        latestReleaseName,
+        localVersion = assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.'));
+        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, localVersion, out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
-            Console.WriteLine(latestReleaseName);
-            Console.WriteLine(latestReleaseDescription);
-            Console.WriteLine(latestReleaseDownloadUrl);
+            //Console.WriteLine(latestReleaseName);
+            //Console.WriteLine(latestReleaseDescription);
+            //Console.WriteLine(latestReleaseDownloadUrl);
             string executablePath = System.AppDomain.CurrentDomain.BaseDirectory,
             tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
             Directory.CreateDirectory(tempPath);
             using (var client = new System.Net.Http.HttpClient(new bsn.HttpClientSync.HttpClientSyncHandler()))
             {
+                client.DefaultRequestHeaders.Add("Accept", "*/*");
+                client.DefaultRequestHeaders.Add("User-Agent", assemblyName.Name + "/" + localVersion);
                 using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, latestReleaseDownloadUrl))
                 {
                     using (var response = bsn.HttpClientSync.HttpClientSyncExtensions.Send(client, request))
