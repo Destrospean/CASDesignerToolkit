@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using bsn.HttpClientSync;
-
-namespace System.Destrospean
+﻿namespace System.Destrospean
 {
     public class Updates
     {
@@ -11,15 +8,11 @@ namespace System.Destrospean
             latestReleaseDownloadUrl = null;
             latestReleaseFilename = null;
             latestReleaseName = null;
-            using (var client = new HttpClient(new HttpClientSyncHandler()))
+            using (var client = new System.Net.Http.HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/" + username + "/" + repository + "/releases");
-                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
-                request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(repository, localVersion));
-                var response = client.Send(request);
-                var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))[0];
-                request.Dispose();
-                response.Dispose();
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(repository); 
+                var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync("https://api.github.com/repos/" + username + "/" + repository + "/releases").Result))[0];
                 if (localVersion.CompareTo(latestRelease["tag_name"].ToString().TrimStart('v')) < 0)
                 {
                     latestReleaseDescription = latestRelease["body"].ToString();
@@ -31,14 +24,8 @@ namespace System.Destrospean
                             var filename = asset["name"].ToString();
                             if (Platform.OS.HasFlag((Platform.OSFlags)Enum.Parse(typeof(Platform.OSFlags), flag)) && filename.Contains(flag.ToString().ToLowerInvariant()) && filename.Contains("Self-Extractor"))
                             {
-                                request = new HttpRequestMessage(HttpMethod.Get, asset["url"].ToString());
-                                request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("*/*"));
-                                request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(repository, localVersion));
-                                response = client.Send(request);
                                 latestReleaseFilename = filename;
-                                latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(response.Content.ReadAsString()))["browser_download_url"].ToString();
-                                request.Dispose();
-                                response.Dispose();
+                                latestReleaseDownloadUrl = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetStringAsync(asset["url"].ToString()).Result))["browser_download_url"].ToString();
                                 return true;
                             }
                         }

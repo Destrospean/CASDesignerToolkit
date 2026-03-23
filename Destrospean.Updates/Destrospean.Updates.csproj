@@ -37,14 +37,6 @@
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="bsn.HttpClientSync">
-      <HintPath>..\libs\bsn.HttpClientSync.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NLog">
-      <HintPath>..\libs\NLog.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

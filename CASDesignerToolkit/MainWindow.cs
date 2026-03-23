@@ -961,9 +961,8 @@ public partial class MainWindow : RendererMainWindow
         string latestReleaseDescription,
         latestReleaseDownloadUrl,
         latestReleaseFilename,
-        latestReleaseName,
-        localVersion = assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.'));
-        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, localVersion, out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        latestReleaseName;
+        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
             //Console.WriteLine(latestReleaseName);
             //Console.WriteLine(latestReleaseDescription);
@@ -971,17 +970,10 @@ public partial class MainWindow : RendererMainWindow
             string executablePath = System.AppDomain.CurrentDomain.BaseDirectory,
             tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
             Directory.CreateDirectory(tempPath);
-            using (var client = new System.Net.Http.HttpClient(new bsn.HttpClientSync.HttpClientSyncHandler()))
+            using (var client = new System.Net.Http.HttpClient())
             {
-                using (var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, latestReleaseDownloadUrl))
-                {
-                    request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
-                    request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue(assemblyName.Name, localVersion));;
-                    using (var response = bsn.HttpClientSync.HttpClientSyncExtensions.Send(client, request))
-                    {
-                        File.WriteAllBytes(tempPath + latestReleaseFilename, bsn.HttpClientSync.HttpClientSyncExtensions.ReadAsByteArray(response.Content));
-                    }
-                }
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
+                File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
             }
             if (Platform.IsUnix)
             {
