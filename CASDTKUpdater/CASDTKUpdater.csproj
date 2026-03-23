@@ -7,6 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>CASDTKUpdater</RootNamespace>
     <AssemblyName>CASDTKUpdater</AssemblyName>
+    <ApplicationIcon>..\CASDesignerToolkit\Icons\CASDesignerToolkit.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>

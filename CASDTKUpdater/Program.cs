@@ -43,9 +43,7 @@ namespace System.Destrospean
                     StartInfo = new ProcessStartInfo
                         {
                             CreateNoWindow = true,
-                            FileName = "CASDesignerToolkit",
-                            RedirectStandardError = true,
-                            RedirectStandardOutput = true,
+                            FileName = executablePath + "CASDesignerToolkit",
                             UseShellExecute = false
                         }
                 })

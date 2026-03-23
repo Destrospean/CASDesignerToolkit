@@ -957,16 +957,16 @@ public partial class MainWindow : RendererMainWindow
         {
             return;
         }
+        var assemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName();
         string latestReleaseDescription,
         latestReleaseDownloadUrl,
         latestReleaseFilename,
-        latestReleaseName,
-        localVersion = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", localVersion.Remove(localVersion.LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        latestReleaseName;
+        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.')), out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
         {
-            Console.WriteLine(latestReleaseName);
-            Console.WriteLine(latestReleaseDescription);
-            Console.WriteLine(latestReleaseDownloadUrl);
+            //Console.WriteLine(latestReleaseName);
+            //Console.WriteLine(latestReleaseDescription);
+            //Console.WriteLine(latestReleaseDownloadUrl);
             string executablePath = System.AppDomain.CurrentDomain.BaseDirectory,
             tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
             Directory.CreateDirectory(tempPath);
@@ -984,8 +984,6 @@ public partial class MainWindow : RendererMainWindow
                         {
                             CreateNoWindow = true,
                             FileName = tempPath + latestReleaseFilename,
-                            RedirectStandardError = false,
-                            RedirectStandardOutput = false,
                             UseShellExecute = false,
                             WorkingDirectory = tempPath
                         }
@@ -995,7 +993,7 @@ public partial class MainWindow : RendererMainWindow
                 process.WaitForExit();
             }
             string updaterFilename = "CASDTKUpdater.exe",
-            downloadedUpdaterPath = tempPath + "CASDesignerToolkit" + System.IO.Path.DirectorySeparatorChar + updaterFilename;
+            downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
             if (File.Exists(downloadedUpdaterPath))
             {
                 if (File.Exists(executablePath + updaterFilename))
@@ -1015,8 +1013,6 @@ public partial class MainWindow : RendererMainWindow
                                     Arguments = Process.GetCurrentProcess().Id.ToString(),
                                     CreateNoWindow = true,
                                     FileName = updaterFilename,
-                                    RedirectStandardError = true,
-                                    RedirectStandardOutput = true,
                                     UseShellExecute = false,
                                     WorkingDirectory = executablePath
                                 }
@@ -1038,11 +1034,11 @@ public partial class MainWindow : RendererMainWindow
             {
                 File.Delete(filename);
             }
-            foreach (var directoryName in Directory.GetDirectories(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + "CASDesignerToolkit"))
+            foreach (var directoryName in Directory.GetDirectories(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + assemblyName.Name))
             {
                 Directory.Move(directoryName, executablePath + directoryName.Substring(directoryName.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
             }
-            foreach (var filename in Directory.GetFiles(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + "CASDesignerToolkit"))
+            foreach (var filename in Directory.GetFiles(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + assemblyName.Name))
             {
                 File.Move(filename, executablePath + filename.Substring(filename.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
             }
@@ -1052,9 +1048,7 @@ public partial class MainWindow : RendererMainWindow
                     StartInfo = new ProcessStartInfo
                         {
                             CreateNoWindow = true,
-                            FileName = Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : "CASDesignerToolkit",
-                            RedirectStandardError = true,
-                            RedirectStandardOutput = true,
+                            FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
                             UseShellExecute = false
                         }
                 })

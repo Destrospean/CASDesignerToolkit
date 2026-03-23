@@ -1,28 +1,49 @@
-﻿namespace Destrospean.DestrospeanCASPEditor
+﻿using System;
+using System.Destrospean;
+using System.IO;
+
+namespace Destrospean.DestrospeanCASPEditor
 {
     class Program
     {
         public static void Main(string[] args)
         {
+            while (true)
+            {
+                try
+                {
+                    Console.SetError(new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
+                    break;
+                }
+                catch
+                {
+                }
+            }
             try
             {
                 MainWindow.CheckForUpdates();
-                if (System.IO.File.Exists(System.AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe"))
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe"))
                 {
-                    System.IO.File.Delete(System.AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe");
+                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "CASDTKUpdater.exe");
                 }
-                System.Console.SetError(new System.IO.StreamWriter(System.AppDomain.CurrentDomain.BaseDirectory + "error.log", true));
-                if (System.Destrospean.Platform.IsWindows)
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteError(ex);
+            }
+            try
+            {
+                if (Platform.IsWindows)
                 {
-                    foreach (var filename in System.IO.Directory.GetFiles(System.AppDomain.CurrentDomain.BaseDirectory))
+                    foreach (var filename in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))
                     {
-                        System.Destrospean.Platform.Windows.Unblock(filename);
+                        Platform.Windows.Unblock(filename);
                     }
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
             }
             try
             {
@@ -31,9 +52,9 @@
                 new MainWindow(args.Length > 0 ? args[0] : null);
                 Gtk.Application.Run();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Destrospean.Logger.WriteError(ex);
+                Logger.WriteError(ex);
                 throw;
             }
         }
