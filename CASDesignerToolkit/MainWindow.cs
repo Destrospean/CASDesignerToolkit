@@ -972,8 +972,8 @@ public partial class MainWindow : RendererMainWindow
             Directory.CreateDirectory(tempPath);
             using (var client = new System.Net.Http.HttpClient())
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(assemblyName.Name);
                 System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(assemblyName.Name);
                 File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
             }
             if (Platform.IsUnix)
