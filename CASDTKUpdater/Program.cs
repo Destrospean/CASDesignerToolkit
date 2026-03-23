@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Diagnostics;
 
-namespace System.Destrospean
+namespace Destrospean.DestrospeanCASPEditor.Updater
 {
-    class CASDTKUpdater
+    class Program
     {
         public static void Main(string[] args)
         {
