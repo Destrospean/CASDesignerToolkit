@@ -987,7 +987,7 @@ public partial class MainWindow : RendererMainWindow
                             RedirectStandardError = false,
                             RedirectStandardOutput = false,
                             UseShellExecute = false,
-                            WorkingDirectory = tempPath,
+                            WorkingDirectory = tempPath
                         }
                 })
             {
@@ -1018,7 +1018,7 @@ public partial class MainWindow : RendererMainWindow
                                     RedirectStandardError = true,
                                     RedirectStandardOutput = true,
                                     UseShellExecute = false,
-                                    WorkingDirectory = executablePath,
+                                    WorkingDirectory = executablePath
                                 }
                         })
                     {
