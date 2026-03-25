@@ -21,14 +21,6 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             try
             {
-                MainWindow.CheckForUpdates();
-            }
-            catch (Exception ex)
-            {
-                Logger.WriteError(ex);
-            }
-            try
-            {
                 if (Platform.IsWindows)
                 {
                     foreach (var filename in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory))

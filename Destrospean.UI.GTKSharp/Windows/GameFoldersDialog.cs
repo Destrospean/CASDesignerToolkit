@@ -94,6 +94,13 @@ namespace Destrospean.DestrospeanCASPEditor
             ApplicationSettings.SaveSettings();
         }
 
+
+        protected void OnCancelButtonClicked(object sender, System.EventArgs e)
+        {
+            Destroy();
+            Dispose();
+        }
+
         protected void OnOKButtonClicked(object sender, System.EventArgs e)
         {
             Destroy();

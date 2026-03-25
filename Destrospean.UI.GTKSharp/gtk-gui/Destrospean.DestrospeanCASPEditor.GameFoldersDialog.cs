@@ -8,6 +8,8 @@ namespace Destrospean.DestrospeanCASPEditor
 		
 		private global::Gtk.Table GameFolderTable;
 		
+		private global::Gtk.Button CancelButton;
+		
 		private global::Gtk.Button OKButton;
 
 		protected virtual void Build ()
@@ -50,6 +52,18 @@ namespace Destrospean.DestrospeanCASPEditor
 			w6.BorderWidth = ((uint)(5));
 			w6.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child ActionArea.Gtk.ButtonBox+ButtonBoxChild
+			this.CancelButton = new global::Gtk.Button ();
+			this.CancelButton.CanDefault = true;
+			this.CancelButton.CanFocus = true;
+			this.CancelButton.Name = "CancelButton";
+			this.CancelButton.UseStock = true;
+			this.CancelButton.UseUnderline = true;
+			this.CancelButton.Label = "gtk-cancel";
+			this.AddActionWidget (this.CancelButton, -6);
+			global::Gtk.ButtonBox.ButtonBoxChild w7 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w6 [this.CancelButton]));
+			w7.Expand = false;
+			w7.Fill = false;
+			// Container child ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.OKButton = new global::Gtk.Button ();
 			this.OKButton.CanDefault = true;
 			this.OKButton.CanFocus = true;
@@ -58,15 +72,17 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.OKButton.UseUnderline = true;
 			this.OKButton.Label = "gtk-ok";
 			this.AddActionWidget (this.OKButton, -5);
-			global::Gtk.ButtonBox.ButtonBoxChild w7 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w6 [this.OKButton]));
-			w7.Expand = false;
-			w7.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w8 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w6 [this.OKButton]));
+			w8.Position = 1;
+			w8.Expand = false;
+			w8.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 480;
 			this.DefaultHeight = 540;
 			this.Show ();
+			this.CancelButton.Clicked += new global::System.EventHandler (this.OnCancelButtonClicked);
 			this.OKButton.Clicked += new global::System.EventHandler (this.OnOKButtonClicked);
 		}
 	}
