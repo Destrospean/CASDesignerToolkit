@@ -864,8 +864,6 @@ public partial class MainWindow : RendererMainWindow
                     <ui>
                         <menubar name='MLODPropertiesMenuBar'>
                             <menu name='OptionsAction' action='OptionsAction'>
-                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
-                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                                 <menu name='ImportAction' action='ImportAction'>
                                     <menuitem name='ImportMLODAction' action='ImportMLODAction'/>
                                     <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
@@ -876,6 +874,9 @@ public partial class MainWindow : RendererMainWindow
                                     <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
                                     <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
                                 </menu>
+                                <separator />
+                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
+                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                             </menu>
                         </menubar>
                     </ui>");
