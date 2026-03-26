@@ -135,7 +135,8 @@ public partial class MainWindow : RendererMainWindow
 
     public class ApplicationSettings : GlobalState.ApplicationSettings
     {
-        const string kCheckForUpdatesAutomaticallyKey = "Check for Updates Automatically", kPlayMusicKey = "Play Music";
+        const string kCheckForUpdatesAutomaticallyKey = "Check for Updates Automatically",
+        kPlayMusicKey = "Play Music";
 
         public static bool CheckForUpdatesAutomatically
         {
