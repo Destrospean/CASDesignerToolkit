@@ -18,9 +18,13 @@ using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
+    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
+
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
     Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
+
+    string mCurrentMusicModes, mSaveAsPath;
 
     bool mDisableUpdateModels = false,
     mWaitBeforeUpdateCheck = false;
@@ -28,10 +32,6 @@ public partial class MainWindow : RendererMainWindow
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
     LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
-
-    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
-
-    string mCurrentMusicModes, mSaveAsPath;
 
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
