@@ -151,6 +151,8 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                     entries.Add(new ImageResourceComboBoxEntry(missing ? null : pixbufs[1], currentValueKey.ToUpperInvariant().Replace("KEY", "key")));
                     listStore.AppendValues(entries[entries.Count - 1].Image, entries[entries.Count - 1].Label);
                 }
+                entries.Add(new ImageResourceComboBoxEntry(null, ""));
+                listStore.AppendValues(entries[entries.Count - 1].Image, entries[entries.Count - 1].Label);
                 entries.Add(new ImageResourceComboBoxEntry(null, "Specify key..."));
                 listStore.AppendValues(entries[entries.Count - 1].Image, entries[entries.Count - 1].Label);
                 var comboBox = new ImageResourceComboBox(entries)
@@ -159,6 +161,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         Model = listStore
                     };
                 var comboBoxLastActive = comboBox.Active;
+                comboBox.RowSeparatorFunc = (model, iter) => (string)model.GetValue(iter, 1) == "";
                 comboBox.Changed += (sender, e) =>
                     {
                         if (comboBox.Active == entries.Count - 1)
@@ -188,9 +191,9 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     }
                                     if (exists)
                                     {
-                                        entries.Insert(entries.Count - 1, new ImageResourceComboBoxEntry(pixbufs[1], textEntryDialog.TextEntryValue.ToUpperInvariant().Replace("KEY", "key")));
-                                        listStore.InsertWithValues(entries.Count - 2, entries[entries.Count - 2].Image, entries[entries.Count - 2].Label);
-                                        comboBox.Active = entries.Count - 2;
+                                        entries.Insert(entries.Count - 2, new ImageResourceComboBoxEntry(pixbufs[1], textEntryDialog.TextEntryValue.ToUpperInvariant().Replace("KEY", "key")));
+                                        listStore.InsertWithValues(entries.Count - 3, entries[entries.Count - 3].Image, entries[entries.Count - 3].Label);
+                                        comboBox.Active = entries.Count - 3;
                                     }
                                 }
                                 else

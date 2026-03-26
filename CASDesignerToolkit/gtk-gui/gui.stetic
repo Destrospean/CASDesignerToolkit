@@ -67,7 +67,7 @@
       </action>
       <action id="GameFoldersAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Game Folders</property>
+        <property name="Label" translatable="yes">Game Folders...</property>
         <property name="ShortLabel" translatable="yes">Game Folders</property>
         <property name="StockId">gtk-directory</property>
         <signal name="Activated" handler="OnGameFoldersActionActivated" />
@@ -78,9 +78,9 @@
         <property name="Sensitive">False</property>
         <property name="ShortLabel" translatable="yes">Resource</property>
       </action>
-      <action id="directoryAction">
+      <action id="ImportResourceAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Import DDS</property>
+        <property name="Label" translatable="yes">Import DDS...</property>
         <property name="ShortLabel" translatable="yes">Import</property>
         <property name="StockId">gtk-directory</property>
         <signal name="Activated" handler="OnImportResourceActionActivated" />
@@ -118,7 +118,7 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Create Shortcut</property>
         <property name="ShortLabel" translatable="yes">Create Shortcut</property>
-        <property name="StockId">gtk-jump-to</property>
+        <property name="StockId">gtk-execute</property>
         <signal name="Activated" handler="OnCreateShortcutActionActivated" />
       </action>
       <action id="ExportResourceAction">
@@ -127,6 +127,21 @@
         <property name="ShortLabel" translatable="yes">Export</property>
         <property name="StockId">gtk-save-as</property>
         <signal name="Activated" handler="OnExportResourceActionActivated" />
+      </action>
+      <action id="CheckForUpdatesAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Check for Updates</property>
+        <property name="ShortLabel" translatable="yes">Check for Updates</property>
+        <property name="StockId">gtk-refresh</property>
+        <signal name="Activated" handler="OnCheckForUpdatesActionActivated" />
+      </action>
+      <action id="CheckForUpdatesAutomaticallyAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Check for Updates Automatically</property>
+        <property name="ShortLabel" translatable="yes">Check for Updates Automatically</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Toggled" handler="OnCheckForUpdatesAutomaticallyActionToggled" />
       </action>
     </action-group>
     <property name="MemberName" />
@@ -154,16 +169,21 @@
                 <node type="Menuitem" action="QuitAction" />
               </node>
               <node type="Menu" action="ResourceAction">
-                <node type="Menuitem" action="directoryAction" />
+                <node type="Menuitem" action="ImportResourceAction" />
                 <node type="Menuitem" action="ExportResourceAction" />
                 <node type="Menuitem" action="ReplaceResourceAction" />
                 <node type="Menuitem" action="DeleteResourceAction" />
               </node>
               <node type="Menu" action="SettingsAction">
                 <node type="Menuitem" action="GameFoldersAction" />
+                <node type="Separator" />
                 <node type="Menuitem" action="UseAdvancedShadersAction" />
                 <node type="Menuitem" action="PlayMusicAction" />
+                <node type="Separator" />
                 <node type="Menuitem" action="CreateShortcutAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="CheckForUpdatesAction" />
+                <node type="Menuitem" action="CheckForUpdatesAutomaticallyAction" />
               </node>
             </node>
           </widget>

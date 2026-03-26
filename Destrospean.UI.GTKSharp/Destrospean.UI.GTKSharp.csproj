@@ -223,6 +223,8 @@
     <Compile Include="Windows\RendererMainWindow.cs" />
     <Compile Include="CairoHelper.cs" />
     <Compile Include="FileTypes.cs" />
+    <Compile Include="Windows\NewUpdateDialog.cs" />
+    <Compile Include="gtk-gui\Destrospean.DestrospeanCASPEditor.NewUpdateDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

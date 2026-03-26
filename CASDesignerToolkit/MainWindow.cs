@@ -19,17 +19,20 @@ using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
+    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
+
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
     Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    bool mDisableUpdateModels = false;
+    string mCurrentMusicModes, mSaveAsPath;
+
+    bool mDisableUpdateModels = false,
+    mWaitBeforeUpdateCheck = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
     LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
-
-    Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
@@ -38,8 +41,6 @@ public partial class MainWindow : RendererMainWindow
     PresetNotebook mPresetNotebook;
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
-
-    string mCurrentMusicModes, mSaveAsPath;
 
     static object sLock = new object();
 
@@ -148,7 +149,25 @@ public partial class MainWindow : RendererMainWindow
 
     public class ApplicationSettings : GlobalState.ApplicationSettings
     {
-        const string kPlayMusicKey = "Play Music";
+        const string kCheckForUpdatesAutomaticallyKey = "Check for Updates Automatically",
+        kPlayMusicKey = "Play Music";
+
+        public static bool CheckForUpdatesAutomatically
+        {
+            get
+            {
+                return Settings == null || !Settings.ContainsKey(kCheckForUpdatesAutomaticallyKey) || (bool)Settings[kCheckForUpdatesAutomaticallyKey];
+            }
+            set
+            {
+                if (Settings == null)
+                {
+                    Settings = new Dictionary<string, object>();
+                }
+                Settings[kCheckForUpdatesAutomaticallyKey] = value;
+                SaveSettings();
+            }
+        }
 
         public static bool PlayMusic
         {
@@ -202,11 +221,31 @@ public partial class MainWindow : RendererMainWindow
                     Logger.WriteError(ex);
                 }
                 Sensitive = true;
+                mWaitBeforeUpdateCheck = false;
             };
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
         {
+            mWaitBeforeUpdateCheck = true;
             new CacheGenerationWindow(this, Icon);
         }
+        new Thread(() =>
+            {
+                if (!ApplicationSettings.CheckForUpdatesAutomatically || File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+                {
+                    return;
+                }
+                while (mWaitBeforeUpdateCheck)
+                {   
+                }
+                try
+                {
+                    CheckForUpdates();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteError(ex);
+                }
+            }).Start();
         var assembly = System.Reflection.Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);
         var treeViewSelectionColor = ResourceTreeView.Style.Base(StateType.Selected);
@@ -214,6 +253,7 @@ public partial class MainWindow : RendererMainWindow
         mFatnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFitnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mMediaPlayer = new LibVLCSharp.Shared.MediaPlayer(mLibVLC);
+        CheckForUpdatesAutomaticallyAction.Active = ApplicationSettings.CheckForUpdatesAutomatically;
         PlayMusicAction.Active = ApplicationSettings.PlayMusic;
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
@@ -257,19 +297,6 @@ public partial class MainWindow : RendererMainWindow
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
-        /*
-        string latestReleaseDescription, latestReleaseDownloadUrl, latestReleaseFilename, latestReleaseName;
-        if (Updates.CheckForUpdates("Destrospean", "CASDesignerToolkit", "0.0.0", out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
-        {
-            Console.WriteLine(latestReleaseName);
-            Console.WriteLine(latestReleaseDescription);
-            Console.WriteLine(latestReleaseDownloadUrl);
-            using (var client = new System.Net.Http.HttpClient())
-            {
-                File.WriteAllBytes(latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
-            }
-        }
-        */
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
@@ -525,8 +552,6 @@ public partial class MainWindow : RendererMainWindow
                     <ui>
                         <menubar name='GEOMPropertiesMenuBar'>
                             <menu name='OptionsAction' action='OptionsAction'>
-                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
-                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                                 <menu name='ImportAction' action='ImportAction'>
                                     <menuitem name='ImportGEOMAction' action='ImportGEOMAction'/>
                                     <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
@@ -537,6 +562,9 @@ public partial class MainWindow : RendererMainWindow
                                     <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
                                     <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
                                 </menu>
+                                <separator />
+                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
+                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                             </menu>
                         </menubar>
                     </ui>");
@@ -1248,6 +1276,124 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    public static void CheckForUpdates()
+    {
+        var assemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName();
+        string latestReleaseDescription,
+        latestReleaseDownloadUrl,
+        latestReleaseFilename,
+        latestReleaseName,
+        localVersion = assemblyName.Version.ToString().Remove(assemblyName.Version.ToString().LastIndexOf('.'));
+        if (Updates.CheckForUpdates("Destrospean", assemblyName.Name, localVersion, out latestReleaseName, out latestReleaseDescription, out latestReleaseDownloadUrl, out latestReleaseFilename))
+        {
+            Application.Invoke((sender, e) =>
+                {
+                    Singleton.Sensitive = false;
+                    var newUpdateDialog = new NewUpdateDialog("An update is available for " + Singleton.OriginalWindowTitle + "!", "v" + localVersion, latestReleaseName, latestReleaseDescription);
+                    if (newUpdateDialog.Run() != (int)ResponseType.Apply)
+                    {
+                        Singleton.Sensitive = true;
+                        newUpdateDialog.Destroy();
+                        newUpdateDialog.Dispose();
+                        return;
+                    }
+                    newUpdateDialog.Destroy();
+                    newUpdateDialog.Dispose();
+                    string executablePath = AppDomain.CurrentDomain.BaseDirectory,
+                    tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
+                    Directory.CreateDirectory(tempPath);
+                    using (var client = new System.Net.Http.HttpClient())
+                    {
+                        System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd(assemblyName.Name);
+                        File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
+                    }
+                    if (Platform.IsUnix)
+                    {
+                        Platform.GetCommandOutput("chmod", "755 \"" + tempPath + latestReleaseFilename + "\"");
+                    }
+                    using (var process = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                                {
+                                    CreateNoWindow = true,
+                                    FileName = tempPath + latestReleaseFilename,
+                                    UseShellExecute = false,
+                                    WorkingDirectory = tempPath
+                                }
+                        })
+                    {
+                        process.Start();
+                        process.WaitForExit();
+                    }
+                    string updaterFilename = "CASDTKUpdater.exe",
+                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
+                    if (File.Exists(downloadedUpdaterPath))
+                    {
+                        if (File.Exists(executablePath + updaterFilename))
+                        {
+                            File.Delete(executablePath + updaterFilename);
+                        }
+                        File.Move(downloadedUpdaterPath, executablePath + updaterFilename);
+                    }
+                    if (Platform.IsWindows)
+                    {
+                        if (File.Exists(executablePath + updaterFilename))
+                        {
+                            using (var process = new Process
+                                {
+                                    StartInfo = new ProcessStartInfo
+                                        {
+                                            Arguments = Process.GetCurrentProcess().Id.ToString(),
+                                            CreateNoWindow = true,
+                                            FileName = updaterFilename,
+                                            UseShellExecute = false,
+                                            WorkingDirectory = executablePath
+                                        }
+                                })
+                            {
+                                process.Start();
+                            }
+                        }
+                        return;
+                    }
+                    foreach (var directoryName in Directory.GetDirectories(executablePath))
+                    {
+                        if (!directoryName.EndsWith("Update"))
+                        {
+                            Directory.Delete(directoryName, true);
+                        }
+                    }
+                    foreach (var filename in Directory.GetFiles(executablePath))
+                    {
+                        File.Delete(filename);
+                    }
+                    foreach (var directoryName in Directory.GetDirectories(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + assemblyName.Name))
+                    {
+                        Directory.Move(directoryName, executablePath + directoryName.Substring(directoryName.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
+                    }
+                    foreach (var filename in Directory.GetFiles(executablePath + "Update" + System.IO.Path.DirectorySeparatorChar + assemblyName.Name))
+                    {
+                        File.Move(filename, executablePath + filename.Substring(filename.LastIndexOf(System.IO.Path.DirectorySeparatorChar)));
+                    }
+                    Directory.Delete(executablePath + "Update", true);
+                    using (var process = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                                {
+                                    CreateNoWindow = true,
+                                    FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
+                                    UseShellExecute = false
+                                }
+                        })
+                    {
+                        process.Start();
+                    }
+                    Environment.Exit(0);
+                });
+        }
+    }
+
     public void ClearTemporaryData()
     {
         lock (GlobalState.Lock)
@@ -1611,6 +1757,17 @@ public partial class MainWindow : RendererMainWindow
         return surface;
     }
 
+
+    protected void OnCheckForUpdatesActionActivated(object sender, EventArgs e)
+    {
+        CheckForUpdates();
+    }
+
+    protected void OnCheckForUpdatesAutomaticallyActionToggled(object sender, EventArgs e)
+    {
+        ApplicationSettings.CheckForUpdatesAutomatically = CheckForUpdatesAutomaticallyAction.Active;
+    }
+
     protected void OnCloseActionActivated(object sender, EventArgs e)
     {
         if (HasUnsavedChanges)
@@ -1651,7 +1808,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 File.Delete(ShortcutPath);
                 CreateShortcutAction.Label = "Create Shortcut";
-                CreateShortcutAction.StockId = Stock.JumpTo;
+                CreateShortcutAction.StockId = Stock.Execute;
                 return;
             }
             var assembly = System.Reflection.Assembly.GetEntryAssembly();
@@ -1720,7 +1877,7 @@ public partial class MainWindow : RendererMainWindow
         TreeIter iter;
         TreeModel model;
         ResourceTreeView.Selection.GetSelected(out model, out iter);
-        var resourceIndexEntry = (IResourceIndexEntry)model.GetValue(iter, 4);
+        var resourceIndexEntry = CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4));
         CurrentPackage.DeleteResource(resourceIndexEntry);
         ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
         RefreshWidgets(false);
@@ -1899,7 +2056,7 @@ public partial class MainWindow : RendererMainWindow
                         </ui>");
                     var menu = (Menu)uiManager.GetWidget("/ResourcePopup");
                     menu.ShowAll();
-                    var resourceIndexEntry = (IResourceIndexEntry)ResourceListStore.GetValue(iter, 4);
+                    var resourceIndexEntry = CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)ResourceListStore.GetValue(iter, 4));
                     deleteResourceAction.Activated += (sender, e) =>
                         {
                             CurrentPackage.DeleteResource(resourceIndexEntry);

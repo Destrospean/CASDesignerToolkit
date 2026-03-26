@@ -82,7 +82,7 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.NoSaveButton.CanFocus = true;
 			this.NoSaveButton.Name = "NoSaveButton";
 			this.NoSaveButton.UseUnderline = true;
-			this.NoSaveButton.Label = global::Mono.Unix.Catalog.GetString ("Don't Save");
+			this.NoSaveButton.Label = global::Mono.Unix.Catalog.GetString ("Don\'t Save");
 			global::Gtk.Image w8 = new global::Gtk.Image ();
 			w8.Pixbuf = global::Stetic.IconLoader.LoadIcon (this, "gtk-no", global::Gtk.IconSize.Menu);
 			this.NoSaveButton.Image = w8;
