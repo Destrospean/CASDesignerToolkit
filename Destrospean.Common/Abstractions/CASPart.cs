@@ -546,7 +546,7 @@ namespace Destrospean.Common.Abstractions
 
         public void SavePreset(int index)
         {
-            CASPartResource.Presets[index].Unknown1 = (uint)index;
+            CASPartResource.Presets[index].Unknown1 = (uint)index + 1;
             CASPartResource.Presets[index].XmlFile = ((CASPartPreset)Presets[index]).XmlFile;
         }
 

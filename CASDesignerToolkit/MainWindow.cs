@@ -1520,7 +1520,7 @@ public partial class MainWindow : RendererMainWindow
         TreeIter iter;
         TreeModel model;
         ResourceTreeView.Selection.GetSelected(out model, out iter);
-        var resourceIndexEntry = (IResourceIndexEntry)model.GetValue(iter, 4);
+        var resourceIndexEntry = CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)model.GetValue(iter, 4));
         CurrentPackage.DeleteResource(resourceIndexEntry);
         ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
         RefreshWidgets(false);
@@ -1699,7 +1699,7 @@ public partial class MainWindow : RendererMainWindow
                         </ui>");
                     var menu = (Menu)uiManager.GetWidget("/ResourcePopup");
                     menu.ShowAll();
-                    var resourceIndexEntry = (IResourceIndexEntry)ResourceListStore.GetValue(iter, 4);
+                    var resourceIndexEntry = CurrentPackage.GetResourceIndexEntry((IResourceIndexEntry)ResourceListStore.GetValue(iter, 4));
                     deleteResourceAction.Activated += (sender, e) =>
                         {
                             CurrentPackage.DeleteResource(resourceIndexEntry);
