@@ -1400,7 +1400,6 @@ public partial class MainWindow : RendererMainWindow
         return surface;
     }
 
-
     protected void OnCheckForUpdatesActionActivated(object sender, EventArgs e)
     {
         CheckForUpdates();
