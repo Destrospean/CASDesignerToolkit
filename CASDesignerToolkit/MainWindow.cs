@@ -22,7 +22,8 @@ public partial class MainWindow : RendererMainWindow
 
     Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    bool mDisableUpdateModels = false, mWaitBeforeUpdateCheck = false;
+    bool mDisableUpdateModels = false,
+    mWaitBeforeUpdateCheck = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
