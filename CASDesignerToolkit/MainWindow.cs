@@ -31,6 +31,8 @@ public partial class MainWindow : RendererMainWindow
 
     Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
+    string mCurrentMusicModes, mSaveAsPath;
+
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
     readonly string mOriginalWindowTitle;
@@ -38,8 +40,6 @@ public partial class MainWindow : RendererMainWindow
     PresetNotebook mPresetNotebook;
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
-
-    string mCurrentMusicModes, mSaveAsPath;
 
     static object sLock = new object();
 
