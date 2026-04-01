@@ -34,15 +34,21 @@
       </Folder>
       <Folder path="GameData/Shared/Packages">
         <Package isPatch="true" priority="2">DeltaBuild0.package</Package>
+        <Package isPatch="true" priority="2">DeltaBuild0-1-converted.package</Package>
         <Package isPatch="false" priority="0">FullBuild0.package</Package>
+        <Package isPatch="false" priority="0">FullBuild0-1-converted.package</Package>
         <Package isPatch="true" priority="2">DeltaBuild1.package</Package>
         <Package isPatch="false" priority="0">FullBuild1.package</Package>
+        <Package isPatch="false" priority="0">FullBuild1-1-converted.package</Package>
       </Folder>
     </GameContent>
     <DDSImages>
       <Folder path="GameData/Shared/Packages">
         <Package isPatch="true" priority="2">DeltaBuild2.package</Package>
         <Package isPatch="false" priority="0">FullBuild2.package</Package>
+        <Package isPatch="false" priority="0">FullBuild2-1-converted.package</Package>
+        <Package isPatch="false" priority="0">FullBuild2-2-converted.package</Package>
+        <Package isPatch="false" priority="0">FullBuild2-3-converted.package</Package>
       </Folder>
     </DDSImages>
     <Thumbnails>
@@ -63,9 +69,11 @@
         <Package isPatch="true" priority="1">p02/DeltaBuild_p02.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuildep1.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuildep1-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuildep1.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuildep1-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -108,9 +116,11 @@
         <Package isPatch="true" priority="1">p03/DeltaBuild_p03.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p04-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -157,9 +167,11 @@
         <Package isPatch="true" priority="1">p05/DeltaBuild_p05.package</Package>
       </Folder>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p06-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -202,9 +214,11 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p08-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -240,10 +254,14 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10-2-converted.package</Package>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild1_p10.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild0_p10-2-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -279,9 +297,13 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12-2-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p12-2-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -336,9 +358,11 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p15-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -355,9 +379,11 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p16-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -393,9 +419,11 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p18-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -412,9 +440,11 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19-1-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p19-1-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
@@ -450,9 +480,13 @@
     <Suppressed>false</Suppressed>
     <GameContent>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21-2-converted.package</Package>
     </GameContent>
     <DDSImages>
       <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21-1-converted.package</Package>
+      <Package isPatch="false" priority="0">GameData/Shared/Packages/FullBuild_p21-2-converted.package</Package>
     </DDSImages>
     <Thumbnails>
       <Folder path="Thumbnails">
