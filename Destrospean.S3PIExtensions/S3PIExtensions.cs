@@ -141,10 +141,7 @@ namespace Destrospean.S3PIExtensions
                             var enumerator = game.GameContent.GetEnumerator();
                             while (enumerator.MoveNext())
                             {
-                                if (System.IO.File.Exists(enumerator.Current.Path))
-                                {
-                                    sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
-                                }
+                                sGameContentPackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
                             }
                         }
                     }
@@ -167,10 +164,7 @@ namespace Destrospean.S3PIExtensions
                             var enumerator = game.DDSImages.GetEnumerator();
                             while (enumerator.MoveNext())
                             {
-                                if (System.IO.File.Exists(enumerator.Current.Path))
-                                {
-                                    sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
-                                }
+                                sGameImageResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
                             }
                         }
                     }
