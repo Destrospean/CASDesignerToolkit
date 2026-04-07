@@ -60,6 +60,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 if (casPart != null)
                 {
                     CASParts[clothingType] = casPart;
+                    resourceKey = casPart.ResourceKey;
                 }
                 if (clothingType == sim.CurrentCASPart.CASPartResource.Clothing)
                 {
@@ -108,7 +109,6 @@ namespace Destrospean.DestrospeanCASPEditor
                             CASPartsDisabled.Add(clothingType);
                         }
                     };
-                
                 Alignment buttonAlignment = new Alignment(0, .5f, 1, 0),
                 checkButtonAlignment = new Alignment(0, .5f, 1, 0)
                     {

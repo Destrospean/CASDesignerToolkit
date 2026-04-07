@@ -258,10 +258,7 @@ namespace Destrospean.Common
                     {
                         switch (clothingType)
                         {
-                            case ClothingType.Body:
                             case ClothingType.Bottom:
-                            case ClothingType.Dental:
-                            case ClothingType.Earrings:
                             case ClothingType.Eyebrow:
                             case ClothingType.EyeColor:
                             case ClothingType.Face:
