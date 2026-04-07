@@ -29,7 +29,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 };
             skinColorButtonAlignment.Add(skinColorButton);
             skinColorCheckButtonAlignment.Add(skinColorCheckButton);
-            SimPreviewTable.Attach(skinColorCheckButtonAlignment, 0, 1, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Fill | AttachOptions.Shrink, 0, 0, 0);
+            SimPreviewTable.Attach(skinColorCheckButtonAlignment, 0, 1, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Fill, 0, 0, 0);
             SimPreviewTable.Attach(skinColorButtonAlignment, 1, 2, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Expand | AttachOptions.Fill, 0, 0, 0);
             SimPreviewTable.NRows++;
             foreach (ClothingType clothingType in System.Enum.GetValues(typeof(ClothingType)))
@@ -66,7 +66,10 @@ namespace Destrospean.DestrospeanCASPEditor
                     CASParts[clothingType] = sim.CurrentCASPart;
                 }
                 Button button = new Button(label),
-                clearButton = new Button(new Gtk.Image(Stock.Clear, IconSize.Menu));
+                clearButton = new Button(new Gtk.Image(Stock.Clear, IconSize.Menu))
+                    {
+                        Relief = ReliefStyle.None
+                    };
                 button.Clicked += (sender, e) =>
                     {
                         var chooseObjectDialog = new ChooseObjectDialog(this, s3pi.Package.Package.NewPackage(0), clothingType, new List<Common.Abstractions.CASPart>(CASParts.Values).FindAll(x => !CASPartsDisabled.Contains(x.CASPartResource.Clothing)).ToArray());

@@ -334,7 +334,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                     var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
-                            Relief = ReliefStyle.None,
+                            Relief = ReliefStyle.None
                         };
                     deleteButton.Clicked += (sender, e) =>
                         {
@@ -418,7 +418,6 @@ namespace Destrospean.DestrospeanCASPEditor
                 shaderComboBoxAlignment.Add(shaderComboBox);
                 shaderComboBox.Changed += (sender, e) =>
                     {
-
                         matd.Shader = (ShaderType)Enum.Parse(typeof(Shader), shaderComboBox.ActiveText.Split(' ')[0]);
                         mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
