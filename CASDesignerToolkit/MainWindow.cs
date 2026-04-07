@@ -1141,6 +1141,8 @@ public partial class MainWindow : RendererMainWindow
         {
             mCurrentMusicModes = null;
             Sim.CurrentCASPart = null;
+            Sim.CASPartOverrides.Clear();
+            Sim.CASPartOverridesDisabled.Clear();
             mSaveAsPath = null;
             GlobalState.Meshes.Clear();
             foreach (var key in new List<string>(PreloadedData.CASParts.Keys))

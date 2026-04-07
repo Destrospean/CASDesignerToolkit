@@ -22,10 +22,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     UseUnderline = false,
                     Xalign = 0
                 };
-            Alignment skinColorButtonAlignment = new Alignment(0, .5f, 0, 0)
-                {
-                    LeftPadding = (uint)WidgetUtils.SmallImageSize,
-                },
+            Alignment skinColorButtonAlignment = new Alignment(0, .5f, 0, 0),
             skinColorCheckButtonAlignment = new Alignment(0, .5f, 1, 0)
                 {
                     LeftPadding = (uint)WidgetUtils.SmallImageSize
@@ -68,7 +65,8 @@ namespace Destrospean.DestrospeanCASPEditor
                 {
                     CASParts[clothingType] = sim.CurrentCASPart;
                 }
-                var button = new Button(label);
+                Button button = new Button(label),
+                clearButton = new Button(new Gtk.Image(Stock.Clear, IconSize.Menu));
                 button.Clicked += (sender, e) =>
                     {
                         var chooseObjectDialog = new ChooseObjectDialog(this, s3pi.Package.Package.NewPackage(0), clothingType, new List<Common.Abstractions.CASPart>(CASParts.Values).FindAll(x => !CASPartsDisabled.Contains(x.CASPartResource.Clothing)).ToArray());
@@ -80,6 +78,12 @@ namespace Destrospean.DestrospeanCASPEditor
                         }
                         chooseObjectDialog.Destroy();
                         chooseObjectDialog.Dispose();
+                    };
+                clearButton.Clicked += (sender, e) =>
+                    {
+                        label.Text = "";
+                        resourceKey = null;
+                        CASParts.Remove(clothingType);
                     };
                 var checkButton = new CheckButton(clothingType.ToString())
                     {
@@ -101,17 +105,20 @@ namespace Destrospean.DestrospeanCASPEditor
                             CASPartsDisabled.Add(clothingType);
                         }
                     };
-                Alignment buttonAlignment = new Alignment(0, .5f, 1, 0)
-                    {
-                        LeftPadding = (uint)WidgetUtils.SmallImageSize,
-                    },
+                
+                Alignment buttonAlignment = new Alignment(0, .5f, 1, 0),
                 checkButtonAlignment = new Alignment(0, .5f, 1, 0)
                     {
                         LeftPadding = (uint)WidgetUtils.SmallImageSize
-                    };
+                    },
+                clearButtonAlignment = new Alignment(1, .5f, 0, 0);
                 buttonAlignment.Add(button);
                 checkButtonAlignment.Add(checkButton);
-                SimPreviewTable.Attach(checkButtonAlignment, 0, 1, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Fill | AttachOptions.Shrink, 0, 0, 0);
+                clearButtonAlignment.Add(clearButton);
+                var hbox = new HBox(false, 4);
+                hbox.PackStart(checkButtonAlignment);
+                hbox.PackEnd(clearButtonAlignment);
+                SimPreviewTable.Attach(hbox, 0, 1, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Fill, 0, 0, 0);
                 SimPreviewTable.Attach(buttonAlignment, 1, 2, SimPreviewTable.NRows - 1, SimPreviewTable.NRows, AttachOptions.Expand | AttachOptions.Fill, 0, 0, 0);
                 SimPreviewTable.NRows++;
                 Response += (o, args) =>
@@ -123,6 +130,10 @@ namespace Destrospean.DestrospeanCASPEditor
                         if (resourceKey != null)
                         {
                             sim.SetCASPartOverride(clothingType, resourceKey);
+                        }
+                        else if (sim.CASPartOverrides.ContainsKey(clothingType))
+                        {
+                            sim.CASPartOverrides.Remove(clothingType);
                         }
                         if (checkButton.Active)
                         {
