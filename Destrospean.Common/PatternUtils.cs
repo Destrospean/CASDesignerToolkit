@@ -18,7 +18,7 @@ namespace Destrospean.Common
 
         public static readonly Dictionary<string, PatternInfo> PreloadedPatterns = new Dictionary<string, PatternInfo>();
 
-        public static void GenerateCache(s3pi.Interfaces.IPackage package)
+        public static void GenerateCache(IPackage package)
         {
             var categories = new List<string>();
             EvaluatedResourceKey gamePatternListEvaluated;
@@ -336,7 +336,7 @@ namespace Destrospean.Common
                     {
                         using (var stream = new MemoryStream(System.Convert.FromBase64String(patternImageBase64StringKvp.Value)))
                         {
-                            PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, (Bitmap)Bitmap.FromStream(stream));
+                            PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, new Bitmap(stream));
                         }
                     }
                 }

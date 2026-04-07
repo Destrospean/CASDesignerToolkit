@@ -41,12 +41,12 @@ namespace Destrospean.Common
                     catch (ResourceIndexEntryNotFoundException)
                     {
                         casPartImage = new Bitmap(64, 64);
-                        using (var graphics = System.Drawing.Graphics.FromImage(casPartImage))
+                        using (var graphics = Graphics.FromImage(casPartImage))
                         {
                             graphics.Clear(Color.Transparent);
                         }
                     }
-                    casPartImage = CASPartUtils.PreloadedCASPartImages[casPartNameKeyThumbnailKey[1]] = new System.Drawing.Bitmap(casPartImage, 64, 64);
+                    casPartImage = PreloadedCASPartImages[casPartNameKeyThumbnailKey[1]] = new Bitmap(casPartImage, 64, 64);
                     uncachedCASPartExists = true;
                 }
                 keys.Add(casPartNameKeyThumbnailKey[1]);
@@ -54,7 +54,7 @@ namespace Destrospean.Common
             }
             if (uncachedCASPartExists)
             {
-                CASPartUtils.SaveCache();
+                SaveCache();
             }
         }
 
@@ -68,7 +68,7 @@ namespace Destrospean.Common
                     {
                         using (var stream = new MemoryStream(System.Convert.FromBase64String(casPartImageBase64StringKvp.Value)))
                         {
-                            PreloadedCASPartImages.Add(casPartImageBase64StringKvp.Key, (Bitmap)Bitmap.FromStream(stream));
+                            PreloadedCASPartImages.Add(casPartImageBase64StringKvp.Key, new Bitmap(stream));
                         }
                     }
                 }
