@@ -167,6 +167,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             sim.RandomizeSkinColor();
                             sim.OverrideSkinColor = false;
                         }
+                        sim.RandomizeCASParts();
                     }
                 };
             ShowAll();

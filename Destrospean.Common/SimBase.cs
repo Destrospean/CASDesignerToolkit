@@ -27,8 +27,7 @@ namespace Destrospean.Common
                 var casParts = new Dictionary<ClothingType, CASPart>();
                 foreach (var casPartKvp in mCASParts)
                 {
-                    CASPart casPartOverride;
-                    casParts.Add(casPartKvp.Key, CurrentCASPart != null && casPartKvp.Key == CurrentCASPart.CASPartResource.Clothing ? CurrentCASPart : !CASPartOverridesDisabled.Contains(casPartKvp.Key) && CASPartOverrides.TryGetValue(casPartKvp.Key, out casPartOverride) ? casPartOverride : casPartKvp.Value);
+                    casParts.Add(casPartKvp.Key, CurrentCASPart != null && casPartKvp.Key == CurrentCASPart.CASPartResource.Clothing ? CurrentCASPart : casPartKvp.Value);
                 }
                 return casParts;
             }
@@ -220,6 +219,30 @@ namespace Destrospean.Common
                     {
                         mCASParts[clothingType].Dispose();
                         mCASParts[clothingType] = null;
+                    }
+                }
+                foreach (var casPartOverrideKvp in CASPartOverrides)
+                {
+                    if (CASPartOverridesDisabled.Contains(casPartOverrideKvp.Key))
+                    {
+                        continue;
+                    }
+                    var isValid = true;
+                    foreach (var casPart in mCASParts.Values)
+                    {
+                        if (casPart == null)
+                        {
+                            continue;
+                        }
+                        if (CASPartsConflict(casPart, casPartOverrideKvp.Value) || (casPartOverrideKvp.Value.CASPartResource.AgeGender.Age & casPart.CASPartResource.AgeGender.Age) == 0 || ((uint)casPartOverrideKvp.Value.CASPartResource.ClothingCategory & (uint.MaxValue - (uint)ClothingCategoryFlags.ValidForMaternity - (uint)ClothingCategoryFlags.ValidForRandom) & (uint)casPart.CASPartResource.ClothingCategory) == 0 || (casPartOverrideKvp.Value.CASPartResource.AgeGender.Gender & casPart.CASPartResource.AgeGender.Gender) == 0 || CASPart.GetAdjustedSpecies(casPartOverrideKvp.Value.CASPartResource.AgeGender.Species) != CASPart.GetAdjustedSpecies(casPart.CASPartResource.AgeGender.Species))
+                        {
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    if (isValid)
+                    {
+                        mCASParts[casPartOverrideKvp.Key] = casPartOverrideKvp.Value;
                     }
                 }
                 var random = new Random();
