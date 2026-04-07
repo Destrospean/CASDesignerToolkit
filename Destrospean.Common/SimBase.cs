@@ -61,7 +61,7 @@ namespace Destrospean.Common
             }
         }
 
-        public delegate void LoadMeshOnMainThreadDelegate(object volume, Preset currentPreset, Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback);
+        public delegate void LoadMeshOnMainThreadDelegate(object volume, Preset currentPreset, Bitmap presetTexture, Bitmap[] ambientAndSpecularMapTextures, object material, LoadTextureDelegate loadTextureCallback);
 
         public delegate int LoadTextureDelegate(string key, Bitmap image);
 

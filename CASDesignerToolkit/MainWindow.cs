@@ -79,7 +79,7 @@ public partial class MainWindow : RendererMainWindow
                                 GlobalState.Meshes.Clear();
                                 GlobalState.Materials.Clear();
                             }
-                            Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                            Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback) => Application.Invoke((sender, e) => Destrospean.Graphics.OpenGL.Sims3.Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback)));
                             GlobalState.Locked = false;
                             foreach (var imageKey in new List<string>(ImageUtils.PreloadedGameImages.Keys))
                             {
