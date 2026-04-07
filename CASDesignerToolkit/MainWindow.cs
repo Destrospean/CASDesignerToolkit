@@ -14,6 +14,7 @@ using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.GenericRCOLResource;
 using s3pi.Interfaces;
+using s3pi.Package;
 using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
@@ -192,7 +193,7 @@ public partial class MainWindow : RendererMainWindow
                 CASPart.LoadLookupCache();
                 ChooseObjectDialog.LoadCache();
             }).Start();
-        (mAddMusicThread = new Thread(() => AddMusic())).Start();
+        (mAddMusicThread = new Thread(AddMusic)).Start();
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
                 RescaleAndReposition(true);
@@ -203,9 +204,9 @@ public partial class MainWindow : RendererMainWindow
                     {
                         mAddMusicThread.Join();
                     }
-                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    ChoosePatternDialog.GenerateCache(Package.NewPackage(0));
                     CASPart.GenerateLookupCache();
-                    ChooseObjectDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    ChooseObjectDialog.GenerateCache(Package.NewPackage(0));
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
@@ -286,7 +287,7 @@ public partial class MainWindow : RendererMainWindow
         if (packagePath != null)
         {
             mAddMusicThread.Join();
-            CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
+            CurrentPackage = Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
@@ -1461,7 +1462,7 @@ public partial class MainWindow : RendererMainWindow
         {
             mRandomizeCASPartsThread.Abort();
         }
-        s3pi.Package.Package.ClosePackage(0, CurrentPackage);
+        Package.ClosePackage(0, CurrentPackage);
         CurrentPackage = null;
         ResourceUtils.MissingResourceKeys.Clear();
         RefreshWidgets();
@@ -1634,8 +1635,8 @@ public partial class MainWindow : RendererMainWindow
                 {
                     mRandomizeCASPartsThread.Abort();
                 }
-                var package = s3pi.Package.Package.OpenPackage(0, fileChooserDialog.Filename, true);
-                s3pi.Package.Package.ClosePackage(0, CurrentPackage);
+                var package = Package.OpenPackage(0, fileChooserDialog.Filename, true);
+                Package.ClosePackage(0, CurrentPackage);
                 CurrentPackage = package;
                 ResourceUtils.MissingResourceKeys.Clear();
                 RefreshWidgets();
