@@ -29,7 +29,6 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.Name = "Destrospean.DestrospeanCASPEditor.ChoosePatternDialog";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Choose Pattern");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
-			this.Resizable = false;
 			// Internal child Destrospean.DestrospeanCASPEditor.ChoosePatternDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;
 			w1.Name = "MainVBox";

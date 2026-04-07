@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common.Abstractions;
@@ -14,6 +15,10 @@ namespace Destrospean.Common
 
         Bitmap mStackedFaceTexture, mStackedScalpTexture;
 
+        public readonly Dictionary<CASPartResource.ClothingType, CASPart> CASPartOverrides = new Dictionary<CASPartResource.ClothingType, CASPart>();
+
+        public readonly List<CASPartResource.ClothingType> CASPartOverridesDisabled = new List<CASPartResource.ClothingType>();
+
         public Dictionary<CASPartResource.ClothingType, CASPart> CASParts
         {
             get
@@ -21,7 +26,8 @@ namespace Destrospean.Common
                 var casParts = new Dictionary<CASPartResource.ClothingType, CASPart>();
                 foreach (var casPartKvp in mCASParts)
                 {
-                    casParts.Add(casPartKvp.Key, CurrentCASPart != null && casPartKvp.Key == CurrentCASPart.CASPartResource.Clothing ? CurrentCASPart : casPartKvp.Value);
+                    CASPart casPartOverride;
+                    casParts.Add(casPartKvp.Key, CurrentCASPart != null && casPartKvp.Key == CurrentCASPart.CASPartResource.Clothing ? CurrentCASPart : !CASPartOverridesDisabled.Contains(casPartKvp.Key) && CASPartOverrides.TryGetValue(casPartKvp.Key, out casPartOverride) ? casPartOverride : casPartKvp.Value);
                 }
                 return casParts;
             }
@@ -48,7 +54,7 @@ namespace Destrospean.Common
             {
                 if (mID == null)
                 {
-                    mID = System.Guid.NewGuid().ToString();
+                    mID = Guid.NewGuid().ToString();
                 }
                 return mID;
             }
@@ -60,7 +66,8 @@ namespace Destrospean.Common
 
         public static object Lock = new object();
 
-        public bool ShowMaternityPartsOnly = false;
+        public bool OverrideSkinColor = false,
+        ShowMaternityPartsOnly = false;
 
         public float[] SkinColor =
             {
@@ -71,7 +78,7 @@ namespace Destrospean.Common
 
         public SimBase()
         {
-            foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
+            foreach (CASPartResource.ClothingType clothingType in Enum.GetValues(typeof(CASPartResource.ClothingType)))
             {
                 mCASParts[clothingType] = null;
             }
@@ -88,9 +95,10 @@ namespace Destrospean.Common
             return a.CASPartResource.Clothing == b.CASPartResource.Clothing || a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (b.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || b.CASPartResource.Clothing == CASPartResource.ClothingType.Top) || (a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && b.CASPartResource.Clothing == CASPartResource.ClothingType.Body;
         }
 
-        public static bool CASPartsConflict(CASPart a, Dictionary<string, uint> b)
+        public static bool CASPartsConflict(CASPart a, Dictionary<string, string> b)
         {
-            return (uint)a.CASPartResource.Clothing == b["Clothing"] || a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (b["Clothing"] == (uint)CASPartResource.ClothingType.Bottom || b["Clothing"] == (uint)CASPartResource.ClothingType.Top) || (a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && b["Clothing"] == (uint)CASPartResource.ClothingType.Body;
+            var bClothing = (CASPartResource.ClothingType)Enum.Parse(typeof(CASPartResource.ClothingType), b["Clothing"]);
+            return a.CASPartResource.Clothing == bClothing || a.CASPartResource.Clothing == CASPartResource.ClothingType.Body && (bClothing == CASPartResource.ClothingType.Bottom || bClothing == CASPartResource.ClothingType.Top) || (a.CASPartResource.Clothing == CASPartResource.ClothingType.Bottom || a.CASPartResource.Clothing == CASPartResource.ClothingType.Top) && bClothing == CASPartResource.ClothingType.Body;
         }
 
         public static List<float[]> FillMissingDeltas(IEnumerable<float[]> vertices, IEnumerable<float[]> deltas)
@@ -112,6 +120,21 @@ namespace Destrospean.Common
                     });
             }
             return newDeltas;
+        }
+
+        public CASPart GetCASPart(CASPartResource.ClothingType clothingType, string key)
+        {
+            s3pi.Interfaces.IPackage package;
+            if (CurrentCASPart == null)
+            {
+                package = s3pi.Package.Package.NewPackage(0);
+            }
+            else
+            {
+                package = CurrentCASPart.ParentPackage;
+            }
+            var evaluated = package.EvaluateResourceKey(key);
+            return new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>());
         }
 
         public Bitmap GetStackedFaceTexture(int presetIndex)
@@ -190,7 +213,7 @@ namespace Destrospean.Common
         {
             lock (Lock)
             {
-                foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
+                foreach (CASPartResource.ClothingType clothingType in Enum.GetValues(typeof(CASPartResource.ClothingType)))
                 {
                     if (mCASParts[clothingType] != null)
                     {
@@ -198,13 +221,18 @@ namespace Destrospean.Common
                         mCASParts[clothingType] = null;
                     }
                 }
-                var random = new System.Random();
-                foreach (CASPartResource.ClothingType clothingType in System.Enum.GetValues(typeof(CASPartResource.ClothingType)))
+                var random = new Random();
+                foreach (CASPartResource.ClothingType clothingType in Enum.GetValues(typeof(CASPartResource.ClothingType)))
                 {
                     var validCurrentTypePartKeys = new List<string>();
                     foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
                     {
-                        if (((!ShowMaternityPartsOnly || casPartLookupKvp.Value["Clothing"] < (uint)CASPartResource.ClothingType.Body || casPartLookupKvp.Value["Clothing"] > (uint)CASPartResource.ClothingType.Bottom || (casPartLookupKvp.Value["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (casPartLookupKvp.Value["Age"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && casPartLookupKvp.Value["Clothing"] == (uint)clothingType && (casPartLookupKvp.Value["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && (casPartLookupKvp.Value["ClothingCategory"] & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (casPartLookupKvp.Value["Gender"] & (uint)CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)casPartLookupKvp.Value["Species"]) == CASPart.GetAdjustedSpecies(CurrentCASPart.CASPartResource.AgeGender.Species)) && !CASPartsConflict(CurrentCASPart, casPartLookupKvp.Value))
+                        var age = (CASPartResource.AgeFlags)Enum.Parse(typeof(CASPartResource.AgeFlags), casPartLookupKvp.Value["Age"]);
+                        var category = (CASPartResource.ClothingCategoryFlags)Enum.Parse(typeof(CASPartResource.ClothingCategoryFlags), casPartLookupKvp.Value["ClothingCategory"]);
+                        var clothing = (CASPartResource.ClothingType)Enum.Parse(typeof(CASPartResource.ClothingType), casPartLookupKvp.Value["Clothing"]);
+                        var gender = (CASPartResource.GenderFlags)Enum.Parse(typeof(CASPartResource.GenderFlags), casPartLookupKvp.Value["Gender"]);
+                        var species = (CASPartResource.SpeciesType)Enum.Parse(typeof(CASPartResource.SpeciesType), casPartLookupKvp.Value["Species"]);
+                        if (((!ShowMaternityPartsOnly || clothing < CASPartResource.ClothingType.Body || clothing > CASPartResource.ClothingType.Bottom || (category & CASPartResource.ClothingCategoryFlags.ValidForMaternity) != 0) && (age & CurrentCASPart.CASPartResource.AgeGender.Age) != 0 && clothing == clothingType && ((uint)category & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)CurrentCASPart.CASPartResource.ClothingCategory) != 0 && ((uint)category & (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) != 0 && (gender & CurrentCASPart.CASPartResource.AgeGender.Gender) != 0 && CASPart.GetAdjustedSpecies(species) == CASPart.GetAdjustedSpecies(CurrentCASPart.CASPartResource.AgeGender.Species)) && !CASPartsConflict(CurrentCASPart, casPartLookupKvp.Value))
                         {
                             var isValid = true;
                             foreach (var casPart in mCASParts.Values)
@@ -213,7 +241,7 @@ namespace Destrospean.Common
                                 {
                                     continue;
                                 }
-                                if (CASPartsConflict(casPart, casPartLookupKvp.Value) || (casPartLookupKvp.Value["Age"] & (uint)casPart.CASPartResource.AgeGender.Age) == 0 || (casPartLookupKvp.Value["ClothingCategory"] & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)casPart.CASPartResource.ClothingCategory) == 0 || (casPartLookupKvp.Value["Gender"] & (uint)casPart.CASPartResource.AgeGender.Gender) == 0 || CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)casPartLookupKvp.Value["Species"]) != CASPart.GetAdjustedSpecies(casPart.CASPartResource.AgeGender.Species))
+                                if (CASPartsConflict(casPart, casPartLookupKvp.Value) || (age & casPart.CASPartResource.AgeGender.Age) == 0 || ((uint)category & (uint.MaxValue - (uint)CASPartResource.ClothingCategoryFlags.ValidForMaternity - (uint)CASPartResource.ClothingCategoryFlags.ValidForRandom) & (uint)casPart.CASPartResource.ClothingCategory) == 0 || (gender & casPart.CASPartResource.AgeGender.Gender) == 0 || CASPart.GetAdjustedSpecies(species) != CASPart.GetAdjustedSpecies(casPart.CASPartResource.AgeGender.Species))
                                 {
                                     isValid = false;
                                     break;
@@ -247,54 +275,63 @@ namespace Destrospean.Common
                         SetCASPart(clothingType, validCurrentTypePartKeys[random.Next(0, validCurrentTypePartKeys.Count - 1)]);
                     }
                 }
-                switch (random.Next(0, 2))
+                if (!OverrideSkinColor)
                 {
-                    case 0:
-                        while (true)
-                        {
-                            SkinColor = new float[]
-                                {
-                                    (float)random.Next(240, 255) / byte.MaxValue,
-                                    (float)random.Next(200, 230) / byte.MaxValue,
-                                    (float)random.Next(160, 200) / byte.MaxValue
-                                };
-                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
-                            {
-                                break;
-                            }
-                        }
-                        break;
-                    case 1:
-                        while (true)
-                        {
-                            SkinColor = new float[]
-                                {
-                                    (float)random.Next(180, 220) / byte.MaxValue,
-                                    (float)random.Next(130, 180) / byte.MaxValue,
-                                    (float)random.Next(90, 140) / byte.MaxValue
-                                };
-                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
-                            {
-                                break;
-                            }
-                        }
-                        break;
-                    case 2:
-                        while (true)
-                        {
-                            SkinColor = new float[]
-                                {
-                                    (float)random.Next(50, 150) / byte.MaxValue,
-                                    (float)random.Next(20, 100) / byte.MaxValue,
-                                    (float)random.Next(10, 70) / byte.MaxValue
-                                };
-                            if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
-                            {
-                                break;
-                            }
-                        }
-                        break;
+                    RandomizeSkinColor();
                 }
+            }
+        }
+
+        public void RandomizeSkinColor()
+        {
+            var random = new Random();
+            switch (random.Next(0, 2))
+            {
+                case 0:
+                    while (true)
+                    {
+                        SkinColor = new float[]
+                            {
+                                (float)random.Next(240, 255) / byte.MaxValue,
+                                (float)random.Next(200, 230) / byte.MaxValue,
+                                (float)random.Next(160, 200) / byte.MaxValue
+                            };
+                        if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                case 1:
+                    while (true)
+                    {
+                        SkinColor = new float[]
+                            {
+                                (float)random.Next(180, 220) / byte.MaxValue,
+                                (float)random.Next(130, 180) / byte.MaxValue,
+                                (float)random.Next(90, 140) / byte.MaxValue
+                            };
+                        if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                case 2:
+                    while (true)
+                    {
+                        SkinColor = new float[]
+                            {
+                                (float)random.Next(50, 150) / byte.MaxValue,
+                                (float)random.Next(20, 100) / byte.MaxValue,
+                                (float)random.Next(10, 70) / byte.MaxValue
+                            };
+                        if (SkinColor[0] >= SkinColor[1] && SkinColor[1] >= SkinColor[2])
+                        {
+                            break;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -316,12 +353,31 @@ namespace Destrospean.Common
             }
             var evaluated = package.EvaluateResourceKey(key);
             (mCASParts[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>())).AllPresets[0].RegenerateTexture();
-
         }
 
         public void SetCASPart(CASPartResource.ClothingType clothingType, uint type, uint group, ulong instance)
         {
             SetCASPart(clothingType, new ResourceKey(type, group, instance).ReverseEvaluateResourceKey());
+        }
+
+        public void SetCASPartOverride(CASPartResource.ClothingType clothingType, string key)
+        {
+            s3pi.Interfaces.IPackage package;
+            if (CurrentCASPart == null)
+            {
+                package = s3pi.Package.Package.NewPackage(0);
+            }
+            else
+            {
+                package = CurrentCASPart.ParentPackage;
+            }
+            if (PreloadedData.CASParts.ContainsKey(key))
+            {
+                CASPartOverrides[clothingType] = PreloadedData.CASParts[key];
+                return;
+            }
+            var evaluated = package.EvaluateResourceKey(key);
+            (CASPartOverrides[clothingType] = new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>())).AllPresets[0].RegenerateTexture();
         }
     }
 }

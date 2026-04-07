@@ -18,6 +18,8 @@ using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
+    readonly List<Tuple<uint, Gtk.Action>> mActionsToRemove = new List<Tuple<uint, Gtk.Action>>();
+
     Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
@@ -185,7 +187,11 @@ public partial class MainWindow : RendererMainWindow
         }
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
-        new Thread(CASPart.LoadLookupCache).Start();
+        new Thread(() =>
+            {
+                CASPart.LoadLookupCache();
+                ChooseObjectDialog.LoadCache();
+            }).Start();
         (mAddMusicThread = new Thread(() => AddMusic())).Start();
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
@@ -199,6 +205,7 @@ public partial class MainWindow : RendererMainWindow
                     }
                     ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
                     CASPart.GenerateLookupCache();
+                    ChooseObjectDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
@@ -209,7 +216,7 @@ public partial class MainWindow : RendererMainWindow
                 Sensitive = true;
                 mWaitBeforeUpdateCheck = false;
             };
-        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
+        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath) || !File.Exists(CASPartUtils.CacheFilePath))
         {
             mWaitBeforeUpdateCheck = true;
             new CacheGenerationWindow(this, Icon);
@@ -413,6 +420,15 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.Attach(mPresetNotebook, 1, 2, 0, 1);
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
+            var simPreviewAction = new Gtk.Action("SimPreviewAction", "Sim Preview...", null, Stock.Preferences);
+            uint simPreviewActionMergeID = UIManager.NewMergeId(),
+            simPreviewSeparatorMergeID = UIManager.NewMergeId();
+            UIManager.AddUi(simPreviewSeparatorMergeID, "/MainMenuBar/SettingsAction", "SimPreviewSeparator", "SimPreviewSeparator", UIManagerItemType.Separator, false);
+            UIManager.AddUi(simPreviewActionMergeID, "/MainMenuBar/SettingsAction", "SimPreviewAction", "SimPreviewAction", UIManagerItemType.Menuitem, false);
+            SettingsAction.ActionGroup.Add(simPreviewAction);
+            simPreviewAction.Activated += (sender, e) => new SimPreviewDialog(this);
+            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewActionMergeID, simPreviewAction));
+            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewSeparatorMergeID, null));
         }
         catch (Exception ex)
         {
@@ -816,6 +832,15 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
+                    while (mActionsToRemove.Count > 0)
+                    {
+                        UIManager.RemoveUi(mActionsToRemove[0].Item1);
+                        if (mActionsToRemove[0].Item2 != null)
+                        {
+                            SettingsAction.ActionGroup.Remove(mActionsToRemove[0].Item2);
+                        }
+                        mActionsToRemove.RemoveAt(0);
+                    }
                     mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();

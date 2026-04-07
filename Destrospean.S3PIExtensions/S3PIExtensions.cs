@@ -121,7 +121,7 @@ namespace Destrospean.S3PIExtensions
 
     public static class ResourceUtils
     {
-        static Dictionary<PackageTag, IPackage> sGameContentPackages, sGameImageResourcePackages;
+        static Dictionary<PackageTag, IPackage> sGameContentPackages, sGameImageResourcePackages, sGameThumbnailResourcePackages;
 
         static object sLock = new object();
 
@@ -173,6 +173,29 @@ namespace Destrospean.S3PIExtensions
             }
         }
 
+        public static Dictionary<PackageTag, IPackage> GameThumbnailResourcePackages
+        {
+            get
+            {
+                if (sGameThumbnailResourcePackages == null)
+                {
+                    lock (sLock)
+                    {
+                        sGameThumbnailResourcePackages = new Dictionary<PackageTag, IPackage>();
+                        foreach (var game in GameFolders.Games)
+                        {
+                            var enumerator = game.Thumbnails.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                sGameThumbnailResourcePackages.Add(enumerator.Current, s3pi.Package.Package.OpenPackage(0, enumerator.Current.Path));
+                            }
+                        }
+                    }
+                }
+                return sGameThumbnailResourcePackages;
+            }
+        }
+
         public static List<string> MissingResourceKeys
         {
             get
@@ -215,6 +238,7 @@ namespace Destrospean.S3PIExtensions
         {
             sGameContentPackages = null;
             sGameImageResourcePackages = null;
+            sGameThumbnailResourcePackages = null;
         }
 
         public static EvaluatedResourceKey EvaluateImageResourceKey(this IPackage package, string key)
@@ -285,6 +309,30 @@ namespace Destrospean.S3PIExtensions
                 }
             }
             throw new ResourceIndexEntryNotFoundException("No resource with the key, \"" + key + ",\" referenced in the XML node could be found.");
+        }
+
+        public static EvaluatedResourceKey EvaluateThumbnailResourceKey(this IPackage package, string key)
+        {
+            try
+            {
+                EvaluatedResourceKey evaluated;
+                if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
+                {
+                    return evaluated;
+                }
+                foreach (var gamePackage in GameThumbnailResourcePackages.Values)
+                {
+                    if (gamePackage.TryEvaluateResourceKeyInternal(key, out evaluated))
+                    {
+                        return evaluated;
+                    }
+                }
+                throw new ResourceIndexEntryNotFoundException("No thumbnail resource with the given key, \"" + key + ",\" could be found.");
+            }
+            catch (FormatException)
+            {
+                return EvaluateThumbnailResourceKey(package, "key:" + GetResourceType("THUM").ToString("X8") + ":00000000:" + System.Security.Cryptography.FNV64.GetHash(key.Substring(key.LastIndexOf("\\") + 1, key.LastIndexOf(".") - key.LastIndexOf("\\") - 1)).ToString("X16"));
+            }
         }
 
         public static NameMapResource.NameMapResource[] GetNameMapResources(this IPackage package)
