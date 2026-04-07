@@ -225,6 +225,10 @@
     <Compile Include="FileTypes.cs" />
     <Compile Include="Windows\NewUpdateDialog.cs" />
     <Compile Include="gtk-gui\Destrospean.DestrospeanCASPEditor.NewUpdateDialog.cs" />
+    <Compile Include="Windows\SimPreviewDialog.cs" />
+    <Compile Include="gtk-gui\Destrospean.DestrospeanCASPEditor.SimPreviewDialog.cs" />
+    <Compile Include="Windows\ChooseObjectDialog.cs" />
+    <Compile Include="gtk-gui\Destrospean.DestrospeanCASPEditor.ChooseObjectDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
