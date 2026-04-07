@@ -85,10 +85,9 @@ namespace Destrospean.Common
                 patternNamesKeysPaths.Sort((a, b) => a[0].CompareTo(b[0]));
                 foreach (var patternNameKeyPath in patternNamesKeysPaths)
                 {
-                    Bitmap image = null;
-                    if (!PreloadedPatternImages.TryGetValue(patternNameKeyPath[1], out image))
+                    Bitmap patternImage = null;
+                    if (!PreloadedPatternImages.TryGetValue(patternNameKeyPath[1], out patternImage))
                     {
-                        Bitmap patternImage = null;
                         PatternInfo patternInfo;
                         if (!PreloadedPatterns.TryGetValue(patternNameKeyPath[1], out patternInfo))
                         {
@@ -113,7 +112,7 @@ namespace Destrospean.Common
                         }
                         if (patternImage != null)
                         {
-                            image = PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
+                            PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
                         }
                         uncachedPatternExists = true;
                     }
