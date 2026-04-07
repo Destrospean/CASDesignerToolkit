@@ -172,4 +172,3 @@ namespace Destrospean.Graphics.OpenGL
         }
     }
 }
-
