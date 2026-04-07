@@ -441,6 +441,7 @@ public partial class MainWindow : RendererMainWindow
     void AddMusic()
     {
         var audioTunerType = ResourceUtils.GetResourceType("AUDT");
+        var nameMapDictionary = new Dictionary<ulong, string>();
         foreach (var package in ResourceUtils.GameContentPackages.Values)
         {
             foreach (var nameMapResource in package.GetNameMapResources())
@@ -449,21 +450,28 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (nameMapKvp.Value.ToLowerInvariant().StartsWith("music_"))
                     {
-                        if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
+                        nameMapDictionary[nameMapKvp.Key] = nameMapKvp.Value;
+                    }
+                }
+            }
+        }
+        foreach (var package in ResourceUtils.GameContentPackages.Values)
+        {
+            foreach (var nameMapKvp in nameMapDictionary)
+            {
+                if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
+                {
+                    mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
+                }
+                foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
+                {
+                    foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                    {
+                        if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
                         {
-                            mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
-                        }
-                        foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
-                        {
-                            foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                            foreach (var item in block.Items)
                             {
-                                if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
-                                {
-                                    foreach (var item in block.Items)
-                                    {
-                                        mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
-                                    }
-                                }
+                                mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
                             }
                         }
                     }
