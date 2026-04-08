@@ -155,35 +155,15 @@ namespace Destrospean.DestrospeanCASPEditor
                 {
                     if (args.ResponseId == ResponseType.Ok)
                     {
-                        if (skinColorCheckButton.Active)
+                        if (sim.OverrideSkinColor = skinColorCheckButton.Active)
                         {
                             sim.SkinColor[0] = (float)(skinColorButton.Color.Red >> 8) / byte.MaxValue;
                             sim.SkinColor[1] = (float)(skinColorButton.Color.Green >> 8) / byte.MaxValue;
                             sim.SkinColor[2] = (float)(skinColorButton.Color.Blue >> 8) / byte.MaxValue;
-                            sim.OverrideSkinColor = true;
                         }
-                        else if (sim.OverrideSkinColor)
-                        {
-                            sim.RandomizeSkinColor();
-                            sim.OverrideSkinColor = false;
-                        }
-                        sim.RandomizeCASParts();
                     }
                 };
             ShowAll();
-        }
-
-        protected void OnCancelButtonClicked(object sender, System.EventArgs e)
-        {
-            Dispose();
-            Destroy();
-        }
-
-        protected void OnOKButtonClicked(object sender, System.EventArgs e)
-        {
-            MainWindowBase.Singleton.NextState = NextStateOptions.UpdateModels;
-            Destroy();
-            Dispose();
         }
     }
 }
