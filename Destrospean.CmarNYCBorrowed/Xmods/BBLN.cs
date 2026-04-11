@@ -213,19 +213,19 @@ namespace Destrospean.CmarNYCBorrowed
                 mBGEOInstance = linkedResourceTGI.Instance;
             }
             mEntries = new Entry[1];
-            mEntries[0] = new Entry(CASRegions.Body, new MorphEntry[]
+            mEntries[0] = new Entry(CASRegions.Body, new[]
                 {
                     new MorphEntry(77951, 1, 0)
                 }, new MorphEntry[0]);
             if (version == 8)
             {
-                mTGIList = new TGI[]
+                mTGIList = new[]
                     {
                         new TGI(0, 0, 0)
                     };
                 return;
             }
-            mTGIList = new TGI[]
+            mTGIList = new[]
                 {
                     new TGI(linkedResourceTGI.Type, linkedResourceTGI.Group, linkedResourceTGI.Instance)
                 };

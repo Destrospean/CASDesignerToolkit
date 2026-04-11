@@ -197,6 +197,12 @@
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\libs\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+      <HintPath>..\libs\System.Net.Http.WebRequest.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">

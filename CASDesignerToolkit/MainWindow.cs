@@ -1061,12 +1061,7 @@ public partial class MainWindow : RendererMainWindow
                     string executablePath = AppDomain.CurrentDomain.BaseDirectory,
                     tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
                     Directory.CreateDirectory(tempPath);
-                    using (var client = new System.Net.Http.HttpClient())
-                    {
-                        System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
-                        client.DefaultRequestHeaders.UserAgent.ParseAdd(assemblyName.Name);
-                        File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
-                    }
+                    File.WriteAllBytes(tempPath + latestReleaseFilename, Updates.GetByteArray(latestReleaseDownloadUrl, assemblyName.Name));
                     if (Platform.IsUnix)
                     {
                         Platform.GetCommandOutput("chmod", "755 \"" + tempPath + latestReleaseFilename + "\"");

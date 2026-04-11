@@ -67,7 +67,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public override string ToString()
         {
-            return string.Concat(new string[]
+            return string.Concat(new[]
                 {
                     A.ToString(),
                     "x + ",

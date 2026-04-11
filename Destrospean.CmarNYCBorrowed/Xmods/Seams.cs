@@ -139,336 +139,336 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
@@ -1258,308 +1258,308 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
@@ -2277,252 +2277,252 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
@@ -3152,336 +3152,336 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
@@ -4291,378 +4291,378 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
@@ -5540,322 +5540,322 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
@@ -6595,231 +6595,231 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__HeadNew__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__",
                             "b__ROOT_bind__",
@@ -7419,378 +7419,378 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Pelvis__",
                             "b__Spine0__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
@@ -8668,322 +8668,322 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__HeadDome__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__NoseTip__",
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__MouthArea__",
                             "b__Jaw__",
@@ -9723,231 +9723,231 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Head__",
                             "b__R_Forearm__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_breast__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Chin__",
                             "b__EyeArea__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Jaw__",
                             "b__ROOT_bind__",
@@ -10547,378 +10547,378 @@ namespace Destrospean.CmarNYCBorrowed
                 mNormal = tempN;
                 string[][] tempB =
                     {
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Neck__",
                             "b__Head__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__L_Calf__Compress__",
                             "b__L_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__Spine0__",
                             "b__Pelvis__",
                             "b__Spine1__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         }, 
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",
                             "b__ROOT_bind__",
                             "b__ROOT_bind__"
                         },
-                        new string[]
+                        new[]
                         {
                             "b__R_Calf__Compress__",
                             "b__R_Calf__",

@@ -184,7 +184,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new double[]
+                return new[]
                 {
                     mMatrix[0, 0],
                     mMatrix[0, 1],
@@ -286,7 +286,7 @@ namespace Destrospean.CmarNYCBorrowed
             double x = 0,
             y = 0,
             z = 0;
-            var temp = new double[]
+            var temp = new[]
                 {
                     v.X,
                     v.Y,
@@ -307,7 +307,7 @@ namespace Destrospean.CmarNYCBorrowed
             var v = new double[4][];
             for (var i = 0; i < 4; i++)
             {
-                v[i] = m1 * new double[]
+                v[i] = m1 * new[]
                     {
                         m2.mMatrix[0, i],
                         m2.mMatrix[1, i],

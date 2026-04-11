@@ -447,7 +447,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     if (elementFloat2 != null)
                     {
                         var hBox = new HBox();
-                        var spinButtons = new SpinButton[]
+                        var spinButtons = new[]
                             {
                                 new SpinButton(new Adjustment(elementFloat2.Data0, -1, 1, 1, 10, 0), 0, 4),
                                 new SpinButton(new Adjustment(elementFloat2.Data1, -1, 1, 1, 10, 0), 0, 4)

@@ -288,7 +288,7 @@ namespace Destrospean.Common.Abstractions
                     return ((CatalogResource.CatalogResource.TC07_Boolean)properties[propertyName]).Unknown1.ToString();
                 case "color":
                     var argb = System.Array.ConvertAll(System.BitConverter.GetBytes(((CatalogResource.CatalogResource.TC02_ARGB)properties[propertyName]).ARGB), x => ((float)x / byte.MaxValue).ToString());
-                    return string.Join(",", new string[]
+                    return string.Join(",", new[]
                         {
                             argb[2],
                             argb[1],
@@ -310,7 +310,7 @@ namespace Destrospean.Common.Abstractions
                     try
                     {
                         var complateElement = ((CatalogResource.CatalogResource.TC06_XYZ)properties[propertyName]);
-                        return string.Join(",", new string[]
+                        return string.Join(",", new[]
                             {
                                 complateElement.Unknown1.ToString(),
                                 complateElement.Unknown2.ToString(),

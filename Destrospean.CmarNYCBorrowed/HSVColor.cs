@@ -249,7 +249,7 @@ namespace Destrospean.CmarNYCBorrowed
                         break;
                 }
             }
-            return new byte[]
+            return new[]
             {
                 Clamp((int)(red * byte.MaxValue)), Clamp((int)(green * byte.MaxValue)), Clamp((int)(blue * byte.MaxValue))
             };

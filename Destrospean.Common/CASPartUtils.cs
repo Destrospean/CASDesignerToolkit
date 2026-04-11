@@ -20,7 +20,7 @@ namespace Destrospean.Common
             var uncachedCASPartExists = false;
             foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
             {
-                casPartsNamesKeysThumbnailKeys.Add(new string[]
+                casPartsNamesKeysThumbnailKeys.Add(new[]
                     {
                         casPartLookupKvp.Value["Unknown1"],
                         casPartLookupKvp.Key,

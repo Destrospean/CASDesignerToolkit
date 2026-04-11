@@ -196,7 +196,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                         {   
                                             evaluated = casPart.ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
                                             var bond = new BOND(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                                            bond.Weight = new float[]
+                                            bond.Weight = new[]
                                                 {
                                                     Fat,
                                                     Fit,
@@ -345,7 +345,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                        }, currentPreset, (Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), new Bitmap[]
+                        }, currentPreset, (Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), new[]
                         {
                             ambientMapImage,
                             specularMapImage,

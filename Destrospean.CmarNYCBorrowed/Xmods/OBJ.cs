@@ -191,7 +191,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return string.Concat(new string[]
+                return string.Concat(new[]
                     {
                         PointString(Point1),
                         " ",
@@ -244,7 +244,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -291,7 +291,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return string.Concat(new string[]
+                return string.Concat(new[]
                     {
                         X.ToString("N7", CultureInfo.InvariantCulture),
                         " ",
@@ -308,7 +308,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         U,
                         V
@@ -356,7 +356,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -403,7 +403,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return string.Concat(new string[]
+                return string.Concat(new[]
                     {
                         X.ToString("N7", CultureInfo.InvariantCulture),
                         " ",
@@ -420,11 +420,11 @@ namespace Destrospean.CmarNYCBorrowed
             mUVList = new List<UV>();
             mNormalList = new List<Normal>();
             mGroupList = new List<Group>();
-            string[] slashSeparator = new string[]
+            string[] slashSeparator = new[]
                 {
                     "/"
                 },
-            spaceSeparator = new string[]
+            spaceSeparator = new[]
                 {
                     " "
                 };
@@ -584,7 +584,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public OBJ(GEOM baseMesh, GEOM[] morphs)
         {
-            var groupNames = new string[]
+            var groupNames = new[]
                 {
                     "group_fat",
                     "group_fit",
@@ -628,7 +628,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public OBJ(GEOM baseMesh, GEOM fatMesh, GEOM fitMesh, GEOM thinMesh, GEOM specialMesh) : this(baseMesh, new GEOM[]
+        public OBJ(GEOM baseMesh, GEOM fatMesh, GEOM fitMesh, GEOM thinMesh, GEOM specialMesh) : this(baseMesh, new[]
             {
                 fatMesh,
                 fitMesh,
@@ -659,7 +659,7 @@ namespace Destrospean.CmarNYCBorrowed
                 var facePoints = wso.GetMesh(i).FacePoints;
                 for (var j = 0; j < facePoints.Length; j += 3)
                 {
-                    mGroupList[i].AddFace(new Face(new int[]
+                    mGroupList[i].AddFace(new Face(new[]
                         {
                             (int)facePoints[j].VertexIndex,
                             (int)facePoints[j + 1].VertexIndex,

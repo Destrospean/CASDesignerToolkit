@@ -434,7 +434,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
+                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new[]
                                     {
                                         j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
                                     } : new GEOM[0];
@@ -445,7 +445,7 @@ namespace Destrospean.Common.Abstractions
                             var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry)));
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] = j == lod ? new GEOM[]
+                                lodMorphMeshes[j] = j == lod ? new[]
                                     {
                                         newGEOMPlusMorphs[i]
                                     } : Array.ConvertAll(vpxy.GetMeshLinks(j), x => geometryResources[new ResourceKey(x.Type, x.Group, x.Instance).ReverseEvaluateResourceKey()]);

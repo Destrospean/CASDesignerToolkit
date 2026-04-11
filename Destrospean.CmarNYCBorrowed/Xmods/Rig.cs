@@ -249,20 +249,20 @@ namespace Destrospean.CmarNYCBorrowed
             public Bone(Bone other, Rig rig)
             {
                 mIndex = other.mIndex;
-                mPosition = new float[]
+                mPosition = new[]
                     {
                         other.mPosition[0],
                         other.mPosition[1],
                         other.mPosition[2]
                     };
-                mOrientation = new float[]
+                mOrientation = new[]
                     {
                         other.mOrientation[0],
                         other.mOrientation[1],
                         other.mOrientation[2],
                         other.mOrientation[3]
                     };
-                mScaling = new float[]
+                mScaling = new[]
                     {
                         other.mScaling[0],
                         other.mScaling[1],

@@ -35,7 +35,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     var textureCoordinates = new List<Vector2>();
                     for (var i = 0; i < indices.Length; i += 3)
                     {
-                        faces.Add(new int[]
+                        faces.Add(new[]
                             {
                                 indices[i],
                                 indices[i + 1],

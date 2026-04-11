@@ -51,7 +51,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 {
                     continue;
                 }
-                casPartsNamesKeysThumbnailKeys.Add(new string[]
+                casPartsNamesKeysThumbnailKeys.Add(new[]
                     {
                         casPartLookupKvp.Value["Unknown1"],
                         casPartLookupKvp.Key,

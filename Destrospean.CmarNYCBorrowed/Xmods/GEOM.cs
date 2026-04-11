@@ -625,7 +625,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new byte[]
+                    return new[]
                     {
                         mAssignments[0],
                         mAssignments[1],
@@ -646,7 +646,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new byte[]
+                    return new[]
                     {
                         (byte)(mWeights[0] * byte.MaxValue),
                         (byte)(mWeights[1] * byte.MaxValue),
@@ -670,7 +670,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         mWeights[0],
                         mWeights[1],
@@ -864,7 +864,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new uint[]
+                    return new[]
                     {
                         mFace[0],
                         mFace[1],
@@ -1244,7 +1244,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 var elementList = new List<object[]>(mData);
                 var fieldList = new List<uint[]>(mFields);
-                fieldList.Insert(index, new uint[]
+                fieldList.Insert(index, new[]
                     {
                         fieldType,
                         valueType,
@@ -1369,7 +1369,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -1446,7 +1446,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -1682,7 +1682,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 set
                 {
-                    mTransformToLocalSpace = new float[]
+                    mTransformToLocalSpace = new[]
                         {
                             (float)value.X,
                             (float)value.Y,
@@ -1867,7 +1867,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -1934,7 +1934,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         U,
                         V
@@ -2048,7 +2048,7 @@ namespace Destrospean.CmarNYCBorrowed
                 mCoordinates = new float[Count][];
                 for (var i = 0; i < Count; i++)
                 {
-                    mCoordinates[i] = new float[]
+                    mCoordinates[i] = new[]
                         {
                             reader.ReadSingle(),
                             reader.ReadSingle()
@@ -2063,7 +2063,7 @@ namespace Destrospean.CmarNYCBorrowed
                 mCoordinates = new float[source.Count][];
                 for (var i = 0; i < Count; i++)
                 {
-                    mCoordinates[i] = new float[]
+                    mCoordinates[i] = new[]
                         {
                             source.mCoordinates[i][0],
                             source.mCoordinates[i][1]
@@ -2078,7 +2078,7 @@ namespace Destrospean.CmarNYCBorrowed
                 mCoordinates = new float[uv0Coordinates.Length][];
                 for (var i = 0; i < uv0Coordinates.Length; i++)
                 {
-                    mCoordinates[i] = new float[]
+                    mCoordinates[i] = new[]
                         {
                             uv0Coordinates[i].X,
                             uv0Coordinates[i].Y
@@ -2209,7 +2209,7 @@ namespace Destrospean.CmarNYCBorrowed
             mSortOrder = baseMesh.mSortOrder;
             mVertexCount = baseMesh.mVertexCount;
             mFaceCount = 3;
-            mVertexFormats = new VertexFormat[]
+            mVertexFormats = new[]
                 {
                     new VertexFormat(1, 1, 12),
                     new VertexFormat(2, 1, 12),
@@ -2306,7 +2306,7 @@ namespace Destrospean.CmarNYCBorrowed
             mSortOrder = baseMesh.mSortOrder;
             mVertexCount = baseMesh.VertexCount;
             mFaceCount = 3;
-            mVertexFormats = new VertexFormat[]
+            mVertexFormats = new[]
                 {
                     new VertexFormat(1, 1, 12),
                     new VertexFormat(2, 1, 12),
@@ -3120,7 +3120,7 @@ namespace Destrospean.CmarNYCBorrowed
                     if (mFaces[i].FacePoint0 == slotVertIndices[0] && mFaces[i].FacePoint1 == slotVertIndices[1] && mFaces[i].FacePoint2 == slotVertIndices[2])
                     {
                         var temp = new SlotrayIntersection(mSlotrayIntersections[j]);
-                        temp.TrianglePointIndices = new int[]
+                        temp.TrianglePointIndices = new[]
                             {
                                 facePoint0,
                                 facePoint1,
@@ -3476,7 +3476,7 @@ namespace Destrospean.CmarNYCBorrowed
                 if (isMorph[i])
                 {
                     geoms[i].mFaceCount = 3;
-                    geoms[i].mVertexFormats = new VertexFormat[]
+                    geoms[i].mVertexFormats = new[]
                         {
                             new VertexFormat(1, 1, 12),
                             new VertexFormat(2, 1, 12),
@@ -3677,7 +3677,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public int[] GetFaceIndices(int faceSequenceNumber)
         {
-            return new int[]
+            return new[]
             {
                 (int)mFaces[faceSequenceNumber].FacePoints[0],
                 (int)mFaces[faceSequenceNumber].FacePoints[1],
@@ -3687,7 +3687,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public uint[] GetFaceIndicesUInt(int faceSequenceNumber)
         {
-            return new uint[]
+            return new[]
             {
                 mFaces[faceSequenceNumber].FacePoints[0],
                 mFaces[faceSequenceNumber].FacePoints[1],
@@ -3697,7 +3697,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public Vector3[] GetFacePoints(int faceSequenceNumber)
         {
-            return new Vector3[]
+            return new[]
             {
                 new Vector3(mPositions[mFaces[faceSequenceNumber].FacePoints[0]].Coordinates), 
                 new Vector3(mPositions[mFaces[faceSequenceNumber].FacePoints[1]].Coordinates), 
@@ -3720,7 +3720,7 @@ namespace Destrospean.CmarNYCBorrowed
                     zMax = position.Z;
                 }
             }
-            return new float[]
+            return new[]
             {
                 yMax,
                 zMax
@@ -4510,7 +4510,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public void SetBones(int vertexSequenceNumber, byte bone0, byte bone1, byte bone2, byte bone3)
         {
-            mBones[vertexSequenceNumber].BoneAssignments = new byte[]
+            mBones[vertexSequenceNumber].BoneAssignments = new[]
                 {
                     bone0,
                     bone1,
@@ -4531,7 +4531,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public void SetBoneWeights(int vertexSequenceNumber, byte weight0, byte weight1, byte weight2, byte weight3)
         {
-            mBones[vertexSequenceNumber].BoneWeights = new byte[]
+            mBones[vertexSequenceNumber].BoneWeights = new[]
                 {
                     weight0,
                     weight1,
@@ -4547,7 +4547,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public void SetBoneWeightsV5(int vertexSequenceNumber, float weight0, float weight1, float weight2, float weight3)
         {
-            mBones[vertexSequenceNumber].BoneWeightsV5 = new float[]
+            mBones[vertexSequenceNumber].BoneWeightsV5 = new[]
                 {
                     weight0,
                     weight1,
@@ -4624,7 +4624,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0] = new Vector3[4][][][];         //ageGenders
             meshSeamVertices[0][0] = new Vector3[4][][];        //Adult Male
             meshSeamVertices[0][0][0] = new Vector3[7][];       //Adult Male LOD0 seams
-            meshSeamVertices[0][0][0][0] = new Vector3[]
+            meshSeamVertices[0][0][0][0] = new[]
                 {
                     new Vector3(.10318f, .16812f, .01464f),
                     new Vector3(.08145f, .16812f, .006759f),
@@ -4647,7 +4647,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][0][0][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][0][0][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][0][0][3] = new Vector3[]
+            meshSeamVertices[0][0][0][3] = new[]
                 {
                     new Vector3(.04994f, 1.65732f, -.04331f),
                     new Vector3(.05748f, 1.65212f, -.02185f),
@@ -4668,7 +4668,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Neck
             meshSeamVertices[0][0][0][4] = new Vector3[0];      //Waist
             meshSeamVertices[0][0][0][5] = new Vector3[0];      //WaistAdultFemale
-            meshSeamVertices[0][0][0][6] = new Vector3[]
+            meshSeamVertices[0][0][0][6] = new[]
                 {
                     new Vector3(.13477f, 1.10102f, .05168f),
                     new Vector3(.09531f, 1.09588f, .08789f),
@@ -4694,7 +4694,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.08691f, 1.10752f, -.0717f)
                 };                                              //WaistAdultMale
             meshSeamVertices[0][0][1] = new Vector3[7][];       //Adult Male LOD1 seams
-            meshSeamVertices[0][0][1][0] = new Vector3[]
+            meshSeamVertices[0][0][1][0] = new[]
                 {
                     new Vector3(.10318f, .16812f, .01464f),
                     new Vector3(.08145f, .16812f, .006759f),
@@ -4715,7 +4715,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][0][1][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][0][1][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][0][1][3] = new Vector3[]
+            meshSeamVertices[0][0][1][3] = new[]
                 {
                     new Vector3(.04994f, 1.65732f, -.04331f),
                     new Vector3(.05748f, 1.65212f, -.02185f),
@@ -4736,7 +4736,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Neck
             meshSeamVertices[0][0][1][4] = new Vector3[0];      //Waist
             meshSeamVertices[0][0][1][5] = new Vector3[0];      //WaistAdultFemale
-            meshSeamVertices[0][0][1][6] = new Vector3[]
+            meshSeamVertices[0][0][1][6] = new[]
                 {
                     new Vector3(.13477f, 1.10102f, .05168f),
                     new Vector3(.07867001f, 1.09439f, .09449001f),
@@ -4754,7 +4754,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.09797f, 1.10787f, -.06464f)
                 };                                              //WaistAdultMale
             meshSeamVertices[0][0][2] = new Vector3[7][];       //Adult Male LOD2 seams
-            meshSeamVertices[0][0][2][0] = new Vector3[]
+            meshSeamVertices[0][0][2][0] = new[]
                 {
                     new Vector3(.1123f, .16812f, .008479001f),
                     new Vector3(.08145f, .16812f, .006759f),
@@ -4771,7 +4771,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][0][2][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][0][2][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][0][2][3] = new Vector3[]
+            meshSeamVertices[0][0][2][3] = new[]
                 {
                     new Vector3(.04994f, 1.65732f, -.04331f),
                     new Vector3(.05748f, 1.65212f, -.02185f),
@@ -4792,7 +4792,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Neck
             meshSeamVertices[0][0][2][4] = new Vector3[0];      //Waist
             meshSeamVertices[0][0][2][5] = new Vector3[0];      //WaistAdultFemale
-            meshSeamVertices[0][0][2][6] = new Vector3[]
+            meshSeamVertices[0][0][2][6] = new[]
                 {
                     new Vector3(.13477f, 1.10102f, .05168f),
                     new Vector3(.07867001f, 1.09439f, .09449001f),
@@ -4808,7 +4808,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.14252f, 1.10484f, .00736f)
                 };                                              //WaistAdultMale
             meshSeamVertices[0][0][3] = new Vector3[7][];       //Adult Male LOD3 seams
-            meshSeamVertices[0][0][3][0] = new Vector3[]
+            meshSeamVertices[0][0][3][0] = new[]
                 {
                     new Vector3(.10318f, .16812f, .01464f),
                     new Vector3(.1301f, .16812f, -.02376f),
@@ -4821,7 +4821,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][0][3][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][0][3][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][0][3][3] = new Vector3[]
+            meshSeamVertices[0][0][3][3] = new[]
                 {
                     new Vector3(.05748f, 1.65212f, -.02185f),
                     new Vector3(0, 1.62329f, .03646f),
@@ -4834,7 +4834,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Neck
             meshSeamVertices[0][0][3][4] = new Vector3[0];      //Waist
             meshSeamVertices[0][0][3][5] = new Vector3[0];      //WaistAdultFemale
-            meshSeamVertices[0][0][3][6] = new Vector3[]
+            meshSeamVertices[0][0][3][6] = new[]
                 {
                     new Vector3(.10672f, 1.09771f, .07308f),
                     new Vector3(0, 1.08875f, .11338f),
@@ -4847,7 +4847,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //WaistAdultMale
             meshSeamVertices[0][1] = new Vector3[4][][];        //Adult Female
             meshSeamVertices[0][1][0] = new Vector3[7][];       //Adult Female LOD0 seams
-            meshSeamVertices[0][1][0][0] = new Vector3[]
+            meshSeamVertices[0][1][0][0] = new[]
                 {
                     new Vector3(.10061f, .17831f, .01385f),
                     new Vector3(.08411001f, .17831f, .01062f),
@@ -4870,7 +4870,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][1][0][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][1][0][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][1][0][3] = new Vector3[]
+            meshSeamVertices[0][1][0][3] = new[]
                 {
                     new Vector3(.04228f, 1.65728f, -.03741f),
                     new Vector3(.04676f, 1.65358f, -.01843f),
@@ -4890,7 +4890,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.04565f, 1.64751f, -.00218f)
                 };                                              //Neck
             meshSeamVertices[0][1][0][4] = new Vector3[0];      //Waist
-            meshSeamVertices[0][1][0][5] = new Vector3[]
+            meshSeamVertices[0][1][0][5] = new[]
                 {
                     new Vector3(0, 1.16153f, .10832f),
                     new Vector3(0, 1.17486f, -.05726f),
@@ -4917,7 +4917,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //WaistAdultFemale
             meshSeamVertices[0][1][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][1][1] = new Vector3[7][];       //Adult Female LOD1 seams
-            meshSeamVertices[0][1][1][0] = new Vector3[]
+            meshSeamVertices[0][1][1][0] = new[]
                 {
                     new Vector3(.10061f, .17831f, .01385f),
                     new Vector3(.08411001f, .17831f, .01062f),
@@ -4938,7 +4938,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][1][1][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][1][1][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][1][1][3] = new Vector3[]
+            meshSeamVertices[0][1][1][3] = new[]
                 {
                     new Vector3(.04228f, 1.65729f, -.03741f),
                     new Vector3(.04676f, 1.65359f, -.01843f),
@@ -4958,7 +4958,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.04565f, 1.64751f, -.00218f)
                 };                                              //Neck
             meshSeamVertices[0][1][1][4] = new Vector3[0];      //Waist
-            meshSeamVertices[0][1][1][5] = new Vector3[]
+            meshSeamVertices[0][1][1][5] = new[]
                 {
                     new Vector3(0, 1.16153f, .10832f),
                     new Vector3(0, 1.17486f, -.05726f),
@@ -4977,7 +4977,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //WaistAdultFemale
             meshSeamVertices[0][1][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][1][2] = new Vector3[7][];       //Adult Female LOD2 seams
-            meshSeamVertices[0][1][2][0] = new Vector3[]
+            meshSeamVertices[0][1][2][0] = new[]
                 {
                     new Vector3(.11008f, .17831f, .00665f),
                     new Vector3(.08411001f, .17831f, .01062f),
@@ -4994,7 +4994,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][1][2][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][1][2][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][1][2][3] = new Vector3[]
+            meshSeamVertices[0][1][2][3] = new[]
                 {
                     new Vector3(.04228f, 1.65729f, -.03742f),
                     new Vector3(.04676f, 1.65358f, -.01844f),
@@ -5014,7 +5014,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.04565f, 1.64751f, -.00218f)
                 };                                              //Neck
             meshSeamVertices[0][1][2][4] = new Vector3[0];      //Waist
-            meshSeamVertices[0][1][2][5] = new Vector3[]
+            meshSeamVertices[0][1][2][5] = new[]
                 {
                     new Vector3(0, 1.16153f, .10832f),
                     new Vector3(0, 1.17486f, -.05726f),
@@ -5029,7 +5029,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //WaistAdultFemale
             meshSeamVertices[0][1][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][1][3] = new Vector3[7][];       //Adult Female LOD3 seams
-            meshSeamVertices[0][1][3][0] = new Vector3[]
+            meshSeamVertices[0][1][3][0] = new[]
                 {
                     new Vector3(.10061f, .17831f, .01385f),
                     new Vector3(.12174f, .17831f, -.02315f),
@@ -5042,7 +5042,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][1][3][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][1][3][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][1][3][3] = new Vector3[]
+            meshSeamVertices[0][1][3][3] = new[]
                 {
                     new Vector3(.04676f, 1.65358f, -.01844f),
                     new Vector3(0, 1.62477f, .03136f),
@@ -5054,7 +5054,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.02586f, 1.63212f, .02275f)
                 };                                              //Neck
             meshSeamVertices[0][1][3][4] = new Vector3[0];      //Waist
-            meshSeamVertices[0][1][3][5] = new Vector3[]
+            meshSeamVertices[0][1][3][5] = new[]
                 {
                     new Vector3(0, 1.16153f, .10832f),
                     new Vector3(0, 1.17486f, -.05726f),
@@ -5068,7 +5068,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][1][3][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][2] = new Vector3[4][][];        //Child
             meshSeamVertices[0][2][0] = new Vector3[7][];       //Child LOD0 seams
-            meshSeamVertices[0][2][0][0] = new Vector3[]
+            meshSeamVertices[0][2][0][0] = new[]
                 {
                     new Vector3(.07243f, .11592f, .01694f),
                     new Vector3(.05307f, .11592f, .0112f),
@@ -5091,7 +5091,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][2][0][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][2][0][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][2][0][3] = new Vector3[]
+            meshSeamVertices[0][2][0][3] = new[]
                 {
                     new Vector3(-.03752f, 1.12267f, -.03273f),
                     new Vector3(-.02065f, 1.12468f, -.04379001f),
@@ -5110,7 +5110,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.01436f, 1.09965f, .02605f),
                     new Vector3(.02295f, 1.10288f, .01802f)
                 };                                              //Neck
-            meshSeamVertices[0][2][0][4] = new Vector3[]
+            meshSeamVertices[0][2][0][4] = new[]
                 {
                     new Vector3(.0914f, .7533001f, .03828f),
                     new Vector3(.06577f, .7498001f, .06943001f),
@@ -5138,7 +5138,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][2][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][2][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][2][1] = new Vector3[7][];       //Child LOD1 seams
-            meshSeamVertices[0][2][1][0] = new Vector3[]
+            meshSeamVertices[0][2][1][0] = new[]
                 {
                     new Vector3(.053066f, .115924f, .011202f),
                     new Vector3(.043329f, .115923f, -.008687f),
@@ -5159,7 +5159,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][2][1][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][2][1][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][2][1][3] = new Vector3[]
+            meshSeamVertices[0][2][1][3] = new[]
                 {
                     new Vector3(-.03752f, 1.12268f, -.03273f),
                     new Vector3(-.02065f, 1.12477f, -.04379001f),
@@ -5178,7 +5178,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.01436f, 1.09965f, .02605f),
                     new Vector3(.02295f, 1.10288f, .01802f)
                 };                                              //Neck
-            meshSeamVertices[0][2][1][4] = new Vector3[]
+            meshSeamVertices[0][2][1][4] = new[]
                 {
                     new Vector3(.0914f, .7533001f, .03828f),
                     new Vector3(.05402f, .74878f, .07478f),
@@ -5198,7 +5198,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][2][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][2][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][2][2] = new Vector3[7][];       //Child LOD2 seams
-            meshSeamVertices[0][2][2][0] = new Vector3[]
+            meshSeamVertices[0][2][2][0] = new[]
                 {
                     new Vector3(.053066f, .115924f, .016333f),
                     new Vector3(),
@@ -5216,7 +5216,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][2][2][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][2][2][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][2][2][3] = new Vector3[]
+            meshSeamVertices[0][2][2][3] = new[]
                 {
                     new Vector3(-.03752f, 1.12267f, -.03273f),
                     new Vector3(0, 1.12563f, -.04968f),
@@ -5235,7 +5235,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.01436f, 1.09967f, .02605f),
                     new Vector3(.02296f, 1.10289f, .01801f)
                 };                                              //Neck
-            meshSeamVertices[0][2][2][4] = new Vector3[]
+            meshSeamVertices[0][2][2][4] = new[]
                 {
                     new Vector3(.0914f, .7533001f, .03828f),
                     new Vector3(.05402f, .74878f, .07478f),
@@ -5253,7 +5253,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][2][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][2][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][2][3] = new Vector3[7][];       //Child LOD3 seams
-            meshSeamVertices[0][2][3][0] = new Vector3[]
+            meshSeamVertices[0][2][3][0] = new[]
                 {
                     new Vector3(.07243f, .11592f, .01694f),
                     new Vector3(.04333f, .11592f, -.00869f),
@@ -5266,7 +5266,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][2][3][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][2][3][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][2][3][3] = new Vector3[]
+            meshSeamVertices[0][2][3][3] = new[]
                 {
                     new Vector3(.02908f, 1.12368f, -.03826001f),
                     new Vector3(0, 1.12563f, -.04968f),
@@ -5277,7 +5277,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(0, 1.09771f, .02923f),
                     new Vector3(-.02296f, 1.10289f, .01801f)
                 };                                              //Neck
-            meshSeamVertices[0][2][3][4] = new Vector3[]
+            meshSeamVertices[0][2][3][4] = new[]
                 {
                     new Vector3(0, .74493f, .08794f),
                     new Vector3(.0721f, .7513f, .05675f),
@@ -5290,7 +5290,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][2][3][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][3] = new Vector3[4][][];        //Toddler
             meshSeamVertices[0][3][0] = new Vector3[7][];       //Toddler LOD0 seams
-            meshSeamVertices[0][3][0][0] = new Vector3[]
+            meshSeamVertices[0][3][0][0] = new[]
                 {
                     new Vector3(.0581f, .08125f, .02318f),
                     new Vector3(.04031f, .08124f, .01804f),
@@ -5313,7 +5313,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][3][0][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][3][0][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][3][0][3] = new Vector3[]
+            meshSeamVertices[0][3][0][3] = new[]
                 {
                     new Vector3(0, .72543f, .02841f),
                     new Vector3(0, .74598f, -.04577f),
@@ -5332,7 +5332,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.02401f, .73009f, .01878f),
                     new Vector3(.01907f, .7453601f, -.0411f)
                 };                                              //Neck
-            meshSeamVertices[0][3][0][4] = new Vector3[]
+            meshSeamVertices[0][3][0][4] = new[]
                 {
                     new Vector3(.08580001f, .46483f, .03673f),
                     new Vector3(.064f, .46369f, .06124f),
@@ -5360,7 +5360,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][3][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][3][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][3][1] = new Vector3[7][];       //Toddler LOD1 seams
-            meshSeamVertices[0][3][1][0] = new Vector3[]
+            meshSeamVertices[0][3][1][0] = new[]
                 {
                     new Vector3(.058104f, .08125f, .023184f),
                     new Vector3(.040309f, .08123501f, .018042f),
@@ -5381,7 +5381,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][3][1][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][3][1][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][3][1][3] = new Vector3[]
+            meshSeamVertices[0][3][1][3] = new[]
                 {
                     new Vector3(0, .725429f, .028412f),
                     new Vector3(0, .745978f, -.045768f),
@@ -5400,7 +5400,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.019068f, .745362f, -.041102f),
                     new Vector3(.015064f, .727072f, .025942f)
                 };                                              //Neck
-            meshSeamVertices[0][3][1][4] = new Vector3[]
+            meshSeamVertices[0][3][1][4] = new[]
                 {
                     new Vector3(.074902f, .464262f, .048984f),
                     new Vector3(.038165f, .46175f, .076512f),
@@ -5420,7 +5420,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][3][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][3][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][3][2] = new Vector3[7][];       //Toddler LOD2 seams
-            meshSeamVertices[0][3][2][0] = new Vector3[]
+            meshSeamVertices[0][3][2][0] = new[]
                 {
                     new Vector3(.065962f, .08125f, .017437f),
                     new Vector3(.040309f, .08123501f, .018042f),
@@ -5437,7 +5437,7 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][3][2][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][3][2][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][3][2][3] = new Vector3[]
+            meshSeamVertices[0][3][2][3] = new[]
                 {
                     new Vector3(0, .725429f, .028412f),
                     new Vector3(0, .745978f, -.045768f),
@@ -5456,7 +5456,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.035021f, .7452821f, -.029798f),
                     new Vector3(.015064f, .727072f, .025942f)
                 };                                              //Neck
-            meshSeamVertices[0][3][2][4] = new Vector3[]
+            meshSeamVertices[0][3][2][4] = new[]
                 {
                     new Vector3(.074902f, .464262f, .048984f),
                     new Vector3(.038165f, .46175f, .076512f),
@@ -5474,7 +5474,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[0][3][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[0][3][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[0][3][3] = new Vector3[7][];       //Toddler LOD3 seams
-            meshSeamVertices[0][3][3][0] = new Vector3[]
+            meshSeamVertices[0][3][3][0] = new[]
                 {
                     new Vector3(.053136f, .081243f, .017739f),
                     new Vector3(.079346f, .08125f, -.005758f),
@@ -5487,12 +5487,12 @@ namespace Destrospean.CmarNYCBorrowed
                 };                                              //Ankles
             meshSeamVertices[0][3][3][1] = new Vector3[0];      //Tail
             meshSeamVertices[0][3][3][2] = new Vector3[0];      //Ears
-            meshSeamVertices[0][3][3][3] = new Vector3[]
+            meshSeamVertices[0][3][3][3] = new[]
                 {
                     new Vector3(0, .725429f, .028412f),
                     new Vector3(0, .745978f, -.045768f)
                 };                                              //Neck
-            meshSeamVertices[0][3][3][4] = new Vector3[]
+            meshSeamVertices[0][3][3][4] = new[]
                 {
                     new Vector3(.056534f, .463006f, .062748f),
                     new Vector3(0, .459831f, .086915f),
@@ -5508,7 +5508,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1] = new Vector3[4][][][];         //ageSpecies
             meshSeamVertices[1][0] = new Vector3[4][][];        //Adult Dog
             meshSeamVertices[1][0][0] = new Vector3[7][];       //Adult Dog LOD0 seams
-            meshSeamVertices[1][0][0][0] = new Vector3[]
+            meshSeamVertices[1][0][0][0] = new[]
                 {
                     new Vector3(.091319f, .110002f, .100705f),
                     new Vector3(.089504f, .111499f, .110355f),
@@ -5567,7 +5567,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.065669f, .107896f, -.529511f),
                     new Vector3(-.053849f, .107928f, -.531096f)
                 };                                              //Ankles
-            meshSeamVertices[1][0][0][1] = new Vector3[]
+            meshSeamVertices[1][0][0][1] = new[]
                 {
                     new Vector3(.021073f, .577363f, -.43746f),
                     new Vector3(.02086f, .592635f, -.42631f),
@@ -5580,7 +5580,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.012646f, .600489f, -.423659f),
                     new Vector3(-.014413f, .569726f, -.445067f)
                 };                                              //Tail
-            meshSeamVertices[1][0][0][2] = new Vector3[]
+            meshSeamVertices[1][0][0][2] = new[]
                 {
                     new Vector3(-.067989f, .768746f, .27049f),
                     new Vector3(-.063373f, .779868f, .276023f),
@@ -5615,7 +5615,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.053795f, .7924451f, .232828f),
                     new Vector3(.066883f, .760161f, .251542f)
                 };                                              //Ears
-            meshSeamVertices[1][0][0][3] = new Vector3[]
+            meshSeamVertices[1][0][0][3] = new[]
                 {
                     new Vector3(0, .65108f, .263976f),
                     new Vector3(-.031086f, .663975f, .251473f),
@@ -5652,7 +5652,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][0][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][0][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][0][1] = new Vector3[7][];       //Adult Dog LOD1 seams
-            meshSeamVertices[1][0][1][0] = new Vector3[]
+            meshSeamVertices[1][0][1][0] = new[]
                 {
                     new Vector3(.089504f, .111499f, .110355f),
                     new Vector3(.083803f, .1126f, .11691f),
@@ -5699,7 +5699,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.067952f, .119676f, -.490161f),
                     new Vector3(-.071998f, .120309f, -.505297f)
                 };                                              //Ankles
-            meshSeamVertices[1][0][1][1] = new Vector3[]
+            meshSeamVertices[1][0][1][1] = new[]
                 {
                     new Vector3(.021073f, .577363f, -.43746f),
                     new Vector3(.016753f, .596562f, -.424984f),
@@ -5710,7 +5710,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.016753f, .596562f, -.424985f),
                     new Vector3(-.014413f, .569726f, -.445067f)
                 };                                              //Tail
-            meshSeamVertices[1][0][1][2] = new Vector3[]
+            meshSeamVertices[1][0][1][2] = new[]
                 {
                     new Vector3(-.067992f, .768754f, .270502f),
                     new Vector3(-.066058f, .759642f, .242946f),
@@ -5739,7 +5739,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.0538f, .792453f, .232841f),
                     new Vector3(.066888f, .760171f, .251553f)
                 };                                              //Ears
-            meshSeamVertices[1][0][1][3] = new Vector3[]
+            meshSeamVertices[1][0][1][3] = new[]
                 {
                     new Vector3(0, .65108f, .263976f),
                     new Vector3(-.031086f, .663975f, .251473f),
@@ -5766,7 +5766,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][0][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][0][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][0][2] = new Vector3[7][];       //Adult Dog LOD2 seams
-            meshSeamVertices[1][0][2][0] = new Vector3[]
+            meshSeamVertices[1][0][2][0] = new[]
                 {
                     new Vector3(.09131901f, .110002f, .100705f),
                     new Vector3(.083803f, .1126f, .11691f),
@@ -5797,14 +5797,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.069497f, .159743f, -.5185031f),
                     new Vector3(-.053665f, .162502f, -.530194f)
                 };                                              //Ankles
-            meshSeamVertices[1][0][2][1] = new Vector3[]
+            meshSeamVertices[1][0][2][1] = new[]
                 {
                     new Vector3(0, .604671f, -.423148f),
                     new Vector3(0, .562809f, -.451407f),
                     new Vector3(.019152f, .575161f, -.439654f),
                     new Vector3(-.019152f, .575161f, -.439654f)
                 };                                              //Tail
-            meshSeamVertices[1][0][2][2] = new Vector3[]
+            meshSeamVertices[1][0][2][2] = new[]
                 {
                     new Vector3(-.067992f, .768753f, .270502f),
                     new Vector3(-.063376f, .779874f, .276034f),
@@ -5825,7 +5825,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.053148f, .8037931f, .266717f),
                     new Vector3(.050583f, .805699f, .24951f)
                 };                                              //Ears
-            meshSeamVertices[1][0][2][3] = new Vector3[]
+            meshSeamVertices[1][0][2][3] = new[]
                 {
                     new Vector3(0, .65108f, .263976f),
                     new Vector3(-.040149f, .6724421f, .244208f),
@@ -5846,7 +5846,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][0][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][0][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][0][3] = new Vector3[7][];       //Adult Dog LOD3 seams
-            meshSeamVertices[1][0][3][0] = new Vector3[]
+            meshSeamVertices[1][0][3][0] = new[]
                 {
                     new Vector3(.083803f, .1126f, .11691f),
                     new Vector3(.059744f, .111575f, .116427f),
@@ -5869,14 +5869,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.069497f, .159743f, -.5185031f),
                     new Vector3(-.053665f, .162502f, -.530194f)
                 };                                              //Ankles
-            meshSeamVertices[1][0][3][1] = new Vector3[]
+            meshSeamVertices[1][0][3][1] = new[]
                 {
                     new Vector3(0, .604671f, -.423148f),
                     new Vector3(0, .562809f, -.451407f),
                     new Vector3(.019152f, .575161f, -.439654f),
                     new Vector3(-.019152f, .575161f, -.439654f)
                 };                                              //Tail
-            meshSeamVertices[1][0][3][2] = new Vector3[]
+            meshSeamVertices[1][0][3][2] = new[]
                 {
                     new Vector3(-.065684f, .774313f, .273268f),
                     new Vector3(-.06681f, .75988f, .25055f),
@@ -5889,7 +5889,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.054662f, .800348f, .269728f),
                     new Vector3(.050898f, .80237f, .242183f)
                 };                                              //Ears
-            meshSeamVertices[1][0][3][3] = new Vector3[]
+            meshSeamVertices[1][0][3][3] = new[]
                 {
                     new Vector3(0, .65108f, .263976f),
                     new Vector3(-.03184f, .664723f, .250976f),
@@ -5905,7 +5905,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][0][3][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][1] = new Vector3[4][][];        //Puppy
             meshSeamVertices[1][1][0] = new Vector3[7][];       //Puppy LOD0 seams
-            meshSeamVertices[1][1][0][0] = new Vector3[]
+            meshSeamVertices[1][1][0][0] = new[]
                 {
                     new Vector3(.036768f, .026227f, .013628f),
                     new Vector3(.03593601f, .02782f, .017807f),
@@ -5964,7 +5964,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.032792f, .027444f, -.167616f),
                     new Vector3(-.02773f, .027534f, -.16831f)
                 };                                              //Ankles
-            meshSeamVertices[1][1][0][1] = new Vector3[]
+            meshSeamVertices[1][1][0][1] = new[]
                 {
                     new Vector3(.008108f, .141443f, -.133774f),
                     new Vector3(.008026f, .147319f, -.129635f),
@@ -5977,7 +5977,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.004865f, .150341f, -.128202f),
                     new Vector3(-.005545001f, .138504f, -.136499f)
                 };                                              //Tail
-            meshSeamVertices[1][1][0][2] = new Vector3[]
+            meshSeamVertices[1][1][0][2] = new[]
                 {
                     new Vector3(-.03149f, .202056f, .044791f),
                     new Vector3(-.029873f, .206929f, .047409f),
@@ -6012,7 +6012,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.02485f, .213747f, .027885f),
                     new Vector3(.031973f, .198507f, .036242f)
                 };                                              //Ears
-            meshSeamVertices[1][1][0][3] = new Vector3[]
+            meshSeamVertices[1][1][0][3] = new[]
                 {
                     new Vector3(0, .145662f, .05409f),
                     new Vector3(-.015691f, .152265f, .04751001f),
@@ -6049,7 +6049,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][1][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][1][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][1][1] = new Vector3[7][];       //Puppy LOD1 seams
-            meshSeamVertices[1][1][1][0] = new Vector3[]
+            meshSeamVertices[1][1][1][0] = new[]
                 {
                     new Vector3(.035936f, .027821f, .017807f),
                     new Vector3(.033462f, .028613f, .020549f),
@@ -6096,7 +6096,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.033966f, .02768f, -.151808f),
                     new Vector3(-.035505f, .028593f, -.157844f)
                 };                                              //Ankles
-            meshSeamVertices[1][1][1][1] = new Vector3[]
+            meshSeamVertices[1][1][1][1] = new[]
                 {
                     new Vector3(.008108f, .141444f, -.133774f),
                     new Vector3(.006446f, .148831f, -.128919f),
@@ -6107,7 +6107,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.006445f, .148831f, -.128919f),
                     new Vector3(-.005545f, .138505f, -.136499f)
                 };                                              //Tail
-            meshSeamVertices[1][1][1][2] = new Vector3[]
+            meshSeamVertices[1][1][1][2] = new[]
                 {
                     new Vector3(-.03149001f, .202056f, .044792f),
                     new Vector3(-.031583f, .198393f, .032406f),
@@ -6136,7 +6136,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.02485f, .213747f, .027885f),
                     new Vector3(.031973f, .198507f, .036242f)
                 };                                              //Ears
-            meshSeamVertices[1][1][1][3] = new Vector3[]
+            meshSeamVertices[1][1][1][3] = new[]
                 {
                     new Vector3(0, .145662f, .05409f),
                     new Vector3(-.015691f, .152266f, .04751001f),
@@ -6163,7 +6163,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][1][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][1][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][1][2] = new Vector3[7][];       //Puppy LOD2 seams
-            meshSeamVertices[1][1][2][0] = new Vector3[]
+            meshSeamVertices[1][1][2][0] = new[]
                 {
                     new Vector3(.036768f, .026228f, .013627f),
                     new Vector3(.033462f, .028613f, .020549f),
@@ -6194,14 +6194,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.03444f, .035381f, -.164102f),
                     new Vector3(-.027588f, .036252f, -.168875f)
                 };                                              //Ankles
-            meshSeamVertices[1][1][2][1] = new Vector3[]
+            meshSeamVertices[1][1][2][1] = new[]
                 {
                     new Vector3(0, .151951f, -.1278f),
                     new Vector3(0, .135843f, -.138939f),
                     new Vector3(.007262f, .14805f, -.129288f),
                     new Vector3(-.007262f, .14805f, -.129289f)
                 };                                              //Tail
-            meshSeamVertices[1][1][2][2] = new Vector3[]
+            meshSeamVertices[1][1][2][2] = new[]
                 {
                     new Vector3(-.03149001f, .202056f, .04479101f),
                     new Vector3(-.029873f, .206929f, .047409f),
@@ -6222,7 +6222,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.024298f, .218782f, .043602f),
                     new Vector3(.023174f, .220216f, .035976f)
                 };                                              //Ears
-            meshSeamVertices[1][1][2][3] = new Vector3[]
+            meshSeamVertices[1][1][2][3] = new[]
                 {
                     new Vector3(0, .145662f, .05409f),
                     new Vector3(-.020114f, .156391f, .043719f),
@@ -6243,7 +6243,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[1][1][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[1][1][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[1][1][3] = new Vector3[7][];       //Puppy LOD3 seams
-            meshSeamVertices[1][1][3][0] = new Vector3[]
+            meshSeamVertices[1][1][3][0] = new[]
                 {
                     new Vector3(.033462f, .028613f, .020549f),
                     new Vector3(.022458f, .028546f, .020436f),
@@ -6266,14 +6266,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.03444f, .035381f, -.164102f),
                     new Vector3(-.027588f, .036252f, -.168875f)
                 };                                              //Ankles
-            meshSeamVertices[1][1][3][1] = new Vector3[]
+            meshSeamVertices[1][1][3][1] = new[]
                 {
                     new Vector3(0, .151951f, -.1278f),
                     new Vector3(0, .135843f, -.138939f),
                     new Vector3(.007824f, .147512f, -.129544f),
                     new Vector3(-.007824f, .147512f, -.129544f)
                 };                                              //Tail
-            meshSeamVertices[1][1][3][2] = new Vector3[]
+            meshSeamVertices[1][1][3][2] = new[]
                 {
                     new Vector3(-.030682f, .204493f, .0461f),
                     new Vector3(-.031915f, .198441f, .035844f),
@@ -6286,7 +6286,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.024986f, .217198f, .045089f),
                     new Vector3(.023382f, .219023f, .032543f)
                 };                                              //Ears
-            meshSeamVertices[1][1][3][3] = new Vector3[]
+            meshSeamVertices[1][1][3][3] = new[]
                 {
                     new Vector3(0, .145662f, .05409f),
                     new Vector3(-.01605f, .152601f, .047202f),
@@ -6303,7 +6303,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2] = new Vector3[4][][][];         //ageSpecies
             meshSeamVertices[2][0] = new Vector3[4][][];        //Adult Cat
             meshSeamVertices[2][0][0] = new Vector3[7][];       //Adult Cat LOD0 seams
-            meshSeamVertices[2][0][0][0] = new Vector3[]
+            meshSeamVertices[2][0][0][0] = new[]
                 {
                     new Vector3(.03187f, .04709f, .04364f),
                     new Vector3(.0239f, .04833f, .05513f),
@@ -6362,7 +6362,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.05311f, .04933f, .05638f),
                     new Vector3(-.02697f, .04753f, .04869f)
                 };                                              //Ankles
-            meshSeamVertices[2][0][0][1] = new Vector3[]
+            meshSeamVertices[2][0][0][1] = new[]
                 {
                     new Vector3(.01765f, .26168f, -.23504f),
                     new Vector3(0, .25412f, -.23691f),
@@ -6375,7 +6375,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.0238f, .27703f, -.22732f),
                     new Vector3(-.01765f, .26168f, -.23504f)
                 };                                              //Tail
-            meshSeamVertices[2][0][0][2] = new Vector3[]
+            meshSeamVertices[2][0][0][2] = new[]
                 {
                     new Vector3(-.01822f, .36544f, .157701f),
                     new Vector3(-.0239f, .36349f, .158141f),
@@ -6408,7 +6408,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.02f, .37197f, .134161f),
                     new Vector3(.05104f, .33899f, .121241f)
                 };                                              //Ears
-            meshSeamVertices[2][0][0][3] = new Vector3[]
+            meshSeamVertices[2][0][0][3] = new[]
                 {
                     new Vector3(0, .27073f, .134301f),
                     new Vector3(0, .32871f, .075801f),
@@ -6443,7 +6443,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][0][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][0][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][0][1] = new Vector3[7][];       //Adult Cat LOD1 seams
-            meshSeamVertices[2][0][1][0] = new Vector3[]
+            meshSeamVertices[2][0][1][0] = new[]
                 {
                     new Vector3(.03187f, .04709f, .04364f),
                     new Vector3(.02666f, .05041f, .06838f),
@@ -6486,7 +6486,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.052695f, .049875f, .05974f),
                     new Vector3(-.02697f, .04753f, .04869f)
                 };                                              //Ankles
-            meshSeamVertices[2][0][1][1] = new Vector3[]
+            meshSeamVertices[2][0][1][1] = new[]
                 {
                     new Vector3(.01765f, .26168f, -.23504f),
                     new Vector3(0, .25412f, -.23691f),
@@ -6497,7 +6497,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.0238f, .27703f, -.22732f),
                     new Vector3(-.01765f, .26168f, -.23504f)
                 };                                              //Tail
-            meshSeamVertices[2][0][1][2] = new Vector3[]
+            meshSeamVertices[2][0][1][2] = new[]
                 {
                     new Vector3(.01822f, .36544f, .157701f),
                     new Vector3(.0239f, .36349f, .158141f),
@@ -6524,7 +6524,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.02f, .37197f, .134161f),
                     new Vector3(-.04701f, .341915f, .117481f)
                 };                                              //Ears
-            meshSeamVertices[2][0][1][3] = new Vector3[]
+            meshSeamVertices[2][0][1][3] = new[]
                 {
                     new Vector3(0, .27073f, .134301f),
                     new Vector3(0, .32871f, .075801f),
@@ -6549,7 +6549,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][0][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][0][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][0][2] = new Vector3[7][];       //Adult Cat LOD2 seams
-            meshSeamVertices[2][0][2][0] = new Vector3[]
+            meshSeamVertices[2][0][2][0] = new[]
                 {
                     new Vector3(.03187f, .04709f, .04364f),
                     new Vector3(.029185f, .050775f, .0706f),
@@ -6582,7 +6582,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.043345f, .046975f, .042065f),
                     new Vector3(-.025412f, .048305f, .053703f)
                 };                                              //Ankles
-            meshSeamVertices[2][0][2][1] = new Vector3[]
+            meshSeamVertices[2][0][2][1] = new[]
                 {
                     new Vector3(.01765f, .26168f, -.23504f),
                     new Vector3(0, .25412f, -.23691f),
@@ -6591,7 +6591,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.020157f, .283505f, -.224207f),
                     new Vector3(-.01765f, .26168f, -.23504f)
                 };                                              //Tail
-            meshSeamVertices[2][0][2][2] = new Vector3[]
+            meshSeamVertices[2][0][2][2] = new[]
                 {
                     new Vector3(.0239f, .36349f, .158141f),
                     new Vector3(.05495f, .34042f, .133701f),
@@ -6614,7 +6614,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.02147f, .36997f, .128571f),
                     new Vector3(-.04701f, .341915f, .117481f)
                 };                                              //Ears
-            meshSeamVertices[2][0][2][3] = new Vector3[]
+            meshSeamVertices[2][0][2][3] = new[]
                 {
                     new Vector3(0, .27073f, .134301f),
                     new Vector3(0, .32871f, .075801f),
@@ -6633,7 +6633,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][0][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][0][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][0][3] = new Vector3[7][];       //Adult Cat LOD3 seams
-            meshSeamVertices[2][0][3][0] = new Vector3[]
+            meshSeamVertices[2][0][3][0] = new[]
                 {
                     new Vector3(.04114f, .051655f, .073715f),
                     new Vector3(.04968f, .05119f, .06906f),
@@ -6658,7 +6658,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.043345f, .046975f, .042065f),
                     new Vector3(-.028641f, .047697f, .048672f)
                 };                                              //Ankles
-            meshSeamVertices[2][0][3][1] = new Vector3[]
+            meshSeamVertices[2][0][3][1] = new[]
                 {
                     new Vector3(.01765f, .26168f, -.23504f),
                     new Vector3(0, .25412f, -.23691f),
@@ -6667,7 +6667,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.01765f, .26168f, -.23504f),
                     new Vector3(0, .29452f, -.21842f)
                 };                                              //Tail
-            meshSeamVertices[2][0][3][2] = new Vector3[]
+            meshSeamVertices[2][0][3][2] = new[]
                 {
                     new Vector3(.0239f, .36349f, .158141f),
                     new Vector3(.05495f, .34042f, .133701f),
@@ -6684,7 +6684,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.021477f, .369976f, .128572f),
                     new Vector3(-.04701f, .341915f, .117481f)
                 };                                              //Ears
-            meshSeamVertices[2][0][3][3] = new Vector3[]
+            meshSeamVertices[2][0][3][3] = new[]
                 {
                     new Vector3(0, .27073f, .134301f),
                     new Vector3(0, .32871f, .075801f),
@@ -6702,7 +6702,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][0][3][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][1] = new Vector3[4][][];        //Kitten
             meshSeamVertices[2][1][0] = new Vector3[7][];       //Kitten LOD0 seams
-            meshSeamVertices[2][1][0][0] = new Vector3[]
+            meshSeamVertices[2][1][0][0] = new[]
                 {
                     new Vector3(.018497f, .026379f, .002009f),
                     new Vector3(.012387f, .028202f, .010199f),
@@ -6761,7 +6761,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.033974f, .028346f, .010665f),
                     new Vector3(-.014679f, .027247f, .005929f)
                 };                                              //Ankles
-            meshSeamVertices[2][1][0][1] = new Vector3[]
+            meshSeamVertices[2][1][0][1] = new[]
                 {
                     new Vector3(0, .149463f, -.115957f),
                     new Vector3(0, .129288f, -.128139f),
@@ -6774,7 +6774,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.008279f, .133257f, -.127143f),
                     new Vector3(-.012724f, .141664f, -.121088f)
                 };                                              //Tail
-            meshSeamVertices[2][1][0][2] = new Vector3[]
+            meshSeamVertices[2][1][0][2] = new[]
                 {
                     new Vector3(.013742f, .209132f, .067178f),
                     new Vector3(.017547f, .207469f, .067133f),
@@ -6807,7 +6807,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.027174f, .201811f, .058545f),
                     new Vector3(-.021947f, .205727f, .062852f)
                 };                                              //Ears
-            meshSeamVertices[2][1][0][3] = new Vector3[]
+            meshSeamVertices[2][1][0][3] = new[]
                 {
                     new Vector3(0, .142284f, .059373f),
                     new Vector3(0, .176906f, .019761f),
@@ -6842,7 +6842,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][1][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][1][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][1][1] = new Vector3[7][];       //Kitten LOD1 seams
-            meshSeamVertices[2][1][1][0] = new Vector3[]
+            meshSeamVertices[2][1][1][0] = new[]
                 {
                     new Vector3(.018497f, .026379f, .002009f),
                     new Vector3(.014981f, .030418f, .020039f),
@@ -6885,7 +6885,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.033671f, .028833f, .01287f),
                     new Vector3(-.014679f, .027247f, .005929f)
                 };                                              //Ankles
-            meshSeamVertices[2][1][1][1] = new Vector3[]
+            meshSeamVertices[2][1][1][1] = new[]
                 {
                     new Vector3(0, .149463f, -.115957f),
                     new Vector3(0, .129288f, -.128139f),
@@ -6896,7 +6896,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.008279f, .133257f, -.127143f),
                     new Vector3(-.012724f, .141664f, -.121088f)
                 };                                              //Tail
-            meshSeamVertices[2][1][1][2] = new Vector3[]
+            meshSeamVertices[2][1][1][2] = new[]
                 {
                     new Vector3(.013742f, .209132f, .067178f),
                     new Vector3(.017547f, .207469f, .067133f),
@@ -6923,7 +6923,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.013788f, .208724f, .050557f),
                     new Vector3(-.013337f, .210111f, .059452f)
                 };                                              //Ears
-            meshSeamVertices[2][1][1][3] = new Vector3[]
+            meshSeamVertices[2][1][1][3] = new[]
                 {
                     new Vector3(0, .142284f, .059373f),
                     new Vector3(0, .176906f, .019761f),
@@ -6948,7 +6948,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][1][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][1][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][1][2] = new Vector3[7][];       //Kitten LOD2 seams
-            meshSeamVertices[2][1][2][0] = new Vector3[]
+            meshSeamVertices[2][1][2][0] = new[]
                 {
                     new Vector3(.018497f, .026379f, .002009f),
                     new Vector3(.01682f, .030802f, .021757f),
@@ -6981,7 +6981,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.027395f, .026091f, .000601f),
                     new Vector3(-.012889f, .027994f, .009263f)
                 };                                              //Ankles
-            meshSeamVertices[2][1][2][1] = new Vector3[]
+            meshSeamVertices[2][1][2][1] = new[]
                 {
                     new Vector3(0, .149463f, -.115957f),
                     new Vector3(0, .129288f, -.128139f),
@@ -6990,7 +6990,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.011052f, .144775f, -.119061f),
                     new Vector3(-.008279f, .133257f, -.127143f)
                 };                                              //Tail
-            meshSeamVertices[2][1][2][2] = new Vector3[]
+            meshSeamVertices[2][1][2][2] = new[]
                 {
                     new Vector3(.017547f, .207469f, .067133f),
                     new Vector3(.037451f, .190713f, .053592f),
@@ -7013,7 +7013,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.01471f, .206704f, .047039f),
                     new Vector3(-.032511f, .188226f, .042294f)
                 };                                              //Ears
-            meshSeamVertices[2][1][2][3] = new Vector3[]
+            meshSeamVertices[2][1][2][3] = new[]
                 {
                     new Vector3(0, .142284f, .059373f),
                     new Vector3(0, .176906f, .019761f),
@@ -7032,7 +7032,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[2][1][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[2][1][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[2][1][3] = new Vector3[7][];       //Kitten LOD3 seams
-            meshSeamVertices[2][1][3][0] = new Vector3[]
+            meshSeamVertices[2][1][3][0] = new[]
                 {
                     new Vector3(.01483f, .03008f, .019832f),
                     new Vector3(.02543f, .031337f, .024132f),
@@ -7059,7 +7059,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.027395f, .026091f, .000601f),
                     new Vector3(-.018497f, .026379f, .002009f)
                 };                                              //Ankles
-            meshSeamVertices[2][1][3][1] = new Vector3[]
+            meshSeamVertices[2][1][3][1] = new[]
                 {
                     new Vector3(0, .149463f, -.115957f),
                     new Vector3(0, .129288f, -.128139f),
@@ -7068,7 +7068,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.011052f, .144775f, -.119061f),
                     new Vector3(-.008279001f, .133257f, -.127143f)
                 };                                              //Tail
-            meshSeamVertices[2][1][3][2] = new Vector3[]
+            meshSeamVertices[2][1][3][2] = new[]
                 {
                     new Vector3(.017547f, .207469f, .067133f),
                     new Vector3(.037451f, .190713f, .053592f),
@@ -7085,7 +7085,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.01471f, .206704f, .047039f),
                     new Vector3(-.032511f, .188226f, .042294f)
                 };                                              //Ears
-            meshSeamVertices[2][1][3][3] = new Vector3[]
+            meshSeamVertices[2][1][3][3] = new[]
                 {
                     new Vector3(0, .142284f, .059373f),
                     new Vector3(0, .176906f, .019761f),
@@ -7104,7 +7104,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[3] = new Vector3[4][][][];         //ageSpecies
             meshSeamVertices[3][0] = new Vector3[4][][];        //Adult LittleDog
             meshSeamVertices[3][0][0] = new Vector3[7][];       //Adult LittleDog LOD0 seams
-            meshSeamVertices[3][0][0][0] = new Vector3[]
+            meshSeamVertices[3][0][0][0] = new[]
                 {
                     new Vector3(.053266f, .05217f, .048082f),
                     new Vector3(.052265f, .052938f, .05303301f),
@@ -7163,7 +7163,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.039837f, .0475f, -.257573f),
                     new Vector3(-.033562f, .047528f, -.258435f)
                 };                                              //Ankles
-            meshSeamVertices[3][0][0][1] = new Vector3[]
+            meshSeamVertices[3][0][0][1] = new[]
                 {
                     new Vector3(.01081f, .278458f, -.210725f),
                     new Vector3(.010701f, .286293f, -.205004f),
@@ -7176,7 +7176,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.006487f, .290322f, -.203094f),
                     new Vector3(-.007394f, .27454f, -.214627f)
                 };                                              //Tail
-            meshSeamVertices[3][0][0][2] = new Vector3[]
+            meshSeamVertices[3][0][0][2] = new[]
                 {
                     new Vector3(-.037003f, .357684f, .114917f),
                     new Vector3(-.035077f, .363509f, .118049f),
@@ -7211,7 +7211,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.030227f, .370931f, .09528001f),
                     new Vector3(.03758f, .353438f, .104691f)
                 };                                              //Ears
-            meshSeamVertices[3][0][0][3] = new Vector3[]
+            meshSeamVertices[3][0][0][3] = new[]
                 {
                     new Vector3(0, .295948f, .115474f),
                     new Vector3(-.017193f, .303061f, .109489f),
@@ -7248,7 +7248,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[3][0][0][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[3][0][0][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[3][0][1] = new Vector3[7][];       //Adult LittleDog LOD1 seams
-            meshSeamVertices[3][0][1][0] = new Vector3[]
+            meshSeamVertices[3][0][1][0] = new[]
                 {
                     new Vector3(.052266f, .052938f, .053031f),
                     new Vector3(.04917501f, .053503f, .056394f),
@@ -7295,7 +7295,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.041092f, .051627f, -.237833f),
                     new Vector3(-.043291f, .052228f, -.245455f)
                 };                                              //Ankles
-            meshSeamVertices[3][0][1][1] = new Vector3[]
+            meshSeamVertices[3][0][1][1] = new[]
                 {
                     new Vector3(.01081f, .278458f, -.210725f),
                     new Vector3(.008594f, .288307f, -.204049f),
@@ -7306,7 +7306,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.008594f, .288307f, -.20405f),
                     new Vector3(-.007394f, .27454f, -.214627f)
                 };                                              //Tail
-            meshSeamVertices[3][0][1][2] = new Vector3[]
+            meshSeamVertices[3][0][1][2] = new[]
                 {
                     new Vector3(-.037003f, .357684f, .114915f),
                     new Vector3(-.037114f, .353302f, .1001f),
@@ -7335,7 +7335,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.030226f, .37093f, .09527801f),
                     new Vector3(.03758f, .353438f, .104689f)
                 };                                              //Ears
-            meshSeamVertices[3][0][1][3] = new Vector3[]
+            meshSeamVertices[3][0][1][3] = new[]
                 {
                     new Vector3(0, .295948f, .115472f),
                     new Vector3(-.017193f, .303061f, .109487f),
@@ -7362,7 +7362,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[3][0][1][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[3][0][1][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[3][0][2] = new Vector3[7][];       //Adult LittleDog LOD2 seams
-            meshSeamVertices[3][0][2][0] = new Vector3[]
+            meshSeamVertices[3][0][2][0] = new[]
                 {
                     new Vector3(.053266f, .05217f, .04808f),
                     new Vector3(.049175f, .053503f, .056394f),
@@ -7393,14 +7393,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.042368f, .068555f, -.252335f),
                     new Vector3(-.03344f, .069764f, -.258f)
                 };                                              //Ankles
-            meshSeamVertices[3][0][2][1] = new Vector3[]
+            meshSeamVertices[3][0][2][1] = new[]
                 {
                     new Vector3(0, .292468f, -.202558f),
                     new Vector3(0, .270991f, -.21788f),
                     new Vector3(.009682f, .287267f, -.204543f),
                     new Vector3(-.009682f, .287267f, -.204543f)
                 };                                              //Tail
-            meshSeamVertices[3][0][2][2] = new Vector3[]
+            meshSeamVertices[3][0][2][2] = new[]
                 {
                     new Vector3(-.037003f, .357684f, .114915f),
                     new Vector3(-.035077f, .363509f, .118047f),
@@ -7421,7 +7421,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.02986f, .376394f, .113493f),
                     new Vector3(.028419f, .377698f, .10437f)
                 };                                              //Ears
-            meshSeamVertices[3][0][2][3] = new Vector3[]
+            meshSeamVertices[3][0][2][3] = new[]
                 {
                     new Vector3(0, .295948f, .115472f),
                     new Vector3(-.022039f, .307239f, .105982f),
@@ -7442,7 +7442,7 @@ namespace Destrospean.CmarNYCBorrowed
             meshSeamVertices[3][0][2][5] = new Vector3[0];      //WaistAdultFemale
             meshSeamVertices[3][0][2][6] = new Vector3[0];      //WaistAdultMale
             meshSeamVertices[3][0][3] = new Vector3[7][];       //Adult LittleDog LOD3 seams
-            meshSeamVertices[3][0][3][0] = new Vector3[]
+            meshSeamVertices[3][0][3][0] = new[]
                 {
                     new Vector3(.049175f, .053503f, .056394f),
                     new Vector3(.036192f, .052977f, .056146f),
@@ -7465,14 +7465,14 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(-.042368f, .068555f, -.252335f),
                     new Vector3(-.03344f, .069764f, -.258f)
                 };                                              //Ankles
-            meshSeamVertices[3][0][3][1] = new Vector3[]
+            meshSeamVertices[3][0][3][1] = new[]
                 {
                     new Vector3(0, .292468f, -.202558f),
                     new Vector3(0, .270991f, -.21788f),
                     new Vector3(.010432f, .28655f, -.204883f),
                     new Vector3(-.010433f, .286549f, -.204883f)
                 };                                              //Tail
-            meshSeamVertices[3][0][3][2] = new Vector3[]
+            meshSeamVertices[3][0][3][2] = new[]
                 {
                     new Vector3(-.03604f, .360596f, .116481f),
                     new Vector3(-.03751f, .353353f, .104223f),
@@ -7485,7 +7485,7 @@ namespace Destrospean.CmarNYCBorrowed
                     new Vector3(.030711f, .374507f, .115047f),
                     new Vector3(.028628f, .375944f, .100264f)
                 };                                              //Ears
-            meshSeamVertices[3][0][3][3] = new Vector3[]
+            meshSeamVertices[3][0][3][3] = new[]
                 {
                     new Vector3(0, .295948f, .115472f),
                     new Vector3(-.017586f, .3034f, .109202f),
@@ -7547,7 +7547,7 @@ namespace Destrospean.CmarNYCBorrowed
         public Vector3[] SlotrayTrianglePositions(int slotrayAdjustmentIndex)
         {
             var vertexIndices = SlotrayAdjustments[slotrayAdjustmentIndex].TrianglePointIndices;
-            return new Vector3[]
+            return new[]
             {
                 new Vector3(mPositions[vertexIndices[0]].Coordinates), 
                 new Vector3(mPositions[vertexIndices[1]].Coordinates),

@@ -29,7 +29,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new Vector3[]
+                return new[]
                 {
                     Point1,
                     Point2,
@@ -113,7 +113,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public override string ToString()
         {
-            return string.Concat(new string[]
+            return string.Concat(new[]
                 {
                     "(",
                     Point1.ToString(),

@@ -141,7 +141,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                         },
                                     UseAlpha = true
                                 };
-                            colorButton.ColorSet += (sender, e) => complate[propertyName] = string.Join(",", System.Array.ConvertAll(new ushort[]
+                            colorButton.ColorSet += (sender, e) => complate[propertyName] = string.Join(",", System.Array.ConvertAll(new[]
                                 {
                                     colorButton.Color.Red,
                                     colorButton.Color.Green,

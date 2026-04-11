@@ -311,7 +311,7 @@ namespace Destrospean.Common
                 case 0:
                     while (true)
                     {
-                        SkinColor = new float[]
+                        SkinColor = new[]
                             {
                                 (float)random.Next(240, 255) / byte.MaxValue,
                                 (float)random.Next(200, 230) / byte.MaxValue,
@@ -326,7 +326,7 @@ namespace Destrospean.Common
                 case 1:
                     while (true)
                     {
-                        SkinColor = new float[]
+                        SkinColor = new[]
                             {
                                 (float)random.Next(180, 220) / byte.MaxValue,
                                 (float)random.Next(130, 180) / byte.MaxValue,
@@ -341,7 +341,7 @@ namespace Destrospean.Common
                 case 2:
                     while (true)
                     {
-                        SkinColor = new float[]
+                        SkinColor = new[]
                             {
                                 (float)random.Next(50, 150) / byte.MaxValue,
                                 (float)random.Next(20, 100) / byte.MaxValue,

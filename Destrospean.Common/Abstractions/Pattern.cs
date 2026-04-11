@@ -186,7 +186,7 @@ namespace Destrospean.Common.Abstractions
                 else if (key.StartsWith("color"))
                 {
                     var color = System.Array.ConvertAll(System.BitConverter.GetBytes(((CatalogResource.CatalogResource.TC02_ARGB)value).ARGB), x => (float)x / byte.MaxValue);
-                    rgbColors.Add(new float[]
+                    rgbColors.Add(new[]
                         {
                             color[2],
                             color[1],
@@ -243,7 +243,7 @@ namespace Destrospean.Common.Abstractions
                     try
                     {
                         var complateElement = (CatalogResource.CatalogResource.TC06_XYZ)value;
-                        color = new float[]
+                        color = new[]
                             {
                                 complateElement.Unknown1,
                                 complateElement.Unknown2,
@@ -360,7 +360,7 @@ namespace Destrospean.Common.Abstractions
                 else if (key.StartsWith("color"))
                 {
                     var color = ParseCommaSeparatedValues(value);
-                    rgbColors.Add(new float[]
+                    rgbColors.Add(new[]
                         {
                             color[0],
                             color[1],
@@ -459,7 +459,7 @@ namespace Destrospean.Common.Abstractions
             }
             for (var i = 0; i < baseHues.Count && baseHues.Count == baseSaturations.Count && baseHues.Count == baseValues.Count; i++)
             {
-                baseHSVColors.Add(new float[]
+                baseHSVColors.Add(new[]
                     {
                         baseHues[i],
                         baseSaturations[i],
@@ -468,7 +468,7 @@ namespace Destrospean.Common.Abstractions
             }
             for (var i = 0; i < hues.Count && hues.Count == saturations.Count && hues.Count == values.Count; i++)
             {
-                hsvColors.Add(new float[]
+                hsvColors.Add(new[]
                     {
                         hues[i],
                         saturations[i],
@@ -482,13 +482,13 @@ namespace Destrospean.Common.Abstractions
                     ChannelsEnabled = channelsEnabled.Count == 0 ? null : channelsEnabled.ToArray(),
                     HSV = hsvColors.Count == 0 ? null : hsvColors.ToArray(),
                     HSVBase = baseHSVColors.Count == 0 ? null : baseHSVColors.ToArray(),
-                    HSVBaseBG = baseHueBackground == float.MinValue || baseSaturationBackground == float.MinValue || baseValueBackground == float.MinValue ? null : new float[]
+                    HSVBaseBG = baseHueBackground == float.MinValue || baseSaturationBackground == float.MinValue || baseValueBackground == float.MinValue ? null : new[]
                         {
                             baseHueBackground,
                             baseSaturationBackground,
                             baseValueBackground
                         },
-                    HSVBG = hueBackground == float.MinValue || saturationBackground == float.MinValue || valueBackground == float.MinValue ? null : new float[]
+                    HSVBG = hueBackground == float.MinValue || saturationBackground == float.MinValue || valueBackground == float.MinValue ? null : new[]
                         {
                             hueBackground,
                             saturationBackground,

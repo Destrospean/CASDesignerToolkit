@@ -276,7 +276,7 @@ namespace Destrospean.Common.Abstractions
                         }
                     }
                     var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
-                    var diffuseMaps = new Bitmap[]
+                    var diffuseMaps = new[]
                         {
                             diffuseMap,
                             faceDiffuseMap,
@@ -294,7 +294,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             float[][] hairMatrix =
                                 {
-                                    new float[]
+                                    new[]
                                     {
                                         diffuseColor[0],
                                         0,
@@ -302,7 +302,7 @@ namespace Destrospean.Common.Abstractions
                                         0,
                                         0
                                     },
-                                    new float[]
+                                    new[]
                                     {
                                         0,
                                         diffuseColor[1],
@@ -310,7 +310,7 @@ namespace Destrospean.Common.Abstractions
                                         0,
                                         0
                                     },
-                                    new float[]
+                                    new[]
                                     {
                                         0,
                                         0,
@@ -366,7 +366,7 @@ namespace Destrospean.Common.Abstractions
                     {
                         float[][] faceMatrix =
                             {
-                                new float[]
+                                new[]
                                 {
                                     tintColor[0],
                                     0,
@@ -374,7 +374,7 @@ namespace Destrospean.Common.Abstractions
                                     0,
                                     0
                                 },
-                                new float[]
+                                new[]
                                 {
                                     0,
                                     tintColor[1],
@@ -382,7 +382,7 @@ namespace Destrospean.Common.Abstractions
                                     0,
                                     0
                                 },
-                                new float[]
+                                new[]
                                 {
                                     0,
                                     0,

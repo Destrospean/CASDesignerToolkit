@@ -490,7 +490,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         mNormalX,
                         mNormalY,
@@ -509,7 +509,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         mU,
                         mV
@@ -566,7 +566,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return string.Concat(new string[]
+                return string.Concat(new[]
                     {
                         "Index: ",
                         VertexIndex.ToString(),
@@ -684,7 +684,7 @@ namespace Destrospean.CmarNYCBorrowed
                         min = Math.Min(min, vertex.VertexID);
                         max = Math.Max(max, vertex.VertexID);
                     }
-                    return new int[]
+                    return new[]
                     {
                         min,
                         max
@@ -1023,7 +1023,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public void SetFacePointNormal(int index, float[] normal)
             {
-                FacePoints[index].Normals = new float[]
+                FacePoints[index].Normals = new[]
                     {
                         normal[0],
                         normal[1],
@@ -1033,7 +1033,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public void SetVertexPosition(int index, float[] position)
             {
-                Vertices[index].Position = new float[]
+                Vertices[index].Position = new[]
                     {
                         position[0],
                         position[1],
@@ -1099,7 +1099,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         X,
                         Y,
@@ -1170,7 +1170,8 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return string.Concat(new string[] {
+                return string.Concat(new[]
+                {
                     VertexID.ToString(),
                     ", X: ",
                     X.ToString(),
@@ -1238,7 +1239,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public float[] GetNormals()
             {
-                return new float[]
+                return new[]
                 {
                     NormalX,
                     NormalY,
@@ -1248,7 +1249,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public float[] GetPosition()
             {
-                return new float[]
+                return new[]
                 {
                     X,
                     Y,
@@ -1258,7 +1259,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public float[] GetUVs()
             {
-                return new float[]
+                return new[]
                 {
                     U,
                     V
@@ -1492,7 +1493,7 @@ namespace Destrospean.CmarNYCBorrowed
             var refFaces = new int[refMesh.Base.FaceCount][];
             for (var i = 0; i < refMesh.Base.FaceCount; i++)
             {
-                refFaces[i] = new int[]
+                refFaces[i] = new[]
                     {
                         (int)refMesh.Base.GetFacePoint(i * 3).VertexIndex,
                         (int)refMesh.Base.GetFacePoint(i * 3 + 1).VertexIndex,
@@ -1585,7 +1586,7 @@ namespace Destrospean.CmarNYCBorrowed
             var refFaces = new int[refMesh.Base.FaceCount][];
             for (var i = 0; i < refMesh.Base.FaceCount; i++)
             {
-                refFaces[i] = new int[]
+                refFaces[i] = new[]
                     {
                         (int)refMesh.Base.GetFacePoint(i * 3).VertexIndex,
                         (int)refMesh.Base.GetFacePoint(i * 3 + 1).VertexIndex,
@@ -1658,7 +1659,7 @@ namespace Destrospean.CmarNYCBorrowed
             var refFaces = new int[refMesh.Base.FaceCount][];
             for (var i = 0; i < refMesh.Base.FaceCount; i++)
             {
-                refFaces[i] = new int[]
+                refFaces[i] = new[]
                     {
                         (int)refMesh.Base.GetFacePoint(i * 3).VertexIndex,
                         (int)refMesh.Base.GetFacePoint(i * 3 + 1).VertexIndex,
