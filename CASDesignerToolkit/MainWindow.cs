@@ -1380,7 +1380,7 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            if (string.IsNullOrEmpty(CurrentPackagePath) && !string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(CurrentPackagePath))
             {
                 CurrentPackagePath = path;
             }
