@@ -126,15 +126,7 @@ public partial class MainWindow : RendererMainWindow
     {
         get
         {
-            if (Platform.IsWindows)
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
-            }
-            if (Platform.IsMacOS)
-            {
-                return null;
-            }
-            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
+            return Platform.IsMacOS ? null : Platform.IsWindows ? Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
         }
     }
 
@@ -1243,7 +1235,7 @@ public partial class MainWindow : RendererMainWindow
                 child.Destroy();
                 child.Dispose();
             }
-            foreach (var action in new Gtk.Action[]
+            foreach (var action in new[]
                 {
                     CloseAction,
                     ResourceAction,
@@ -1499,24 +1491,24 @@ public partial class MainWindow : RendererMainWindow
                 return;
             }
             var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (Platform.IsMacOS)
+            {
+                return;
+            }
             if (Platform.IsWindows)
             {
                 Platform.Windows.CreateShortcut(ShortcutPath, assembly.Location, AppDomain.CurrentDomain.BaseDirectory, null, ShortcutDescription);
                 Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly.Location);
             }
-            else if (Platform.IsMacOS)
-            {
-                return;
-            }
             else
             {
                 var mimeType = "x-wine-extension-package";
                 var assemblyName = assembly.GetName().Name;
-                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new string[]
+                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new[]
                     {
                         "Game"
                     },
-                    new string[]
+                    new[]
                     {
                         mimeType
                     });
