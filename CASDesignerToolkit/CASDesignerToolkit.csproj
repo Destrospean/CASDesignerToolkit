@@ -191,18 +191,11 @@
     <Reference Include="System.ValueTuple">
       <HintPath>..\libs\System.ValueTuple.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\libs\System.Net.Http.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Crypto">
       <HintPath>..\libs\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-      <HintPath>..\libs\System.Net.Http.WebRequest.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
