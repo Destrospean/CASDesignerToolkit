@@ -27,7 +27,7 @@ public partial class MainWindow : RendererMainWindow
 
     Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    string mCurrentMusicModes, mSaveAsPath;
+    string mCurrentMusicModes;
 
     bool mDisableUpdateModels = false,
     mWaitBeforeUpdateCheck = false;
@@ -47,6 +47,8 @@ public partial class MainWindow : RendererMainWindow
     static object sLock = new object();
 
     public IPackage CurrentPackage;
+
+    public string CurrentPackagePath;
 
     public Image Image = new Image();
 
@@ -289,6 +291,7 @@ public partial class MainWindow : RendererMainWindow
             mAddMusicThread.Join();
             CurrentPackage = Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
+            CurrentPackagePath = packagePath;
             AddFilePathToWindowTitle(packagePath);
         }
     }
@@ -922,56 +925,6 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void PlayMusic(params string[] modes)
-    {
-        var audioResources = new List<EvaluatedResourceKey>();
-        foreach (var audioResourceByMode in mAudioResourcesByMode)
-        {
-            if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))
-            {
-                audioResources.AddRange(audioResourceByMode.Value);
-            }
-        }
-        Shuffle(audioResources);
-        while (true)
-        {
-            foreach (var audioResource in audioResources)
-            {
-                using (var process = Process.Start(new ProcessStartInfo
-                    {
-                        Arguments = "-pi -po",
-                        CreateNoWindow = true,
-                        FileName = "ealayer3",
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    }))
-                {
-                    if (process == null)
-                    {
-                        Logger.WriteError(new Exception("Failed to start the executable."));
-                        return;
-                    }
-                    using (var standardInput = process.StandardInput.BaseStream)
-                    {
-                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
-                    }
-                    var wait = true;
-                    mMediaPlayer.EndReached += (sender, e) => wait = false;
-                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                    mMediaPlayer.Play(media);
-                    mMediaPlayer.Position = 0;
-                    while (wait)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    process.WaitForExit();
-                }
-            }
-        }
-    }
-
     void RandomizeCASParts()
     {
         if (mRandomizeCASPartsThread != null)
@@ -1081,7 +1034,8 @@ public partial class MainWindow : RendererMainWindow
                         process.WaitForExit();
                     }
                     string updaterFilename = "CASDTKUpdater.exe",
-                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
+                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename,
+                    packagePath = ((MainWindow)Singleton).CurrentPackagePath;
                     if (File.Exists(downloadedUpdaterPath))
                     {
                         if (File.Exists(executablePath + updaterFilename))
@@ -1098,7 +1052,7 @@ public partial class MainWindow : RendererMainWindow
                                 {
                                     StartInfo = new ProcessStartInfo
                                         {
-                                            Arguments = Process.GetCurrentProcess().Id.ToString(),
+                                            Arguments = Process.GetCurrentProcess().Id.ToString() + (string.IsNullOrEmpty(packagePath) ? "" : " " + packagePath),
                                             CreateNoWindow = true,
                                             FileName = updaterFilename,
                                             UseShellExecute = false,
@@ -1135,6 +1089,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             StartInfo = new ProcessStartInfo
                                 {
+                                    Arguments = packagePath ?? "",
                                     CreateNoWindow = true,
                                     FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
                                     UseShellExecute = false
@@ -1156,7 +1111,7 @@ public partial class MainWindow : RendererMainWindow
             Sim.CurrentCASPart = null;
             Sim.CASPartOverrides.Clear();
             Sim.CASPartOverridesDisabled.Clear();
-            mSaveAsPath = null;
+            CurrentPackagePath = null;
             GlobalState.Meshes.Clear();
             foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
             {
@@ -1214,6 +1169,56 @@ public partial class MainWindow : RendererMainWindow
         }
         fileChooserDialog.Destroy();
         fileChooserDialog.Dispose();
+    }
+
+    public void PlayMusic(params string[] modes)
+    {
+        var audioResources = new List<EvaluatedResourceKey>();
+        foreach (var audioResourceByMode in mAudioResourcesByMode)
+        {
+            if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))
+            {
+                audioResources.AddRange(audioResourceByMode.Value);
+            }
+        }
+        Shuffle(audioResources);
+        while (true)
+        {
+            foreach (var audioResource in audioResources)
+            {
+                using (var process = Process.Start(new ProcessStartInfo
+                    {
+                        Arguments = "-pi -po",
+                        CreateNoWindow = true,
+                        FileName = "ealayer3",
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    }))
+                {
+                    if (process == null)
+                    {
+                        Logger.WriteError(new Exception("Failed to start the executable."));
+                        return;
+                    }
+                    using (var standardInput = process.StandardInput.BaseStream)
+                    {
+                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
+                    }
+                    var wait = true;
+                    mMediaPlayer.EndReached += (sender, e) => wait = false;
+                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
+                    mMediaPlayer.Play(media);
+                    mMediaPlayer.Position = 0;
+                    while (wait)
+                    {
+                        Thread.Sleep(1);
+                    }
+                    process.WaitForExit();
+                }
+            }
+        }
     }
 
     public void RefreshWidgets(bool clearTemporaryData = true)
@@ -1383,9 +1388,9 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            if (string.IsNullOrEmpty(mSaveAsPath))
+            if (string.IsNullOrEmpty(CurrentPackagePath) && !string.IsNullOrEmpty(path))
             {
-                mSaveAsPath = path;
+                CurrentPackagePath = path;
             }
             foreach (var casPartKvp in PreloadedData.CASParts)
             {
@@ -1412,13 +1417,13 @@ public partial class MainWindow : RendererMainWindow
                 }
             }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
-            if (string.IsNullOrEmpty(mSaveAsPath))
+            if (string.IsNullOrEmpty(CurrentPackagePath))
             {
                 CurrentPackage.SavePackage();
             }
             else
             {
-                CurrentPackage.SaveAs(mSaveAsPath);
+                CurrentPackage.SaveAs(CurrentPackagePath);
             }
             NextState = NextStateOptions.NoUnsavedChanges;
         }
@@ -1653,6 +1658,7 @@ public partial class MainWindow : RendererMainWindow
                 ResourceUtils.MissingResourceKeys.Clear();
                 RefreshWidgets();
                 NextState = NextStateOptions.NoUnsavedChanges;
+                CurrentPackagePath = fileChooserDialog.Filename;
                 AddFilePathToWindowTitle(fileChooserDialog.Filename);
             }
             catch (Exception ex)
