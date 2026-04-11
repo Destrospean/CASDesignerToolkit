@@ -71,8 +71,7 @@ namespace System.Destrospean
                     using (var reader = new System.IO.StreamReader(stream))
                     {
                         var response = reader.ReadToEnd();
-                        response = response.Remove(response.IndexOf("\r\n\r\n"));
-                        responseSplit = response.Split(new[]
+                        responseSplit = response.Remove(response.IndexOf("\r\n\r\n")).Split(new[]
                             {
                                 "\r\n"
                             }, StringSplitOptions.None);
