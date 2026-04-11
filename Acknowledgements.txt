@@ -5,6 +5,8 @@ Below is a list of people who helped with this project either directly or indire
 - MonoChaos - Provided the icon for the tool and helped test the tool for issues
 - zoeoe - Helped with issues related to the S3PI library and provided some code for object meshes
 - VirtualHugs - Helped with explaining things related to CASPs; I'm not a mesher, so her advice was incredibly helpful
+- Zenchreal - Made ealayer3, used for the music player
+- Translu - Made improvements to ealayer3
 
 Testers:
 
