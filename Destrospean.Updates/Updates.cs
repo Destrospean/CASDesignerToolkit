@@ -31,7 +31,9 @@ namespace System.Destrospean
             latestReleaseFilename = null;
             latestReleaseName = null;
             var latestRelease = ((Newtonsoft.Json.Linq.JToken)Newtonsoft.Json.JsonConvert.DeserializeObject(GetString("https://api.github.com/repos/" + username + "/" + repository + "/releases", repository)))[0];
-            if (localVersion.CompareTo(latestRelease["tag_name"].ToString().TrimStart('v')) < 0)
+            int[] latestVersionArray = Array.ConvertAll(latestRelease["tag_name"].ToString().TrimStart('v').Split('.'), int.Parse),
+            localVersionArray = Array.ConvertAll(localVersion.Split('.'), int.Parse);
+            if (latestVersionArray[0] > localVersionArray[0] || latestVersionArray[0] == localVersionArray[0] && (latestVersionArray[1] > localVersionArray[1] || latestVersionArray[0] == localVersionArray[0] && latestVersionArray[2] > localVersionArray[2]))
             {
                 latestReleaseDescription = latestRelease["body"].ToString();
                 latestReleaseName = latestRelease["name"].ToString();
