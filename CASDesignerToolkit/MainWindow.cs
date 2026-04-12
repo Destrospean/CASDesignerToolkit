@@ -29,8 +29,7 @@ public partial class MainWindow : RendererMainWindow
 
     string mCurrentMusicModes;
 
-    bool mDisableUpdateModels = false,
-    mWaitBeforeUpdateCheck = false;
+    bool mDisableUpdateModels = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
@@ -188,9 +187,9 @@ public partial class MainWindow : RendererMainWindow
                 ChooseObjectDialog.LoadCache();
             }).Start();
         (mAddMusicThread = new Thread(AddMusic)).Start();
+        var waitBeforeUpdateCheck = false;
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
-                RescaleAndReposition(true);
                 Sensitive = false;
                 try
                 {
@@ -209,11 +208,11 @@ public partial class MainWindow : RendererMainWindow
                     Logger.WriteError(ex);
                 }
                 Sensitive = true;
-                mWaitBeforeUpdateCheck = false;
+                waitBeforeUpdateCheck = false;
             };
         if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath) || !File.Exists(CASPartUtils.CacheFilePath))
         {
-            mWaitBeforeUpdateCheck = true;
+            waitBeforeUpdateCheck = true;
             new CacheGenerationWindow(this, Icon);
         }
         new Thread(() =>
@@ -222,7 +221,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     return;
                 }
-                while (mWaitBeforeUpdateCheck)
+                while (waitBeforeUpdateCheck)
                 {   
                 }
                 try
@@ -262,7 +261,7 @@ public partial class MainWindow : RendererMainWindow
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
-        ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
+        DrawingAreaTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
         ScrolledWindow.SizeAllocated += (o, args) =>
@@ -438,7 +437,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -620,7 +618,6 @@ public partial class MainWindow : RendererMainWindow
                         catch (Exception ex)
                         {
                             Logger.WriteError(ex);
-                            throw;
                         }
                     },
                 importMeshGroup = (meshFileType) =>
@@ -655,7 +652,6 @@ public partial class MainWindow : RendererMainWindow
                         catch (Exception ex)
                         {
                             Logger.WriteError(ex);
-                            throw;
                         }
                     };
                 addMeshGroupAction.Activated += (sender, e) =>
@@ -709,7 +705,6 @@ public partial class MainWindow : RendererMainWindow
                             catch (Exception ex)
                             {
                                 Logger.WriteError(ex);
-                                throw;
                             }
                         }
                         fileChooserDialog.Destroy();
@@ -801,7 +796,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -913,7 +907,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1206,7 +1199,6 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
@@ -1307,7 +1299,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1333,46 +1324,41 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
         fileChooserDialog.Dispose();
     }
 
-    public override void RescaleAndReposition(bool skipRescale = false)
+    public override void RescaleAndReposition()
     {
         try
         {
             var monitorGeometry = Screen.GetMonitorGeometry(Screen.GetMonitorAtWindow(GdkWindow));
             var scaleEnvironmentVariable = Environment.GetEnvironmentVariable("CASDTK_SCALE");
-            if (!skipRescale)
-            {
-                WidgetUtils.Scale = string.IsNullOrEmpty(scaleEnvironmentVariable) ? Platform.IsUnix ? (monitorGeometry.Height < 1080 ? 1080 : monitorGeometry.Height) / 1080f : 1 : float.Parse(scaleEnvironmentVariable, System.Globalization.CultureInfo.InvariantCulture);
-                WidgetUtils.WineScaleDenominator = Platform.IsRunningUnderWine ? (float)Screen.Resolution / 96 : 1;
-                SetDefaultSize((int)(DefaultWidth * WidgetUtils.Scale), (int)(DefaultHeight * WidgetUtils.Scale));
-                foreach (var widget in new Widget[]
-                    {
-                        DrawingArea,
-                        ImageTable,
-                        MainHPaned,
-                        ResourcePropertyNotebook,
-                        ResourcePropertyTable,
-                        ResourceTreeView,
-                        this
-                    })
+            WidgetUtils.Scale = string.IsNullOrEmpty(scaleEnvironmentVariable) ? Platform.IsUnix ? (monitorGeometry.Height < 1080 ? 1080 : monitorGeometry.Height) / 1080f : 1 : float.Parse(scaleEnvironmentVariable, System.Globalization.CultureInfo.InvariantCulture);
+            WidgetUtils.WineScaleDenominator = Platform.IsRunningUnderWine ? (float)Screen.Resolution / 96 : 1;
+            SetDefaultSize((int)(DefaultWidth * WidgetUtils.Scale), (int)(DefaultHeight * WidgetUtils.Scale));
+            foreach (var widget in new Widget[]
                 {
-                    widget.SetSizeRequest(widget.WidthRequest == -1 ? -1 : (int)(widget.WidthRequest * WidgetUtils.Scale), widget.HeightRequest == -1 ? -1 : (int)(widget.HeightRequest * WidgetUtils.Scale));
-                }
-                Resize(DefaultWidth, DefaultHeight);
+                    DrawingArea,
+                    DrawingAreaTable,
+                    MainHPaned,
+                    ResourcePropertyNotebook,
+                    ResourcePropertyTable,
+                    ResourceTreeView,
+                    this
+                })
+            {
+                widget.SetSizeRequest(widget.WidthRequest == -1 ? -1 : (int)(widget.WidthRequest * WidgetUtils.Scale), widget.HeightRequest == -1 ? -1 : (int)(widget.HeightRequest * WidgetUtils.Scale));
             }
+            Resize(DefaultWidth, DefaultHeight);
             mAlphaCheckerboardPixbuf = ImageUtils.CreateCheckerboard(monitorGeometry.Width, monitorGeometry.Height, (int)(8 * WidgetUtils.Scale), System.Drawing.Color.FromArgb(191, 191, 191), System.Drawing.Color.FromArgb(127, 127, 127)).ToPixbuf();
             Move(((int)(monitorGeometry.Width / WidgetUtils.WineScaleDenominator) - WidthRequest) >> 1, ((int)(monitorGeometry.Height / WidgetUtils.WineScaleDenominator) - HeightRequest) >> 1);
         }
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1422,7 +1408,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1598,7 +1583,6 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
@@ -1656,7 +1640,6 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();

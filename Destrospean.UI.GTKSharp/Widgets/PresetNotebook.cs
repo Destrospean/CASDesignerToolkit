@@ -98,7 +98,6 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -257,7 +256,6 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -310,7 +308,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
+                return null;
             }
         }
 
@@ -439,7 +437,6 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -465,7 +462,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
+                return null;
             }
         }
     }

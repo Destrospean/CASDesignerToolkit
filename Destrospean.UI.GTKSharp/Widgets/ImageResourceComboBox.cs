@@ -230,7 +230,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             catch (System.Exception ex)
             {
                 System.Destrospean.Logger.WriteError(ex);
-                throw;
+                return null;
             }
         }
 

@@ -95,208 +95,281 @@ namespace Destrospean.Common.Abstractions
             {
                 get
                 {
-                    uint[] controlMapArray = null,
-                    faceControlMapArray = null,
-                    maskArray = null,
-                    scalpControlMapArray = null;
-                    Bitmap diffuseMap = null,
-                    faceDiffuseMap = null,
-                    multiplier = null,
-                    overlay = null,
-                    scalpDiffuseMap = null;
-                    float[] diffuseColor = null,
-                    highlightColor = null,
-                    rootColor = null,
-                    tintColor =
+                    try {
+                        uint[] controlMapArray = null,
+                        faceControlMapArray = null,
+                        maskArray = null,
+                        scalpControlMapArray = null;
+                        Bitmap diffuseMap = null,
+                        faceDiffuseMap = null,
+                        multiplier = null,
+                        overlay = null,
+                        scalpDiffuseMap = null;
+                        float[] diffuseColor = null,
+                        highlightColor = null,
+                        rootColor = null,
+                        tintColor =
+                            {
+                                1,
+                                1,
+                                1
+                            },
+                        tipColor = null;
+                        bool drawsOnFace = false, drawsOnScalp = false;
+                        int height = 1024,
+                        width = 1024;
+                        List<Bitmap> logos = new List<Bitmap>(),
+                        stencils = new List<Bitmap>();
+                        List<bool> logosEnabled = new List<bool>(),
+                        stencilsEnabled = new List<bool>(),
+                        tintColorsEnabled = new List<bool>();
+                        List<float[]> logosLowerRight = new List<float[]>(),
+                        logosUpperLeft = new List<float[]>(),
+                        stencilsTiling = new List<float[]>(),
+                        tintColors = new List<float[]>();
+                        List<float> logosRotation = new List<float>(),
+                        stencilsRotation = new List<float>();
+                        foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
                         {
-                            1,
-                            1,
-                            1
-                        },
-                    tipColor = null;
-                    bool drawsOnFace = false, drawsOnScalp = false;
-                    int height = 1024,
-                    width = 1024;
-                    List<Bitmap> logos = new List<Bitmap>(),
-                    stencils = new List<Bitmap>();
-                    List<bool> logosEnabled = new List<bool>(),
-                    stencilsEnabled = new List<bool>(),
-                    tintColorsEnabled = new List<bool>();
-                    List<float[]> logosLowerRight = new List<float[]>(),
-                    logosUpperLeft = new List<float[]>(),
-                    stencilsTiling = new List<float[]>(),
-                    tintColors = new List<float[]>();
-                    List<float> logosRotation = new List<float>(),
-                    stencilsRotation = new List<float>();
-                    foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
-                    {
-                        if (!PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key))
-                        {
-                            continue;
+                            if (!PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key))
+                            {
+                                continue;
+                            }
+                            string key = propertyXmlNodeKvp.Key.ToLowerInvariant(),
+                            value = propertyXmlNodeKvp.Value.Attributes["value"].Value;
+                            if (key.StartsWith("logo"))
+                            {
+                                if (key.EndsWith("enabled"))
+                                {
+                                    logosEnabled.Add(bool.Parse(value));
+                                }
+                                else if (key.EndsWith("lowerright"))
+                                {
+                                    logosLowerRight.Add(ParseCommaSeparatedValues(value));
+                                }
+                                else if (key.EndsWith("upperleft"))
+                                {
+                                    logosUpperLeft.Add(ParseCommaSeparatedValues(value));
+                                }
+                                else if (key.EndsWith("rotation"))
+                                {
+                                    logosRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+                                }
+                                else if (key.EndsWith("texture"))
+                                {
+                                    logos.Add(ParentPackage.GetTexture(value, GetTextureCallback, width, height));
+                                }
+                            }
+                            else if (key.StartsWith("stencil"))
+                            {
+                                if (key.Length == 9)
+                                {
+                                    stencils.Add(ParentPackage.GetTexture(value, GetTextureCallback, width, height));
+                                }
+                                else if (key.EndsWith("enabled"))
+                                {
+                                    stencilsEnabled.Add(bool.Parse(value));
+                                }
+                                else if (key.EndsWith("rotation"))
+                                {
+                                    stencilsRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+                                }
+                                else if (key.EndsWith("tiling"))
+                                {
+                                    stencilsTiling.Add(ParseCommaSeparatedValues(value));
+                                }
+                            }
+                            else if (key.StartsWith("tint color"))
+                            {
+                                if (key.Length == 10)
+                                {
+                                    tintColor = ParseCommaSeparatedValues(value);
+                                }
+                                else if (key.Length == 12)
+                                {
+                                    tintColors.Add(ParseCommaSeparatedValues(value));
+                                }
+                                else if (key.EndsWith("enabled"))
+                                {
+                                    tintColorsEnabled.Add(bool.Parse(value));
+                                }
+                            }
+                            else
+                            {
+                                switch (key)
+                                {
+                                    case "ambient":
+                                        AmbientMap = value;
+                                        goto case "skin ambient";
+                                    case "body ambient":
+                                        BodyAmbientMap = value;
+                                        break;
+                                    case "body specular":
+                                        BodySpecularMap = value;
+                                        break;
+                                    case "clothing ambient":
+                                        AmbientMap = value;
+                                        break;
+                                    case "clothing specular":
+                                        SpecularMap = value;
+                                        break;
+                                    case "control map":
+                                        controlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "diffuse color":
+                                        diffuseColor = ParseCommaSeparatedValues(value);
+                                        break;
+                                    case "diffuse map":
+                                        diffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "drawsonface":
+                                        drawsOnFace = bool.Parse(value);
+                                        break;
+                                    case "drawsonscalp":
+                                        drawsOnScalp = bool.Parse(value);
+                                        break;
+                                    case "face ambient":
+                                        goto case "ambient";
+                                    case "face control map":
+                                        faceControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "face diffuse map":
+                                        faceDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "face overlay":
+                                        goto case "overlay";
+                                    case "face specular":
+                                        goto case "specular";
+                                    case "highlight color":
+                                        highlightColor = ParseCommaSeparatedValues(value);
+                                        break;
+                                    case "mask":
+                                        maskArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "multiplier":
+                                        multiplier = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "overlay":
+                                        overlay = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "root color":
+                                        rootColor = ParseCommaSeparatedValues(value);
+                                        break;
+                                    case "scalp control map":
+                                        scalpControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "scalp diffuse map":
+                                        scalpDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "skin ambient":
+                                        SkinAmbientMap = value;
+                                        break;
+                                    case "skin specular":
+                                        SkinSpecularMap = value;
+                                        break;
+                                    case "specular":
+                                        SpecularMap = value;
+                                        goto case "skin specular";
+                                    case "tip color":
+                                        tipColor = ParseCommaSeparatedValues(value);
+                                        break;
+                                }
+                            }
                         }
-                        string key = propertyXmlNodeKvp.Key.ToLowerInvariant(),
-                        value = propertyXmlNodeKvp.Value.Attributes["value"].Value;
-                        if (key.StartsWith("logo"))
+                        var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
+                        var diffuseMaps = new[]
+                            {
+                                diffuseMap,
+                                faceDiffuseMap,
+                                scalpDiffuseMap
+                            };
+                        var controlMapArrays = new uint[][]
+                            {
+                                controlMapArray,
+                                faceControlMapArray,
+                                scalpControlMapArray
+                            };
+                        for (var i = 0; i < diffuseMaps.Length; i++)
                         {
-                            if (key.EndsWith("enabled"))
+                            if (diffuseMaps[i] != null && complateName == "hairuniversal")
                             {
-                                logosEnabled.Add(bool.Parse(value));
-                            }
-                            else if (key.EndsWith("lowerright"))
-                            {
-                                logosLowerRight.Add(ParseCommaSeparatedValues(value));
-                            }
-                            else if (key.EndsWith("upperleft"))
-                            {
-                                logosUpperLeft.Add(ParseCommaSeparatedValues(value));
-                            }
-                            else if (key.EndsWith("rotation"))
-                            {
-                                logosRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
-                            }
-                            else if (key.EndsWith("texture"))
-                            {
-                                logos.Add(ParentPackage.GetTexture(value, GetTextureCallback, width, height));
+                                float[][] hairMatrix =
+                                    {
+                                        new[]
+                                        {
+                                            diffuseColor[0],
+                                            0,
+                                            0,
+                                            0,
+                                            0
+                                        },
+                                        new[]
+                                        {
+                                            0,
+                                            diffuseColor[1],
+                                            0,
+                                            0,
+                                            0
+                                        },
+                                        new[]
+                                        {
+                                            0,
+                                            0,
+                                            diffuseColor[2],
+                                            0,
+                                            0
+                                        },
+                                        new float[]
+                                        {
+                                            0,
+                                            0,
+                                            0,
+                                            1,
+                                            0
+                                        },
+                                        new float[]
+                                        {
+                                            0,
+                                            0,
+                                            0,
+                                            0,
+                                            1
+                                        }
+                                    };
+                                using (var graphics = Graphics.FromImage(diffuseMaps[i]))
+                                {
+                                    var attributes = new ImageAttributes();
+                                    var colorMatrix = new ColorMatrix(hairMatrix);
+                                    attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                                    graphics.DrawImage(diffuseMaps[i], new Rectangle(0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height), 0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height, GraphicsUnit.Pixel, attributes);
+                                }
+                                if (controlMapArrays[i] != null)
+                                {
+                                    try
+                                    {
+                                        diffuseMaps[i] = diffuseMaps[i].GetWithPatternsApplied(controlMapArrays[i], new List<object>
+                                            {
+                                                rootColor,
+                                                highlightColor,
+                                                tipColor
+                                            }, false);
+                                    }
+                                    catch (System.IndexOutOfRangeException)
+                                    {
+                                    }
+                                }
                             }
                         }
-                        else if (key.StartsWith("stencil"))
+                        diffuseMap = diffuseMaps[0];
+                        faceDiffuseMap = diffuseMaps[1];
+                        scalpDiffuseMap = diffuseMaps[2];
+                        if (complateName.StartsWith("casoverlay") || complateName.StartsWith("casskinoverlay"))
                         {
-                            if (key.Length == 9)
-                            {
-                                stencils.Add(ParentPackage.GetTexture(value, GetTextureCallback, width, height));
-                            }
-                            else if (key.EndsWith("enabled"))
-                            {
-                                stencilsEnabled.Add(bool.Parse(value));
-                            }
-                            else if (key.EndsWith("rotation"))
-                            {
-                                stencilsRotation.Add(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
-                            }
-                            else if (key.EndsWith("tiling"))
-                            {
-                                stencilsTiling.Add(ParseCommaSeparatedValues(value));
-                            }
-                        }
-                        else if (key.StartsWith("tint color"))
-                        {
-                            if (key.Length == 10)
-                            {
-                                tintColor = ParseCommaSeparatedValues(value);
-                            }
-                            else if (key.Length == 12)
-                            {
-                                tintColors.Add(ParseCommaSeparatedValues(value));
-                            }
-                            else if (key.EndsWith("enabled"))
-                            {
-                                tintColorsEnabled.Add(bool.Parse(value));
-                            }
-                        }
-                        else
-                        {
-                            switch (key)
-                            {
-                                case "ambient":
-                                    AmbientMap = value;
-                                    goto case "skin ambient";
-                                case "body ambient":
-                                    BodyAmbientMap = value;
-                                    break;
-                                case "body specular":
-                                    BodySpecularMap = value;
-                                    break;
-                                case "clothing ambient":
-                                    AmbientMap = value;
-                                    break;
-                                case "clothing specular":
-                                    SpecularMap = value;
-                                    break;
-                                case "control map":
-                                    controlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
-                                    break;
-                                case "diffuse color":
-                                    diffuseColor = ParseCommaSeparatedValues(value);
-                                    break;
-                                case "diffuse map":
-                                    diffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
-                                    break;
-                                case "drawsonface":
-                                    drawsOnFace = bool.Parse(value);
-                                    break;
-                                case "drawsonscalp":
-                                    drawsOnScalp = bool.Parse(value);
-                                    break;
-                                case "face ambient":
-                                    goto case "ambient";
-                                case "face control map":
-                                    faceControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
-                                    break;
-                                case "face diffuse map":
-                                    faceDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
-                                    break;
-                                case "face overlay":
-                                    goto case "overlay";
-                                case "face specular":
-                                    goto case "specular";
-                                case "highlight color":
-                                    highlightColor = ParseCommaSeparatedValues(value);
-                                    break;
-                                case "mask":
-                                    maskArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
-                                    break;
-                                case "multiplier":
-                                    multiplier = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
-                                    break;
-                                case "overlay":
-                                    overlay = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
-                                    break;
-                                case "root color":
-                                    rootColor = ParseCommaSeparatedValues(value);
-                                    break;
-                                case "scalp control map":
-                                    scalpControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
-                                    break;
-                                case "scalp diffuse map":
-                                    scalpDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
-                                    break;
-                                case "skin ambient":
-                                    SkinAmbientMap = value;
-                                    break;
-                                case "skin specular":
-                                    SkinSpecularMap = value;
-                                    break;
-                                case "specular":
-                                    SpecularMap = value;
-                                    goto case "skin specular";
-                                case "tip color":
-                                    tipColor = ParseCommaSeparatedValues(value);
-                                    break;
-                            }
-                        }
-                    }
-                    var complateName = mXmlDocument.SelectSingleNode("complate").Attributes["name"].Value.ToLowerInvariant();
-                    var diffuseMaps = new[]
-                        {
-                            diffuseMap,
-                            faceDiffuseMap,
-                            scalpDiffuseMap
-                        };
-                    var controlMapArrays = new uint[][]
-                        {
-                            controlMapArray,
-                            faceControlMapArray,
-                            scalpControlMapArray
-                        };
-                    for (var i = 0; i < diffuseMaps.Length; i++)
-                    {
-                        if (diffuseMaps[i] != null && complateName == "hairuniversal")
-                        {
-                            float[][] hairMatrix =
+                            float[][] faceMatrix =
                                 {
                                     new[]
                                     {
-                                        diffuseColor[0],
+                                        tintColor[0],
                                         0,
                                         0,
                                         0,
@@ -305,7 +378,7 @@ namespace Destrospean.Common.Abstractions
                                     new[]
                                     {
                                         0,
-                                        diffuseColor[1],
+                                        tintColor[1],
                                         0,
                                         0,
                                         0
@@ -314,7 +387,7 @@ namespace Destrospean.Common.Abstractions
                                     {
                                         0,
                                         0,
-                                        diffuseColor[2],
+                                        tintColor[2],
                                         0,
                                         0
                                     },
@@ -335,213 +408,147 @@ namespace Destrospean.Common.Abstractions
                                         1
                                     }
                                 };
-                            using (var graphics = Graphics.FromImage(diffuseMaps[i]))
+                            using (var graphics = Graphics.FromImage(overlay))
                             {
                                 var attributes = new ImageAttributes();
-                                var colorMatrix = new ColorMatrix(hairMatrix);
+                                var colorMatrix = new ColorMatrix(faceMatrix);
                                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                                graphics.DrawImage(diffuseMaps[i], new Rectangle(0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height), 0, 0, diffuseMaps[i].Width, diffuseMaps[i].Height, GraphicsUnit.Pixel, attributes);
+                                graphics.DrawImage(overlay, new Rectangle(0, 0, overlay.Width, overlay.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel, attributes);
                             }
-                            if (controlMapArrays[i] != null)
+                            if (maskArray == null)
+                            {
+                                maskArray = new uint[overlay.Height * overlay.Width >> 2];
+                                for (var i = 0; i < maskArray.Length; i++)
+                                {
+                                    maskArray[i] = 0;
+                                }
+                            }
+                            while (tintColorsEnabled.Count < tintColors.Count)
+                            {
+                                tintColorsEnabled.Add(false);
+                            }
+                            for (var i = 0; i < tintColors.Count; i++)
+                            {
+                                if (!tintColorsEnabled[i])
+                                {
+                                    tintColors[i] = null;
+                                }
+                            }
+                            try
+                            {
+                                overlay = overlay.GetWithPatternsApplied(maskArray, tintColors.ConvertAll(x => (object)x), true);
+                            }
+                            catch (System.IndexOutOfRangeException)
+                            {
+                            }
+                        }
+                        bool patternEnabled;
+                        var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x =>
+                            {
+                                if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
+                                {
+                                    var patternImage = x.PatternImage as Bitmap;
+                                    if (patternImage == null)
+                                    {
+                                        return x.PatternImage;
+                                    }
+                                    var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
+                                    return GetTiled(patternImage, tiling[0], tiling[1]);
+                                }
+                                return null;
+                            });
+                        if (maskArray != null)
+                        {
+                            if (multiplier != null)
                             {
                                 try
                                 {
-                                    diffuseMaps[i] = diffuseMaps[i].GetWithPatternsApplied(controlMapArrays[i], new List<object>
-                                        {
-                                            rootColor,
-                                            highlightColor,
-                                            tipColor
-                                        }, false);
+                                    multiplier = multiplier.GetWithPatternsApplied(maskArray, patternImages, false);
+                                }
+                                catch (System.IndexOutOfRangeException)
+                                {
+                                }
+                            }
+                            if (overlay != null)
+                            {
+                                try
+                                {
+                                    overlay = overlay.GetWithPatternsApplied(maskArray, patternImages, true);
                                 }
                                 catch (System.IndexOutOfRangeException)
                                 {
                                 }
                             }
                         }
-                    }
-                    diffuseMap = diffuseMaps[0];
-                    faceDiffuseMap = diffuseMaps[1];
-                    scalpDiffuseMap = diffuseMaps[2];
-                    if (complateName.StartsWith("casoverlay") || complateName.StartsWith("casskinoverlay"))
-                    {
-                        float[][] faceMatrix =
+                        var texture = new Bitmap(width, height);
+                        using (var graphics = Graphics.FromImage(texture))
+                        {
+                            /*
+                            var casPart = CASTableObject as CASPart;
+                            if (multiplier == null && diffuseMap == null && casPart != null)
                             {
-                                new[]
+                                foreach (var geomAndKey in new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[0])
                                 {
-                                    tintColor[0],
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                                },
-                                new[]
-                                {
-                                    0,
-                                    tintColor[1],
-                                    0,
-                                    0,
-                                    0
-                                },
-                                new[]
-                                {
-                                    0,
-                                    0,
-                                    tintColor[2],
-                                    0,
-                                    0
-                                },
-                                new float[]
-                                {
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    0
-                                },
-                                new float[]
-                                {
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    1
-                                }
-                            };
-                        using (var graphics = Graphics.FromImage(overlay))
-                        {
-                            var attributes = new ImageAttributes();
-                            var colorMatrix = new ColorMatrix(faceMatrix);
-                            attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                            graphics.DrawImage(overlay, new Rectangle(0, 0, overlay.Width, overlay.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel, attributes);
-                        }
-                        if (maskArray == null)
-                        {
-                            maskArray = new uint[overlay.Height * overlay.Width >> 2];
-                            for (var i = 0; i < maskArray.Length; i++)
-                            {
-                                maskArray[i] = 0;
-                            }
-                        }
-                        while (tintColorsEnabled.Count < tintColors.Count)
-                        {
-                            tintColorsEnabled.Add(false);
-                        }
-                        for (var i = 0; i < tintColors.Count; i++)
-                        {
-                            if (!tintColorsEnabled[i])
-                            {
-                                tintColors[i] = null;
-                            }
-                        }
-                        try
-                        {
-                            overlay = overlay.GetWithPatternsApplied(maskArray, tintColors.ConvertAll(x => (object)x), true);
-                        }
-                        catch (System.IndexOutOfRangeException)
-                        {
-                        }
-                    }
-                    bool patternEnabled;
-                    var patternImages = Patterns.FindAll(x => x.SlotName != "Logo").ConvertAll(x =>
-                        {
-                            if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
-                            {
-                                var patternImage = x.PatternImage as Bitmap;
-                                if (patternImage == null)
-                                {
-                                    return x.PatternImage;
-                                }
-                                var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
-                                return GetTiled(patternImage, tiling[0], tiling[1]);
-                            }
-                            return null;
-                        });
-                    if (maskArray != null)
-                    {
-                        if (multiplier != null)
-                        {
-                            try
-                            {
-                                multiplier = multiplier.GetWithPatternsApplied(maskArray, patternImages, false);
-                            }
-                            catch (System.IndexOutOfRangeException)
-                            {
-                            }
-                        }
-                        if (overlay != null)
-                        {
-                            try
-                            {
-                                overlay = overlay.GetWithPatternsApplied(maskArray, patternImages, true);
-                            }
-                            catch (System.IndexOutOfRangeException)
-                            {
-                            }
-                        }
-                    }
-                    var texture = new Bitmap(width, height);
-                    using (var graphics = Graphics.FromImage(texture))
-                    {
-                        /*
-                        var casPart = CASTableObject as CASPart;
-                        if (multiplier == null && diffuseMap == null && casPart != null)
-                        {
-                            foreach (var geomAndKey in new List<List<CASPart.GEOMAndKey>>(casPart.LODs.Values)[0])
-                            {
-                                for (var i = 0; i < geomAndKey.GEOM.Shader.FieldCount; i++)
-                                {
-                                    uint fieldType, valueType;
-                                    var field = geomAndKey.GEOM.Shader.GetField(i, out fieldType, out valueType);
-                                    if (fieldType == (uint)s3pi.GenericRCOLResource.FieldType.DiffuseMap)
+                                    for (var i = 0; i < geomAndKey.GEOM.Shader.FieldCount; i++)
                                     {
-                                        var tgi = geomAndKey.GEOM.TGIList[(uint)field[0]];
-                                        graphics.DrawImage(ParentPackage.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), GetTextureCallback, width, height), 0, 0);
-                                        break;
+                                        uint fieldType, valueType;
+                                        var field = geomAndKey.GEOM.Shader.GetField(i, out fieldType, out valueType);
+                                        if (fieldType == (uint)s3pi.GenericRCOLResource.FieldType.DiffuseMap)
+                                        {
+                                            var tgi = geomAndKey.GEOM.TGIList[(uint)field[0]];
+                                            graphics.DrawImage(ParentPackage.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), GetTextureCallback, width, height), 0, 0);
+                                            break;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        */
-                        if (diffuseMap != null)
-                        {
-                            graphics.DrawImage(diffuseMap, 0, 0);
-                        }
-                        if (multiplier != null)
-                        {
-                            graphics.DrawImage(multiplier, 0, 0);
-                        }
-                        if (overlay != null)
-                        {
-                            graphics.DrawImage(overlay, 0, 0);
-                        }
-                        for (var i = 0; i < stencils.Count; i++)
-                        {
-                            if (stencilsEnabled[i])
+                            */
+                            if (diffuseMap != null)
                             {
-                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i][0], stencilsTiling[i][1])), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
+                                graphics.DrawImage(diffuseMap, 0, 0);
+                            }
+                            if (multiplier != null)
+                            {
+                                graphics.DrawImage(multiplier, 0, 0);
+                            }
+                            if (overlay != null)
+                            {
+                                graphics.DrawImage(overlay, 0, 0);
+                            }
+                            for (var i = 0; i < stencils.Count; i++)
+                            {
+                                if (stencilsEnabled[i])
+                                {
+                                    graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i][0], stencilsTiling[i][1])), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
+                                }
+                            }
+                            for (var i = 0; i < logos.Count; i++)
+                            {
+                                if (logosEnabled[i])
+                                {
+                                    int logoHeight = (int)((logosLowerRight[i][1] - logosUpperLeft[i][1]) * height),
+                                    logoWidth = (int)((logosLowerRight[i][0] - logosUpperLeft[i][0]) * width);
+                                    graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(logos[i]), logosRotation[i]), logosUpperLeft[i][0] * width - (logoWidth >> 1), logosUpperLeft[i][1] * height - (logoHeight >> 1), logoWidth << 1, logoHeight << 1);
+                                }
                             }
                         }
-                        for (var i = 0; i < logos.Count; i++)
+                        if (FaceTexture != null)
                         {
-                            if (logosEnabled[i])
-                            {
-                                int logoHeight = (int)((logosLowerRight[i][1] - logosUpperLeft[i][1]) * height),
-                                logoWidth = (int)((logosLowerRight[i][0] - logosUpperLeft[i][0]) * width);
-                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(logos[i]), logosRotation[i]), logosUpperLeft[i][0] * width - (logoWidth >> 1), logosUpperLeft[i][1] * height - (logoHeight >> 1), logoWidth << 1, logoHeight << 1);
-                            }
+                            FaceTexture.Dispose();
                         }
+                        if (ScalpTexture != null)
+                        {
+                            ScalpTexture.Dispose();
+                        }
+                        FaceTexture = drawsOnFace ? faceDiffuseMap : null;
+                        ScalpTexture = drawsOnScalp ? scalpDiffuseMap : null;
+                        return texture;
                     }
-                    if (FaceTexture != null)
+                    catch (System.Exception ex)
                     {
-                        FaceTexture.Dispose();
+                        System.Destrospean.Logger.WriteError(ex);
+                        return null;
                     }
-                    if (ScalpTexture != null)
-                    {
-                        ScalpTexture.Dispose();
-                    }
-                    FaceTexture = drawsOnFace ? faceDiffuseMap : null;
-                    ScalpTexture = drawsOnScalp ? scalpDiffuseMap : null;
-                    return texture;
                 }
             }
 

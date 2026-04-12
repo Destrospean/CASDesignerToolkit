@@ -205,7 +205,7 @@
                 <property name="CanFocus">True</property>
                 <property name="Position">270</property>
                 <child>
-                  <widget class="Gtk.Table" id="ImageTable">
+                  <widget class="Gtk.Table" id="DrawingAreaTable">
                     <property name="MemberName" />
                     <property name="WidthRequest">270</property>
                     <property name="HeightRequest">270</property>
