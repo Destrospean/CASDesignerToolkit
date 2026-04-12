@@ -25,7 +25,7 @@ public partial class MainWindow : RendererMainWindow
 
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
-    Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
+    readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
     string mCurrentMusicModes;
 
@@ -44,7 +44,7 @@ public partial class MainWindow : RendererMainWindow
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
-    static object sLock = new object();
+    object mLock = new object();
 
     public IPackage CurrentPackage;
 
@@ -65,7 +65,7 @@ public partial class MainWindow : RendererMainWindow
                 }
                 (mLoadMeshesThread = new Thread(() =>
                     {
-                        lock (sLock)
+                        lock (mLock)
                         {
                             foreach (var materialKvp in GlobalState.Materials)
                             {
@@ -917,6 +917,56 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
+    void PlayMusic(params string[] modes)
+    {
+        var audioResources = new List<EvaluatedResourceKey>();
+        foreach (var audioResourceByMode in mAudioResourcesByMode)
+        {
+            if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))
+            {
+                audioResources.AddRange(audioResourceByMode.Value);
+            }
+        }
+        Shuffle(audioResources);
+        while (true)
+        {
+            foreach (var audioResource in audioResources)
+            {
+                using (var process = Process.Start(new ProcessStartInfo
+                    {
+                        Arguments = "-pi -po",
+                        CreateNoWindow = true,
+                        FileName = "ealayer3",
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    }))
+                {
+                    if (process == null)
+                    {
+                        Logger.WriteError(new Exception("Failed to start the executable."));
+                        return;
+                    }
+                    using (var standardInput = process.StandardInput.BaseStream)
+                    {
+                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
+                    }
+                    var wait = true;
+                    mMediaPlayer.EndReached += (sender, e) => wait = false;
+                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
+                    mMediaPlayer.Play(media);
+                    mMediaPlayer.Position = 0;
+                    while (wait)
+                    {
+                        Thread.Sleep(1);
+                    }
+                    process.WaitForExit();
+                }
+            }
+        }
+    }
+
     void RandomizeCASParts()
     {
         if (mRandomizeCASPartsThread != null)
@@ -925,7 +975,7 @@ public partial class MainWindow : RendererMainWindow
         }
         (mRandomizeCASPartsThread = new Thread(() =>
             {
-                lock (sLock)
+                lock (mLock)
                 {
                     Sim.RandomizeCASParts();
                     Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
@@ -1161,56 +1211,6 @@ public partial class MainWindow : RendererMainWindow
         }
         fileChooserDialog.Destroy();
         fileChooserDialog.Dispose();
-    }
-
-    public void PlayMusic(params string[] modes)
-    {
-        var audioResources = new List<EvaluatedResourceKey>();
-        foreach (var audioResourceByMode in mAudioResourcesByMode)
-        {
-            if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))
-            {
-                audioResources.AddRange(audioResourceByMode.Value);
-            }
-        }
-        Shuffle(audioResources);
-        while (true)
-        {
-            foreach (var audioResource in audioResources)
-            {
-                using (var process = Process.Start(new ProcessStartInfo
-                    {
-                        Arguments = "-pi -po",
-                        CreateNoWindow = true,
-                        FileName = "ealayer3",
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    }))
-                {
-                    if (process == null)
-                    {
-                        Logger.WriteError(new Exception("Failed to start the executable."));
-                        return;
-                    }
-                    using (var standardInput = process.StandardInput.BaseStream)
-                    {
-                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
-                    }
-                    var wait = true;
-                    mMediaPlayer.EndReached += (sender, e) => wait = false;
-                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                    mMediaPlayer.Play(media);
-                    mMediaPlayer.Position = 0;
-                    while (wait)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    process.WaitForExit();
-                }
-            }
-        }
     }
 
     public void RefreshWidgets(bool clearTemporaryData = true)
