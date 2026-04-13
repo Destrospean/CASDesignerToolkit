@@ -51,7 +51,7 @@ public partial class MainWindow
 	
 	private global::Gtk.HPaned MainHPaned;
 	
-	private global::Gtk.Table ImageTable;
+	private global::Gtk.Table DrawingAreaTable;
 	
 	private global::Gtk.DrawingArea DrawingArea;
 	
@@ -168,20 +168,20 @@ public partial class MainWindow
 		this.MainHPaned.Name = "MainHPaned";
 		this.MainHPaned.Position = 270;
 		// Container child MainHPaned.Gtk.Paned+PanedChild
-		this.ImageTable = new global::Gtk.Table (((uint)(1)), ((uint)(1)), false);
-		this.ImageTable.WidthRequest = 270;
-		this.ImageTable.HeightRequest = 270;
-		this.ImageTable.Name = "ImageTable";
-		this.ImageTable.RowSpacing = ((uint)(6));
-		this.ImageTable.ColumnSpacing = ((uint)(6));
-		// Container child ImageTable.Gtk.Table+TableChild
+		this.DrawingAreaTable = new global::Gtk.Table (((uint)(1)), ((uint)(1)), false);
+		this.DrawingAreaTable.WidthRequest = 270;
+		this.DrawingAreaTable.HeightRequest = 270;
+		this.DrawingAreaTable.Name = "DrawingAreaTable";
+		this.DrawingAreaTable.RowSpacing = ((uint)(6));
+		this.DrawingAreaTable.ColumnSpacing = ((uint)(6));
+		// Container child DrawingAreaTable.Gtk.Table+TableChild
 		this.DrawingArea = new global::Gtk.DrawingArea ();
 		this.DrawingArea.WidthRequest = 270;
 		this.DrawingArea.HeightRequest = 270;
 		this.DrawingArea.Name = "DrawingArea";
-		this.ImageTable.Add (this.DrawingArea);
-		this.MainHPaned.Add (this.ImageTable);
-		global::Gtk.Paned.PanedChild w4 = ((global::Gtk.Paned.PanedChild)(this.MainHPaned [this.ImageTable]));
+		this.DrawingAreaTable.Add (this.DrawingArea);
+		this.MainHPaned.Add (this.DrawingAreaTable);
+		global::Gtk.Paned.PanedChild w4 = ((global::Gtk.Paned.PanedChild)(this.MainHPaned [this.DrawingAreaTable]));
 		w4.Resize = false;
 		w4.Shrink = false;
 		// Container child MainHPaned.Gtk.Paned+PanedChild

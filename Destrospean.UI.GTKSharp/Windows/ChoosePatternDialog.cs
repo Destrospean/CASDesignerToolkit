@@ -92,7 +92,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     var uncachedPatternExists = false;
                     for (var i = 0; i < patternKeysPaths.Count; i += 2)
                     {
-                        patternNamesKeysPaths.Add(new string[]
+                        patternNamesKeysPaths.Add(new[]
                             {
                                 patternKeysPaths[i + 1].Substring(patternKeysPaths[i + 1].LastIndexOf("\\") + 1),
                                 patternKeysPaths[i],

@@ -35,7 +35,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     var textureCoordinates = new List<Vector2>();
                     for (var i = 0; i < indices.Length; i += 3)
                     {
-                        faces.Add(new int[]
+                        faces.Add(new[]
                             {
                                 indices[i],
                                 indices[i + 1],
@@ -113,12 +113,12 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Object = gameObject,
                             TextureCoordinates = textureCoordinates.ToArray(),
                             Vertices = vertices.ToArray()
-                        }, currentPreset, (System.Drawing.Bitmap)currentPreset.Texture.Clone(), material, loadTextureCallback);
+                        }, currentPreset, (System.Drawing.Bitmap)currentPreset.Texture.Clone(), null, material, loadTextureCallback);
                 }
             }
         }
 
-        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, SimBase.LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, System.Drawing.Bitmap[] ambientAndSpecularMapTextures, object material, SimBase.LoadTextureDelegate loadTextureCallback)
         {
             var materialCast = (Material)material;
             var volumeCast = (Volume)volume;

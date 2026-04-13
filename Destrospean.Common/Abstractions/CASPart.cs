@@ -31,7 +31,7 @@ namespace Destrospean.Common.Abstractions
 
         public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
             
-        public static Dictionary<string, Dictionary<string, uint>> CASPartLookupCache;
+        public static Dictionary<string, Dictionary<string, string>> CASPartLookupCache;
 
         public readonly CASPartResource.CASPartResource CASPartResource;
 
@@ -280,7 +280,7 @@ namespace Destrospean.Common.Abstractions
 
         public static void GenerateLookupCache()
         {
-            CASPartLookupCache = new Dictionary<string, Dictionary<string, uint>>();
+            CASPartLookupCache = new Dictionary<string, Dictionary<string, string>>();
             foreach (var gamePackageKvp in ResourceUtils.GameContentPackages)
             {
                 var resourceType = ResourceUtils.GetResourceType("CASP");
@@ -292,35 +292,39 @@ namespace Destrospean.Common.Abstractions
                     {
                         continue;
                     }
-                    CASPartLookupCache[key] = new Dictionary<string, uint>
+                    CASPartLookupCache[key] = new Dictionary<string, string>
                     {
                         {
                             "Age",
-                            (uint)casPartResource.AgeGender.Age
+                            casPartResource.AgeGender.Age.ToString()
                         },
                         {
                             "Clothing",
-                            (uint)casPartResource.Clothing
+                            casPartResource.Clothing.ToString()
                         },
                         {
                             "ClothingCategory",
-                            (uint)casPartResource.ClothingCategory
+                            casPartResource.ClothingCategory.ToString()
                         },
                         {
                             "DataType",
-                            (uint)casPartResource.DataType
+                            casPartResource.DataType.ToString()
                         },
                         {
                             "Gender",
-                            (uint)casPartResource.AgeGender.Gender
+                            casPartResource.AgeGender.Gender.ToString()
                         },
                         {
                             "Handedness",
-                            (uint)casPartResource.AgeGender.Handedness
+                            casPartResource.AgeGender.Handedness.ToString()
                         },
                         {
                             "Species",
-                            (uint)casPartResource.AgeGender.Species
+                            casPartResource.AgeGender.Species.ToString()
+                        },
+                        {
+                            "Unknown1",
+                            casPartResource.Unknown1
                         }
                     };
                 }
@@ -430,7 +434,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new GEOM[]
+                                lodMorphMeshes[j] = LODs.ContainsKey(j) ? new[]
                                     {
                                         j == lod ? newGEOMPlusMorphs[i] : new GEOM(LODs[j][groupIndex].GEOM, new BGEO(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry))), 0, j)
                                     } : new GEOM[0];
@@ -441,7 +445,7 @@ namespace Destrospean.Common.Abstractions
                             var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(((APackage)morphEvaluated.Package).GetResource(morphEvaluated.ResourceIndexEntry)));
                             for (var j = 0; j < lodMorphMeshes.Length; j++)
                             {
-                                lodMorphMeshes[j] = j == lod ? new GEOM[]
+                                lodMorphMeshes[j] = j == lod ? new[]
                                     {
                                         newGEOMPlusMorphs[i]
                                     } : Array.ConvertAll(vpxy.GetMeshLinks(j), x => geometryResources[new ResourceKey(x.Type, x.Group, x.Instance).ReverseEvaluateResourceKey()]);
@@ -530,7 +534,7 @@ namespace Destrospean.Common.Abstractions
             {
                 using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
                 {
-                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, uint>>>(reader);
+                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, string>>>(reader);
                 }
             }
         }

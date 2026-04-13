@@ -58,14 +58,6 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static Bitmap Base64StringToBitmap(string base64String)
-        {
-            using (var stream = new System.IO.MemoryStream(Convert.FromBase64String(base64String)))
-            {
-                return (Bitmap)Bitmap.FromStream(stream);
-            }
-        }
-
         public static Pixbuf Colorize(this Pixbuf pixbuf, Gdk.Color color)
         {
             var bitmap = pixbuf.ToBitmap();

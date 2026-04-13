@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
@@ -195,7 +196,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                         {   
                                             evaluated = casPart.ParentPackage.EvaluateResourceKey(new ResourceKey(link.Type, link.Group, link.Instance).ReverseEvaluateResourceKey());
                                             var bond = new BOND(new BinaryReader(((s3pi.Interfaces.APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)));
-                                            bond.Weight = new float[]
+                                            bond.Weight = new[]
                                                 {
                                                     Fat,
                                                     Fit,
@@ -252,6 +253,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         case CmarNYCBorrowed.Shader.CasSimHair:
                         case CmarNYCBorrowed.Shader.CasSimHairSimple:
                         case CmarNYCBorrowed.Shader.SimAlphaBlended:
+                        case CmarNYCBorrowed.Shader.SimAlphaTested:
                         case CmarNYCBorrowed.Shader.SimEyelashes:
                         case CmarNYCBorrowed.Shader.SimGlass:
                         case CmarNYCBorrowed.Shader.SimHair:
@@ -298,6 +300,30 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         GlobalState.Materials[geomAndKey.Key] = material;
                     }
                     var currentPreset = casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                    string ambientMap = currentPreset.AmbientMap ?? material.AmbientMap,
+                    specularMap = currentPreset.SpecularMap ?? material.SpecularMap,
+                    skinAmbientMap = ((CASPartPreset)currentPreset).SkinAmbientMap ?? material.AmbientMap,
+                    skinSpecularMap = ((CASPartPreset)currentPreset).SkinSpecularMap ?? material.SpecularMap;
+                    Bitmap ambientMapImage = null,
+                    specularMapImage = null,
+                    skinAmbientMapImage = null,
+                    skinSpecularMapImage = null;
+                    if (!string.IsNullOrEmpty(ambientMap))
+                    {
+                        ambientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(ambientMap, Complate.GetTextureCallback).Clone();
+                    }
+                    if (!string.IsNullOrEmpty(specularMap))
+                    {
+                        specularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(specularMap, Complate.GetTextureCallback).Clone();
+                    }
+                    if (!string.IsNullOrEmpty(skinAmbientMap))
+                    {
+                        skinAmbientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinAmbientMap, Complate.GetTextureCallback).Clone();
+                    }
+                    if (!string.IsNullOrEmpty(skinSpecularMap))
+                    {
+                        skinSpecularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinSpecularMap, Complate.GetTextureCallback).Clone();
+                    }
                     loadMeshOnMainThreadCallback(new CASPartVolume
                         {
                             ColorData = colors.ConvertAll(ToVector3).ToArray(),
@@ -319,18 +345,24 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                        }, currentPreset, (System.Drawing.Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), material, loadTextureCallback);
+                        }, currentPreset, (Bitmap)(casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), new[]
+                        {
+                            ambientMapImage,
+                            specularMapImage,
+                            skinAmbientMapImage,
+                            skinSpecularMapImage
+                        }, material, loadTextureCallback);
                 }
             }
         }
 
-        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, object material, LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, Bitmap presetTexture, Bitmap[] ambientAndSpecularMapTextures, object material, LoadTextureDelegate loadTextureCallback)
         {
             var casPartPreset = (CASPartPreset)currentPreset;
             var casPartVolume = (CASPartVolume)volume;
             var materialCast = (Material)material;
-            casPartVolume.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
-            casPartVolume.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
+            casPartVolume.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, ambientAndSpecularMapTextures[0]);
+            casPartVolume.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, ambientAndSpecularMapTextures[1]);
             if (!string.IsNullOrEmpty(casPartPreset.BodyAmbientMap))
             {
                 casPartVolume.BodyAmbientMapID = loadTextureCallback(casPartPreset.BodyAmbientMap, null);
@@ -341,14 +373,21 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             }
             if (!string.IsNullOrEmpty(casPartPreset.SkinAmbientMap))
             {
-                casPartVolume.SkinAmbientMapID = loadTextureCallback(casPartPreset.SkinAmbientMap, null);
+                casPartVolume.SkinAmbientMapID = loadTextureCallback(casPartPreset.SkinAmbientMap, ambientAndSpecularMapTextures[2]);
             }
             if (!string.IsNullOrEmpty(casPartPreset.SkinSpecularMap))
             {
-                casPartVolume.SkinSpecularMapID = loadTextureCallback(casPartPreset.SkinSpecularMap, null);
+                casPartVolume.SkinSpecularMapID = loadTextureCallback(casPartPreset.SkinSpecularMap, ambientAndSpecularMapTextures[3]);
             }
             casPartVolume.MainTextureID = loadTextureCallback(casPartVolume.Key, presetTexture);
             GlobalState.Meshes[casPartVolume.Key] = casPartVolume;
+            foreach (var texture in ambientAndSpecularMapTextures)
+            {
+                if (texture != null)
+                {
+                    texture.Dispose();
+                }
+            }
             presetTexture.Dispose();
             foreach (var meshKey in new List<string>(GlobalState.Meshes.Keys))
             {

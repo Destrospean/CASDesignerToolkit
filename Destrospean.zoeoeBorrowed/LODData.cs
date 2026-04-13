@@ -38,7 +38,7 @@ namespace Destrospean.zoeoeBorrowed
                         if (element.Field == FieldType.UVScales)
                         {
                             var elementFloat3 = ((ElementFloat3)element);
-                            uvScales = new float[]
+                            uvScales = new[]
                                 {
                                     elementFloat3.Data0,
                                     elementFloat3.Data1,

@@ -29,108 +29,116 @@ namespace Destrospean.Common.Abstractions
             {
                 get
                 {
-                    int height = 1024,
-                    width = 1024;
-                    uint[] maskArray = null;
-                    Bitmap multiplier = null,
-                    overlay = null;
-                    var stencils = new List<Bitmap>();
-                    var stencilsEnabled = new List<bool>();
-                    var stencilsRotation = new List<float>();
-                    var stencilsTiling = new List<CatalogResource.CatalogResource.TC05_XY>();
-                    foreach (var propertyTypedKvp in PropertiesTyped)
+                    try
                     {
-                        var key = propertyTypedKvp.Key.ToLowerInvariant();
-                        var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
-                        if (key.StartsWith("stencil"))
+                        int height = 1024,
+                        width = 1024;
+                        uint[] maskArray = null;
+                        Bitmap multiplier = null,
+                        overlay = null;
+                        var stencils = new List<Bitmap>();
+                        var stencilsEnabled = new List<bool>();
+                        var stencilsRotation = new List<float>();
+                        var stencilsTiling = new List<CatalogResource.CatalogResource.TC05_XY>();
+                        foreach (var propertyTypedKvp in PropertiesTyped)
                         {
-                            if (key.Length == 9)
+                            var key = propertyTypedKvp.Key.ToLowerInvariant();
+                            var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
+                            if (key.StartsWith("stencil"))
                             {
-                                stencils.Add(ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height));
-                            }
-                            else if (key.EndsWith("enabled"))
-                            {
-                                stencilsEnabled.Add(((CatalogResource.CatalogResource.TC07_Boolean)value).Unknown1);
-                            }
-                            else if (key.EndsWith("rotation"))
-                            {
-                                stencilsRotation.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
-                            }
-                            else if (key.EndsWith("tiling"))
-                            {
-                                stencilsTiling.Add((CatalogResource.CatalogResource.TC05_XY)value);
-                            }
-                        }
-                        else
-                        {
-                            switch (key)
-                            {
-                                case "ambient":
-                                    AmbientMap = MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey();
-                                    break;
-                                case "mask":
-                                    maskArray = ParentPackage.GetTextureARGBArray(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
-                                    break;
-                                case "multiplier":
-                                    multiplier = ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
-                                    break;
-                                case "overlay":
-                                    overlay = ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
-                                    break;
-                                case "specular":
-                                    SpecularMap = MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey();
-                                    break;
-                            }
-                        }
-                    }
-                    bool patternEnabled;
-                    var patternImages = Patterns.ConvertAll(x =>
-                        {
-                            if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
-                            {
-                                var patternImage = x.PatternImage as Bitmap;
-                                if (patternImage == null)
+                                if (key.Length == 9)
                                 {
-                                    return x.PatternImage;
+                                    stencils.Add(ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height));
                                 }
-                                var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
-                                return GetTiled(patternImage, tiling[0], tiling[1]);
+                                else if (key.EndsWith("enabled"))
+                                {
+                                    stencilsEnabled.Add(((CatalogResource.CatalogResource.TC07_Boolean)value).Unknown1);
+                                }
+                                else if (key.EndsWith("rotation"))
+                                {
+                                    stencilsRotation.Add(((CatalogResource.CatalogResource.TC04_Single)value).Unknown1);
+                                }
+                                else if (key.EndsWith("tiling"))
+                                {
+                                    stencilsTiling.Add((CatalogResource.CatalogResource.TC05_XY)value);
+                                }
                             }
-                            return null;
-                        });
-                    if (maskArray != null)
-                    {
-                        if (multiplier != null)
-                        {
-                            try
+                            else
                             {
-                                multiplier = multiplier.GetWithPatternsApplied(maskArray, patternImages, false);
-                            }
-                            catch (System.IndexOutOfRangeException)
-                            {
+                                switch (key)
+                                {
+                                    case "ambient":
+                                        AmbientMap = MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey();
+                                        break;
+                                    case "mask":
+                                        maskArray = ParentPackage.GetTextureARGBArray(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
+                                        break;
+                                    case "multiplier":
+                                        multiplier = ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
+                                        break;
+                                    case "overlay":
+                                        overlay = ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback, width, height);
+                                        break;
+                                    case "specular":
+                                        SpecularMap = MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)value).TGIIndex].ReverseEvaluateResourceKey();
+                                        break;
+                                }
                             }
                         }
+                        bool patternEnabled;
+                        var patternImages = Patterns.ConvertAll(x =>
+                            {
+                                if (bool.TryParse(GetValue(x.SlotName + " Enabled"), out patternEnabled) && patternEnabled)
+                                {
+                                    var patternImage = x.PatternImage as Bitmap;
+                                    if (patternImage == null)
+                                    {
+                                        return x.PatternImage;
+                                    }
+                                    var tiling = ParseCommaSeparatedValues(GetValue(x.SlotName + " Tiling"));
+                                    return GetTiled(patternImage, tiling[0], tiling[1]);
+                                }
+                                return null;
+                            });
+                        if (maskArray != null)
+                        {
+                            if (multiplier != null)
+                            {
+                                try
+                                {
+                                    multiplier = multiplier.GetWithPatternsApplied(maskArray, patternImages, false);
+                                }
+                                catch (System.IndexOutOfRangeException)
+                                {
+                                }
+                            }
+                        }
+                        var texture = new Bitmap(width, height);
+                        using (var graphics = Graphics.FromImage(texture))
+                        {
+                            if (multiplier != null)
+                            {
+                                graphics.DrawImage(multiplier, 0, 0);
+                            }
+                            if (overlay != null)
+                            {
+                                graphics.DrawImage(overlay, 0, 0);
+                            }
+                            for (var i = 0; i < stencils.Count; i++)
+                            {
+                                if (stencilsEnabled[i])
+                                {
+                                    graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i].Unknown1, stencilsTiling[i].Unknown2)), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
+                                }
+                            }
+                        }
+                        return texture;
                     }
-                    var texture = new Bitmap(width, height);
-                    using (var graphics = Graphics.FromImage(texture))
+                    catch (System.Exception ex)
                     {
-                        if (multiplier != null)
-                        {
-                            graphics.DrawImage(multiplier, 0, 0);
-                        }
-                        if (overlay != null)
-                        {
-                            graphics.DrawImage(overlay, 0, 0);
-                        }
-                        for (var i = 0; i < stencils.Count; i++)
-                        {
-                            if (stencilsEnabled[i])
-                            {
-                                graphics.DrawImage(GetRotated(GetInQuadrupleSizeCanvas(GetTiled(stencils[i], stencilsTiling[i].Unknown1, stencilsTiling[i].Unknown2)), stencilsRotation[i]), -stencils[i].Width >> 1, -stencils[i].Height >> 1);
-                            }
-                        }
+                        System.Destrospean.Logger.WriteError(ex);
+                        return null;
                     }
-                    return texture;
                 }
             }
 
@@ -288,7 +296,7 @@ namespace Destrospean.Common.Abstractions
                     return ((CatalogResource.CatalogResource.TC07_Boolean)properties[propertyName]).Unknown1.ToString();
                 case "color":
                     var argb = System.Array.ConvertAll(System.BitConverter.GetBytes(((CatalogResource.CatalogResource.TC02_ARGB)properties[propertyName]).ARGB), x => ((float)x / byte.MaxValue).ToString());
-                    return string.Join(",", new string[]
+                    return string.Join(",", new[]
                         {
                             argb[2],
                             argb[1],
@@ -310,7 +318,7 @@ namespace Destrospean.Common.Abstractions
                     try
                     {
                         var complateElement = ((CatalogResource.CatalogResource.TC06_XYZ)properties[propertyName]);
-                        return string.Join(",", new string[]
+                        return string.Join(",", new[]
                             {
                                 complateElement.Unknown1.ToString(),
                                 complateElement.Unknown2.ToString(),

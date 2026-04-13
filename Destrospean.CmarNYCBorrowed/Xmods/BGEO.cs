@@ -164,7 +164,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public int[] GetLODData(int lod)
             {
-                return new int[]
+                return new[]
                 {
                     mFirstVertexID[lod],
                     mVertexIDCount[lod],
@@ -276,7 +276,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 get
                 {
-                    return new float[]
+                    return new[]
                     {
                         mX,
                         mY,
@@ -346,7 +346,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 throw new BlendException("Age/gender/species/region array lengths do not match GEOM array length!");
             }
-            mMagic = new char[]
+            mMagic = new[]
                 {
                     'B',
                     'G',
@@ -404,7 +404,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 throw new BlendException("Age/gender/species/region array lengths do not match GEOM array length!");
             }
-            mMagic = new char[]
+            mMagic = new[]
                 {
                     'B',
                     'G',
@@ -458,7 +458,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public BGEO(GEOM[][] lodMorphMeshes) //dimensions: lod, mesh - for clothing fat/fit/thin/special morphs
         {
-            mMagic = new char[]
+            mMagic = new[]
                 {
                     'B',
                     'G',

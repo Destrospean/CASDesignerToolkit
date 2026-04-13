@@ -18,7 +18,7 @@ namespace Destrospean.Common
 
         public static readonly Dictionary<string, PatternInfo> PreloadedPatterns = new Dictionary<string, PatternInfo>();
 
-        public static void GenerateCache(s3pi.Interfaces.IPackage package)
+        public static void GenerateCache(IPackage package)
         {
             var categories = new List<string>();
             EvaluatedResourceKey gamePatternListEvaluated;
@@ -75,7 +75,7 @@ namespace Destrospean.Common
                 var uncachedPatternExists = false;
                 for (var j = 0; j < patternKeysPaths.Count; j += 2)
                 {
-                    patternNamesKeysPaths.Add(new string[]
+                    patternNamesKeysPaths.Add(new[]
                         {
                             patternKeysPaths[j + 1].Substring(patternKeysPaths[j + 1].LastIndexOf("\\") + 1),
                             patternKeysPaths[j],
@@ -85,10 +85,9 @@ namespace Destrospean.Common
                 patternNamesKeysPaths.Sort((a, b) => a[0].CompareTo(b[0]));
                 foreach (var patternNameKeyPath in patternNamesKeysPaths)
                 {
-                    Bitmap image = null;
-                    if (!PreloadedPatternImages.TryGetValue(patternNameKeyPath[1], out image))
+                    Bitmap patternImage = null;
+                    if (!PreloadedPatternImages.TryGetValue(patternNameKeyPath[1], out patternImage))
                     {
-                        Bitmap patternImage = null;
                         PatternInfo patternInfo;
                         if (!PreloadedPatterns.TryGetValue(patternNameKeyPath[1], out patternInfo))
                         {
@@ -113,7 +112,7 @@ namespace Destrospean.Common
                         }
                         if (patternImage != null)
                         {
-                            image = PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
+                            PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
                         }
                         uncachedPatternExists = true;
                     }
@@ -184,7 +183,7 @@ namespace Destrospean.Common
                 else if (key.StartsWith("color"))
                 {
                     var color = Pattern.ParseCommaSeparatedValues(value);
-                    rgbColors.Add(new float[]
+                    rgbColors.Add(new[]
                         {
                             color[0],
                             color[1],
@@ -283,7 +282,7 @@ namespace Destrospean.Common
             }
             for (var i = 0; i < baseHues.Count && baseHues.Count == baseSaturations.Count && baseHues.Count == baseValues.Count; i++)
             {
-                baseHSVColors.Add(new float[]
+                baseHSVColors.Add(new[]
                     {
                         baseHues[i],
                         baseSaturations[i],
@@ -292,7 +291,7 @@ namespace Destrospean.Common
             }
             for (var i = 0; i < hues.Count && hues.Count == saturations.Count && hues.Count == values.Count; i++)
             {
-                hsvColors.Add(new float[]
+                hsvColors.Add(new[]
                     {
                         hues[i],
                         saturations[i],
@@ -306,13 +305,13 @@ namespace Destrospean.Common
                 ChannelsEnabled = channelsEnabled.Count == 0 ? null : channelsEnabled.ToArray(),
                 HSV = hsvColors.Count == 0 ? null : hsvColors.ToArray(),
                 HSVBase = baseHSVColors.Count == 0 ? null : baseHSVColors.ToArray(),
-                HSVBaseBG = baseHueBackground == float.MinValue || baseSaturationBackground == float.MinValue || baseValueBackground == float.MinValue ? null : new float[]
+                HSVBaseBG = baseHueBackground == float.MinValue || baseSaturationBackground == float.MinValue || baseValueBackground == float.MinValue ? null : new[]
                     {
                         baseHueBackground,
                         baseSaturationBackground,
                         baseValueBackground
                     },
-                HSVBG = hueBackground == float.MinValue || saturationBackground == float.MinValue || valueBackground == float.MinValue ? null : new float[]
+                HSVBG = hueBackground == float.MinValue || saturationBackground == float.MinValue || valueBackground == float.MinValue ? null : new[]
                     {
                         hueBackground,
                         saturationBackground,
@@ -336,7 +335,7 @@ namespace Destrospean.Common
                     {
                         using (var stream = new MemoryStream(System.Convert.FromBase64String(patternImageBase64StringKvp.Value)))
                         {
-                            PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, (Bitmap)Bitmap.FromStream(stream));
+                            PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, new Bitmap(stream));
                         }
                     }
                 }

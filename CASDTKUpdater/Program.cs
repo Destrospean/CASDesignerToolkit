@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
 
 namespace Destrospean.DestrospeanCASPEditor.Updater
 {
@@ -42,6 +42,7 @@ namespace Destrospean.DestrospeanCASPEditor.Updater
                 {
                     StartInfo = new ProcessStartInfo
                         {
+                            Arguments = args.Length == 1 ? "" : args[1],
                             CreateNoWindow = true,
                             FileName = "CASDesignerToolkit",
                             UseShellExecute = false

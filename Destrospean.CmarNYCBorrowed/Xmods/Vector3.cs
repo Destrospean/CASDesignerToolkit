@@ -29,7 +29,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new float[]
+                return new[]
                 {
                     X,
                     Y,
@@ -427,7 +427,7 @@ namespace Destrospean.CmarNYCBorrowed
                         }
                         if (index0 != index1)
                         {
-                            return new int[]
+                            return new[]
                             {
                                 index0,
                                 index1
@@ -435,7 +435,7 @@ namespace Destrospean.CmarNYCBorrowed
                         }
                         else
                         {
-                            return new int[]
+                            return new[]
                             {
                                 indices[0]
                             };
@@ -444,7 +444,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 else
                 {
-                    return new int[]
+                    return new[]
                     {
                         indices[0]
                     };
@@ -463,7 +463,7 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     if (this == refMeshPositions[i])
                     {
-                        return new int[]
+                        return new[]
                         {
                             i
                         };

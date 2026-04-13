@@ -15,20 +15,22 @@ using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.GenericRCOLResource;
 using s3pi.Interfaces;
+using s3pi.Package;
 using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
+    readonly List<Tuple<uint, Gtk.Action>> mActionsToRemove = new List<Tuple<uint, Gtk.Action>>();
+
     Thread mAddMusicThread, mLoadMeshesThread, mPlayMusicThread, mRandomizeCASPartsThread;
 
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
-    Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
+    readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    string mCurrentMusicModes, mSaveAsPath;
+    string mCurrentMusicModes;
 
-    bool mDisableUpdateModels = false,
-    mWaitBeforeUpdateCheck = false;
+    bool mDisableUpdateModels = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
@@ -42,9 +44,11 @@ public partial class MainWindow : RendererMainWindow
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
-    static object sLock = new object();
+    object mLock = new object();
 
     public IPackage CurrentPackage;
+
+    public string CurrentPackagePath;
 
     public Image Image = new Image();
 
@@ -61,7 +65,7 @@ public partial class MainWindow : RendererMainWindow
                 }
                 (mLoadMeshesThread = new Thread(() =>
                     {
-                        lock (sLock)
+                        lock (mLock)
                         {
                             foreach (var materialKvp in GlobalState.Materials)
                             {
@@ -84,10 +88,10 @@ public partial class MainWindow : RendererMainWindow
                                 switch ((string)model.GetValue(iter, 0))
                                 {
                                     case "CASP":
-                                        Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                        Sim.LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, GlobalState.LoadTexture, (casPartVolume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback) => Application.Invoke((sender, e) => Sim.LoadMeshOnMainThread(casPartVolume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback)));
                                         break;
                                     case "OBJD":
-                                        PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()].LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, material, loadTextureCallback) => Application.Invoke((sender, e) => GameObjectUtils.LoadMeshOnMainThread(volume, currentPreset, presetTexture, material, loadTextureCallback)));
+                                        PreloadedData.GameObjects[((IResourceIndexEntry)model.GetValue(iter, 4)).ReverseEvaluateResourceKey()].LoadMeshes(mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage, ResourcePropertyNotebook.CurrentPage, (uint)MTST.State.Default, GlobalState.LoadTexture, (volume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback) => Application.Invoke((sender, e) => GameObjectUtils.LoadMeshOnMainThread(volume, currentPreset, presetTexture, ambientAndSpecularMapTextures, material, loadTextureCallback)));
                                         break;
                                 }
                             }
@@ -135,15 +139,7 @@ public partial class MainWindow : RendererMainWindow
     {
         get
         {
-            if (Platform.IsWindows)
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk";
-            }
-            if (Platform.IsMacOS)
-            {
-                return null;
-            }
-            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
+            return Platform.IsMacOS ? null : Platform.IsWindows ? Environment.GetFolderPath(Environment.SpecialFolder.StartMenu) + "\\" + OriginalWindowTitle + ".lnk" : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/applications/" + OriginalWindowTitle + ".desktop";
         }
     }
 
@@ -199,11 +195,15 @@ public partial class MainWindow : RendererMainWindow
         }
         BuildResourceTable();
         new Thread(ChoosePatternDialog.LoadCache).Start();
-        new Thread(CASPart.LoadLookupCache).Start();
-        (mAddMusicThread = new Thread(() => AddMusic())).Start();
+        new Thread(() =>
+            {
+                CASPart.LoadLookupCache();
+                ChooseObjectDialog.LoadCache();
+            }).Start();
+        (mAddMusicThread = new Thread(AddMusic)).Start();
+        var waitBeforeUpdateCheck = false;
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
-                RescaleAndReposition(true);
                 Sensitive = false;
                 try
                 {
@@ -211,8 +211,9 @@ public partial class MainWindow : RendererMainWindow
                     {
                         mAddMusicThread.Join();
                     }
-                    ChoosePatternDialog.GenerateCache(s3pi.Package.Package.NewPackage(0));
+                    ChoosePatternDialog.GenerateCache(Package.NewPackage(0));
                     CASPart.GenerateLookupCache();
+                    ChooseObjectDialog.GenerateCache(Package.NewPackage(0));
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
@@ -221,11 +222,11 @@ public partial class MainWindow : RendererMainWindow
                     Logger.WriteError(ex);
                 }
                 Sensitive = true;
-                mWaitBeforeUpdateCheck = false;
+                waitBeforeUpdateCheck = false;
             };
-        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath))
+        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath) || !File.Exists(CASPartUtils.CacheFilePath))
         {
-            mWaitBeforeUpdateCheck = true;
+            waitBeforeUpdateCheck = true;
             new CacheGenerationWindow(this, Icon);
         }
         new Thread(() =>
@@ -234,7 +235,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     return;
                 }
-                while (mWaitBeforeUpdateCheck)
+                while (waitBeforeUpdateCheck)
                 {   
                 }
                 try
@@ -274,7 +275,7 @@ public partial class MainWindow : RendererMainWindow
         ResourcePropertyNotebook.RemovePage(0);
         PrepareGLWidget();
         GLWidget.SetSizeRequest(DrawingArea.WidthRequest, DrawingArea.HeightRequest);
-        ImageTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
+        DrawingAreaTable.Attach(GLWidget, 0, 1, 0, 1, AttachOptions.Fill, AttachOptions.Fill, 0, 0);
         Image.SetSizeRequest(1024, 1024);
         DrawingArea.ExposeEvent += (o, args) => DrawImage();
         ScrolledWindow.SizeAllocated += (o, args) =>
@@ -293,8 +294,9 @@ public partial class MainWindow : RendererMainWindow
         if (packagePath != null)
         {
             mAddMusicThread.Join();
-            CurrentPackage = s3pi.Package.Package.OpenPackage(0, packagePath, true);
+            CurrentPackage = Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
+            CurrentPackagePath = packagePath;
             AddFilePathToWindowTitle(packagePath);
         }
     }
@@ -452,17 +454,35 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
             BuildLODNotebook(gameObject);
+            var simPreviewAction = new Gtk.Action("SimPreviewAction", "Sim Preview...", null, Stock.Preferences);
+            uint simPreviewActionMergeID = UIManager.NewMergeId(),
+            simPreviewSeparatorMergeID = UIManager.NewMergeId();
+            UIManager.AddUi(simPreviewSeparatorMergeID, "/MainMenuBar/SettingsAction", "SimPreviewSeparator", "SimPreviewSeparator", UIManagerItemType.Separator, false);
+            UIManager.AddUi(simPreviewActionMergeID, "/MainMenuBar/SettingsAction", "SimPreviewAction", "SimPreviewAction", UIManagerItemType.Menuitem, false);
+            SettingsAction.ActionGroup.Add(simPreviewAction);
+            simPreviewAction.Activated += (sender, e) =>
+                {
+                    var simPreviewDialog = new SimPreviewDialog(this);
+                    if (simPreviewDialog.Run() == (int)ResponseType.Ok)
+                    {
+                        RandomizeCASParts();
+                    }
+                    simPreviewDialog.Destroy();
+                    simPreviewDialog.Dispose();
+                };
+            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewActionMergeID, simPreviewAction));
+            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewSeparatorMergeID, null));
         }
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
     void AddMusic()
     {
         var audioTunerType = ResourceUtils.GetResourceType("AUDT");
+        var nameMapDictionary = new Dictionary<ulong, string>();
         foreach (var package in ResourceUtils.GameContentPackages.Values)
         {
             foreach (var nameMapResource in package.GetNameMapResources())
@@ -471,21 +491,28 @@ public partial class MainWindow : RendererMainWindow
                 {
                     if (nameMapKvp.Value.ToLowerInvariant().StartsWith("music_"))
                     {
-                        if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
+                        nameMapDictionary[nameMapKvp.Key] = nameMapKvp.Value;
+                    }
+                }
+            }
+        }
+        foreach (var package in ResourceUtils.GameContentPackages.Values)
+        {
+            foreach (var nameMapKvp in nameMapDictionary)
+            {
+                if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
+                {
+                    mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
+                }
+                foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
+                {
+                    foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                    {
+                        if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
                         {
-                            mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
-                        }
-                        foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
-                        {
-                            foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                            foreach (var item in block.Items)
                             {
-                                if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
-                                {
-                                    foreach (var item in block.Items)
-                                    {
-                                        mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
-                                    }
-                                }
+                                mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
                             }
                         }
                     }
@@ -630,7 +657,6 @@ public partial class MainWindow : RendererMainWindow
                         catch (Exception ex)
                         {
                             Logger.WriteError(ex);
-                            throw;
                         }
                     },
                 importMeshGroup = (meshFileType) =>
@@ -665,7 +691,6 @@ public partial class MainWindow : RendererMainWindow
                         catch (Exception ex)
                         {
                             Logger.WriteError(ex);
-                            throw;
                         }
                     };
                 addMeshGroupAction.Activated += (sender, e) =>
@@ -719,7 +744,6 @@ public partial class MainWindow : RendererMainWindow
                             catch (Exception ex)
                             {
                                 Logger.WriteError(ex);
-                                throw;
                             }
                         }
                         fileChooserDialog.Destroy();
@@ -811,7 +835,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1091,6 +1114,15 @@ public partial class MainWindow : RendererMainWindow
             ResourceTreeView.ButtonPressEvent += OnResourceTreeViewButtonPress;
             ResourceTreeView.Selection.Changed += (sender, e) => 
                 {
+                    while (mActionsToRemove.Count > 0)
+                    {
+                        UIManager.RemoveUi(mActionsToRemove[0].Item1);
+                        if (mActionsToRemove[0].Item2 != null)
+                        {
+                            SettingsAction.ActionGroup.Remove(mActionsToRemove[0].Item2);
+                        }
+                        mActionsToRemove.RemoveAt(0);
+                    }
                     mDisableUpdateModels = true;
                     GLWidget.Hide();
                     Image.Clear();
@@ -1156,7 +1188,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1218,7 +1249,7 @@ public partial class MainWindow : RendererMainWindow
         }
         (mRandomizeCASPartsThread = new Thread(() =>
             {
-                lock (sLock)
+                lock (mLock)
                 {
                     Sim.RandomizeCASParts();
                     Application.Invoke((sender, e) => NextState = NextStateOptions.UpdateModels);
@@ -1303,12 +1334,7 @@ public partial class MainWindow : RendererMainWindow
                     string executablePath = AppDomain.CurrentDomain.BaseDirectory,
                     tempPath = executablePath + "Update" + System.IO.Path.DirectorySeparatorChar;
                     Directory.CreateDirectory(tempPath);
-                    using (var client = new System.Net.Http.HttpClient())
-                    {
-                        System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072;
-                        client.DefaultRequestHeaders.UserAgent.ParseAdd(assemblyName.Name);
-                        File.WriteAllBytes(tempPath + latestReleaseFilename, client.GetByteArrayAsync(latestReleaseDownloadUrl).Result);
-                    }
+                    File.WriteAllBytes(tempPath + latestReleaseFilename, Updates.GetByteArray(latestReleaseDownloadUrl, assemblyName.Name));
                     if (Platform.IsUnix)
                     {
                         Platform.GetCommandOutput("chmod", "755 \"" + tempPath + latestReleaseFilename + "\"");
@@ -1328,7 +1354,8 @@ public partial class MainWindow : RendererMainWindow
                         process.WaitForExit();
                     }
                     string updaterFilename = "CASDTKUpdater.exe",
-                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
+                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename,
+                    packagePath = ((MainWindow)Singleton).CurrentPackagePath;
                     if (File.Exists(downloadedUpdaterPath))
                     {
                         if (File.Exists(executablePath + updaterFilename))
@@ -1345,7 +1372,7 @@ public partial class MainWindow : RendererMainWindow
                                 {
                                     StartInfo = new ProcessStartInfo
                                         {
-                                            Arguments = Process.GetCurrentProcess().Id.ToString(),
+                                            Arguments = Process.GetCurrentProcess().Id.ToString() + (string.IsNullOrEmpty(packagePath) ? "" : " " + packagePath),
                                             CreateNoWindow = true,
                                             FileName = updaterFilename,
                                             UseShellExecute = false,
@@ -1382,6 +1409,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             StartInfo = new ProcessStartInfo
                                 {
+                                    Arguments = packagePath ?? "",
                                     CreateNoWindow = true,
                                     FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
                                     UseShellExecute = false
@@ -1401,7 +1429,9 @@ public partial class MainWindow : RendererMainWindow
         {
             mCurrentMusicModes = null;
             Sim.CurrentCASPart = null;
-            mSaveAsPath = null;
+            Sim.CASPartOverrides.Clear();
+            Sim.CASPartOverridesDisabled.Clear();
+            CurrentPackagePath = null;
             GlobalState.Meshes.Clear();
             foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
             {
@@ -1463,7 +1493,6 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
@@ -1492,7 +1521,7 @@ public partial class MainWindow : RendererMainWindow
                 child.Destroy();
                 child.Dispose();
             }
-            foreach (var action in new Gtk.Action[]
+            foreach (var action in new[]
                 {
                     CloseAction,
                     ResourceAction,
@@ -1599,7 +1628,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1629,46 +1657,41 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
         fileChooserDialog.Dispose();
     }
 
-    public override void RescaleAndReposition(bool skipRescale = false)
+    public override void RescaleAndReposition()
     {
         try
         {
             var monitorGeometry = Screen.GetMonitorGeometry(Screen.GetMonitorAtWindow(GdkWindow));
             var scaleEnvironmentVariable = Environment.GetEnvironmentVariable("CASDTK_SCALE");
-            if (!skipRescale)
-            {
-                WidgetUtils.Scale = string.IsNullOrEmpty(scaleEnvironmentVariable) ? Platform.IsUnix ? (monitorGeometry.Height < 1080 ? 1080 : monitorGeometry.Height) / 1080f : 1 : float.Parse(scaleEnvironmentVariable, System.Globalization.CultureInfo.InvariantCulture);
-                WidgetUtils.WineScaleDenominator = Platform.IsRunningUnderWine ? (float)Screen.Resolution / 96 : 1;
-                SetDefaultSize((int)(DefaultWidth * WidgetUtils.Scale), (int)(DefaultHeight * WidgetUtils.Scale));
-                foreach (var widget in new Widget[]
-                    {
-                        DrawingArea,
-                        ImageTable,
-                        MainHPaned,
-                        ResourcePropertyNotebook,
-                        ResourcePropertyTable,
-                        ResourceTreeView,
-                        this
-                    })
+            WidgetUtils.Scale = string.IsNullOrEmpty(scaleEnvironmentVariable) ? Platform.IsUnix ? (monitorGeometry.Height < 1080 ? 1080 : monitorGeometry.Height) / 1080f : 1 : float.Parse(scaleEnvironmentVariable, System.Globalization.CultureInfo.InvariantCulture);
+            WidgetUtils.WineScaleDenominator = Platform.IsRunningUnderWine ? (float)Screen.Resolution / 96 : 1;
+            SetDefaultSize((int)(DefaultWidth * WidgetUtils.Scale), (int)(DefaultHeight * WidgetUtils.Scale));
+            foreach (var widget in new Widget[]
                 {
-                    widget.SetSizeRequest(widget.WidthRequest == -1 ? -1 : (int)(widget.WidthRequest * WidgetUtils.Scale), widget.HeightRequest == -1 ? -1 : (int)(widget.HeightRequest * WidgetUtils.Scale));
-                }
-                Resize(DefaultWidth, DefaultHeight);
+                    DrawingArea,
+                    DrawingAreaTable,
+                    MainHPaned,
+                    ResourcePropertyNotebook,
+                    ResourcePropertyTable,
+                    ResourceTreeView,
+                    this
+                })
+            {
+                widget.SetSizeRequest(widget.WidthRequest == -1 ? -1 : (int)(widget.WidthRequest * WidgetUtils.Scale), widget.HeightRequest == -1 ? -1 : (int)(widget.HeightRequest * WidgetUtils.Scale));
             }
+            Resize(DefaultWidth, DefaultHeight);
             mAlphaCheckerboardPixbuf = ImageUtils.CreateCheckerboard(monitorGeometry.Width, monitorGeometry.Height, (int)(8 * WidgetUtils.Scale), System.Drawing.Color.FromArgb(191, 191, 191), System.Drawing.Color.FromArgb(127, 127, 127)).ToPixbuf();
             Move(((int)(monitorGeometry.Width / WidgetUtils.WineScaleDenominator) - WidthRequest) >> 1, ((int)(monitorGeometry.Height / WidgetUtils.WineScaleDenominator) - HeightRequest) >> 1);
         }
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1676,9 +1699,9 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            if (string.IsNullOrEmpty(mSaveAsPath))
+            if (string.IsNullOrEmpty(CurrentPackagePath))
             {
-                mSaveAsPath = path;
+                CurrentPackagePath = path;
             }
             foreach (var casPartKvp in PreloadedData.CASParts)
             {
@@ -1730,20 +1753,19 @@ public partial class MainWindow : RendererMainWindow
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
             }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
-            if (string.IsNullOrEmpty(mSaveAsPath))
+            if (string.IsNullOrEmpty(CurrentPackagePath))
             {
                 CurrentPackage.SavePackage();
             }
             else
             {
-                CurrentPackage.SaveAs(mSaveAsPath);
+                CurrentPackage.SaveAs(CurrentPackagePath);
             }
             NextState = NextStateOptions.NoUnsavedChanges;
         }
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
@@ -1757,7 +1779,6 @@ public partial class MainWindow : RendererMainWindow
         }
         return surface;
     }
-
 
     protected void OnCheckForUpdatesActionActivated(object sender, EventArgs e)
     {
@@ -1793,7 +1814,7 @@ public partial class MainWindow : RendererMainWindow
         {
             mRandomizeCASPartsThread.Abort();
         }
-        s3pi.Package.Package.ClosePackage(0, CurrentPackage);
+        Package.ClosePackage(0, CurrentPackage);
         CurrentPackage = null;
         ResourceUtils.MissingResourceKeys.Clear();
         RefreshWidgets();
@@ -1813,24 +1834,24 @@ public partial class MainWindow : RendererMainWindow
                 return;
             }
             var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (Platform.IsMacOS)
+            {
+                return;
+            }
             if (Platform.IsWindows)
             {
                 Platform.Windows.CreateShortcut(ShortcutPath, assembly.Location, AppDomain.CurrentDomain.BaseDirectory, null, ShortcutDescription);
                 Platform.Windows.SetFileAssociation("DBPFPackage", FileTypes.DBPFPackage, ".package", assembly.Location);
             }
-            else if (Platform.IsMacOS)
-            {
-                return;
-            }
             else
             {
                 var mimeType = "x-wine-extension-package";
                 var assemblyName = assembly.GetName().Name;
-                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new string[]
+                Platform.FreeDesktop.CreateShortcut(ShortcutPath, AppDomain.CurrentDomain.BaseDirectory + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName), AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.BaseDirectory + assemblyName + ".svg", OriginalWindowTitle, ShortcutDescription, new[]
                     {
                         "Game"
                     },
-                    new string[]
+                    new[]
                     {
                         mimeType
                     });
@@ -1920,7 +1941,6 @@ public partial class MainWindow : RendererMainWindow
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();
@@ -1966,18 +1986,18 @@ public partial class MainWindow : RendererMainWindow
                 {
                     mRandomizeCASPartsThread.Abort();
                 }
-                var package = s3pi.Package.Package.OpenPackage(0, fileChooserDialog.Filename, true);
-                s3pi.Package.Package.ClosePackage(0, CurrentPackage);
+                var package = Package.OpenPackage(0, fileChooserDialog.Filename, true);
+                Package.ClosePackage(0, CurrentPackage);
                 CurrentPackage = package;
                 ResourceUtils.MissingResourceKeys.Clear();
                 RefreshWidgets();
                 NextState = NextStateOptions.NoUnsavedChanges;
+                CurrentPackagePath = fileChooserDialog.Filename;
                 AddFilePathToWindowTitle(fileChooserDialog.Filename);
             }
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
         fileChooserDialog.Destroy();

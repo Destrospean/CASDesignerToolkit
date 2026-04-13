@@ -66,7 +66,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -99,7 +98,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -334,7 +332,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                     var deleteButton = new Button(DefaultTableColumnSpacingBase == 6 ? new Gtk.Image(Stock.Delete, IconSize.Menu) : new Gtk.Image(new Gtk.Image().RenderIcon(Stock.Delete, IconSize.Menu, "").ScaleSimple(SmallImageSize, SmallImageSize, InterpType.Bilinear)))
                         {
-                            Relief = ReliefStyle.None,
+                            Relief = ReliefStyle.None
                         };
                     deleteButton.Clicked += (sender, e) =>
                         {
@@ -393,7 +391,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -418,7 +415,6 @@ namespace Destrospean.DestrospeanCASPEditor
                 shaderComboBoxAlignment.Add(shaderComboBox);
                 shaderComboBox.Changed += (sender, e) =>
                     {
-
                         matd.Shader = (ShaderType)Enum.Parse(typeof(Shader), shaderComboBox.ActiveText.Split(' ')[0]);
                         mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
@@ -448,7 +444,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     if (elementFloat2 != null)
                     {
                         var hBox = new HBox();
-                        var spinButtons = new SpinButton[]
+                        var spinButtons = new[]
                             {
                                 new SpinButton(new Adjustment(elementFloat2.Data0, -1, 1, 1, 10, 0), 0, 4),
                                 new SpinButton(new Adjustment(elementFloat2.Data1, -1, 1, 1, 10, 0), 0, 4)
@@ -690,7 +686,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -799,7 +794,7 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
+                return null;
             }
         }
 
@@ -829,7 +824,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (Exception ex)
             {
                 Logger.WriteError(ex);
-                throw;
             }
         }
     }

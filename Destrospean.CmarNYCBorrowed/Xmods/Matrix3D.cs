@@ -54,7 +54,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new float[,]
+                return new[,]
                 {
                     {
                         mMatrix[0, 0],
@@ -160,7 +160,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public Matrix3D(float[,] matrix)
         {
-            mMatrix = new float[,]
+            mMatrix = new[,]
                 {
                     {
                         matrix[0, 0],
@@ -224,14 +224,14 @@ namespace Destrospean.CmarNYCBorrowed
             var v = new float[3][];
             for (var i = 0; i < 3; i++)
             {
-                v[i] = m1 * new float[]
+                v[i] = m1 * new[]
                     {
                         m2.mMatrix[0, i],
                         m2.mMatrix[1, i],
                         m2.mMatrix[2, i]
                     };
             }
-            return new Matrix3D(new float[,] {
+            return new Matrix3D(new[,] {
                 {
                     v[0][0],
                     v[1][0],
@@ -252,7 +252,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public static Matrix3D FromScale(Vector3 scale)
         {
-            return new Matrix3D(new float[,]
+            return new Matrix3D(new[,]
                 {
                     {
                         scale.X,
@@ -309,7 +309,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public Matrix3D Transpose()
         {
-            return new Matrix3D(new float[,]
+            return new Matrix3D(new[,]
                 {
                     {
                         mMatrix[0, 0],

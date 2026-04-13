@@ -300,7 +300,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public static Bitmap GetTexture(this IPackage package, string key, GetTextureDelegate getTextureCallback, int width, int height)
         {
-            return package.GetTexture(key, getTextureCallback, new int[]
+            return package.GetTexture(key, getTextureCallback, new[]
                 {
                     width,
                     height
@@ -329,7 +329,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public static uint[] GetTextureARGBArray(this IPackage package, string key, GetTextureDelegate getTextureCallback, int width, int height)
         {
-            return package.GetTextureARGBArray(key, getTextureCallback, new int[]
+            return package.GetTextureARGBArray(key, getTextureCallback, new[]
                 {
                     width,
                     height
@@ -393,7 +393,7 @@ namespace Destrospean.CmarNYCBorrowed
                             Math.DivRem(currentX, image.Width, out width);
                             Math.DivRem(currentY, image.Height, out height);
                             var color = image.GetPixel(width, height);
-                            rgba = new float[]
+                            rgba = new[]
                                 {
                                     color.R * kInverseByteMax,
                                     color.G * kInverseByteMax,

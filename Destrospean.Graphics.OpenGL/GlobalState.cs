@@ -225,6 +225,10 @@ namespace Destrospean.Graphics.OpenGL
                 void main()
                 {
                     vec4 texcolor = texture2D(maintexture, f_texcoord);
+                    if (texcolor.a > 0.0 && !hasTransparency)
+                    {{
+                        texcolor = vec4(texcolor.r * texcolor.a + skin_color.r * (1.0 - texcolor.a), texcolor.g * texcolor.a + skin_color.g * (1.0 - texcolor.a), texcolor.b * texcolor.a + skin_color.b * (1.0 - texcolor.a), texcolor.a);
+                    }}
                     if (texcolor.a < 0.1)
                     {{
                         if (hasTransparency)
@@ -330,14 +334,10 @@ namespace Destrospean.Graphics.OpenGL
                 varying vec2 f_texcoord;
                 uniform sampler2D maintexture;
                 uniform bool hasAmbientMap;
-                uniform bool hasSkinAmbientMap;
                 uniform bool hasSpecularMap;
-                uniform bool hasSkinSpecularMap;
                 uniform bool hasTransparency;
                 uniform sampler2D map_ambient;
-                uniform sampler2D map_skin_ambient;
                 uniform sampler2D map_specular;
-                uniform sampler2D map_skin_specular;
                 uniform mat4 view;
                 uniform vec3 material_ambient;
                 uniform vec3 material_diffuse;
@@ -350,9 +350,12 @@ namespace Destrospean.Graphics.OpenGL
 
                 void main()
                 {{
-                    bool isSkin = false;
                     vec3 n = normalize(v_norm);
                     vec4 texcolor = texture2D(maintexture, f_texcoord);
+                    if (texcolor.a > 0.0 && !hasTransparency)
+                    {{
+                        texcolor = vec4(texcolor.r * texcolor.a + skin_color.r * (1.0 - texcolor.a), texcolor.g * texcolor.a + skin_color.g * (1.0 - texcolor.a), texcolor.b * texcolor.a + skin_color.b * (1.0 - texcolor.a), texcolor.a);
+                    }}
                     if (texcolor.a < 0.1)
                     {{
                         if (hasTransparency)
@@ -361,7 +364,6 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         else
                         {{
-                            isSkin = true;
                             texcolor = vec4(skin_color, 1.0);
                         }}
                     }}
@@ -380,18 +382,7 @@ namespace Destrospean.Graphics.OpenGL
                         }}
                         vec4 light_ambient = lights[i].ambientIntensity * vec4(lights[i].color, 0.0);
                         vec4 light_diffuse = lights[i].diffuseIntensity * vec4(lights[i].color, 0.0);
-                        if (isSkin)
-                        {{
-                            lightcolor = lightcolor + texcolor * light_ambient * vec4(0.25, 0.25, 0.25, 0.0);
-                        }}
-                        else if (hasAmbientMap)
-                        {{
-                            lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0) * texture2D(map_ambient, f_texcoord).r;
-                        }}
-                        else
-                        {{
-                            lightcolor = lightcolor + texcolor * light_ambient * vec4(material_ambient, 0.0);
-                        }}
+                        lightcolor = lightcolor + texcolor * light_ambient * vec4(0.25, 0.25, 0.25, 0.0);
                         float lambertmaterial_diffuse = max(dot(n, lightvec), 0.0);
                         bool inConeOrNotSpotlight = lights[i].type != 2 || degrees(acos(dot(lightvec, lights[i].direction))) < lights[i].coneAngle;
                         if (inConeOrNotSpotlight)
@@ -401,11 +392,7 @@ namespace Destrospean.Graphics.OpenGL
                         vec3 reflectionvec = normalize(reflect(-lightvec, v_norm));
                         vec3 viewvec = normalize(vec3(inverse(view) * vec4(0.0, 0.0, 0.0, 1.0)) - v_pos); 
                         float material_specularreflection = max(dot(v_norm, lightvec), 0.0) * pow(max(dot(reflectionvec, viewvec), 0.0), material_specExponent);
-                        if (hasSkinSpecularMap && isSkin)
-                        {{
-                            material_specularreflection = material_specularreflection * texture2D(map_skin_specular, f_texcoord).r;
-                        }}
-                        else if (hasSpecularMap)
+                        if (hasSpecularMap)
                         {{
                             material_specularreflection = material_specularreflection * texture2D(map_specular, f_texcoord).r;
                         }}
@@ -579,21 +566,6 @@ namespace Destrospean.Graphics.OpenGL
                             GL.ActiveTexture(TextureUnit.Texture0);
                         }
                     }
-                    if (Shaders[shader].GetUniform("map_skin_ambient") != -1)
-                    {
-                        if (casPartVolume == null || casPartVolume.SkinAmbientMapID == -1)
-                        {
-                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinAmbientMap"), 0);
-                        }
-                        else
-                        {
-                            GL.ActiveTexture(TextureUnit.Texture4);
-                            GL.BindTexture(TextureTarget.Texture2D, casPartVolume.SkinAmbientMapID);
-                            GL.Uniform1(Shaders[shader].GetUniform("map_skin_ambient"), 4);
-                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinAmbientMap"), 1);
-                            GL.ActiveTexture(TextureUnit.Texture0);
-                        }
-                    }
                     if (Shaders[shader].GetUniform("map_specular") != -1)
                     {
                         if (mesh.SpecularMapID == -1)
@@ -606,21 +578,6 @@ namespace Destrospean.Graphics.OpenGL
                             GL.BindTexture(TextureTarget.Texture2D, mesh.SpecularMapID);
                             GL.Uniform1(Shaders[shader].GetUniform("map_specular"), 1);
                             GL.Uniform1(Shaders[shader].GetUniform("hasSpecularMap"), 1);
-                            GL.ActiveTexture(TextureUnit.Texture0);
-                        }
-                    }
-                    if (Shaders[shader].GetUniform("map_skin_specular") != -1)
-                    {
-                        if (casPartVolume == null || casPartVolume.SkinSpecularMapID == -1)
-                        {
-                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinSpecularMap"), 0);
-                        }
-                        else
-                        {
-                            GL.ActiveTexture(TextureUnit.Texture2);
-                            GL.BindTexture(TextureTarget.Texture2D, casPartVolume.SkinSpecularMapID);
-                            GL.Uniform1(Shaders[shader].GetUniform("map_skin_specular"), 2);
-                            GL.Uniform1(Shaders[shader].GetUniform("hasSkinSpecularMap"), 1);
                             GL.ActiveTexture(TextureUnit.Texture0);
                         }
                     }

@@ -21,7 +21,6 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.Name = "Destrospean.DestrospeanCASPEditor.GameFoldersDialog";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Game Folders");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
-			this.Resizable = false;
 			this.DestroyWithParent = true;
 			// Internal child Destrospean.DestrospeanCASPEditor.GameFoldersDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;

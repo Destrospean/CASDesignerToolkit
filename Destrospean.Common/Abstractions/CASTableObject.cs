@@ -42,10 +42,13 @@ namespace Destrospean.Common.Abstractions
 
         public readonly List<Preset> Presets = new List<Preset>();
 
+        public readonly string ResourceKey;
+
         public delegate void UpdateUIDelegate(CASTableObject castableObject, int lodIndex, int groupIndex);
 
         public CASTableObject(s3pi.Interfaces.IPackage package, s3pi.Interfaces.IResourceIndexEntry resourceIndexEntry)
         {
+            ResourceKey = resourceIndexEntry.ReverseEvaluateResourceKey();
             ParentPackage = package;
         }
 

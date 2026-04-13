@@ -146,14 +146,14 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 else if (mType == EntryType.BoneEntry)
                 {
-                    mTGIRefs = new int[]
+                    mTGIRefs = new[]
                         {
                             reader.ReadInt32()
                         };
                 }
             }
 
-            public Entry(int lod, int tgiIndex) : this((byte)lod, new int[]
+            public Entry(int lod, int tgiIndex) : this((byte)lod, new[]
                 {
                     tgiIndex
                 })
@@ -179,7 +179,7 @@ namespace Destrospean.CmarNYCBorrowed
             public Entry(int tgiIndex)
             {
                 mType = EntryType.BoneEntry;
-                mTGIRefs = new int[]
+                mTGIRefs = new[]
                     {
                         tgiIndex
                     };
@@ -271,9 +271,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public VPXY(TGI tgi, TGI[][] geomTGIs) : this(tgi, new TGI[]
-            {
-            }, geomTGIs)
+        public VPXY(TGI tgi, TGI[][] geomTGIs) : this(tgi, new TGI[0], geomTGIs)
         {
         }
 
@@ -288,13 +286,13 @@ namespace Destrospean.CmarNYCBorrowed
             mIndexCount = 0;
             mExternalCount = 0;
             mInternalCount = 1;
-            mInternalITG = new TGI[]
+            mInternalITG = new[]
                 {
                     new TGI(tgi.Type, tgi.Group, tgi.Instance)
                 };
             mChunkPosition = 44;
             mChunkSize = 141;
-            mMagic = new char[]
+            mMagic = new[]
                 {
                     'V',
                     'P',

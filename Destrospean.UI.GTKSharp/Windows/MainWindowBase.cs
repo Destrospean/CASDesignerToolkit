@@ -61,6 +61,6 @@
             return responseType;
         }
 
-        public abstract void RescaleAndReposition(bool skipRescale = false);
+        public abstract void RescaleAndReposition();
     }
 }

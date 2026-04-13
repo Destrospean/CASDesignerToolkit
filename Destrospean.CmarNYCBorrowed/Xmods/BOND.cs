@@ -145,7 +145,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public BOND()
         {
-            PublicKey = new TGI[]
+            PublicKey = new[]
                 {
                     new TGI()
                 };
@@ -232,7 +232,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 DelayLoadKey[i].Write(writer, TGI.TGISequence.ITG);
             }
-            ObjectKey = new ObjectData[]
+            ObjectKey = new[]
                 {
                     new ObjectData((uint)(20 + (PublicKey.Length << 4) + (ExternalKey.Length << 4) + (DelayLoadKey.Length << 4) + 8), (uint)(4 + Adjustments.Length * 44))
                 };

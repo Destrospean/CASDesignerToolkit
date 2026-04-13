@@ -27,7 +27,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
             get
             {
-                return new float[]
+                return new[]
                 {
                     mX,
                     mY,
