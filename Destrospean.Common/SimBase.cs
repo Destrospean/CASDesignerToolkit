@@ -150,9 +150,11 @@ namespace Destrospean.Common
                 {
                     foreach (var clothingType in new[]
                         {
-                            ClothingType.Necklace,
-                            ClothingType.Glove,
                             ClothingType.Socks,
+                            ClothingType.LeftGarter,
+                            ClothingType.RightGarter,
+                            ClothingType.Glove,
+                            ClothingType.Necklace,
                             ClothingType.Body,
                             ClothingType.Bottom,
                             ClothingType.Top
@@ -163,7 +165,21 @@ namespace Destrospean.Common
                         {
                             continue;
                         }
-                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
+                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                        var xmlDocument = new System.Xml.XmlDocument();
+                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
+                        var isValid = false;
+                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                        {
+                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body")
+                            {
+                                isValid = true;
+                            }
+                        }
+                        if (isValid)
+                        {
+                            graphics.DrawImage(preset.Texture, 0, 0);
+                        }
                     }
                 }
                 return mStackedBodyTexture;
