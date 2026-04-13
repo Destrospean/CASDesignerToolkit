@@ -25,9 +25,9 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build from Docker image
       run: IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:master tools/build.sh
-    - name: Bundle Windows version from Docker image
+    - name: Bundle Windows i386 version from Docker image
       run: IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:master tools/bundle_windows.sh
-    - name: Build Linux version from Docker image
+    - name: Bundle Linux amd64 version from Docker image
       run: IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:master tools/bundle_debian.sh
     - name: Release
       uses: softprops/action-gh-release@v1

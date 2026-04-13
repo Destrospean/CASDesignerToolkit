@@ -98,10 +98,10 @@ jobs:
       - name: Build from Docker image
         run: IMAGE_NAME=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:master tools/build.sh
 
-      - name: Bundle Windows version from Docker image
+      - name: Bundle Windows i386 version from Docker image
         run: IMAGE_NAME=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:master tools/bundle_windows.sh
 
-      - name: Bundle Linux version from Docker image
+      - name: Bundle Linux amd64 version from Docker image
         run: IMAGE_NAME=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:master tools/bundle_debian.sh
 
       - name: Upload Windows i386 artifact
