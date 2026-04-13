@@ -14,7 +14,7 @@ namespace Destrospean.Common
 
         string mID;
 
-        Bitmap mStackedFaceTexture, mStackedScalpTexture;
+        Bitmap mStackedBodyTexture, mStackedFaceTexture, mStackedScalpTexture, mStackedShoesTexture;
 
         public readonly Dictionary<ClothingType, CASPart> CASPartOverrides = new Dictionary<ClothingType, CASPart>();
 
@@ -137,6 +137,39 @@ namespace Destrospean.Common
             return new CASPart(evaluated.Package, evaluated.ResourceIndexEntry, new Dictionary<string, GEOM>(), new Dictionary<string, s3pi.GenericRCOLResource.GenericRCOLResource>());
         }
 
+        public Bitmap GetStackedBodyTexture(int presetIndex)
+        {
+            lock (Lock)
+            {
+                if (mStackedBodyTexture != null)
+                {
+                    mStackedBodyTexture.Dispose();
+                }
+                mStackedBodyTexture = new Bitmap(1024, 1024);
+                using (var graphics = Graphics.FromImage(mStackedBodyTexture))
+                {
+                    foreach (var clothingType in new[]
+                        {
+                            ClothingType.Necklace,
+                            ClothingType.Glove,
+                            ClothingType.Socks,
+                            ClothingType.Body,
+                            ClothingType.Bottom,
+                            ClothingType.Top
+                        })
+                    {
+                        CASPart casPart;
+                        if (!CASParts.TryGetValue(clothingType, out casPart) || casPart == null)
+                        {
+                            continue;
+                        }
+                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
+                    }
+                }
+                return mStackedBodyTexture;
+            }
+        }
+
         public Bitmap GetStackedFaceTexture(int presetIndex)
         {
             lock (Lock)
@@ -198,6 +231,35 @@ namespace Destrospean.Common
                     }
                 }
                 return mStackedScalpTexture;
+            }
+        }
+
+        public Bitmap GetStackedShoesTexture(int presetIndex)
+        {
+            lock (Lock)
+            {
+                if (mStackedShoesTexture != null)
+                {
+                    mStackedShoesTexture.Dispose();
+                }
+                mStackedShoesTexture = new Bitmap(1024, 1024);
+                using (var graphics = Graphics.FromImage(mStackedShoesTexture))
+                {
+                    foreach (var clothingType in new[]
+                        {
+                            ClothingType.Socks,
+                            ClothingType.Shoes
+                        })
+                    {
+                        CASPart casPart;
+                        if (!CASParts.TryGetValue(clothingType, out casPart) || casPart == null)
+                        {
+                            continue;
+                        }
+                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
+                    }
+                }
+                return mStackedShoesTexture;
             }
         }
 
