@@ -1,3 +1,5 @@
 #!/bin/bash
 cd "${0%/*}"
-docker run --rm --name casdesignertoolkit -v "$(pwd)/..":/CASDesignerToolkit $IMAGE_NAME bash -c "/CASDesignerToolkit/tools/build_debian.sh && cd /CASDesignerToolkit/CASDesignerToolkit/bin/Release && rm *.pdb BouncyCastle.Crypto.xml LibVLCSharp.xml Newtonsoft.Json.xml OpenTK.xml s3pi*.xml System.*.xml TeximpNet.xml && /CASDesignerToolkit/tools/bundle_debian.sh"
+docker run --rm --name casdesignertoolkit-build -v "$(pwd)/..":/CASDesignerToolkit $IMAGE_NAME bash -c "/CASDesignerToolkit/tools/_build.sh"
+rm ../CASDesignerToolkit/bin/Release/*.pdb ../CASDesignerToolkit/bin/Release/*.xml
+cp ../GameFolders.xml ../CASDesignerToolkit/bin/Release
