@@ -27,7 +27,7 @@ public partial class MainWindow : RendererMainWindow
 
     readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    string mCurrentMusicModes;
+    string mCurrentMusicModes, mSaveAsPath;
 
     bool mDisableUpdateModels = false;
 
@@ -46,8 +46,6 @@ public partial class MainWindow : RendererMainWindow
     object mLock = new object();
 
     public IPackage CurrentPackage;
-
-    public string CurrentPackagePath;
 
     public Image Image = new Image();
 
@@ -282,7 +280,6 @@ public partial class MainWindow : RendererMainWindow
             mAddMusicThread.Join();
             CurrentPackage = Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
-            CurrentPackagePath = packagePath;
             AddFilePathToWindowTitle(packagePath);
         }
     }
@@ -907,6 +904,7 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
+            throw;
         }
     }
 
@@ -1069,8 +1067,7 @@ public partial class MainWindow : RendererMainWindow
                         process.WaitForExit();
                     }
                     string updaterFilename = "CASDTKUpdater.exe",
-                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename,
-                    packagePath = ((MainWindow)Singleton).CurrentPackagePath;
+                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
                     if (File.Exists(downloadedUpdaterPath))
                     {
                         if (File.Exists(executablePath + updaterFilename))
@@ -1087,7 +1084,7 @@ public partial class MainWindow : RendererMainWindow
                                 {
                                     StartInfo = new ProcessStartInfo
                                         {
-                                            Arguments = Process.GetCurrentProcess().Id.ToString() + (string.IsNullOrEmpty(packagePath) ? "" : " " + packagePath),
+                                            Arguments = Process.GetCurrentProcess().Id.ToString(),
                                             CreateNoWindow = true,
                                             FileName = updaterFilename,
                                             UseShellExecute = false,
@@ -1124,7 +1121,6 @@ public partial class MainWindow : RendererMainWindow
                         {
                             StartInfo = new ProcessStartInfo
                                 {
-                                    Arguments = packagePath ?? "",
                                     CreateNoWindow = true,
                                     FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
                                     UseShellExecute = false
@@ -1146,7 +1142,7 @@ public partial class MainWindow : RendererMainWindow
             Sim.CurrentCASPart = null;
             Sim.CASPartOverrides.Clear();
             Sim.CASPartOverridesDisabled.Clear();
-            CurrentPackagePath = null;
+            mSaveAsPath = null;
             GlobalState.Meshes.Clear();
             foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
             {
@@ -1366,9 +1362,9 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            if (string.IsNullOrEmpty(CurrentPackagePath))
+            if (string.IsNullOrEmpty(mSaveAsPath))
             {
-                CurrentPackagePath = path;
+                mSaveAsPath = path;
             }
             foreach (var casPartKvp in PreloadedData.CASParts)
             {
@@ -1395,13 +1391,13 @@ public partial class MainWindow : RendererMainWindow
                 }
             }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
-            if (string.IsNullOrEmpty(CurrentPackagePath))
+            if (string.IsNullOrEmpty(mSaveAsPath))
             {
                 CurrentPackage.SavePackage();
             }
             else
             {
-                CurrentPackage.SaveAs(CurrentPackagePath);
+                CurrentPackage.SaveAs(mSaveAsPath);
             }
             NextState = NextStateOptions.NoUnsavedChanges;
         }
@@ -1634,7 +1630,6 @@ public partial class MainWindow : RendererMainWindow
                 ResourceUtils.MissingResourceKeys.Clear();
                 RefreshWidgets();
                 NextState = NextStateOptions.NoUnsavedChanges;
-                CurrentPackagePath = fileChooserDialog.Filename;
                 AddFilePathToWindowTitle(fileChooserDialog.Filename);
             }
             catch (Exception ex)

@@ -42,7 +42,6 @@ namespace Destrospean.DestrospeanCASPEditor.Updater
                 {
                     StartInfo = new ProcessStartInfo
                         {
-                            Arguments = args.Length == 1 ? "" : args[1],
                             CreateNoWindow = true,
                             FileName = "CASDesignerToolkit",
                             UseShellExecute = false
