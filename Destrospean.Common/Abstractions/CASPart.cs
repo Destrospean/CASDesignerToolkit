@@ -540,7 +540,6 @@ namespace Destrospean.Common.Abstractions
                     Newtonsoft.Json.Linq.JToken version;
                     if (!cache.TryGetValue("Version", out version) || (uint)version != LookupCacheVersion)
                     {
-                        File.Delete(LookupCacheFilePath);
                         return false;
                     }
                     CASPartLookupCache = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(cache["Data"].ToString());

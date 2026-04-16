@@ -178,11 +178,23 @@ public partial class MainWindow : RendererMainWindow
             CreateShortcutAction.StockId = Stock.Delete;
         }
         BuildResourceTable();
-        new Thread(() => ChoosePatternDialog.LoadCache()).Start();
         new Thread(() =>
             {
-                CASPart.LoadLookupCache();
-                ChooseObjectDialog.LoadCache();
+                if (!ChoosePatternDialog.LoadCache())
+                {
+                    File.Delete(PatternThumbnailCache.Singleton.CacheFilePath);
+                }
+            }).Start();
+        new Thread(() =>
+            {
+                if (!CASPart.LoadLookupCache())
+                {
+                    File.Delete(CASPart.LookupCacheFilePath);
+                }
+                if (!ChooseObjectDialog.LoadCache())
+                {
+                    File.Delete(CASPartThumbnailCache.Singleton.CacheFilePath);
+                };
             }).Start();
         (mAddMusicThread = new Thread(AddMusic)).Start();
         var waitBeforeUpdateCheck = false;

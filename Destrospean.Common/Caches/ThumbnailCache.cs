@@ -25,7 +25,6 @@ namespace Destrospean.Common
                     Newtonsoft.Json.Linq.JToken version;
                     if (!cache.TryGetValue("Version", out version) || (uint)version != CacheVersion)
                     {
-                        File.Delete(CacheFilePath);
                         return false;
                     }
                     foreach (var thumbnailKvp in (Newtonsoft.Json.Linq.JObject)cache["Data"])
