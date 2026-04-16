@@ -477,5 +477,19 @@ namespace Destrospean.S3PIExtensions
             }
             return nameMapDictionary;
         }
+
+        public static bool TryConvertFromS3PIFormat(string s3piFormatKey, out string key)
+        {
+            try
+            {
+                key = "key:" + string.Join(":", s3piFormatKey.Replace("0x", "").Split('-'));
+                return true;
+            }
+            catch
+            {
+                key = null;
+                return false;
+            }
+        }
     }
 }

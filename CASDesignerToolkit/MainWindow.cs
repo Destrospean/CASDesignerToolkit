@@ -904,7 +904,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-            throw;
         }
     }
 
