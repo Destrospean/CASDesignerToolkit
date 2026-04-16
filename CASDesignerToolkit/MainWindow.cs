@@ -178,7 +178,7 @@ public partial class MainWindow : RendererMainWindow
             CreateShortcutAction.StockId = Stock.Delete;
         }
         BuildResourceTable();
-        new Thread(ChoosePatternDialog.LoadCache).Start();
+        new Thread(() => ChoosePatternDialog.LoadCache()).Start();
         new Thread(() =>
             {
                 CASPart.LoadLookupCache();
@@ -195,9 +195,9 @@ public partial class MainWindow : RendererMainWindow
                     {
                         mAddMusicThread.Join();
                     }
-                    ChoosePatternDialog.GenerateCache(Package.NewPackage(0));
+                    ChoosePatternDialog.GenerateCache();
                     CASPart.GenerateLookupCache();
-                    ChooseObjectDialog.GenerateCache(Package.NewPackage(0));
+                    ChooseObjectDialog.GenerateCache();
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
@@ -208,28 +208,32 @@ public partial class MainWindow : RendererMainWindow
                 Sensitive = true;
                 waitBeforeUpdateCheck = false;
             };
-        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath) || !File.Exists(CASPartUtils.CacheFilePath))
-        {
-            waitBeforeUpdateCheck = true;
-            new CacheGenerationWindow(this, Icon);
-        }
         new Thread(() =>
             {
-                if (!ApplicationSettings.CheckForUpdatesAutomatically || File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+                Thread.Sleep(1000);
+                if (!File.Exists(PatternThumbnailCache.Singleton.CacheFilePath) || !File.Exists(CASPart.LookupCacheFilePath) || !File.Exists(CASPartThumbnailCache.Singleton.CacheFilePath))
                 {
-                    return;
+                    waitBeforeUpdateCheck = true;
+                    Application.Invoke((sender, e) => new CacheGenerationWindow(this, Icon));
                 }
-                while (waitBeforeUpdateCheck)
-                {   
-                }
-                try
-                {
-                    CheckForUpdates();
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteError(ex);
-                }
+                new Thread(() =>
+                    {
+                        if (!ApplicationSettings.CheckForUpdatesAutomatically || File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+                        {
+                            return;
+                        }
+                        while (waitBeforeUpdateCheck)
+                        {   
+                        }
+                        try
+                        {
+                            CheckForUpdates();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteError(ex);
+                        }
+                    }).Start();
             }).Start();
         var assembly = System.Reflection.Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);

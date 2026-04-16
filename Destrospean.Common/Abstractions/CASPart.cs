@@ -28,8 +28,6 @@ namespace Destrospean.Common.Abstractions
                 return species == 0 ? Species.Human : species;
             }
         }
-
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
             
         public static Dictionary<string, Dictionary<string, string>> CASPartLookupCache;
 
@@ -48,6 +46,10 @@ namespace Destrospean.Common.Abstractions
         }
 
         public readonly Dictionary<int, List<GEOMAndKey>> LODs = new Dictionary<int, List<GEOMAndKey>>();
+
+        public static readonly string LookupCacheFilePath = string.Format("{0}{1}Destrospean{1}CASPartLookupCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
+
+        public const uint LookupCacheVersion = 0;
 
         public struct GEOMAndKey
         {
@@ -528,23 +530,35 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void LoadLookupCache()
+        public static bool LoadLookupCache()
         {
-            if (File.Exists(CacheFilePath))
+            if (File.Exists(LookupCacheFilePath))
             {
-                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
+                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(LookupCacheFilePath, FileMode.Open)))
                 {
-                    CASPartLookupCache = new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, Dictionary<string, string>>>(reader);
+                    var cache = new Newtonsoft.Json.JsonSerializer().Deserialize<Newtonsoft.Json.Linq.JObject>(reader);
+                    Newtonsoft.Json.Linq.JToken version;
+                    if (!cache.TryGetValue("Version", out version) || (uint)version != LookupCacheVersion)
+                    {
+                        File.Delete(LookupCacheFilePath);
+                        return false;
+                    }
+                    CASPartLookupCache = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(cache["Data"].ToString());
                 }
+                return true;
             }
+            return false;
         }
 
         public static void SaveLookupCache()
         {
-            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(CacheFilePath));
-            using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(CacheFilePath, FileMode.Create)))
+            var cache = new Newtonsoft.Json.Linq.JObject();
+            cache.Add("Version", LookupCacheVersion);
+            cache.Add("Data", Newtonsoft.Json.JsonConvert.SerializeObject(CASPartLookupCache));
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(LookupCacheFilePath));
+            using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(LookupCacheFilePath, FileMode.Create)))
             {
-                new Newtonsoft.Json.JsonSerializer().Serialize(writer, CASPartLookupCache);
+                new Newtonsoft.Json.JsonSerializer().Serialize(writer, cache);
             }
         }
 
