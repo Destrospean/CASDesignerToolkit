@@ -169,11 +169,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             var textEntryDialog = new TextEntryDialog("Specify Key", "Specify the image resource's key (in the format of \"key:########:########:################\"):", MainWindowBase.Singleton);
                             if (textEntryDialog.Run() == (int)ResponseType.Ok)
                             {
-                                string key;
-                                if (!ResourceUtils.TryConvertFromS3PIFormat(textEntryDialog.TextEntryValue, out key))
-                                {
-                                    key = textEntryDialog.TextEntryValue;
-                                }
+                                var key = textEntryDialog.TextEntryValue.Replace("-0x", ":").Replace("0x", "key:");
                                 var existingEntryIndex = entries.FindIndex(x => x.Label.ToLowerInvariant() == key.ToLowerInvariant());
                                 if (existingEntryIndex == -1)
                                 {
