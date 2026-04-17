@@ -297,7 +297,7 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     mScaling[i] = reader.ReadSingle();
                 }
-                char[] temp = reader.ReadChars(reader.ReadInt32());
+                var temp = reader.ReadChars(reader.ReadInt32());
                 mBoneName = new string(temp);
                 mOpposingBoneIndex = reader.ReadInt32();
                 mParentBoneIndex = reader.ReadInt32();
