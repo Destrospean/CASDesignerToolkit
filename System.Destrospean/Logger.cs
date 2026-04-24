@@ -2,9 +2,9 @@
 {
     public static class Logger
     {
-        public static void WriteError(System.Exception ex, bool fatal = false)
+        public static void WriteError(Exception ex, bool fatal = false)
         {
-            System.IO.File.WriteAllText(System.AppDomain.CurrentDomain.BaseDirectory + (fatal ? "crash-" : "error-") + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", ex.Message + System.Environment.NewLine + ex.StackTrace);
+            IO.File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + (fatal ? "crash-" : "error-") + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log", ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
 }
