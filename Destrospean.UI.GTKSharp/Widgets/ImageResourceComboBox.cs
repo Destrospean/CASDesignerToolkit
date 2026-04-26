@@ -169,18 +169,19 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             var textEntryDialog = new TextEntryDialog("Specify Key", "Specify the image resource's key (in the format of \"key:########:########:################\"):", MainWindowBase.Singleton);
                             if (textEntryDialog.Run() == (int)ResponseType.Ok)
                             {
-                                var existingEntryIndex = entries.FindIndex(x => x.Label.ToLowerInvariant() == textEntryDialog.TextEntryValue.ToLowerInvariant());
+                                var key = textEntryDialog.TextEntryValue.Replace("-0x", ":").Replace("0x", "key:");
+                                var existingEntryIndex = entries.FindIndex(x => x.Label.ToLowerInvariant() == key.ToLowerInvariant());
                                 if (existingEntryIndex == -1)
                                 {
                                     var exists = true;
                                     System.Collections.Generic.List<Pixbuf> pixbufs = null;
-                                    if (!ImageUtils.PreloadedGameImagePixbufs.TryGetValue(textEntryDialog.TextEntryValue, out pixbufs))
+                                    if (!ImageUtils.PreloadedGameImagePixbufs.TryGetValue(key, out pixbufs))
                                     {
                                         try
                                         {
-                                            var evaluated = package.EvaluateImageResourceKey(textEntryDialog.TextEntryValue);
+                                            var evaluated = package.EvaluateImageResourceKey(key);
                                             evaluated.Package.PreloadGameImage(evaluated.ResourceIndexEntry, imageWidget);
-                                            pixbufs = ImageUtils.PreloadedGameImagePixbufs[textEntryDialog.TextEntryValue];
+                                            pixbufs = ImageUtils.PreloadedGameImagePixbufs[key];
                                             pixbufs.Add(pixbufs[0].ScaleSimple(WidgetUtils.SmallImageSize, WidgetUtils.SmallImageSize, InterpType.Bilinear));
                                         }
                                         catch
@@ -191,7 +192,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                     }
                                     if (exists)
                                     {
-                                        entries.Insert(entries.Count - 2, new ImageResourceComboBoxEntry(pixbufs[1], textEntryDialog.TextEntryValue.ToUpperInvariant().Replace("KEY", "key")));
+                                        entries.Insert(entries.Count - 2, new ImageResourceComboBoxEntry(pixbufs[1], key.ToUpperInvariant().Replace("KEY", "key")));
                                         listStore.InsertWithValues(entries.Count - 3, entries[entries.Count - 3].Image, entries[entries.Count - 3].Label);
                                         comboBox.Active = entries.Count - 3;
                                     }

@@ -2226,7 +2226,7 @@ namespace Destrospean.CmarNYCBorrowed
             mBoneHashCount = baseMesh.mBoneHashCount;
             mBoneHashArray = baseMesh.mBoneHashArray;
             mTGICount = 1;
-            mTGIs = new TGI[]
+            mTGIs = new[]
                 {
                     new TGI(0, 0, 0)
                 };
@@ -2323,7 +2323,7 @@ namespace Destrospean.CmarNYCBorrowed
             mBoneHashCount = baseMesh.mBoneHashCount;
             mBoneHashArray = baseMesh.mBoneHashArray;
             mTGICount = 1;
-            mTGIs = new TGI[]
+            mTGIs = new[]
                 {
                     new TGI(0, 0, 0)
                 };

@@ -28,7 +28,7 @@ public partial class MainWindow : RendererMainWindow
 
     readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-    string mCurrentMusicModes;
+    string mCurrentMusicModes, mSaveAsPath;
 
     bool mDisableUpdateModels = false;
 
@@ -47,8 +47,6 @@ public partial class MainWindow : RendererMainWindow
     object mLock = new object();
 
     public IPackage CurrentPackage;
-
-    public string CurrentPackagePath;
 
     public Image Image = new Image();
 
@@ -194,11 +192,23 @@ public partial class MainWindow : RendererMainWindow
             CreateShortcutAction.StockId = Stock.Delete;
         }
         BuildResourceTable();
-        new Thread(ChoosePatternDialog.LoadCache).Start();
         new Thread(() =>
             {
-                CASPart.LoadLookupCache();
-                ChooseObjectDialog.LoadCache();
+                if (!ChoosePatternDialog.LoadCache())
+                {
+                    File.Delete(PatternThumbnailCache.Singleton.CacheFilePath);
+                }
+            }).Start();
+        new Thread(() =>
+            {
+                if (!CASPart.LoadLookupCache())
+                {
+                    File.Delete(CASPart.LookupCacheFilePath);
+                }
+                if (!ChooseObjectDialog.LoadCache())
+                {
+                    File.Delete(CASPartThumbnailCache.Singleton.CacheFilePath);
+                };
             }).Start();
         (mAddMusicThread = new Thread(AddMusic)).Start();
         var waitBeforeUpdateCheck = false;
@@ -211,9 +221,9 @@ public partial class MainWindow : RendererMainWindow
                     {
                         mAddMusicThread.Join();
                     }
-                    ChoosePatternDialog.GenerateCache(Package.NewPackage(0));
+                    ChoosePatternDialog.GenerateCache();
                     CASPart.GenerateLookupCache();
-                    ChooseObjectDialog.GenerateCache(Package.NewPackage(0));
+                    ChooseObjectDialog.GenerateCache();
                     mAudioResourcesByMode.Clear();
                     AddMusic();
                 }
@@ -224,28 +234,32 @@ public partial class MainWindow : RendererMainWindow
                 Sensitive = true;
                 waitBeforeUpdateCheck = false;
             };
-        if (!File.Exists(PatternUtils.CacheFilePath) || !File.Exists(CASPart.CacheFilePath) || !File.Exists(CASPartUtils.CacheFilePath))
-        {
-            waitBeforeUpdateCheck = true;
-            new CacheGenerationWindow(this, Icon);
-        }
         new Thread(() =>
             {
-                if (!ApplicationSettings.CheckForUpdatesAutomatically || File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+                Thread.Sleep(1000);
+                if (!File.Exists(PatternThumbnailCache.Singleton.CacheFilePath) || !File.Exists(CASPart.LookupCacheFilePath) || !File.Exists(CASPartThumbnailCache.Singleton.CacheFilePath))
                 {
-                    return;
+                    waitBeforeUpdateCheck = true;
+                    Application.Invoke((sender, e) => new CacheGenerationWindow(this, Icon));
                 }
-                while (waitBeforeUpdateCheck)
-                {   
-                }
-                try
-                {
-                    CheckForUpdates();
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteError(ex);
-                }
+                new Thread(() =>
+                    {
+                        if (!ApplicationSettings.CheckForUpdatesAutomatically || File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noupdate"))
+                        {
+                            return;
+                        }
+                        while (waitBeforeUpdateCheck)
+                        {   
+                        }
+                        try
+                        {
+                            CheckForUpdates();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteError(ex);
+                        }
+                    }).Start();
             }).Start();
         var assembly = System.Reflection.Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);
@@ -296,7 +310,6 @@ public partial class MainWindow : RendererMainWindow
             mAddMusicThread.Join();
             CurrentPackage = Package.OpenPackage(0, packagePath, true);
             RefreshWidgets();
-            CurrentPackagePath = packagePath;
             AddFilePathToWindowTitle(packagePath);
         }
     }
@@ -1354,8 +1367,7 @@ public partial class MainWindow : RendererMainWindow
                         process.WaitForExit();
                     }
                     string updaterFilename = "CASDTKUpdater.exe",
-                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename,
-                    packagePath = ((MainWindow)Singleton).CurrentPackagePath;
+                    downloadedUpdaterPath = tempPath + assemblyName.Name + System.IO.Path.DirectorySeparatorChar + updaterFilename;
                     if (File.Exists(downloadedUpdaterPath))
                     {
                         if (File.Exists(executablePath + updaterFilename))
@@ -1372,7 +1384,7 @@ public partial class MainWindow : RendererMainWindow
                                 {
                                     StartInfo = new ProcessStartInfo
                                         {
-                                            Arguments = Process.GetCurrentProcess().Id.ToString() + (string.IsNullOrEmpty(packagePath) ? "" : " " + packagePath),
+                                            Arguments = Process.GetCurrentProcess().Id.ToString(),
                                             CreateNoWindow = true,
                                             FileName = updaterFilename,
                                             UseShellExecute = false,
@@ -1409,7 +1421,6 @@ public partial class MainWindow : RendererMainWindow
                         {
                             StartInfo = new ProcessStartInfo
                                 {
-                                    Arguments = packagePath ?? "",
                                     CreateNoWindow = true,
                                     FileName = executablePath + (Environment.GetEnvironmentVariable("CASDTK_IMMUTABLE") == "1" ? "start.sh" : assemblyName.Name),
                                     UseShellExecute = false
@@ -1431,7 +1442,7 @@ public partial class MainWindow : RendererMainWindow
             Sim.CurrentCASPart = null;
             Sim.CASPartOverrides.Clear();
             Sim.CASPartOverridesDisabled.Clear();
-            CurrentPackagePath = null;
+            mSaveAsPath = null;
             GlobalState.Meshes.Clear();
             foreach (var key in new List<string>(PreloadedData.CASParts.Keys))
             {
@@ -1699,9 +1710,9 @@ public partial class MainWindow : RendererMainWindow
     {
         try
         {
-            if (string.IsNullOrEmpty(CurrentPackagePath))
+            if (string.IsNullOrEmpty(mSaveAsPath))
             {
-                CurrentPackagePath = path;
+                mSaveAsPath = path;
             }
             foreach (var casPartKvp in PreloadedData.CASParts)
             {
@@ -1753,13 +1764,13 @@ public partial class MainWindow : RendererMainWindow
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
             }
             CurrentPackage.FindAll(x => !x.IsDeleted && x.Compressed == 0).ForEach(x => x.Compressed = 0xFFFF);
-            if (string.IsNullOrEmpty(CurrentPackagePath))
+            if (string.IsNullOrEmpty(mSaveAsPath))
             {
                 CurrentPackage.SavePackage();
             }
             else
             {
-                CurrentPackage.SaveAs(CurrentPackagePath);
+                CurrentPackage.SaveAs(mSaveAsPath);
             }
             NextState = NextStateOptions.NoUnsavedChanges;
         }
@@ -1992,7 +2003,6 @@ public partial class MainWindow : RendererMainWindow
                 ResourceUtils.MissingResourceKeys.Clear();
                 RefreshWidgets();
                 NextState = NextStateOptions.NoUnsavedChanges;
-                CurrentPackagePath = fileChooserDialog.Filename;
                 AddFilePathToWindowTitle(fileChooserDialog.Filename);
             }
             catch (Exception ex)

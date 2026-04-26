@@ -46,7 +46,7 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.Entry.Name = "Entry";
 			this.Entry.IsEditable = true;
 			this.Entry.WidthChars = 44;
-			this.Entry.MaxLength = 38;
+			this.Entry.MaxLength = 40;
 			this.Entry.InvisibleChar = '•';
 			this.Alignment.Add (this.Entry);
 			w1.Add (this.Alignment);

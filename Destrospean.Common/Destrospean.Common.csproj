@@ -106,8 +106,9 @@
     <Compile Include="Abstractions\CASPartPreset.cs" />
     <Compile Include="Abstractions\GameObjectPreset.cs" />
     <Compile Include="Abstractions\Preset.cs" />
-    <Compile Include="PatternUtils.cs" />
-    <Compile Include="CASPartUtils.cs" />
+    <Compile Include="Caches\ThumbnailCache.cs" />
+    <Compile Include="Caches\PatternThumbnailCache.cs" />
+    <Compile Include="Caches\CASPartThumbnailCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -131,5 +132,8 @@
       <Name>System.Destrospean</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Caches\" />
   </ItemGroup>
 </Project>

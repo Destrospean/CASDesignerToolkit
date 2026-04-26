@@ -134,7 +134,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (System.Exception ex)
             {
                 System.Destrospean.Logger.WriteError(ex);
-                throw;
             }
         }
 
@@ -189,7 +188,6 @@ namespace Destrospean.DestrospeanCASPEditor
             catch (System.Exception ex)
             {
                 System.Destrospean.Logger.WriteError(ex);
-                throw;
             }
         }
     }

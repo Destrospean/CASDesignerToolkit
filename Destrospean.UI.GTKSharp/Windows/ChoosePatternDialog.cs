@@ -107,9 +107,9 @@ namespace Destrospean.DestrospeanCASPEditor
                         {
                             Bitmap patternImage = null;
                             PatternInfo patternInfo;
-                            if (!PatternUtils.PreloadedPatterns.TryGetValue(patternNameKeyPath[1], out patternInfo))
+                            if (!PatternThumbnailCache.PreloadedPatterns.TryGetValue(patternNameKeyPath[1], out patternInfo))
                             {
-                                patternInfo = PatternUtils.PreloadedPatterns[patternNameKeyPath[1]] = PatternUtils.GetPatternInfo(package, patternNameKeyPath[1]);
+                                patternInfo = PatternThumbnailCache.PreloadedPatterns[patternNameKeyPath[1]] = PatternThumbnailCache.GetPatternInfo(package, patternNameKeyPath[1]);
                             }
                             switch (patternInfo.Type)
                             {
@@ -130,7 +130,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             }
                             if (patternImage != null)
                             {
-                                patternImage = PatternUtils.PreloadedPatternImages[patternNameKeyPath[1]] = new System.Drawing.Bitmap(patternImage, 64, 64);
+                                patternImage = PatternThumbnailCache.Singleton.PreloadedThumbnails[patternNameKeyPath[1]] = new System.Drawing.Bitmap(patternImage, 64, 64);
                                 pixbuf = PreloadedPatternImagePixbufs[patternNameKeyPath[1]] = patternImage.ToPixbuf();
                             }
                             uncachedPatternExists = true;
@@ -141,7 +141,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                     if (uncachedPatternExists)
                     {
-                        PatternUtils.SaveCache();
+                        PatternThumbnailCache.Singleton.SaveCache();
                     }
                     PatternIconView.SelectPath(new TreePath("0"));
                 };
@@ -176,26 +176,30 @@ namespace Destrospean.DestrospeanCASPEditor
                 };
         }
 
-        public static void GenerateCache(IPackage package)
+        public static void GenerateCache()
         {
-            if (System.IO.File.Exists(PatternUtils.CacheFilePath))
+            if (System.IO.File.Exists(PatternThumbnailCache.Singleton.CacheFilePath))
             {
                 return;
             }
-            PatternUtils.GenerateCache(package);
-            foreach (var patternImageKvp in PatternUtils.PreloadedPatternImages)
+            PatternThumbnailCache.Singleton.GenerateCache(s3pi.Package.Package.NewPackage(0));
+            foreach (var patternImageKvp in PatternThumbnailCache.Singleton.PreloadedThumbnails)
             {
                 PreloadedPatternImagePixbufs.Add(patternImageKvp.Key, patternImageKvp.Value.ToPixbuf());
             }
         }
 
-        public static void LoadCache()
+        public static bool LoadCache()
         {
-            PatternUtils.LoadCache();
-            foreach (var patternImageKvp in PatternUtils.PreloadedPatternImages)
+            if (!PatternThumbnailCache.Singleton.LoadCache())
+            {
+                return false;
+            }
+            foreach (var patternImageKvp in PatternThumbnailCache.Singleton.PreloadedThumbnails)
             {
                 PreloadedPatternImagePixbufs.Add(patternImageKvp.Key, patternImageKvp.Value.ToPixbuf());
             }
+            return true;
         }
     }
 }

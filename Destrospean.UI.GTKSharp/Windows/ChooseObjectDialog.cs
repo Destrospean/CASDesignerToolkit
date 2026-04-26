@@ -78,7 +78,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             graphics.Clear(Color.Transparent);
                         }
                     }
-                    casPartImage = CASPartUtils.PreloadedCASPartImages[casPartNameKeyThumbnailKey[1]] = new System.Drawing.Bitmap(casPartImage, 64, 64);
+                    casPartImage = CASPartThumbnailCache.Singleton.PreloadedThumbnails[casPartNameKeyThumbnailKey[1]] = new System.Drawing.Bitmap(casPartImage, 64, 64);
                     pixbuf = PreloadedCASPartImagePixbufs[casPartNameKeyThumbnailKey[1]] = casPartImage.ToPixbuf();
                     uncachedCASPartExists = true;
                 }
@@ -88,7 +88,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
             if (uncachedCASPartExists)
             {
-                CASPartUtils.SaveCache();
+                CASPartThumbnailCache.Singleton.SaveCache();
             }
             IconView.Model = listStore;
             IconView.PixbufColumn = 1;
@@ -114,26 +114,30 @@ namespace Destrospean.DestrospeanCASPEditor
                 };
         }
 
-        public static void GenerateCache(IPackage package)
+        public static void GenerateCache()
         {
-            if (System.IO.File.Exists(CASPartUtils.CacheFilePath))
+            if (System.IO.File.Exists(CASPartThumbnailCache.Singleton.CacheFilePath))
             {
                 return;
             }
-            CASPartUtils.GenerateCache(package);
-            foreach (var casPartImageKvp in CASPartUtils.PreloadedCASPartImages)
+            CASPartThumbnailCache.Singleton.GenerateCache(s3pi.Package.Package.NewPackage(0));
+            foreach (var casPartImageKvp in CASPartThumbnailCache.Singleton.PreloadedThumbnails)
             {
                 PreloadedCASPartImagePixbufs.Add(casPartImageKvp.Key, casPartImageKvp.Value.ToPixbuf());
             }
         }
 
-        public static void LoadCache()
+        public static bool LoadCache()
         {
-            CASPartUtils.LoadCache();
-            foreach (var casPartImageKvp in CASPartUtils.PreloadedCASPartImages)
+            if (!CASPartThumbnailCache.Singleton.LoadCache())
+            {
+                return false;
+            }
+            foreach (var casPartImageKvp in CASPartThumbnailCache.Singleton.PreloadedThumbnails)
             {
                 PreloadedCASPartImagePixbufs.Add(casPartImageKvp.Key, casPartImageKvp.Value.ToPixbuf());
             }
+            return true;
         }
     }
 }

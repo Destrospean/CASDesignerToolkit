@@ -10,16 +10,24 @@ using s3pi.Interfaces;
 
 namespace Destrospean.Common
 {
-    public static class PatternUtils
+    public class PatternThumbnailCache : ThumbnailCache
     {
-        public static readonly string CacheFilePath = string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
-
-        public static readonly Dictionary<string, Bitmap> PreloadedPatternImages = new Dictionary<string, Bitmap>();
+        public override string CacheFilePath
+        {
+            get
+            {
+                return string.Format("{0}{1}Destrospean{1}PatternThumbnailCache", System.Destrospean.Platform.CacheDirectoryPath, Path.DirectorySeparatorChar);
+            }
+        }
 
         public static readonly Dictionary<string, PatternInfo> PreloadedPatterns = new Dictionary<string, PatternInfo>();
 
-        public static void GenerateCache(IPackage package)
+        public static PatternThumbnailCache Singleton = new PatternThumbnailCache();
+
+        public void GenerateCache(IPackage package)
         {
+            PreloadedPatterns.Clear();
+            PreloadedThumbnails.Clear();
             var categories = new List<string>();
             EvaluatedResourceKey gamePatternListEvaluated;
             try
@@ -86,7 +94,7 @@ namespace Destrospean.Common
                 foreach (var patternNameKeyPath in patternNamesKeysPaths)
                 {
                     Bitmap patternImage = null;
-                    if (!PreloadedPatternImages.TryGetValue(patternNameKeyPath[1], out patternImage))
+                    if (!PreloadedThumbnails.TryGetValue(patternNameKeyPath[1], out patternImage))
                     {
                         PatternInfo patternInfo;
                         if (!PreloadedPatterns.TryGetValue(patternNameKeyPath[1], out patternInfo))
@@ -112,7 +120,7 @@ namespace Destrospean.Common
                         }
                         if (patternImage != null)
                         {
-                            PreloadedPatternImages[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
+                            PreloadedThumbnails[patternNameKeyPath[1]] = new Bitmap(patternImage, 64, 64);
                         }
                         uncachedPatternExists = true;
                     }
@@ -323,41 +331,6 @@ namespace Destrospean.Common
                 RGBMask = rgbMask,
                 SolidColor = rgbColors.Count == 1 ? rgbColors[0] : null
             };
-        }
-
-        public static void LoadCache()
-        {
-            if (File.Exists(CacheFilePath))
-            {
-                using (var reader = new Newtonsoft.Json.Bson.BsonReader(new FileStream(CacheFilePath, FileMode.Open)))
-                {
-                    foreach (var patternImageBase64StringKvp in new Newtonsoft.Json.JsonSerializer().Deserialize<Dictionary<string, string>>(reader))
-                    {
-                        using (var stream = new MemoryStream(System.Convert.FromBase64String(patternImageBase64StringKvp.Value)))
-                        {
-                            PreloadedPatternImages.Add(patternImageBase64StringKvp.Key, new Bitmap(stream));
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void SaveCache()
-        {
-            var patternThumbnailCache = new Dictionary<string, string>();
-            foreach (var patternImageKvp in PreloadedPatternImages)
-            {
-                using (var stream = new MemoryStream())
-                {
-                    patternImageKvp.Value.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    patternThumbnailCache.Add(patternImageKvp.Key, System.Convert.ToBase64String(stream.ToArray()));
-                }
-            }
-            Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));
-            using (var writer = new Newtonsoft.Json.Bson.BsonWriter(new FileStream(CacheFilePath, FileMode.Create)))
-            {
-                new Newtonsoft.Json.JsonSerializer().Serialize(writer, patternThumbnailCache);
-            }
         }
     }
 }

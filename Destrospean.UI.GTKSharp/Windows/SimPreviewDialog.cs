@@ -34,19 +34,7 @@ namespace Destrospean.DestrospeanCASPEditor
             SimPreviewTable.NRows++;
             foreach (ClothingType clothingType in System.Enum.GetValues(typeof(ClothingType)))
             {
-                switch (clothingType)
-                {
-                    case ClothingType.BasePeltLayer:
-                    case ClothingType.EyeColor:
-                    case ClothingType.FirstAccessory:
-                    case ClothingType.None:
-                    case ClothingType.NoseRing:
-                    case ClothingType.PeltLayer:
-                    case ClothingType.Tattoo:
-                    case ClothingType.TattooTemplate:
-                        continue;
-                }
-                if (clothingType >= ClothingType.BodyHairChestUpper)
+                if (clothingType == 0)
                 {
                     continue;
                 }
