@@ -194,18 +194,18 @@ public partial class MainWindow : RendererMainWindow
         BuildResourceTable();
         new Thread(() =>
             {
-                if (!ChoosePatternDialog.LoadCache())
+                if (!ChoosePatternDialog.LoadCache() && File.Exists(PatternThumbnailCache.Singleton.CacheFilePath))
                 {
                     File.Delete(PatternThumbnailCache.Singleton.CacheFilePath);
                 }
             }).Start();
         new Thread(() =>
             {
-                if (!CASPart.LoadLookupCache())
+                if (!CASPart.LoadLookupCache() && File.Exists(CASPart.LookupCacheFilePath))
                 {
                     File.Delete(CASPart.LookupCacheFilePath);
                 }
-                if (!ChooseObjectDialog.LoadCache())
+                if (!ChooseObjectDialog.LoadCache() && File.Exists(CASPartThumbnailCache.Singleton.CacheFilePath))
                 {
                     File.Delete(CASPartThumbnailCache.Singleton.CacheFilePath);
                 };
