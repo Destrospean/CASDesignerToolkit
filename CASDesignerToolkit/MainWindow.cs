@@ -25,23 +25,19 @@ public partial class MainWindow : RendererMainWindow
 
     Gdk.Pixbuf mAlphaCheckerboardPixbuf, mBabyBumpPixbuf, mFatnessPixbuf, mFitnessPixbuf;
 
-    readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
-
-    string mCurrentMusicModes, mSaveAsPath;
+    AudioPlayer mAudioPlayer;
 
     bool mDisableUpdateModels = false;
 
     SizeAllocatedHandler mGLWidgetSizeAllocatedHandler;
 
-    LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
-
     object mLock = new object();
-
-    LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
     readonly string mOriginalWindowTitle;
 
     PresetNotebook mPresetNotebook;
+
+    string mSaveAsPath;
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
 
@@ -196,7 +192,8 @@ public partial class MainWindow : RendererMainWindow
                     File.Delete(CASPartThumbnailCache.Singleton.CacheFilePath);
                 };
             }).Start();
-        (mAddMusicThread = new Thread(AddMusic)).Start();
+        mAudioPlayer = new AudioPlayer();
+        (mAddMusicThread = new Thread(mAudioPlayer.AddMusic)).Start();
         var waitBeforeUpdateCheck = false;
         CacheGenerationWindow.GenerateCachesAction = () =>
             {
@@ -210,8 +207,8 @@ public partial class MainWindow : RendererMainWindow
                     ChoosePatternDialog.GenerateCache();
                     CASPart.GenerateLookupCache();
                     ChooseObjectDialog.GenerateCache();
-                    mAudioResourcesByMode.Clear();
-                    AddMusic();
+                    mAudioPlayer.Clear();
+                    mAudioPlayer.AddMusic();
                 }
                 catch (Exception ex)
                 {
@@ -253,19 +250,18 @@ public partial class MainWindow : RendererMainWindow
         mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFatnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fatness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
         mFitnessPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.Fitness.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
-        mMediaPlayer = new LibVLCSharp.Shared.MediaPlayer(mLibVLC);
         CheckForUpdatesAutomaticallyAction.Active = ApplicationSettings.CheckForUpdatesAutomatically;
         PlayMusicAction.Active = ApplicationSettings.PlayMusic;
         UseAdvancedShadersAction.Active = ApplicationSettings.UseAdvancedOpenGLShaders;
         PlayMusicAction.Toggled += (sender, e) =>
             {
-                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mCurrentMusicModes))
+                if ((ApplicationSettings.PlayMusic = PlayMusicAction.Active) && !string.IsNullOrEmpty(mAudioPlayer.CurrentMusicModes))
                 {
-                    (mPlayMusicThread = new Thread(() => PlayMusic(mCurrentMusicModes.Split(',')))).Start();
+                    (mPlayMusicThread = new Thread(() => mAudioPlayer.PlayMusic(mAudioPlayer.CurrentMusicModes.Split(',')))).Start();
                 }
                 else
                 {
-                    mMediaPlayer.Stop();
+                    mAudioPlayer.Stop();
                     if (mPlayMusicThread != null)
                     {
                         mPlayMusicThread.Abort();
@@ -450,48 +446,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-        }
-    }
-
-    void AddMusic()
-    {
-        var audioTunerType = ResourceUtils.GetResourceType("AUDT");
-        var nameMapDictionary = new Dictionary<ulong, string>();
-        foreach (var package in ResourceUtils.GameContentPackages.Values)
-        {
-            foreach (var nameMapResource in package.GetNameMapResources())
-            {
-                foreach (var nameMapKvp in nameMapResource.ToDictionary())
-                {
-                    if (nameMapKvp.Value.ToLowerInvariant().StartsWith("music_"))
-                    {
-                        nameMapDictionary[nameMapKvp.Key] = nameMapKvp.Value;
-                    }
-                }
-            }
-        }
-        foreach (var package in ResourceUtils.GameContentPackages.Values)
-        {
-            foreach (var nameMapKvp in nameMapDictionary)
-            {
-                if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
-                {
-                    mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
-                }
-                foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
-                {
-                    foreach (var block in ((s3piwrappers.AudioTunerResource)WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
-                    {
-                        if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
-                        {
-                            foreach (var item in block.Items)
-                            {
-                                mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -902,15 +856,15 @@ public partial class MainWindow : RendererMainWindow
                                 RandomizeCASParts();
                                 goto case forAllMusicModeCasesCase;
                             case forAllMusicModeCasesCase:
-                                if (ApplicationSettings.PlayMusic && musicModes != mCurrentMusicModes)
+                                if (ApplicationSettings.PlayMusic && musicModes != mAudioPlayer.CurrentMusicModes)
                                 {
                                     if (mPlayMusicThread != null)
                                     {
                                         mPlayMusicThread.Abort();
                                     }
-                                    (mPlayMusicThread = new Thread(() => PlayMusic(musicModes.Split(',')))).Start();
+                                    (mPlayMusicThread = new Thread(() => mAudioPlayer.PlayMusic(musicModes.Split(',')))).Start();
                                 }
-                                mCurrentMusicModes = musicModes;
+                                mAudioPlayer.CurrentMusicModes = musicModes;
                                 break;
                         }
                     }
@@ -920,56 +874,6 @@ public partial class MainWindow : RendererMainWindow
         catch (Exception ex)
         {
             Logger.WriteError(ex);
-        }
-    }
-
-    void PlayMusic(params string[] modes)
-    {
-        var audioResources = new List<EvaluatedResourceKey>();
-        foreach (var audioResourceByMode in mAudioResourcesByMode)
-        {
-            if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))
-            {
-                audioResources.AddRange(audioResourceByMode.Value);
-            }
-        }
-        Shuffle(audioResources);
-        while (true)
-        {
-            foreach (var audioResource in audioResources)
-            {
-                using (var process = Process.Start(new ProcessStartInfo
-                    {
-                        Arguments = "-pi -po",
-                        CreateNoWindow = true,
-                        FileName = "ealayer3",
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    }))
-                {
-                    if (process == null)
-                    {
-                        Logger.WriteError(new Exception("Failed to start the executable."));
-                        return;
-                    }
-                    using (var standardInput = process.StandardInput.BaseStream)
-                    {
-                        ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
-                    }
-                    var wait = true;
-                    mMediaPlayer.EndReached += (sender, e) => wait = false;
-                    var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                    mMediaPlayer.Play(media);
-                    mMediaPlayer.Position = 0;
-                    while (wait)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    process.WaitForExit();
-                }
-            }
         }
     }
 
@@ -1003,20 +907,6 @@ public partial class MainWindow : RendererMainWindow
             BuildLODNotebook(casPart, lodIndex, groupIndex);
         }
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-    }
-
-    static void Shuffle<T>(IList<T> list)
-    {
-        var random = new Random();
-        var count = list.Count;
-        while (count > 1)
-        {
-            count--;
-            var n = random.Next(count + 1);
-            T value = list[n];
-            list[n] = list[count];
-            list[count] = value;
-        }
     }
 
     public static void AdjustFontSizes(Container container, Pango.FontDescription fontDescription)
@@ -1153,7 +1043,7 @@ public partial class MainWindow : RendererMainWindow
     {
         lock (GlobalState.Lock)
         {
-            mCurrentMusicModes = null;
+            mAudioPlayer.CurrentMusicModes = null;
             Sim.CurrentCASPart = null;
             Sim.CASPartOverrides.Clear();
             Sim.CASPartOverridesDisabled.Clear();
@@ -1458,7 +1348,7 @@ public partial class MainWindow : RendererMainWindow
                     return;
             }
         }
-        mMediaPlayer.Stop();
+        mAudioPlayer.Stop();
         if (mPlayMusicThread != null)
         {
             mPlayMusicThread.Abort();
@@ -1535,7 +1425,7 @@ public partial class MainWindow : RendererMainWindow
                     return;
             }
         }
-        mMediaPlayer.Stop();
+        mAudioPlayer.Stop();
         if (mPlayMusicThread != null)
         {
             mPlayMusicThread.Abort();
@@ -1630,7 +1520,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     mAddMusicThread.Join();
                 }
-                mMediaPlayer.Stop();
+                mAudioPlayer.Stop();
                 if (mPlayMusicThread != null)
                 {
                     mPlayMusicThread.Abort();
@@ -1672,7 +1562,7 @@ public partial class MainWindow : RendererMainWindow
             }
         }
         Destroy();
-        mMediaPlayer.Stop();
+        mAudioPlayer.Stop();
         if (mPlayMusicThread != null)
         {
             mPlayMusicThread.Abort();
