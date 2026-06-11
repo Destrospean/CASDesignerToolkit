@@ -2728,7 +2728,7 @@ namespace Destrospean.CmarNYCBorrowed
             mFacePointCount += meshToAppend.mFacePointCount;
         }
 
-        public void AutoBone(GEOM refMesh, bool unassignedVerticesOnly, bool interpolate, int interpolationPointCount, float weightingFactor, bool restrictToFace, Action updateProgressCallback = null)
+        public void AutoBone(GEOM refMesh, bool unassignedVerticesOnly, bool interpolate, int interpolationPointCount, float weightingFactor, bool restrictToFace, System.Destrospean.Action updateProgressCallback = null)
         {
             uint[] newBoneHashList,
             refBoneHashList = refMesh.BoneHashList;
@@ -3359,7 +3359,7 @@ namespace Destrospean.CmarNYCBorrowed
             mBoneHashArray = usedBoneHash.ToArray();
         }
 
-        public static GEOM[] GEOMsFromOBJ(OBJ obj, GEOM refMesh, TGI bumpMapTGI, bool smoothModel, bool cleanModel, Action updateProgressCallback = null)
+        public static GEOM[] GEOMsFromOBJ(OBJ obj, GEOM refMesh, TGI bumpMapTGI, bool smoothModel, bool cleanModel, System.Destrospean.Action updateProgressCallback = null)
         {
             if (!refMesh.IsValid || !refMesh.IsBase)
             {
@@ -3629,7 +3629,7 @@ namespace Destrospean.CmarNYCBorrowed
             return geoms;
         }
 
-        public static GEOM[] GEOMsFromWSO(WSO wso, GEOM refMesh, TGI bumpMapTGI, Action updateProgressCallback = null)
+        public static GEOM[] GEOMsFromWSO(WSO wso, GEOM refMesh, TGI bumpMapTGI, System.Destrospean.Action updateProgressCallback = null)
         {
             return GEOMsFromOBJ(new OBJ(wso), refMesh, bumpMapTGI, false, false, updateProgressCallback);
         }

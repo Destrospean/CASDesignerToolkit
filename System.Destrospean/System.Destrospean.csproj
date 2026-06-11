@@ -31,6 +31,7 @@
     <Reference Include="System" />
     <Reference Include="Interop.IWshRuntimeLibrary">
       <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
