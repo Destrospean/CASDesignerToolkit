@@ -399,7 +399,7 @@ public partial class MainWindow : RendererMainWindow
             buttonHBox.PackStart(showMaternityPartsOnlyCheckButtonAlignment, false, true, 0);
             buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
             var casPart = castableObject as CASPart;
-            Destrospean.CmarNYCBorrowed.Action additionalToggleAction = delegate
+            System.Destrospean.Action additionalToggleAction = delegate
                 {
                     NextState = NextStateOptions.UnsavedChanges;
                     castableObject.ClearCurrentRig();
@@ -737,7 +737,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         Value = Sim.Special
                     };
-                Destrospean.CmarNYCBorrowed.Action changeOtherSliders = delegate
+                System.Destrospean.Action changeOtherSliders = delegate
                     {
                         for (var i = 0; i < casPart.LODs.Count; i++)
                         {
