@@ -203,7 +203,7 @@ namespace Destrospean.Common.Abstractions
                 ReplacePresetComplate(ParentPackage.EvaluateResourceKey(MaterialBlock.ParentTGIBlocks[MaterialBlock.ComplateXMLIndex].ReverseEvaluateResourceKey()));
             }
 
-            public override void SetValue(string propertyName, string newValue, Action beforeMarkUnsaved = null)
+            public override void SetValue(string propertyName, string newValue, System.Destrospean.Action beforeMarkUnsaved = null)
             {
                 GameObjectPreset.SetValue((GameObjectPreset)Preset, MaterialBlock, propertyName, newValue, PropertiesTyped[propertyName].Type, Properties, beforeMarkUnsaved);
             }
@@ -391,7 +391,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public static void SetValue(GameObjectPreset preset, CatalogResource.CatalogResource.MaterialBlock materialBlock, string propertyName, string newValue, string type, IDictionary<string, object> properties, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public static void SetValue(GameObjectPreset preset, CatalogResource.CatalogResource.MaterialBlock materialBlock, string propertyName, string newValue, string type, IDictionary<string, object> properties, System.Destrospean.Action beforeMarkUnsaved = null)
         {
             if (!materialBlock.ComplateOverrides.Exists(x => x.VariableName == propertyName))
             {

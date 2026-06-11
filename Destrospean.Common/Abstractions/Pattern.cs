@@ -300,7 +300,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        void SetValue(GameObjectPreset preset, string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        void SetValue(GameObjectPreset preset, string propertyName, string newValue, System.Destrospean.Action beforeMarkUnsaved = null)
         {
             GameObjectPreset.SetValue(preset, preset.MaterialBlock.MaterialBlocks.Find(x => x.Pattern == SlotName), propertyName, newValue, PropertiesTyped[propertyName].Type, mProperties, beforeMarkUnsaved ?? (() => RefreshPatternInfo(true, preset.MaterialBlock, preset.ParentPackage)));
         }
@@ -508,7 +508,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public override void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public override void SetValue(string propertyName, string newValue, System.Destrospean.Action beforeMarkUnsaved = null)
         {
             var preset = Preset as GameObjectPreset;
             if (preset == null)

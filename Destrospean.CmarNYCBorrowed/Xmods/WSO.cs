@@ -1456,7 +1456,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public void AutoBone(WSO refMesh, bool unassignedVerticesOnly, bool interpolate, int interpolationPoints, float weightingFactor, bool restrictToFace, Action updateProgressCallback = null)
+        public void AutoBone(WSO refMesh, bool unassignedVerticesOnly, bool interpolate, int interpolationPoints, float weightingFactor, bool restrictToFace, System.Destrospean.Action updateProgressCallback = null)
         {
             int emptyBone;
             string[] newBoneNameList,
@@ -1574,7 +1574,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public void AutoMorph(WSO refMesh, bool interpolate, int interpolationPoints, bool restrictToFace, bool doFat, bool doThin, bool doFit, bool doSpecial, float weightingFactor, Action updateProgressCallback = null)
+        public void AutoMorph(WSO refMesh, bool interpolate, int interpolationPoints, bool restrictToFace, bool doFat, bool doThin, bool doFit, bool doSpecial, float weightingFactor, System.Destrospean.Action updateProgressCallback = null)
         {
             var refPoints = new int[Base.VertexCount][];
             var refVertices = new Vector3[refMesh.Base.VertexCount];
@@ -1648,7 +1648,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public void AutoUV(WSO refMesh, bool unassignedOnly, float weightingFactor, Action updateProgressCallback = null)
+        public void AutoUV(WSO refMesh, bool unassignedOnly, float weightingFactor, System.Destrospean.Action updateProgressCallback = null)
         {
             var refVertices = new Vector3[refMesh.Base.VertexCount];
             for (var i = 0; i < refVertices.Length; i++)
@@ -2352,7 +2352,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public static WSO[] WSOsfromOBJ(OBJ obj, WSO refMesh, bool smoothModel, bool cleanModel, bool flipUV, Action updateProgressCallback = null)
+        public static WSO[] WSOsfromOBJ(OBJ obj, WSO refMesh, bool smoothModel, bool cleanModel, bool flipUV, System.Destrospean.Action updateProgressCallback = null)
         {
             if (obj.UVArray.Length == 0)
             {

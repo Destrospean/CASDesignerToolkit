@@ -54,7 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Action.cs" />
     <Compile Include="HSVColor.cs" />
     <Compile Include="MeshUtils.cs" />
     <Compile Include="PatternInfo.cs" />
@@ -85,6 +84,11 @@
     <ProjectReference Include="..\Destrospean.S3PIExtensions\Destrospean.S3PIExtensions.csproj">
       <Project>{27A16A39-0FCB-4861-A86A-EE354EAE90F0}</Project>
       <Name>Destrospean.S3PIExtensions</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
+      <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
+      <Name>System.Destrospean</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

@@ -689,7 +689,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static Frame GetEnumPropertyCheckButtonsInNewFrame(string label, CmarNYCBorrowed.Action additionalToggleAction, object propertyHolder, params string[] propertyPathComponents)
+        public static Frame GetEnumPropertyCheckButtonsInNewFrame(string label, System.Destrospean.Action additionalToggleAction, object propertyHolder, params string[] propertyPathComponents)
         {
             try
             {

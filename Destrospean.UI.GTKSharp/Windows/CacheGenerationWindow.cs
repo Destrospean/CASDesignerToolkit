@@ -2,7 +2,7 @@
 {
     public partial class CacheGenerationWindow : Gtk.Window
     {
-        public static CmarNYCBorrowed.Action GenerateCachesAction;
+        public static System.Destrospean.Action GenerateCachesAction;
 
         public CacheGenerationWindow(Gtk.Window parent, Gdk.Pixbuf icon) : base(Gtk.WindowType.Toplevel)
         {

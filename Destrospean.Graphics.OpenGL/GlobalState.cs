@@ -614,7 +614,7 @@ namespace Destrospean.Graphics.OpenGL
             }
         }
 
-        public static void OnUpdateFrame(CmarNYCBorrowed.Action processInputCallback, float fov, float aspectRatio)
+        public static void OnUpdateFrame(System.Destrospean.Action processInputCallback, float fov, float aspectRatio)
         {
             lock (Lock)
             {

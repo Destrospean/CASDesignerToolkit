@@ -23,7 +23,7 @@ namespace Destrospean.Common.Abstractions
 
         public static object Lock = new object();
 
-        public static CmarNYCBorrowed.Action MarkModelsNeedUpdatedCallback, MarkUnsavedChangesCallback;
+        public static System.Destrospean.Action MarkModelsNeedUpdatedCallback, MarkUnsavedChangesCallback;
 
         public abstract s3pi.Interfaces.IPackage ParentPackage
         {
@@ -161,7 +161,7 @@ namespace Destrospean.Common.Abstractions
             return new Bitmap(imageCopy, image.Width, image.Height);
         }
 
-        public virtual void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public virtual void SetValue(string propertyName, string newValue, System.Destrospean.Action beforeMarkUnsaved = null)
         {
             mPropertiesXmlNodes[propertyName].Attributes["value"].Value = newValue;
             if (beforeMarkUnsaved != null)

@@ -223,7 +223,7 @@
 
         public abstract void ReplacePattern(string patternSlotName, string patternKey);
 
-        public override void SetValue(string propertyName, string newValue, CmarNYCBorrowed.Action beforeMarkUnsaved = null)
+        public override void SetValue(string propertyName, string newValue, System.Destrospean.Action beforeMarkUnsaved = null)
         {
             mInternal.SetValue(propertyName, newValue, beforeMarkUnsaved ?? RegenerateTexture);
         }
