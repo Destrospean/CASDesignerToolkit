@@ -35,6 +35,8 @@ public partial class MainWindow : RendererMainWindow
 
     LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
 
+    object mLock = new object();
+
     LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
     readonly string mOriginalWindowTitle;
@@ -42,8 +44,6 @@ public partial class MainWindow : RendererMainWindow
     PresetNotebook mPresetNotebook;
 
     SwitchPageHandler mResourcePropertyNotebookSwitchPageHandler;
-
-    object mLock = new object();
 
     public IPackage CurrentPackage;
 
