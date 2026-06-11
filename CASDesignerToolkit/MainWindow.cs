@@ -463,24 +463,27 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyTable.ShowAll();
             BuildLODNotebook(casPart);
             BuildLODNotebook(gameObject);
-            var simPreviewAction = new Gtk.Action("SimPreviewAction", "Sim Preview...", null, Stock.Preferences);
-            uint simPreviewActionMergeID = UIManager.NewMergeId(),
-            simPreviewSeparatorMergeID = UIManager.NewMergeId();
-            UIManager.AddUi(simPreviewSeparatorMergeID, "/MainMenuBar/SettingsAction", "SimPreviewSeparator", "SimPreviewSeparator", UIManagerItemType.Separator, false);
-            UIManager.AddUi(simPreviewActionMergeID, "/MainMenuBar/SettingsAction", "SimPreviewAction", "SimPreviewAction", UIManagerItemType.Menuitem, false);
-            SettingsAction.ActionGroup.Add(simPreviewAction);
-            simPreviewAction.Activated += (sender, e) =>
-                {
-                    var simPreviewDialog = new SimPreviewDialog(this);
-                    if (simPreviewDialog.Run() == (int)ResponseType.Ok)
+            if (casPart != null)
+            {
+                var simPreviewAction = new Gtk.Action("SimPreviewAction", "Sim Preview...", null, Stock.Preferences);
+                uint simPreviewActionMergeID = UIManager.NewMergeId(),
+                simPreviewSeparatorMergeID = UIManager.NewMergeId();
+                UIManager.AddUi(simPreviewSeparatorMergeID, "/MainMenuBar/SettingsAction", "SimPreviewSeparator", "SimPreviewSeparator", UIManagerItemType.Separator, false);
+                UIManager.AddUi(simPreviewActionMergeID, "/MainMenuBar/SettingsAction", "SimPreviewAction", "SimPreviewAction", UIManagerItemType.Menuitem, false);
+                SettingsAction.ActionGroup.Add(simPreviewAction);
+                simPreviewAction.Activated += (sender, e) =>
                     {
-                        RandomizeCASParts();
-                    }
-                    simPreviewDialog.Destroy();
-                    simPreviewDialog.Dispose();
-                };
-            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewActionMergeID, simPreviewAction));
-            mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewSeparatorMergeID, null));
+                        var simPreviewDialog = new SimPreviewDialog(this);
+                        if (simPreviewDialog.Run() == (int)ResponseType.Ok)
+                        {
+                            RandomizeCASParts();
+                        }
+                        simPreviewDialog.Destroy();
+                        simPreviewDialog.Dispose();
+                    };
+                mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewActionMergeID, simPreviewAction));
+                mActionsToRemove.Add(new Tuple<uint, Gtk.Action>(simPreviewSeparatorMergeID, null));
+            }
         }
         catch (Exception ex)
         {
