@@ -1005,8 +1005,8 @@ namespace Destrospean.CmarNYCBorrowed
                 for (var i = 0; i < FaceCount * 3; i++)
                 {
                     var facePoint = GetFacePoint(i);
-                    extendedVertices[(int)facePoint.VertexIndex].SetNormals(facePoint.Normals);
-                    extendedVertices[(int)facePoint.VertexIndex].SetUVs(facePoint.UVs);
+                    extendedVertices[facePoint.VertexIndex].SetNormals(facePoint.Normals);
+                    extendedVertices[facePoint.VertexIndex].SetUVs(facePoint.UVs);
                 }
                 return extendedVertices;
             }
@@ -1416,7 +1416,25 @@ namespace Destrospean.CmarNYCBorrowed
 
         public WSO(BinaryReader reader)
         {
-            Read(reader);
+            mVersion = reader.ReadInt32();
+            if (mVersion == 5)
+            {
+                var count = reader.ReadInt32();
+                mSoftwareName = reader.ReadChars(count);
+                mUnknown = reader.ReadInt32();
+            }
+            mMeshCount = reader.ReadInt32();
+            mMeshes = new MeshGroup[mMeshCount];
+            for (var i = 0; i < mMeshCount; i++)
+            {
+                mMeshes[i] = new MeshGroup(reader);
+            }
+            mBoneCount = reader.ReadInt32();
+            mBones = new Bone[mBoneCount];
+            for (var i = 0; i < mBoneCount; i++)
+            {
+                mBones[i] = new Bone(reader);
+            }
         }
 
         public void AppendMesh(WSO meshToAppend)
@@ -1920,29 +1938,6 @@ namespace Destrospean.CmarNYCBorrowed
                 mMeshes[i] = newMorphs[i - 1];
             }
             return true;
-        }
-
-        public void Read(BinaryReader reader)
-        {
-            mVersion = reader.ReadInt32();
-            if (mVersion == 5)
-            {
-                var count = reader.ReadInt32();
-                mSoftwareName = reader.ReadChars(count);
-                mUnknown = reader.ReadInt32();
-            }
-            mMeshCount = reader.ReadInt32();
-            mMeshes = new MeshGroup[mMeshCount];
-            for (var i = 0; i < mMeshCount; i++)
-            {
-                mMeshes[i] = new MeshGroup(reader);
-            }
-            mBoneCount = reader.ReadInt32();
-            mBones = new Bone[mBoneCount];
-            for (var i = 0; i < mBoneCount; i++)
-            {
-                mBones[i] = new Bone(reader);
-            }
         }
 
         public void ReplaceBones(WSO wso)

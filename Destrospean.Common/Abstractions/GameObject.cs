@@ -302,44 +302,133 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            /*
             var mlod = (MLOD)((GenericRCOLResource)LODs[lod].Resource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
-                var wso = new WSO(new BinaryReader(fileStream));
-                for (var i = 0; i < LODs[lod].MeshGroups.Count; i++)
+                switch (meshFileType)
                 {
-                    var meshGroup = LODs[lod].MeshGroups[i];
-                    if (groupIndex > -1 && groupIndex != i)
-                    {
-                        continue;
-                    }
-                    var group = wso.GetMesh(groupIndex == -1 ? i : 0);
-                    var vertices = new List<meshExpImp.ModelBlocks.Vertex>();
-                    foreach (var extendedVertex in group.GetExtendedVertices())
-                    {
-                        vertices.Add(new meshExpImp.ModelBlocks.Vertex 
+                    case MeshFileType.OBJ:
+                        {
+                            var obj = new OBJ(new StreamReader(fileStream));
+                            var indexOffset = 0;
+                            for (var i = 0; i < obj.GroupCount; i++)
                             {
-                                Normal = extendedVertex.GetNormals(),
-                                Position = extendedVertex.GetPosition(),
-                                UV = new float[][]
+                                var group = obj.GroupArray[i];
+                                if (i >= LODs[lod].MeshGroups.Count || groupIndex > -1 && groupIndex != i)
+                                {
+                                    continue;
+                                }
+                                var meshGroup = LODs[lod].MeshGroups[i + indexOffset];
+                                if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
+                                {
+                                    meshGroup = LODs[lod].MeshGroups[i + ++indexOffset];
+                                }
+                                List<int[]> faces = new List<int[]>(),
+                                vertexIndices = new List<int[]>();
+                                foreach (var face in group.Faces)
+                                {
+                                    var temp = new int[3];
+                                    int j = 0,
+                                    vertexIndex = 0;
+                                    foreach (var facePoint in face.FacePoints)
                                     {
-                                        extendedVertex.GetUVs()
+                                        if (!obj.TryGetVertexIndex(facePoint, vertexIndices, out vertexIndex, false))
+                                        {
+                                            temp[j] = vertexIndices.Count;
+                                            vertexIndices.Add(facePoint);
+                                        }
+                                        else
+                                        {
+                                            temp[j] = vertexIndex;
+                                        }
+                                        j++;
                                     }
-                            });
-                    }
-                    meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices.ToArray(), meshGroup.UVScales);
-                    var indices = new int[group.FacePointCount];
-                    for (var j = 0; j < indices.Length; j += 3)
-                    {
-                        indices[j] = group.GetFacePoint(j).VertexIndex;
-                    }
-                    meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, indices);
+                                    faces.Add(temp);
+                                }
+                                var vertices = new meshExpImp.ModelBlocks.Vertex[vertexIndices.Count];
+                                for (var j = 0; j < faces.Count; j++)
+                                {
+                                    for (var k = 0; k < 3; k++)
+                                    {
+                                        var vertexIndex = vertexIndices[faces[j][k]];
+                                        vertices[faces[j][k]] = new meshExpImp.ModelBlocks.Vertex
+                                            {
+                                                Normal = new[]
+                                                    {
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[0],
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[1],
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[2],
+                                                        0 // Needed because of a bug with S3PI where the last value is truncated
+                                                    },
+                                                Position = obj.VertexArray[vertexIndex[0] - 1].Coordinates,
+                                                UV = new float[][]
+                                                    {
+                                                        new[]
+                                                        {
+                                                            obj.UVArray[vertexIndex[1] - 1].Coordinates[0],
+                                                            1 - obj.UVArray[vertexIndex[1] - 1].Coordinates[1]
+                                                        }
+                                                    }
+                                            };
+                                    }
+                                }
+                                var faceIndices = new List<int>();
+                                foreach (var face in faces)
+                                {
+                                    faceIndices.AddRange(face);
+                                }
+                                meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, faceIndices.ToArray());
+                                meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                            }
+                            break;
+                        }
+                    case MeshFileType.WSO:
+                        {
+                            var wso = new WSO(new BinaryReader(fileStream));
+                            var indexOffset = 0;
+                            for (var i = 0; i < wso.MeshCount; i++)
+                            {
+                                var group = wso.GetMesh(i);
+                                if (i >= LODs[lod].MeshGroups.Count || groupIndex > -1 && groupIndex != i)
+                                {
+                                    continue;
+                                }
+                                var meshGroup = LODs[lod].MeshGroups[i + indexOffset];
+                                if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
+                                {
+                                    meshGroup = LODs[lod].MeshGroups[i + ++indexOffset];
+                                }
+                                var vertices = new meshExpImp.ModelBlocks.Vertex[group.VertexCount];
+                                var indices = new int[group.FacePointCount];
+                                for (var j = 0; j < indices.Length; j++)
+                                {
+                                    var facePoint = group.GetFacePoint(j);
+                                    indices[j] = facePoint.VertexIndex;
+                                    vertices[facePoint.VertexIndex] = new meshExpImp.ModelBlocks.Vertex
+                                        {
+                                            Normal = new[]
+                                                {
+                                                    facePoint.Normals[0],
+                                                    facePoint.Normals[1],
+                                                    facePoint.Normals[2],
+                                                    0 // Needed because of a bug with S3PI where the last value is truncated
+                                                },
+                                            Position = group.GetVertex(facePoint.VertexIndex).Position,
+                                            UV = new float[][]
+                                                {
+                                                    facePoint.UVs
+                                                }
+                                        };
+                                }
+                                meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, indices);
+                                meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                            }
+                            break;
+                        }
                 }
                 LoadLODs(mlodResources, modlResources, vpxyResources);
                 updateUICallback(this, new List<LODId>(LODs.Keys).IndexOf(lod), groupIndex);
             }
-            */
         }
 
         public void LoadLODs(Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
