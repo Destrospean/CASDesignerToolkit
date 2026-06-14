@@ -1311,7 +1311,7 @@ namespace Destrospean.CmarNYCBorrowed
         {
         }
 
-        public WSO(GEOM baseMesh, GEOM[] morphs) : this(baseMesh, Array.FindAll(morphs, x => x.IsValid), Array.FindAll(morphs, x => x.IsValid).Length == 1)
+        public WSO(GEOM baseMesh, GEOM[] morphs) : this(baseMesh, Array.FindAll(morphs, x => x != null && x.IsValid), Array.FindAll(morphs, x => x != null && x.IsValid).Length == 1)
         {
         }
 
