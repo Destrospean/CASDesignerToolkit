@@ -268,7 +268,7 @@ namespace Destrospean.Common.Abstractions
                 case MeshFileType.OBJ:
                     using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(".obj") ? "" : ".obj")))
                     {
-                        new OBJ(geom, Array.ConvertAll(morphs, x => x.IsValid ? x : null)).Write(new StreamWriter(fileStream));
+                        new OBJ(geom, Array.ConvertAll(morphs, x => x != null && x.IsValid ? x : null)).Write(new StreamWriter(fileStream));
                     }
                     break;
                 case MeshFileType.WSO:
