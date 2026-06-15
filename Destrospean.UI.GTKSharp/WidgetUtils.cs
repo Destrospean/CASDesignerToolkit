@@ -151,7 +151,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             switch (field.Length)
                             {
                                 case 1:
-                                    var spinButtonFloat = new SpinButton(new Adjustment((float)field[0], -1, 1, 1, 10, 0), 0, 4);
+                                    var spinButtonFloat = new SpinButton(new Adjustment((float)field[0], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4);
                                     spinButtonFloat.ValueChanged += (sender, e) =>
                                         {
                                             field[0] = (float)spinButtonFloat.Value;
@@ -163,8 +163,8 @@ namespace Destrospean.DestrospeanCASPEditor
                                     var hBox = new HBox();
                                     var spinButtons = new List<SpinButton>
                                         {
-                                            new SpinButton(new Adjustment((float)field[0], -1, 1, 1, 10, 0), 0, 4),
-                                            new SpinButton(new Adjustment((float)field[1], -1, 1, 1, 10, 0), 0, 4)
+                                            new SpinButton(new Adjustment((float)field[0], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4),
+                                            new SpinButton(new Adjustment((float)field[1], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4)
                                         };
                                     spinButtons[0].ValueChanged += (sender, e) =>
                                         {
@@ -431,7 +431,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     var elementFloat = element as ElementFloat;
                     if (elementFloat != null)
                     {
-                        var spinButton = new SpinButton(new Adjustment(elementFloat.Data, -1, 1, 1, 10, 0), 0, 4);
+                        var spinButton = new SpinButton(new Adjustment(elementFloat.Data, float.MinValue, float.MaxValue, 1, 10, 0), 0, 4);
                         spinButton.ValueChanged += (sender, e) =>
                             {
                                 elementFloat.Data = (float)spinButton.Value;
@@ -446,8 +446,8 @@ namespace Destrospean.DestrospeanCASPEditor
                         var hBox = new HBox();
                         var spinButtons = new[]
                             {
-                                new SpinButton(new Adjustment(elementFloat2.Data0, -1, 1, 1, 10, 0), 0, 4),
-                                new SpinButton(new Adjustment(elementFloat2.Data1, -1, 1, 1, 10, 0), 0, 4)
+                                new SpinButton(new Adjustment(elementFloat2.Data0, float.MinValue, float.MaxValue, 1, 10, 0), 0, 4),
+                                new SpinButton(new Adjustment(elementFloat2.Data1, float.MinValue, float.MaxValue, 1, 10, 0), 0, 4)
                             };
                         spinButtons[0].ValueChanged += (sender, e) =>
                             {
