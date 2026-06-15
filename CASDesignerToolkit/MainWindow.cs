@@ -829,26 +829,30 @@ public partial class MainWindow : RendererMainWindow
                         ShowTabs = false
                     };
                 var actionGroup = new ActionGroup("Default");
-                Gtk.Action addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                Gtk.Action //addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
+                /*
                 deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
                     {
                         Sensitive = lodKvp.Value.MeshGroups.Count > 1
                     },
                 exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
+                */
                 exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
                 exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
-                importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
+                //importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
                 importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
                 importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
                 actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
                 actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
+                /*
                 actionGroup.Add(addMeshGroupAction);
                 actionGroup.Add(deleteMeshGroupAction);
                 actionGroup.Add(exportMLODAction);
+                */
                 actionGroup.Add(exportOBJAction);
                 actionGroup.Add(exportWSOAction);
-                actionGroup.Add(importMLODAction);
+                //actionGroup.Add(importMLODAction);
                 actionGroup.Add(importOBJAction);
                 actionGroup.Add(importWSOAction);
                 var uiManager = new UIManager();
@@ -858,18 +862,18 @@ public partial class MainWindow : RendererMainWindow
                         <menubar name='MLODPropertiesMenuBar'>
                             <menu name='OptionsAction' action='OptionsAction'>
                                 <menu name='ImportAction' action='ImportAction'>
-                                    <menuitem name='ImportMLODAction' action='ImportMLODAction'/>
+                                    <!-- menuitem name='ImportMLODAction' action='ImportMLODAction'/ -->
                                     <menuitem name='ImportOBJAction' action='ImportOBJAction'/>
                                     <menuitem name='ImportWSOAction' action='ImportWSOAction'/>
                                 </menu>                            
                                 <menu name='ExportAction' action='ExportAction'>
-                                    <menuitem name='ExportMLODAction' action='ExportMLODAction'/>
+                                    <!-- menuitem name='ExportMLODAction' action='ExportMLODAction'/ -->
                                     <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
                                     <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
                                 </menu>
-                                <separator />
-                                <menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/>
-                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
+                                <!-- separator / -->
+                                <!-- menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/ -->
+                                <!-- menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/ -->
                             </menu>
                         </menubar>
                     </ui>");
@@ -964,6 +968,7 @@ public partial class MainWindow : RendererMainWindow
                             throw;
                         }
                     };
+                /*
                 addMeshGroupAction.Activated += (sender, e) =>
                     {
                         int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
@@ -991,9 +996,11 @@ public partial class MainWindow : RendererMainWindow
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
+                */
                 exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
                 exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
-                importMLODAction.Activated += (sender, e) =>
+                /*
+               importMLODAction.Activated += (sender, e) =>
                     {
                         var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter
@@ -1017,6 +1024,7 @@ public partial class MainWindow : RendererMainWindow
                         fileChooserDialog.Destroy();
                         fileChooserDialog.Dispose();
                     };
+                */
                 importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
                 importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
                 var meshGroupPageButtonHBox = new HBox(false, 0);
