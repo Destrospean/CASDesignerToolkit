@@ -244,6 +244,20 @@ MimeType=application/{6}", name, targetPath, workingDirectory, iconPath, descrip
                 shortcut.Save();
             }
 
+            public static void GetWindowsVersion(out string productName, out string currentBuild, out string displayVersion)
+            {
+                currentBuild = displayVersion = productName = null;
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"))
+                {
+                    if (key != null)
+                    {
+                        productName = key.GetValue("ProductName")?.ToString(); 
+                        currentBuild = key.GetValue("CurrentBuild")?.ToString(); 
+                        displayVersion = key.GetValue("DisplayVersion")?.ToString() ?? key.GetValue("ReleaseId")?.ToString();
+                    }
+                }
+            }
+
             public static void SetFileAssociation(string fileType, string description, string extension, string executablePath)
             {
                 var classesRegistryPath = "HKEY_CURRENT_USER\\Software\\Classes\\";

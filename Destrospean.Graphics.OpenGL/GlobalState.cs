@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Destrospean.S3PIExtensions;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -679,12 +678,12 @@ namespace Destrospean.Graphics.OpenGL
                 VertexDeltaDataThin = deltaVerticesThin.ToArray();
                 VertexDeltaDataSpecial = deltaVerticesSpecial.ToArray();
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vPosition"));
-                GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexData.Length * Vector3.SizeInBytes), VertexData, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexData.Length * Vector3.SizeInBytes), VertexData, BufferUsageHint.StaticDraw);
                 GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vPosition"), 3, VertexAttribPointerType.Float, false, 0, 0);
                 if (Shaders[ActiveShader].GetAttribute("vColor") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vColor"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(ColorData.Length * Vector3.SizeInBytes), ColorData, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(ColorData.Length * Vector3.SizeInBytes), ColorData, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vColor"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("texcoord") != -1)
@@ -696,55 +695,55 @@ namespace Destrospean.Graphics.OpenGL
                 if (Shaders[ActiveShader].GetAttribute("vNormal") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vNormal"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(NormalData.Length * Vector3.SizeInBytes), NormalData, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(NormalData.Length * Vector3.SizeInBytes), NormalData, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vNormal"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaNormalFat") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaNormalFat"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataFat.Length * Vector3.SizeInBytes), NormalDeltaDataFat, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataFat.Length * Vector3.SizeInBytes), NormalDeltaDataFat, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaNormalFat"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaNormalFit") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaNormalFit"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataFit.Length * Vector3.SizeInBytes), NormalDeltaDataFit, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataFit.Length * Vector3.SizeInBytes), NormalDeltaDataFit, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaNormalFit"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaNormalSpecial") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaNormalSpecial"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataSpecial.Length * Vector3.SizeInBytes), NormalDeltaDataSpecial, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataSpecial.Length * Vector3.SizeInBytes), NormalDeltaDataSpecial, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaNormalSpecial"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaNormalThin") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaNormalThin"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataThin.Length * Vector3.SizeInBytes), NormalDeltaDataThin, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(NormalDeltaDataThin.Length * Vector3.SizeInBytes), NormalDeltaDataThin, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaNormalThin"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaPositionFat") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaPositionFat"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataFat.Length * Vector3.SizeInBytes), VertexDeltaDataFat, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataFat.Length * Vector3.SizeInBytes), VertexDeltaDataFat, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionFat"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaPositionFit") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaPositionFit"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataFit.Length * Vector3.SizeInBytes), VertexDeltaDataFit, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataFit.Length * Vector3.SizeInBytes), VertexDeltaDataFit, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionFit"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaPositionSpecial") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaPositionSpecial"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataSpecial.Length * Vector3.SizeInBytes), VertexDeltaDataSpecial, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataSpecial.Length * Vector3.SizeInBytes), VertexDeltaDataSpecial, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionSpecial"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 if (Shaders[ActiveShader].GetAttribute("vDeltaPositionThin") != -1)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, Shaders[ActiveShader].GetBuffer("vDeltaPositionThin"));
-                    GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataThin.Length * Vector3.SizeInBytes), VertexDeltaDataThin, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexDeltaDataThin.Length * Vector3.SizeInBytes), VertexDeltaDataThin, BufferUsageHint.StaticDraw);
                     GL.VertexAttribPointer(Shaders[ActiveShader].GetAttribute("vDeltaPositionThin"), 3, VertexAttribPointerType.Float, true, 0, 0);
                 }
                 foreach (var mesh in new List<Volume>((Locked ? LockedMeshes : Meshes).Values))

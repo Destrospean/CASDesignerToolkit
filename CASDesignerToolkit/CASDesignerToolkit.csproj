@@ -206,6 +206,9 @@
     <EmbeddedResource Include="Icons\Fatness.png" />
     <EmbeddedResource Include="Icons\Fitness.png" />
     <EmbeddedResource Include="Icons\CASDesignerToolkit.png" />
+    <EmbeddedResource Include="Icons\CASDesignerToolkit.ico">
+      <DeployService-UseProjectRelativePath>True</DeployService-UseProjectRelativePath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -289,7 +292,6 @@
   </ProjectExtensions>
   <ItemGroup>
     <None Include="Icons\CASDesignerToolkit.svg" />
-    <None Include="Icons\CASDesignerToolkit.ico" />
     <None Include="..\LICENSE.md">
       <Link>LICENSE.md</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

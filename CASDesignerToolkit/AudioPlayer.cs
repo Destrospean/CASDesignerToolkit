@@ -10,7 +10,7 @@ namespace Destrospean.DestrospeanCASPEditor
     {
         readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
 
-        LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--demux=avformat", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
+        LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
 
         LibVLCSharp.Shared.MediaPlayer mMediaPlayer;
 
@@ -105,9 +105,9 @@ namespace Destrospean.DestrospeanCASPEditor
                         }
                         var wait = true;
                         mMediaPlayer.EndReached += (sender, e) => wait = false;
-                        var media = new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream));
-                        mMediaPlayer.Play(media);
+                        mMediaPlayer.Play(new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream), ":demux=avformat", ":file-caching=1000", ":network-caching=1000"));
                         mMediaPlayer.Position = 0;
+                        mMediaPlayer.SetRate(1);
                         while (wait)
                         {
                             System.Threading.Thread.Sleep(1);

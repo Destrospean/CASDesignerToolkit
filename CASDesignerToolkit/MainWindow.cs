@@ -294,6 +294,16 @@ public partial class MainWindow : RendererMainWindow
             RefreshWidgets();
             AddFilePathToWindowTitle(packagePath);
         }
+        if (Platform.IsWindows)
+        {
+            string currentBuild, displayVersion, productName;
+            Platform.Windows.GetWindowsVersion(out productName, out currentBuild, out displayVersion);
+            int currentBuildNumber;
+            if (int.TryParse(currentBuild, out currentBuildNumber) && currentBuildNumber < 10240)
+            {
+                Icon = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.CASDesignerToolkit.png", 32, 32);
+            }
+        }
     }
 
     void AddCASTableObjectWidgets(CASTableObject castableObject)
