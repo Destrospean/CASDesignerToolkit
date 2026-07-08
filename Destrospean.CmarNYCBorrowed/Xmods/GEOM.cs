@@ -1248,7 +1248,8 @@ namespace Destrospean.CmarNYCBorrowed
                     {
                         fieldType,
                         valueType,
-                        valueCount
+                        valueCount,
+                        0u
                     });
                 elementList.Insert(index, new object[valueCount]);
                 for (var i = 0; i < valueCount; i++)
@@ -1329,12 +1330,15 @@ namespace Destrospean.CmarNYCBorrowed
                 writer.Write(mZero);
                 writer.Write(DataSize);
                 writer.Write(FieldCount);
+                var dataSize = 0u;
                 for (var i = 0; i < FieldCount; i++)
                 {
-                    for (var j = 0; j < 4; j++)
+                    for (var j = 0; j < 3; j++)
                     {
                         writer.Write(mFields[i][j]);
                     }
+                    writer.Write((uint)(16 + FieldCount * 16 + dataSize));
+                    dataSize += mFields[i][2] * 4;
                 }
                 for (var i = 0; i < FieldCount; i++)
                 {
