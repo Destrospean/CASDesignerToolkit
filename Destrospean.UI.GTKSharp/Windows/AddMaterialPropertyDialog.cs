@@ -93,7 +93,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                 break;
                             case "ElementTextureRef":
                                 ValueType = CmarNYCBorrowed.MeshFormatDataType.Uint;
-                                ValueCount = 1;
+                                ValueCount = 4;
                                 break;
                         }
                         DataType = assembly.GetType("s3pi.GenericRCOLResource." + dataTypes[DataTypeComboBox.Active]);
