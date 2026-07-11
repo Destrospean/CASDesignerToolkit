@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
@@ -169,7 +170,7 @@ namespace System.Destrospean
         {
             public static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory = "", string iconPath = "", string name = "", string description = "", string[] categories = null, string[] mimeTypes = null)
             {
-                System.IO.File.WriteAllText(shortcutPath, string.Format(@"[Desktop Entry]
+                File.WriteAllText(shortcutPath, string.Format(@"[Desktop Entry]
 Type=Application
 Name={0}
 Exec='{1}' %f
@@ -184,9 +185,10 @@ MimeType=application/{6}", name, targetPath, workingDirectory, iconPath, descrip
             {
                 string mimeDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/mime",
                 mimeTypePath = mimeDirectoryPath + "/packages/" + mimeType + ".xml";
-                if (!System.IO.File.Exists(mimeTypePath))
+                Directory.CreateDirectory(mimeDirectoryPath + "/packages");
+                if (!File.Exists(mimeTypePath))
                 {
-                    System.IO.File.WriteAllText(mimeTypePath, string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
+                    File.WriteAllText(mimeTypePath, string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <mime-info xmlns=""http://www.freedesktop.org/standards/shared-mime-info"">
   <mime-type type=""application/{0}"">
     <comment>{1}</comment>

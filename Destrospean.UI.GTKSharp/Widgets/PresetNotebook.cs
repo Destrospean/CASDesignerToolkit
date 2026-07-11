@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Destrospean;
 using System.Globalization;
 using Destrospean.Common.Abstractions;
@@ -95,7 +96,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         };
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.WriteError(ex);
             }
@@ -108,7 +109,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 foreach (var propertyName in complate.PropertyNames)
                 {
                     Complate.PropertyMeta propertyMeta;
-                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out propertyMeta))
+                    if (!complate.PropertiesTyped.TryGetValue(propertyName, out propertyMeta) || complate is Pattern && propertyMeta.Type != "color" && !(propertyMeta.Type == "string" && propertyName.StartsWith("HSVShift")))
                     {
                         continue;
                     }
@@ -128,7 +129,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             break;
                         case "color":
                             alignment.Xscale = 0;
-                            var rgba = System.Array.ConvertAll(value.Split(','), x => (ushort)(float.Parse(x, CultureInfo.InvariantCulture) * ushort.MaxValue));
+                            var rgba = Array.ConvertAll(value.Split(','), x => (ushort)(float.Parse(x, CultureInfo.InvariantCulture) * ushort.MaxValue));
                             var colorButton = new ColorButton
                                 {
                                     Alpha = rgba[3],
@@ -140,7 +141,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                         },
                                     UseAlpha = true
                                 };
-                            colorButton.ColorSet += (sender, e) => complate[propertyName] = string.Join(",", System.Array.ConvertAll(new[]
+                            colorButton.ColorSet += (sender, e) => complate[propertyName] = string.Join(",", Array.ConvertAll(new[]
                                 {
                                     colorButton.Color.Red,
                                     colorButton.Color.Green,
@@ -193,6 +194,46 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             valueWidget = button;
                             break;
                         case "string":
+                            if (propertyName.StartsWith("HSVShift"))
+                            {
+                                alignment.Xscale = 0;
+                                var shortName = propertyName.Substring(9);
+                                float baseH = float.Parse(complate["Base H " + shortName]),
+                                baseS = float.Parse(complate["Base S " + shortName]),
+                                baseV = float.Parse(complate["Base V " + shortName]); 
+                                var hsv = Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
+                                var rgb = new CmarNYCBorrowed.HSVColor((baseH + hsv[0]) * 360, baseS + hsv[1], baseV + hsv[2]).ToRGB();
+                                var hsvColorButton = new ColorButton
+                                    {
+                                        Color = new Color
+                                            {
+                                                Blue = (ushort)(rgb[2] << 8),
+                                                Green = (ushort)(rgb[1] << 8),
+                                                Red = (ushort)(rgb[0] << 8)
+                                            }
+                                    };
+                                hsvColorButton.ColorSet += (sender, e) =>
+                                    {
+                                        var newHSV = new CmarNYCBorrowed.HSVColor((byte)(hsvColorButton.Color.Red >> 8), (byte)(hsvColorButton.Color.Green >> 8), (byte)(hsvColorButton.Color.Blue >> 8));
+                                        complate.SetValue(propertyName, string.Join(",", Array.ConvertAll(new[]
+                                            {
+                                                newHSV.Hue / 360 - baseH,
+                                                newHSV.Saturation - baseS,
+                                                newHSV.Value - baseV
+                                            }, x => x.ToString("F4", CultureInfo.InvariantCulture))), () =>
+                                            {
+                                            });
+                                        complate.SetValue("H " + shortName, (newHSV.Hue / 360 - baseH).ToString(), () =>
+                                            {
+                                            });
+                                        complate.SetValue("S " + shortName, (newHSV.Saturation - baseS).ToString(), () =>
+                                            {
+                                            });
+                                        complate["V " + shortName] = (newHSV.Value - baseV).ToString();
+                                    };
+                                valueWidget = hsvColorButton;
+                                break;
+                            }
                             var entry = new Entry
                                 {
                                     Sensitive = false,
@@ -216,7 +257,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             break;
                         case "vec2":
                             var hBox = new HBox();
-                            var coordinates = System.Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
+                            var coordinates = Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
                             var spinButtons = new List<SpinButton>
                                 {
                                     new SpinButton(new Adjustment(coordinates[0], float.MinValue, float.MaxValue, 1, 10, 0), 0, 4),
@@ -244,7 +285,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         var maxHeight = 0;
                         foreach (var child in table.Children)
                         {
-                            maxHeight = System.Math.Max(child.Allocation.Height, maxHeight);
+                            maxHeight = Math.Max(child.Allocation.Height, maxHeight);
                         }
                         foreach (var child in table.Children)
                         {
@@ -253,7 +294,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                     };
                 table.ShowAll();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.WriteError(ex);
             }
@@ -305,7 +346,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 hBox.ShowAll();
                 return hBox;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.WriteError(ex);
                 return null;
@@ -434,7 +475,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 }
                 ShowAll();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.WriteError(ex);
             }
@@ -459,7 +500,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                 notebook.ShowAll();
                 return notebook;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Logger.WriteError(ex);
                 return null;
