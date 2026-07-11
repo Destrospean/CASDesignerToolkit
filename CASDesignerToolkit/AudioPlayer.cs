@@ -103,16 +103,19 @@ namespace Destrospean.DestrospeanCASPEditor
                         {
                             ((APackage)audioResource.Package).GetResource(audioResource.ResourceIndexEntry).CopyTo(standardInput);
                         }
-                        var wait = true;
-                        mMediaPlayer.EndReached += (sender, e) => wait = false;
-                        mMediaPlayer.Play(new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(process.StandardOutput.BaseStream), ":demux=avformat", ":file-caching=1000", ":network-caching=1000"));
-                        mMediaPlayer.Position = 0;
-                        mMediaPlayer.SetRate(1);
-                        while (wait)
+                        using (var outputStream = new System.IO.MemoryStream())
                         {
-                            System.Threading.Thread.Sleep(1);
+                            process.StandardOutput.BaseStream.CopyTo(outputStream);
+                            outputStream.Position = 0;
+                            var wait = true;
+                            mMediaPlayer.EndReached += (sender, e) => wait = false;
+                            mMediaPlayer.Play(new LibVLCSharp.Shared.Media(mLibVLC, new LibVLCSharp.Shared.StreamMediaInput(outputStream), ":demux=avformat"));
+                            while (wait)
+                            {
+                                System.Threading.Thread.Sleep(1);
+                            }
+                            process.WaitForExit();
                         }
-                        process.WaitForExit();
                     }
                 }
             }
