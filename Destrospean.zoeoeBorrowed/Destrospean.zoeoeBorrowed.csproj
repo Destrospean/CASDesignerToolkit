@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Destrospean.zoeoeBorrowed</RootNamespace>
     <AssemblyName>Destrospean.zoeoeBorrowed</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
