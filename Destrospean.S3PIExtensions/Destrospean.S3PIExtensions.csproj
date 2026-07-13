@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Destrospean.S3PIExtensions</RootNamespace>
     <AssemblyName>Destrospean.S3PIExtensions</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

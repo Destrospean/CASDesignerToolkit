@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Destrospean.Graphics.OpenGL</RootNamespace>
     <AssemblyName>Destrospean.Graphics.OpenGL</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
