@@ -310,19 +310,19 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     skinSpecularMapImage = null;
                     if (!string.IsNullOrEmpty(ambientMap))
                     {
-                        ambientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(ambientMap, Complate.GetTextureCallback)?.Clone() ?? null;
+                        ambientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(ambientMap, Complate.GetTextureCallback)?.Clone();
                     }
                     if (!string.IsNullOrEmpty(specularMap))
                     {
-                        specularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(specularMap, Complate.GetTextureCallback)?.Clone() ?? null;
+                        specularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(specularMap, Complate.GetTextureCallback)?.Clone();
                     }
                     if (!string.IsNullOrEmpty(skinAmbientMap))
                     {
-                        skinAmbientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinAmbientMap, Complate.GetTextureCallback)?.Clone() ?? null;
+                        skinAmbientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinAmbientMap, Complate.GetTextureCallback)?.Clone();
                     }
                     if (!string.IsNullOrEmpty(skinSpecularMap))
                     {
-                        skinSpecularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinSpecularMap, Complate.GetTextureCallback)?.Clone() ?? null;
+                        skinSpecularMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(skinSpecularMap, Complate.GetTextureCallback)?.Clone();
                     }
                     loadMeshOnMainThreadCallback(new CASPartVolume
                         {
