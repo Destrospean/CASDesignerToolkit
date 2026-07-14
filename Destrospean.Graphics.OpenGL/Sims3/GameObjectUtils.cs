@@ -101,7 +101,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         continue;
                     }
-                    var currentPreset = gameObject.AllPresets[presetIndex];
+                    var currentPreset = gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[presetIndex];
                     loadMeshOnMainThreadCallback(new Volume
                         {
                             ColorData = colors.ToArray(),
@@ -113,7 +113,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Object = gameObject,
                             TextureCoordinates = textureCoordinates.ToArray(),
                             Vertices = vertices.ToArray()
-                        }, currentPreset, (System.Drawing.Bitmap)currentPreset.Texture.Clone(), null, material, loadTextureCallback);
+                        }, currentPreset, (System.Drawing.Bitmap)currentPreset?.Texture.Clone(), null, material, loadTextureCallback);
                 }
             }
         }
@@ -122,11 +122,11 @@ namespace Destrospean.Graphics.OpenGL.Sims3
         {
             var materialCast = (Material)material;
             var volumeCast = (Volume)volume;
-            volumeCast.AmbientMapID = loadTextureCallback(currentPreset.AmbientMap ?? materialCast.AmbientMap, null);
-            volumeCast.SpecularMapID = loadTextureCallback(currentPreset.SpecularMap ?? materialCast.SpecularMap, null);
+            volumeCast.AmbientMapID = loadTextureCallback(currentPreset?.AmbientMap ?? materialCast.AmbientMap, null);
+            volumeCast.SpecularMapID = loadTextureCallback(currentPreset?.SpecularMap ?? materialCast.SpecularMap, null);
             volumeCast.MainTextureID = materialCast.DiffuseMap.Length > 0 && Convert.ToUInt32(materialCast.DiffuseMap.Substring(4, 8), 16) == ResourceUtils.GetResourceType("_IMG") ? loadTextureCallback(materialCast.DiffuseMap, null) : loadTextureCallback(volumeCast.Key, presetTexture);
             GlobalState.Meshes[volumeCast.Key] = volumeCast;
-            presetTexture.Dispose();
+            presetTexture?.Dispose();
             foreach (var meshKey in new List<string>(GlobalState.Meshes.Keys))
             {
                 Volume mesh;

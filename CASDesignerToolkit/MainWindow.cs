@@ -350,7 +350,10 @@ public partial class MainWindow : RendererMainWindow
             flagPageVBox.PackStart(buttonHBox, false, false, 0);
             flagPageVBox.PackStart(flagNotebook, true, true, 0);
             Button addPresetButton = new Button(new Gtk.Image(Stock.Add, IconSize.SmallToolbar)),
-            exportTextureButton = new Button("Export Texture"),
+            exportTextureButton = new Button("Export Texture")
+                {
+                    Sensitive = castableObject.AllPresets.Count > 0
+                },
             nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
                 {
                     Xalign = .5f
@@ -402,7 +405,10 @@ public partial class MainWindow : RendererMainWindow
             flagPageButtonHBox.PackEnd(resetViewButton, false, true, 4);
             flagPageButtonHBox.PackEnd(exportTextureButton, false, true, 4);
             buttonHBox.PackStart(flagPageButtonHBox, false, true, 0);
-            buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
+            if (castableObject.AllPresets.Count > 0)
+            {
+                buttonHBox.PackEnd(addPresetButtonAlignment, false, true, 0);
+            }
             System.Destrospean.Action additionalToggleAction = delegate
                 {
                     NextState = NextStateOptions.UnsavedChanges;
@@ -444,12 +450,13 @@ public partial class MainWindow : RendererMainWindow
             var gameObject = castableObject as GameObject;
             if (gameObject != null)
             {
-                var frameCount = 3;
+                int maxFrameCount = castableObject.AllPresets.Count == 0 ? 6 : 3,
+                frameCount = maxFrameCount;
                 foreach (var property in gameObject.CatalogResource.GetType().GetProperties())
                 {
-                    if (frameCount == 3)
+                    if (frameCount == maxFrameCount)
                     {
-                        flagTables.Add(new Table(2, 3, true));
+                        flagTables.Add(new Table(2, (uint)maxFrameCount, true));
                         flagNotebook.AppendPage(flagTables[flagTables.Count - 1], new Label());
                         frameCount = 0;
                     }
@@ -465,7 +472,7 @@ public partial class MainWindow : RendererMainWindow
                     flagTables.RemoveAt(flagTables.Count - 1);
                 }
             }
-            ResourcePropertyTable.Attach(flagPageVBox, 0, 1, 0, 1);
+            ResourcePropertyTable.Attach(flagPageVBox, 0, castableObject.AllPresets.Count == 0 ? 2u : 1u, 0, 1);
             mPresetNotebook = PresetNotebook.CreateInstance(castableObject, Image);
             mPresetNotebook.Scrollable = true;
             mPresetNotebook.SwitchPage += (o, args) => NextState = NextStateOptions.UpdateModels;
@@ -1047,7 +1054,7 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
+                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
                 if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
