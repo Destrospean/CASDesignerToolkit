@@ -46,7 +46,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 var squareCanvasImage = imageCopy.GetInSquareCanvas();
                 preloadedImagePixbufs[preloadVariables.ResourceKey] = new List<Pixbuf>
                     {
-                        squareCanvasImage.ToPixbuf().ScaleSimple((int)(squareCanvasImage.Width * preloadVariables.Scale), (int)(squareCanvasImage.Height * preloadVariables.Scale), InterpType.Bilinear)
+                        squareCanvasImage.ToPixbuf()
                     };
                 imageCopy.Dispose();
                 squareCanvasImage.Dispose();
@@ -227,7 +227,7 @@ namespace Destrospean.DestrospeanCASPEditor
             using (var stream = new System.IO.MemoryStream())
             {
                 bitmap.Save(stream, ImageFormat.Png);
-                stream.Seek(0, System.IO.SeekOrigin.Begin);
+                stream.Position = 0;
                 return new Pixbuf(stream);
             }
         }
