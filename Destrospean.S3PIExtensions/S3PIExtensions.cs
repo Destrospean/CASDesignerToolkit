@@ -87,11 +87,7 @@ namespace Destrospean.S3PIExtensions
         public int CompareTo(IResourceKey other)
         {
             var result = ResourceType.CompareTo(other.ResourceType);
-            if (result != 0)
-            {
-                return result;
-            }
-            if ((result = ResourceGroup.CompareTo(other.ResourceGroup)) != 0)
+            if (result != 0 || (result = ResourceGroup.CompareTo(other.ResourceGroup)) != 0)
             {
                 return result;
             }
