@@ -14,7 +14,61 @@ namespace Destrospean.Common
 
         string mID;
 
-        Bitmap mStackedBodyTexture, mStackedFaceTexture, mStackedScalpTexture, mStackedShoesTexture;
+        Bitmap mStackedBodyTexture, mStackedFaceTexture, mStackedScalpTexture;
+
+        public Bitmap BodyMultiplier
+        {
+            get
+            {
+                /*
+                var specifier = "af";
+                var bodyCASP = CASParts[ClothingType.Body] ?? CASParts[ClothingType.Bottom] ?? CASParts[ClothingType.Top];
+                if (bodyCASP != null)
+                {
+                    specifier = "";
+                    switch (bodyCASP.AdjustedAge)
+                    {
+                        case AgeGender.Baby:
+                            specifier = "b";
+                            break;
+                        case AgeGender.Toddler:
+                            specifier = "p";
+                            break;
+                        case AgeGender.Child:
+                            specifier = "c";
+                            break;
+                        case AgeGender.Teen:
+                            specifier = "t";
+                            break;
+                        case AgeGender.Elder:
+                            specifier = "e";
+                            break;
+                        default:
+                            specifier = "a";
+                            break;
+                    }
+                    if (bodyCASP.AdjustedAge <= AgeGender.Child)
+                    {
+                        specifier += "u";
+                    }
+                    else
+                    {
+                        switch (bodyCASP.CASPartResource.AgeGender.Gender)
+                        {
+                            case GenderFlags.Male:
+                                specifier += "m";
+                                break;
+                            default:
+                                specifier += "f";
+                                break;
+                        }
+                    }
+                }
+                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(specifier + "Body_m").ToString("X16"), Complate.GetTextureCallback, 1024, 1024)?.Clone() ?? new Bitmap(1024, 1024);
+                */
+                return new Bitmap(1024, 1024);
+            }
+        }
 
         public readonly Dictionary<ClothingType, CASPart> CASPartOverrides = new Dictionary<ClothingType, CASPart>();
 
@@ -145,41 +199,31 @@ namespace Destrospean.Common
                 {
                     mStackedBodyTexture.Dispose();
                 }
-                mStackedBodyTexture = new Bitmap(1024, 1024);
-                using (var graphics = Graphics.FromImage(mStackedBodyTexture))
+                using (var graphics = Graphics.FromImage(mStackedBodyTexture = BodyMultiplier))
                 {
-                    foreach (var clothingType in new[]
-                        {
-                            ClothingType.Socks,
-                            ClothingType.LeftGarter,
-                            ClothingType.RightGarter,
-                            ClothingType.Glove,
-                            ClothingType.Necklace,
-                            ClothingType.Body,
-                            ClothingType.Bottom,
-                            ClothingType.Top
-                        })
+                    var casParts = new List<CASPart>();
+                    foreach (var casPart in CASParts.Values)
                     {
-                        CASPart casPart;
-                        if (!CASParts.TryGetValue(clothingType, out casPart) || casPart == null)
+                        if (casPart == null)
                         {
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
                         var xmlDocument = new System.Xml.XmlDocument();
                         xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        var isValid = false;
                         foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
                             if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body")
                             {
-                                isValid = true;
+                                casParts.Add(casPart);
+                                break;
                             }
                         }
-                        if (isValid)
-                        {
-                            graphics.DrawImage(preset.Texture, 0, 0);
-                        }
+                    }
+                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
+                    foreach (var casPart in casParts)
+                    {
+                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
                     }
                 }
                 return mStackedBodyTexture;
@@ -194,9 +238,9 @@ namespace Destrospean.Common
                 {
                     mStackedFaceTexture.Dispose();
                 }
-                mStackedFaceTexture = new Bitmap(1024, 1024);
-                using (var graphics = Graphics.FromImage(mStackedFaceTexture))
+                using (var graphics = Graphics.FromImage(mStackedFaceTexture = new Bitmap(1024, 1024)))
                 {
+                    var casParts = new List<CASPart>();
                     foreach (var casPart in CASParts.Values)
                     {
                         if (casPart == null)
@@ -204,14 +248,22 @@ namespace Destrospean.Common
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        if (casPart.CASPartResource.DataType == DataTypeFlags.FaceOverlay)
+                        var xmlDocument = new System.Xml.XmlDocument();
+                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
+                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
-                            graphics.DrawImage(preset.Texture, 0, 0);
+                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "face")
+                            {
+                                casParts.Add(casPart);
+                                break;
+                            }
                         }
-                        if (preset.FaceTexture != null)
-                        {
-                            graphics.DrawImage(preset.FaceTexture, 0, 0);
-                        }
+                    }
+                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
+                    foreach (var casPart in casParts)
+                    {
+                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                        graphics.DrawImage(preset.FaceTexture ?? preset.Texture, 0, 0);
                     }
                 }
                 return mStackedFaceTexture;
@@ -226,9 +278,9 @@ namespace Destrospean.Common
                 {
                     mStackedScalpTexture.Dispose();
                 }
-                mStackedScalpTexture = new Bitmap(1024, 1024);
-                using (var graphics = Graphics.FromImage(mStackedScalpTexture))
+                using (var graphics = Graphics.FromImage(mStackedScalpTexture = new Bitmap(1024, 1024)))
                 {
+                    var casParts = new List<CASPart>();
                     foreach (var casPart in CASParts.Values)
                     {
                         if (casPart == null)
@@ -236,46 +288,25 @@ namespace Destrospean.Common
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        if (casPart.CASPartResource.DataType == DataTypeFlags.Scalp)
+                        var xmlDocument = new System.Xml.XmlDocument();
+                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
+                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
-                            graphics.DrawImage(preset.Texture, 0, 0);
+                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "scalp")
+                            {
+                                casParts.Add(casPart);
+                                break;
+                            }
                         }
-                        if (preset.ScalpTexture != null)
-                        {
-                            graphics.DrawImage(preset.ScalpTexture, 0, 0);
-                        }
+                    }
+                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
+                    foreach (var casPart in casParts)
+                    {
+                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                        graphics.DrawImage(preset.ScalpTexture ?? preset.Texture, 0, 0);
                     }
                 }
                 return mStackedScalpTexture;
-            }
-        }
-
-        public Bitmap GetStackedShoesTexture(int presetIndex)
-        {
-            lock (Lock)
-            {
-                if (mStackedShoesTexture != null)
-                {
-                    mStackedShoesTexture.Dispose();
-                }
-                mStackedShoesTexture = new Bitmap(1024, 1024);
-                using (var graphics = Graphics.FromImage(mStackedShoesTexture))
-                {
-                    foreach (var clothingType in new[]
-                        {
-                            ClothingType.Socks,
-                            ClothingType.Shoes
-                        })
-                    {
-                        CASPart casPart;
-                        if (!CASParts.TryGetValue(clothingType, out casPart) || casPart == null)
-                        {
-                            continue;
-                        }
-                        graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
-                    }
-                }
-                return mStackedShoesTexture;
             }
         }
 
