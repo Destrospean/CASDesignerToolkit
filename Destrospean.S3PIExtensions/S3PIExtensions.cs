@@ -364,9 +364,9 @@ namespace Destrospean.S3PIExtensions
             string tag = null;
             try
             {
-                var buffer = new byte[5];
+                var buffer = new byte[4];
                 stream.Read(buffer, 0, buffer.Length);
-                if ("DDS |" == new string(Array.ConvertAll(buffer, x => (char)x)))
+                if ("DDS " == new string(Array.ConvertAll(buffer, x => (char)x)))
                 {
                     tag = "_IMG";
                     goto FinalSteps;

@@ -345,7 +345,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                             Normals = normals.ConvertAll(ToVector3).ToArray(),
                             TextureCoordinates = textureCoordinates.ConvertAll(x => new Vector2(x[0], x[1])).ToArray(),
                             Vertices = vertices.ConvertAll(ToVector3).ToArray(),
-                        }, currentPreset, (Bitmap)(casPart.CASPartResource.Clothing >= CASPartResource.ClothingType.Body && casPart.CASPartResource.Clothing <= CASPartResource.ClothingType.Bottom ? GetStackedBodyTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Shoes ? GetStackedShoesTexture(presetIndex) : currentPreset.Texture).Clone(), new[]
+                        }, currentPreset, (Bitmap)(casPart.CASPartResource.Clothing >= CASPartResource.ClothingType.Body && casPart.CASPartResource.Clothing <= CASPartResource.ClothingType.Shoes ? GetStackedBodyTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face ? GetStackedFaceTexture(presetIndex) : casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? GetStackedScalpTexture(presetIndex) : currentPreset.Texture).Clone(), new[]
                         {
                             ambientMapImage,
                             specularMapImage,
