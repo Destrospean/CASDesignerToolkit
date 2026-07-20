@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Xml;
 using CASPartResource;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common.Abstractions;
@@ -206,9 +207,9 @@ namespace Destrospean.Common
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new System.Xml.XmlDocument();
+                        var xmlDocument = new XmlDocument();
                         xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
                             if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body")
                             {
@@ -245,9 +246,9 @@ namespace Destrospean.Common
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new System.Xml.XmlDocument();
+                        var xmlDocument = new XmlDocument();
                         xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
                             if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "face")
                             {
@@ -285,9 +286,9 @@ namespace Destrospean.Common
                             continue;
                         }
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new System.Xml.XmlDocument();
+                        var xmlDocument = new XmlDocument();
                         xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (System.Xml.XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                         {
                             if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "scalp")
                             {
