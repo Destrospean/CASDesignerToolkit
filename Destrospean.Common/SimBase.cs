@@ -20,7 +20,6 @@ namespace Destrospean.Common
         {
             get
             {
-                /*
                 var specifier = "af";
                 var bodyCASP = CASParts[ClothingType.Body] ?? CASParts[ClothingType.Bottom] ?? CASParts[ClothingType.Top];
                 if (bodyCASP != null)
@@ -64,9 +63,7 @@ namespace Destrospean.Common
                         }
                     }
                 }
-                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(specifier + "Body_m").ToString("X16"), Complate.GetTextureCallback, 1024, 1024)?.Clone() ?? new Bitmap(1024, 1024);
-                */
-                return new Bitmap(1024, 1024);
+                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(specifier + "Body_m").ToString("X16"), Complate.GetTextureCallback)?.Clone() ?? new Bitmap(1024, 1024);
             }
         }
 
@@ -199,7 +196,7 @@ namespace Destrospean.Common
                 {
                     mStackedBodyTexture.Dispose();
                 }
-                using (var graphics = Graphics.FromImage(mStackedBodyTexture = BodyMultiplier))
+                using (var graphics = Graphics.FromImage(mStackedBodyTexture = new Bitmap(1024, 1024)))
                 {
                     var casParts = new List<CASPart>();
                     foreach (var casPart in CASParts.Values)
@@ -263,7 +260,7 @@ namespace Destrospean.Common
                     foreach (var casPart in casParts)
                     {
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        graphics.DrawImage(preset.FaceTexture ?? preset.Texture, 0, 0);
+                        graphics.DrawImage(preset.FaceTexture ?? preset.Texture ?? new Bitmap(1024, 1024), 0, 0);
                     }
                 }
                 return mStackedFaceTexture;
@@ -303,7 +300,7 @@ namespace Destrospean.Common
                     foreach (var casPart in casParts)
                     {
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        graphics.DrawImage(preset.ScalpTexture ?? preset.Texture, 0, 0);
+                        graphics.DrawImage(preset.ScalpTexture ?? preset.Texture ?? new Bitmap(1024, 1024), 0, 0);
                     }
                 }
                 return mStackedScalpTexture;
