@@ -432,19 +432,19 @@ public partial class MainWindow : RendererMainWindow
                                     switch (casPart.CASPartResource.DataType)
                                     {
                                         case CASPartResource.DataTypeFlags.Accessory:
-                                            element.SetAttribute("value", "Face");
-                                            break;
                                         case CASPartResource.DataTypeFlags.Body:
-                                        case CASPartResource.DataTypeFlags.FaceOverlay: 
                                         case CASPartResource.DataTypeFlags.Hair:
                                         case CASPartResource.DataTypeFlags.Scalp:
                                             element.SetAttribute("value", casPart.CASPartResource.DataType.ToString());
+                                            break;
+                                        case CASPartResource.DataTypeFlags.FaceOverlay:
+                                            element.SetAttribute("value", "Face");
                                             break;
                                     }
                                 }
                             }
                         }
-                        additionalToggleAction();
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     }, casPart.CASPartResource, "DataType"), 2, 3, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Age", additionalToggleAction, casPart.CASPartResource.AgeGender, "Age"), 0, 1, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Gender", additionalToggleAction, casPart.CASPartResource.AgeGender, "Gender"), 1, 2, 0, 1);
