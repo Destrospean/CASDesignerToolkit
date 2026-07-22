@@ -421,7 +421,31 @@ public partial class MainWindow : RendererMainWindow
                 }
                 flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Category", additionalToggleAction, casPart.CASPartResource, "ClothingCategory"), 0, 1, 0, 2);
                 flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Clothing Type", additionalToggleAction, casPart.CASPartResource, "Clothing"), 1, 2, 0, 2);
-                flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Data Type", additionalToggleAction, casPart.CASPartResource, "DataType"), 2, 3, 0, 2);
+                flagTables[0].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Data Type", () =>
+                    {
+                        foreach (var preset in casPart.AllPresets)
+                        {
+                            foreach (System.Xml.XmlElement element in ((System.Xml.XmlDocument)preset.GetType().GetField("mXmlDocument", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(preset)).SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                            {
+                                if (element.Name.ToLowerInvariant() == "value" && "bodytypeparttype".Contains((element.GetAttribute("key") ?? "").ToLowerInvariant()))
+                                {
+                                    switch (casPart.CASPartResource.DataType)
+                                    {
+                                        case CASPartResource.DataTypeFlags.Accessory:
+                                            element.SetAttribute("value", "Face");
+                                            break;
+                                        case CASPartResource.DataTypeFlags.Body:
+                                        case CASPartResource.DataTypeFlags.FaceOverlay: 
+                                        case CASPartResource.DataTypeFlags.Hair:
+                                        case CASPartResource.DataTypeFlags.Scalp:
+                                            element.SetAttribute("value", casPart.CASPartResource.DataType.ToString());
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        additionalToggleAction();
+                    }, casPart.CASPartResource, "DataType"), 2, 3, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Age", additionalToggleAction, casPart.CASPartResource.AgeGender, "Age"), 0, 1, 0, 2);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Gender", additionalToggleAction, casPart.CASPartResource.AgeGender, "Gender"), 1, 2, 0, 1);
                 flagTables[1].Attach(WidgetUtils.GetEnumPropertyCheckButtonsInNewFrame("Species", additionalToggleAction, casPart.CASPartResource.AgeGender, "Species"), 2, 3, 0, 2);

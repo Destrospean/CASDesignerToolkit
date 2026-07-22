@@ -210,14 +210,11 @@
         {
             new System.Threading.Thread(() =>
                 {
-                    lock (CmarNYCBorrowed.TextureUtils.Lock)
+                    lock (Lock)
                     {
-                        lock (Lock)
-                        {
-                            mInternal.Texture = mInternal.NewTexture;
-                        }
-                        MarkModelsNeedUpdatedCallback();
+                        mInternal.Texture = mInternal.NewTexture;
                     }
+                    MarkModelsNeedUpdatedCallback();
                 }).Start();
         }
 
