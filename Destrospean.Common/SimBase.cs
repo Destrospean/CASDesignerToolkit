@@ -191,6 +191,26 @@ namespace Destrospean.Common
 
         public Bitmap GetStackedBodyTexture(int presetIndex)
         {
+            var casParts = new List<CASPart>();
+            foreach (var casPart in CASParts.Values)
+            {
+                if (casPart == null)
+                {
+                    continue;
+                }
+                var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load(preset.XmlFile);
+                foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                {
+                    if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body")
+                    {
+                        casParts.Add(casPart);
+                        break;
+                    }
+                }
+            }
+            casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
             lock (Lock)
             {
                 if (mStackedBodyTexture != null)
@@ -199,26 +219,6 @@ namespace Destrospean.Common
                 }
                 using (var graphics = Graphics.FromImage(mStackedBodyTexture = new Bitmap(1024, 1024)))
                 {
-                    var casParts = new List<CASPart>();
-                    foreach (var casPart in CASParts.Values)
-                    {
-                        if (casPart == null)
-                        {
-                            continue;
-                        }
-                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new XmlDocument();
-                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
-                        {
-                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body")
-                            {
-                                casParts.Add(casPart);
-                                break;
-                            }
-                        }
-                    }
-                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
                     foreach (var casPart in casParts)
                     {
                         graphics.DrawImage(casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0].Texture, 0, 0);
@@ -230,6 +230,26 @@ namespace Destrospean.Common
 
         public Bitmap GetStackedFaceTexture(int presetIndex)
         {
+            var casParts = new List<CASPart>();
+            foreach (var casPart in CASParts.Values)
+            {
+                if (casPart == null)
+                {
+                    continue;
+                }
+                var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load(preset.XmlFile);
+                foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                {
+                    if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && ((element.GetAttribute("value") ?? "").ToLowerInvariant() == "face" || (element.GetAttribute("value") ?? "").ToLowerInvariant() == "hair" && bool.Parse(preset["DrawsOnFace"] ?? "false")))
+                    {
+                        casParts.Add(casPart);
+                        break;
+                    }
+                }
+            }
+            casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
             lock (Lock)
             {
                 if (mStackedFaceTexture != null)
@@ -238,26 +258,6 @@ namespace Destrospean.Common
                 }
                 using (var graphics = Graphics.FromImage(mStackedFaceTexture = new Bitmap(1024, 1024)))
                 {
-                    var casParts = new List<CASPart>();
-                    foreach (var casPart in CASParts.Values)
-                    {
-                        if (casPart == null)
-                        {
-                            continue;
-                        }
-                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new XmlDocument();
-                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
-                        {
-                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "face")
-                            {
-                                casParts.Add(casPart);
-                                break;
-                            }
-                        }
-                    }
-                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
                     foreach (var casPart in casParts)
                     {
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
@@ -270,6 +270,26 @@ namespace Destrospean.Common
 
         public Bitmap GetStackedScalpTexture(int presetIndex)
         {
+            var casParts = new List<CASPart>();
+            foreach (var casPart in CASParts.Values)
+            {
+                if (casPart == null)
+                {
+                    continue;
+                }
+                var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load(preset.XmlFile);
+                foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                {
+                    if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && ((element.GetAttribute("value") ?? "").ToLowerInvariant() == "scalp" || (element.GetAttribute("value") ?? "").ToLowerInvariant() == "hair" && bool.Parse(preset["DrawsOnScalp"] ?? "false")))
+                    {
+                        casParts.Add(casPart);
+                        break;
+                    }
+                }
+            }
+            casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
             lock (Lock)
             {
                 if (mStackedScalpTexture != null)
@@ -278,26 +298,6 @@ namespace Destrospean.Common
                 }
                 using (var graphics = Graphics.FromImage(mStackedScalpTexture = new Bitmap(1024, 1024)))
                 {
-                    var casParts = new List<CASPart>();
-                    foreach (var casPart in CASParts.Values)
-                    {
-                        if (casPart == null)
-                        {
-                            continue;
-                        }
-                        var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
-                        var xmlDocument = new XmlDocument();
-                        xmlDocument.LoadXml(preset.XmlFile.ReadToEnd());
-                        foreach (XmlElement element in xmlDocument.SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
-                        {
-                            if (element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "scalp")
-                            {
-                                casParts.Add(casPart);
-                                break;
-                            }
-                        }
-                    }
-                    casParts.Sort((a, b) => a.CASPartResource.OverlayPriority.CompareTo(b.CASPartResource.OverlayPriority));
                     foreach (var casPart in casParts)
                     {
                         var preset = (CASPartPreset)casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
