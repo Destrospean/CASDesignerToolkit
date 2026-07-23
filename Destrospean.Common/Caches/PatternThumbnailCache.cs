@@ -29,7 +29,7 @@ namespace Destrospean.Common
             PreloadedPatterns.Clear();
             PreloadedThumbnails.Clear();
             var categories = new List<string>();
-            EvaluatedResourceKey gamePatternListEvaluated;
+            PackageResourceIndexEntryTuple gamePatternListEvaluated;
             try
             {
                 gamePatternListEvaluated = package.EvaluateResourceKey("key:D4D9FBE5:00000000:1BDE14D18B416FEC");

@@ -152,16 +152,17 @@ namespace Destrospean.DestrospeanCASPEditor
             lock (CmarNYCBorrowed.TextureUtils.Lock)
             {
                 Bitmap image;
-                var resource = s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, resourceIndexEntry);
+                var stream = (System.IO.MemoryStream)((APackage)package).GetResource(resourceIndexEntry);
                 try
                 {
-                    image = GDImageLibrary._DDS.LoadImage(resource.AsBytes);
+                    image = GDImageLibrary._DDS.LoadImage(stream.ToArray());
                 }
                 catch (ArgumentNullException)
                 {
                     try
                     {
-                        using (var dds = TeximpNet.DDS.DDSFile.Read(resource.Stream))
+                        stream.Position = 0;
+                        using (var dds = TeximpNet.DDS.DDSFile.Read(stream))
                         {
                             var mipmap = dds.MipChains[0][0];
                             var pixelFormat = PixelFormat.Format32bppArgb;

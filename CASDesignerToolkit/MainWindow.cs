@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Destrospean;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
@@ -16,7 +17,6 @@ using Gtk;
 using s3pi.GenericRCOLResource;
 using s3pi.Interfaces;
 using s3pi.Package;
-using s3pi.WrapperDealer;
 
 public partial class MainWindow : RendererMainWindow
 {
@@ -258,7 +258,7 @@ public partial class MainWindow : RendererMainWindow
                         }
                     }).Start();
             }).Start();
-        var assembly = System.Reflection.Assembly.GetEntryAssembly();
+        var assembly = Assembly.GetEntryAssembly();
         var iconSize = (int)(32 * WidgetUtils.Scale);
         var treeViewSelectionColor = ResourceTreeView.Style.Base(StateType.Selected);
         mBabyBumpPixbuf = new Gdk.Pixbuf(assembly, "Destrospean.DestrospeanCASPEditor.Icons.BabyBump.png", iconSize, iconSize).Colorize(treeViewSelectionColor);
@@ -445,7 +445,7 @@ public partial class MainWindow : RendererMainWindow
                     {
                         foreach (var preset in casPart.AllPresets)
                         {
-                            foreach (System.Xml.XmlElement element in ((System.Xml.XmlDocument)preset.GetType().GetField("mXmlDocument", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(preset)).SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
+                            foreach (System.Xml.XmlElement element in ((System.Xml.XmlDocument)preset.GetType().GetField("mXmlDocument", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(preset)).SelectSingleNode("preset").SelectSingleNode("complate").ChildNodes)
                             {
                                 if (element.Name.ToLowerInvariant() == "value" && "bodytypeparttype".Contains((element.GetAttribute("key") ?? "").ToLowerInvariant()))
                                 {
@@ -1265,7 +1265,7 @@ public partial class MainWindow : RendererMainWindow
 
     public static void CheckForUpdates()
     {
-        var assemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName();
+        var assemblyName = Assembly.GetEntryAssembly().GetName();
         string latestReleaseDescription,
         latestReleaseDownloadUrl,
         latestReleaseFilename,
@@ -1559,7 +1559,7 @@ public partial class MainWindow : RendererMainWindow
                     case "VPXY":
                         if (!PreloadedData.VPXYs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.VPXYs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
+                            PreloadedData.VPXYs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
                 }
@@ -1591,11 +1591,10 @@ public partial class MainWindow : RendererMainWindow
         {
             try
             {
-                var tempResourceIndexEntry = CurrentPackage.AddResource(fileChooserDialog.Filename, resourceIndexEntry, false);
+                CurrentPackage.DeleteResource(resourceIndexEntry);
+                var tempResourceIndexEntry = CurrentPackage.AddResource(fileChooserDialog.Filename, resourceIndexEntry, true);
                 CurrentPackage.ResolveResourceType(tempResourceIndexEntry);
-                CurrentPackage.ReplaceResource(resourceIndexEntry, WrapperDealer.GetResource(0, CurrentPackage, tempResourceIndexEntry));
-                CurrentPackage.DeleteResource(tempResourceIndexEntry);
-                ResourceUtils.MissingResourceKeys.Add(resourceIndexEntry.ReverseEvaluateResourceKey());
+                ResourceUtils.MissingResourceKeys.Add(tempResourceIndexEntry.ReverseEvaluateResourceKey());
                 RefreshWidgets(false);
                 foreach (var casPartKvp in PreloadedData.CASParts)
                 {
@@ -1786,7 +1785,7 @@ public partial class MainWindow : RendererMainWindow
                 CreateShortcutAction.StockId = Stock.Execute;
                 return;
             }
-            var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            var assembly = Assembly.GetEntryAssembly();
             if (Platform.IsMacOS)
             {
                 return;

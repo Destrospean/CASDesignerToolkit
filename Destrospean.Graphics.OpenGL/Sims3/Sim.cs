@@ -113,7 +113,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                     {
                         BBLN bbln;
                         string bblnKey;
-                        EvaluatedResourceKey evaluated;
+                        PackageResourceIndexEntryTuple evaluated;
                         try
                         {
                             bblnKey = casPart.CASPartResource.TGIBlocks[bblnIndices[i]].ReverseEvaluateResourceKey();

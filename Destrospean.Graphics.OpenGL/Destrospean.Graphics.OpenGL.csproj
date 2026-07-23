@@ -58,10 +58,6 @@
       <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="s3pi.WrapperDealer">
-      <HintPath>..\libs\s3pi.WrapperDealer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="s3pi.TxtcResource">
       <HintPath>..\libs\s3pi.TxtcResource.dll</HintPath>
       <Private>False</Private>

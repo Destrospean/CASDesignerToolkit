@@ -138,9 +138,6 @@
       <HintPath>..\libs\s3pi.UserCAStPreset.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="s3pi.WrapperDealer">
-      <HintPath>..\libs\s3pi.WrapperDealer.dll</HintPath>
-    </Reference>
     <Reference Include="System.Custom">
       <HintPath>..\libs\System.Custom.dll</HintPath>
     </Reference>

@@ -8,7 +8,7 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public class AudioPlayer
     {
-        readonly Dictionary<string, List<EvaluatedResourceKey>> mAudioResourcesByMode = new Dictionary<string, List<EvaluatedResourceKey>>(StringComparer.InvariantCultureIgnoreCase);
+        readonly Dictionary<string, List<PackageResourceIndexEntryTuple>> mAudioResourcesByMode = new Dictionary<string, List<PackageResourceIndexEntryTuple>>(StringComparer.InvariantCultureIgnoreCase);
 
         LibVLCSharp.Shared.LibVLC mLibVLC = new LibVLCSharp.Shared.LibVLC(false, "--quiet", "--aout=" + (Platform.IsLinux ? "alsa" : Platform.IsMacOS ? "coreaudio" : Platform.IsWindows ? "waveout" : "oss"));
 
@@ -44,17 +44,17 @@ namespace Destrospean.DestrospeanCASPEditor
                 {
                     if (!mAudioResourcesByMode.ContainsKey(nameMapKvp.Value))
                     {
-                        mAudioResourcesByMode.Add(nameMapKvp.Value, new List<EvaluatedResourceKey>());
+                        mAudioResourcesByMode.Add(nameMapKvp.Value, new List<PackageResourceIndexEntryTuple>());
                     }
                     foreach (var resourceIndexEntry in package.FindAll(x => x.ResourceType == audioTunerType && x.Instance == nameMapKvp.Key))
                     {
-                        foreach (var block in ((s3piwrappers.AudioTunerResource)s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, resourceIndexEntry)).Blocks)
+                        foreach (var block in (new s3piwrappers.AudioTunerResource(0, ((APackage)package).GetResource(resourceIndexEntry))).Blocks)
                         {
                             if (block.Id == s3piwrappers.AudioTunerResource.SoundProperty.Samples)
                             {
                                 foreach (var item in block.Items)
                                 {
-                                    mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new EvaluatedResourceKey(package, x)));
+                                    mAudioResourcesByMode[nameMapKvp.Value].AddRange(package.FindAll(x => x.ResourceType == 0x1EEF63A && x.Instance == ((s3piwrappers.AudioTunerResource.SoundKeyData)item).Data.Instance).ConvertAll(x => new PackageResourceIndexEntryTuple(package, x)));
                                 }
                             }
                         }
@@ -70,7 +70,7 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public void PlayMusic(params string[] modes)
         {
-            var audioResources = new List<EvaluatedResourceKey>();
+            var audioResources = new List<PackageResourceIndexEntryTuple>();
             foreach (var audioResourceByMode in mAudioResourcesByMode)
             {
                 if (modes.Length == 0 || Array.Exists(modes, x => x == audioResourceByMode.Key))

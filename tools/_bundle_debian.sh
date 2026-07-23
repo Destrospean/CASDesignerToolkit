@@ -9,8 +9,8 @@ cp $RELEASE_DIR/Acknowledgements.txt CASDesignerToolkit
 cp $RELEASE_DIR/ealayer3 CASDesignerToolkit
 cp $RELEASE_DIR/GameFolders.xml CASDesignerToolkit
 cp $RELEASE_DIR/LICENSE.md CASDesignerToolkit
-cp $RELEASE_DIR/*License.txt CASDesignerToolkit
 cp $RELEASE_DIR/s3pi* CASDesignerToolkit
+cp $RELEASE_DIR/*License.txt CASDesignerToolkit
 cp $RELEASE_DIR/*.sh CASDesignerToolkit
 cp ../CASDesignerToolkit/Icons/CASDesignerToolkit.svg CASDesignerToolkit
 rar a -sfxlinux.sfx CASDesignerToolkit-linux-amd64-Self-Extractor CASDesignerToolkit/*
