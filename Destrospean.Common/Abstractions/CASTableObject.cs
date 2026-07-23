@@ -77,9 +77,8 @@ namespace Destrospean.Common.Abstractions
                 return;
             }
             var defaultPresetResourceIndexEntry = ParentPackage.EvaluateResourceKey(DefaultPresetKey).ResourceIndexEntry;
-            var tempResourceIndexEntry = ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(((CASPartPreset)AllPresets[0]).XmlFile.ReadToEnd())), false);
-            ParentPackage.ReplaceResource(defaultPresetResourceIndexEntry, s3pi.WrapperDealer.WrapperDealer.GetResource(0, ParentPackage, tempResourceIndexEntry));
-            ParentPackage.DeleteResource(tempResourceIndexEntry);
+            ParentPackage.DeleteResource(defaultPresetResourceIndexEntry);
+            ParentPackage.AddResource(defaultPresetResourceIndexEntry, new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(((CASPartPreset)AllPresets[0]).XmlFile.ReadToEnd())), true);
         }
 
         public abstract void SavePresets();

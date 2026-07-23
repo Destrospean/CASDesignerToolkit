@@ -58,10 +58,6 @@
       <HintPath>..\libs\s3pi.NameMapResource.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="s3pi.WrapperDealer">
-      <HintPath>..\libs\s3pi.WrapperDealer.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

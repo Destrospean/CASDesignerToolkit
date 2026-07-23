@@ -6,7 +6,6 @@ using Destrospean.Common.Abstractions;
 using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.Interfaces;
-using s3pi.WrapperDealer;
 
 namespace Destrospean.DestrospeanCASPEditor
 {

@@ -7,7 +7,6 @@ using Destrospean.zoeoeBorrowed;
 using meshExpImp.ModelBlocks;
 using s3pi.GenericRCOLResource;
 using s3pi.Interfaces;
-using s3pi.WrapperDealer;
 
 namespace Destrospean.Common.Abstractions
 {
@@ -46,7 +45,7 @@ namespace Destrospean.Common.Abstractions
                 if (mObjKeyResource == null)
                 {
                     var evaluated = ParentPackage.EvaluateResourceKey(ObjectCatalogResource.TGIBlocks[(int)ObjectCatalogResource.OBJKIndex].ReverseEvaluateResourceKey());
-                    mObjKeyResource = (ObjKeyResource.ObjKeyResource)WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry);
+                    mObjKeyResource = evaluated.GetResource<ObjKeyResource.ObjKeyResource>();
                 }
                 return mObjKeyResource;
             }
@@ -54,7 +53,7 @@ namespace Destrospean.Common.Abstractions
 
         public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
-            CatalogResource = (CatalogResource.CatalogResource)WrapperDealer.GetResource(0, package, resourceIndexEntry);
+            CatalogResource = new PackageResourceIndexEntryTuple(package, resourceIndexEntry).GetResource<CatalogResource.CatalogResource>();
             var propertyInfo = CatalogResource.GetType().GetProperty("Materials", typeof(CatalogResource.CatalogResource.MaterialList));
             if (propertyInfo != null)
             {
@@ -351,7 +350,7 @@ namespace Destrospean.Common.Abstractions
                 var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
                 if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
                 {
-                    vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
+                    vpxyResources.Add(vpxyKey, new GenericRCOLResource(0, ((APackage)ParentPackage).GetResource(vpxyResourceIndexEntry)));
                     vpxyResource = vpxyResources[vpxyKey];
                 }
             }
@@ -381,7 +380,7 @@ namespace Destrospean.Common.Abstractions
                         GenericRCOLResource modlResource;
                         if (!modlResources.TryGetValue(modlKey, out modlResource))
                         {
-                            modlResources.Add(modlKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, modlResourceIndexEntry));
+                            modlResources.Add(modlKey, new GenericRCOLResource(0, ((APackage)ParentPackage).GetResource(modlResourceIndexEntry)));
                             modlResource = modlResources[modlKey];
                         }
                         LODs.Clear();
@@ -399,7 +398,7 @@ namespace Destrospean.Common.Abstractions
                                 GenericRCOLResource mlodResource;
                                 if (!mlodResources.TryGetValue(mlodKey, out mlodResource))
                                 {
-                                    mlodResources.Add(mlodKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, mlodResourceIndexEntry));
+                                    mlodResources.Add(mlodKey, new GenericRCOLResource(0, ((APackage)ParentPackage).GetResource(mlodResourceIndexEntry)));
                                     mlodResource = mlodResources[mlodKey];
                                 }
                                 LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, mlodKey, mlodResource, (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock));

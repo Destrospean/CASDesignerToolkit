@@ -29,16 +29,59 @@ namespace Destrospean.S3PIExtensions
         }
     }
 
-    public struct EvaluatedResourceKey
+    public struct PackageResourceIndexEntryTuple
     {
         public readonly IPackage Package;
 
         public readonly IResourceIndexEntry ResourceIndexEntry;
 
-        public EvaluatedResourceKey(IPackage package, IResourceIndexEntry resourceIndexEntry)
+        public System.IO.MemoryStream Stream
+        {
+            get
+            {
+                return (System.IO.MemoryStream)((APackage)Package).GetResource(ResourceIndexEntry);
+            }
+        }
+
+        public PackageResourceIndexEntryTuple(IPackage package, IResourceIndexEntry resourceIndexEntry)
         {
             Package = package;
             ResourceIndexEntry = resourceIndexEntry;
+        }
+
+        object GetResource(Type type)
+        {
+            Console.WriteLine(type.FullName);
+            if (type.IsAbstract || type.IsInterface)
+            {
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (var implementationType in assembly.GetTypes())
+                    {
+                        if (implementationType.IsAbstract || implementationType.IsInterface)
+                        {
+                            return GetResource(implementationType);
+                        }
+                        if (!type.IsAssignableFrom(implementationType))
+                        {
+                            continue;
+                        }
+                        try
+                        {
+                            return Activator.CreateInstance(implementationType, 0, Stream);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+            return Activator.CreateInstance(type, 0, Stream);
+        }
+
+        public T GetResource<T>() where T : IResource
+        {
+            return (T)GetResource(typeof(T));
         }
     }
 
@@ -204,7 +247,7 @@ namespace Destrospean.S3PIExtensions
             }
         }
 
-        static bool TryEvaluateResourceKeyInternal(this IPackage package, string key, out EvaluatedResourceKey evaluated)
+        static bool TryEvaluateResourceKeyInternal(this IPackage package, string key, out PackageResourceIndexEntryTuple evaluated)
         {
             lock (sLock)
             {
@@ -217,10 +260,10 @@ namespace Destrospean.S3PIExtensions
                 var results = package.FindAll(x => x.ResourceType == tgi[0] && x.ResourceGroup == tgi[1] && x.Instance == tgi[2]);
                 if (results.Count == 0)
                 {
-                    evaluated = new EvaluatedResourceKey(null, null);
+                    evaluated = new PackageResourceIndexEntryTuple(null, null);
                     return false;
                 }
-                evaluated = new EvaluatedResourceKey(package, results[0]);
+                evaluated = new PackageResourceIndexEntryTuple(package, results[0]);
                 return true;
             }
         }
@@ -237,11 +280,11 @@ namespace Destrospean.S3PIExtensions
             sGameThumbnailResourcePackages = null;
         }
 
-        public static EvaluatedResourceKey EvaluateImageResourceKey(this IPackage package, string key)
+        public static PackageResourceIndexEntryTuple EvaluateImageResourceKey(this IPackage package, string key)
         {
             try
             {
-                EvaluatedResourceKey evaluated;
+                PackageResourceIndexEntryTuple evaluated;
                 if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
                 {
                     return evaluated;
@@ -261,11 +304,11 @@ namespace Destrospean.S3PIExtensions
             }
         }
 
-        public static EvaluatedResourceKey EvaluateResourceKey(this IPackage package, string key)
+        public static PackageResourceIndexEntryTuple EvaluateResourceKey(this IPackage package, string key)
         {   
             try
             {
-                EvaluatedResourceKey evaluated;
+                PackageResourceIndexEntryTuple evaluated;
                 if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
                 {
                     return evaluated;
@@ -285,14 +328,14 @@ namespace Destrospean.S3PIExtensions
             }
         }
 
-        public static EvaluatedResourceKey EvaluateResourceKey(this IPackage package, System.Xml.XmlNode xmlNode)
+        public static PackageResourceIndexEntryTuple EvaluateResourceKey(this IPackage package, System.Xml.XmlNode xmlNode)
         {   
             if (!((System.Xml.XmlElement)xmlNode).HasAttribute("reskey"))
             {
                 throw new AttributeNotFoundException("The XML node given does not have the \"reskey\" attribute.");
             }
             var key = xmlNode.Attributes["reskey"].Value;
-            EvaluatedResourceKey evaluated;
+            PackageResourceIndexEntryTuple evaluated;
             if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
             {
                 return evaluated;
@@ -307,11 +350,11 @@ namespace Destrospean.S3PIExtensions
             throw new ResourceIndexEntryNotFoundException("No resource with the key, \"" + key + ",\" referenced in the XML node could be found.");
         }
 
-        public static EvaluatedResourceKey EvaluateThumbnailResourceKey(this IPackage package, string key)
+        public static PackageResourceIndexEntryTuple EvaluateThumbnailResourceKey(this IPackage package, string key)
         {
             try
             {
-                EvaluatedResourceKey evaluated;
+                PackageResourceIndexEntryTuple evaluated;
                 if (package.TryEvaluateResourceKeyInternal(key, out evaluated))
                 {
                     return evaluated;
@@ -333,7 +376,7 @@ namespace Destrospean.S3PIExtensions
 
         public static NameMapResource.NameMapResource[] GetNameMapResources(this IPackage package)
         {
-            return package.FindAll(x => x.GetResourceTypeTag() == "_KEY").ConvertAll(x => (NameMapResource.NameMapResource)s3pi.WrapperDealer.WrapperDealer.GetResource(0, package, x)).ToArray();
+            return package.FindAll(x => x.GetResourceTypeTag() == "_KEY").ConvertAll(x => new NameMapResource.NameMapResource(0, ((APackage)package).GetResource(x))).ToArray();
         }
 
         public static IResourceIndexEntry GetResourceIndexEntry(this IPackage package, IResourceKey resourceKey)

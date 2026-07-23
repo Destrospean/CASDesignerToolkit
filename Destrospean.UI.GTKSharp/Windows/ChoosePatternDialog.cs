@@ -6,7 +6,6 @@ using Destrospean.Common;
 using Destrospean.S3PIExtensions;
 using Gtk;
 using s3pi.Interfaces;
-using s3pi.WrapperDealer;
 
 namespace Destrospean.DestrospeanCASPEditor
 {
@@ -48,10 +47,10 @@ namespace Destrospean.DestrospeanCASPEditor
             patternListStore = new ListStore(typeof(string), typeof(Gdk.Pixbuf));
             var gamePatternListEvaluated = package.EvaluateResourceKey("key:D4D9FBE5:00000000:1BDE14D18B416FEC");
             var patternsByCategory = new Dictionary<string, List<string>>();
-            System.Action<IResource> addPatternsByCategory = (patternListResource) =>
+            System.Action<PackageResourceIndexEntryTuple> addPatternsByCategory = (patternListResource) =>
                 {
                     var xmlDocument = new XmlDocument();
-                    xmlDocument.LoadXml(new System.IO.StreamReader(patternListResource.Stream).ReadToEnd());
+                    xmlDocument.Load(patternListResource.Stream);
                     foreach (XmlNode childNode in xmlDocument.SelectSingleNode("patternlist").ChildNodes)
                     {
                         if (childNode.Name == "category")
@@ -145,10 +144,10 @@ namespace Destrospean.DestrospeanCASPEditor
                     }
                     PatternIconView.SelectPath(new TreePath("0"));
                 };
-            addPatternsByCategory(WrapperDealer.GetResource(0, gamePatternListEvaluated.Package, gamePatternListEvaluated.ResourceIndexEntry));
+            addPatternsByCategory(gamePatternListEvaluated);
             foreach (var patternListResourceIndexEntry in package.FindAll(x => x.ResourceType == ResourceUtils.GetResourceType("PTRN")))
             {
-                addPatternsByCategory(WrapperDealer.GetResource(0, package, patternListResourceIndexEntry));
+                addPatternsByCategory(new PackageResourceIndexEntryTuple(package, patternListResourceIndexEntry));
             }
             categories.AddRange(patternsByCategory.Keys);
             categories.Sort();

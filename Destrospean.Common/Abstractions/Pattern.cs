@@ -95,7 +95,7 @@ namespace Destrospean.Common.Abstractions
                 };
             Preset = preset;
             var evaluated = ParentPackage.EvaluateResourceKey(patternMaterialBlockCast.ParentTGIBlocks[patternMaterialBlockCast.ComplateXMLIndex].ReverseEvaluateResourceKey());
-            mXmlDocument.LoadXml(new System.IO.StreamReader(s3pi.WrapperDealer.WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry).Stream).ReadToEnd());
+            mXmlDocument.Load(evaluated.Stream);
             foreach (var complateOverride in patternMaterialBlockCast.ComplateOverrides)
             {
                 mProperties[complateOverride.VariableName] = complateOverride;
@@ -130,7 +130,7 @@ namespace Destrospean.Common.Abstractions
                 };
             Preset = preset;
             var evaluated = ParentPackage.EvaluateResourceKey(patternXmlNode);
-            mXmlDocument.LoadXml(new System.IO.StreamReader(s3pi.WrapperDealer.WrapperDealer.GetResource(0, evaluated.Package, evaluated.ResourceIndexEntry).Stream).ReadToEnd());
+            mXmlDocument.Load(evaluated.Stream);
             foreach (XmlNode childNode in patternXmlNode.ChildNodes)
             {
                 if (childNode.Name == "value")
