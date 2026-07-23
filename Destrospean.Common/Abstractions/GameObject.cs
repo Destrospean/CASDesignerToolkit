@@ -66,8 +66,7 @@ namespace Destrospean.Common.Abstractions
                 DefaultPresetKey = "key:" + ResourceUtils.GetResourceType("_XML").ToString("X8") + lodData.ResourceKey.Substring(12);
                 try
                 {   
-                    var defaultPresetResourceEvaluated = ParentPackage.EvaluateResourceKey(DefaultPresetKey);
-                    using (var reader = new StreamReader(((APackage)defaultPresetResourceEvaluated.Package).GetResource(defaultPresetResourceEvaluated.ResourceIndexEntry)))
+                    using (var reader = new StreamReader(ParentPackage.EvaluateResourceKey(DefaultPresetKey).Stream))
                     {
                         DefaultPreset = new CASPartPreset(this, reader);
                     }
@@ -457,8 +456,7 @@ namespace Destrospean.Common.Abstractions
                 switch (entry01.ParentTGIBlocks[entry01.TGIIndex].GetResourceTypeTag())
                 {
                     case "_RIG":
-                        var evaluated = ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey());
-                        using (var reader = new BinaryReader(((APackage)evaluated.Package).GetResource(evaluated.ResourceIndexEntry)))
+                        using (var reader = new BinaryReader(ParentPackage.EvaluateResourceKey(entry01.ParentTGIBlocks[entry01.TGIIndex].ReverseEvaluateResourceKey()).Stream))
                         {
                             mCurrentRig = new Rig(reader);
                         }

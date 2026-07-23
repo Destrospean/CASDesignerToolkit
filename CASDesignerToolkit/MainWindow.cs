@@ -1520,7 +1520,7 @@ public partial class MainWindow : RendererMainWindow
                     case "FTPT":
                         if (!PreloadedData.FTPTs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.FTPTs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
+                            PreloadedData.FTPTs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
                     case "GEOM":
@@ -1535,19 +1535,19 @@ public partial class MainWindow : RendererMainWindow
                     case "LITE":
                         if (!PreloadedData.LITEs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.LITEs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
+                            PreloadedData.LITEs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
                     case "MLOD":
                         if (!PreloadedData.MLODs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.MLODs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
+                            PreloadedData.MLODs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
                     case "MODL":
                         if (!PreloadedData.MODLs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
-                            PreloadedData.MODLs[key] = (GenericRCOLResource)WrapperDealer.GetResource(0, CurrentPackage, resourceIndexEntry);
+                            PreloadedData.MODLs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
                     case "OBJD":
