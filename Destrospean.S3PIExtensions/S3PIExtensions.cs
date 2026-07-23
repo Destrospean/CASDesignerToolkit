@@ -51,28 +51,20 @@ namespace Destrospean.S3PIExtensions
 
         object GetResource(Type type)
         {
-            Console.WriteLine(type.FullName);
             if (type.IsAbstract || type.IsInterface)
             {
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (var implementationType in type.Assembly.GetTypes())
                 {
-                    foreach (var implementationType in assembly.GetTypes())
+                    if (implementationType.IsAbstract || implementationType.IsInterface || !type.IsAssignableFrom(implementationType))
                     {
-                        if (implementationType.IsAbstract || implementationType.IsInterface)
-                        {
-                            return GetResource(implementationType);
-                        }
-                        if (!type.IsAssignableFrom(implementationType))
-                        {
-                            continue;
-                        }
-                        try
-                        {
-                            return Activator.CreateInstance(implementationType, 0, Stream);
-                        }
-                        catch
-                        {
-                        }
+                        continue;
+                    }
+                    try
+                    {
+                        return Activator.CreateInstance(implementationType, 0, Stream);
+                    }
+                    catch
+                    {
                     }
                 }
             }
