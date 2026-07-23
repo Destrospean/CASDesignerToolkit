@@ -44,8 +44,7 @@ namespace Destrospean.Common.Abstractions
                 }
                 if (mObjKeyResource == null)
                 {
-                    var evaluated = ParentPackage.EvaluateResourceKey(ObjectCatalogResource.TGIBlocks[(int)ObjectCatalogResource.OBJKIndex].ReverseEvaluateResourceKey());
-                    mObjKeyResource = evaluated.GetResource<ObjKeyResource.ObjKeyResource>();
+                    mObjKeyResource = ParentPackage.EvaluateResourceKey(ObjectCatalogResource.TGIBlocks[(int)ObjectCatalogResource.OBJKIndex].ReverseEvaluateResourceKey()).GetResource<ObjKeyResource.ObjKeyResource>();
                 }
                 return mObjKeyResource;
             }
