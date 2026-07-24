@@ -501,7 +501,9 @@ namespace Destrospean.Common.Abstractions
                     vpxyResources.Add(vpxyKey, evaluated.GetResource<GenericRCOLResource>());
                     vpxyResource = vpxyResources[vpxyKey];
                 }
-                foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
+                foreach (var entry in new s3pi.GenericRCOLResource.VPXY(0, (sender, e) =>
+                    {
+                    }, vpxyResource.ChunkEntries[0].RCOLBlock.Stream).Entries)
                 {
                     var entry00 = entry as s3pi.GenericRCOLResource.VPXY.Entry00;
                     if (entry00 != null)

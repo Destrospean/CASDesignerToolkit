@@ -18,13 +18,67 @@ namespace Destrospean.zoeoeBorrowed
             MeshGroups = new System.Collections.Generic.List<MeshGroupData>();
             foreach (var meshGroup in mlodChunk.Meshes)
             {
-                var indexBuffer = resource.ChunkEntries[meshGroup.IndexBufferIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock as IBUF;
                 var materialIndexBlock = resource.ChunkEntries[meshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock;
-                var skinController = resource.ChunkEntries[meshGroup.SkinControllerIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock as SKIN;
-                var vertexBuffer = resource.ChunkEntries[meshGroup.VertexBufferIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock as VBUF;
-                var vertexFormat = resource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock as VRTF;
-                var mtst = materialIndexBlock as MTST;
-                var matd = mtst == null ? materialIndexBlock as MATD : resource.ChunkEntries[mtst.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + resource.PublicChunks].RCOLBlock as MATD;
+                IBUF indexBuffer = null;
+                try
+                {
+                    indexBuffer = new IBUF(0, (sender, e) =>
+                        {
+                        }, resource.ChunkEntries[meshGroup.IndexBufferIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock.Stream);
+                }
+                catch
+                {
+                }
+                SKIN skinController = null;
+                try
+                {
+                    skinController = new SKIN(0, (sender, e) =>
+                        {
+                        }, resource.ChunkEntries[meshGroup.SkinControllerIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock.Stream);
+                }
+                catch
+                {
+                }
+                VBUF vertexBuffer = null;
+                try
+                {
+                    vertexBuffer = new VBUF(0, (sender, e) =>
+                        {
+                        }, resource.ChunkEntries[meshGroup.VertexBufferIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock.Stream);
+                }
+                catch
+                {
+                }
+                VRTF vertexFormat = null;
+                try
+                {
+                    vertexFormat = new VRTF(0, (sender, e) =>
+                        {
+                        }, resource.ChunkEntries[meshGroup.VertexFormatIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock.Stream);
+                }
+                catch
+                {
+                }
+                MTST mtst = null;
+                try
+                {
+                    mtst = new MTST(0, (sender, e) =>
+                        {
+                        }, materialIndexBlock.Stream);
+                }
+                catch
+                {
+                }
+                MATD matd = null;
+                try
+                {
+                    matd = new MATD(0, (sender, e) =>
+                        {
+                        }, mtst == null ? materialIndexBlock.Stream : resource.ChunkEntries[mtst.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + resource.PublicChunks].RCOLBlock.Stream);
+                }
+                catch
+                {
+                }
                 float[] uvScales =
                     {   
                         -1,
