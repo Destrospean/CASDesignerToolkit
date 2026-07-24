@@ -1497,7 +1497,7 @@ public partial class MainWindow : RendererMainWindow
                 {
                     case "_IMG":
                     case "CASP":
-                    case "OBJD":
+                    //case "OBJD":
                         ResourceListStore.AppendValues(tag, "0x" + resourceIndexEntry.ResourceType.ToString("X8"), "0x" + resourceIndexEntry.ResourceGroup.ToString("X8"), "0x" + resourceIndexEntry.Instance.ToString("X16"), resourceIndexEntry);
                         break;
                 }
@@ -1517,12 +1517,14 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.CASParts[key] = new CASPart(CurrentPackage, resourceIndexEntry, PreloadedData.GEOMs, PreloadedData.VPXYs);
                         }
                         break;
+                    /*
                     case "FTPT":
                         if (!PreloadedData.FTPTs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
                             PreloadedData.FTPTs[key] = new GenericRCOLResource(0, ((APackage)CurrentPackage).GetResource(resourceIndexEntry));
                         }
                         break;
+                    */
                     case "GEOM":
                         if (!PreloadedData.GEOMs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1532,6 +1534,7 @@ public partial class MainWindow : RendererMainWindow
                             }
                         }
                         break;
+                    /*
                     case "LITE":
                         if (!PreloadedData.LITEs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1556,6 +1559,7 @@ public partial class MainWindow : RendererMainWindow
                             PreloadedData.GameObjects[key] = new GameObject(CurrentPackage, resourceIndexEntry, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         }
                         break;
+                    */
                     case "VPXY":
                         if (!PreloadedData.VPXYs.ContainsKey(key) || missingResourceKeyIndex > -1)
                         {
@@ -1664,6 +1668,7 @@ public partial class MainWindow : RendererMainWindow
                 casPartKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(casPartKvp.Key).ResourceIndexEntry, casPartKvp.Value.CASPartResource);
             }
+            /*
             foreach (var ftptResourceKvp in PreloadedData.FTPTs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(ftptResourceKvp.Key).ResourceIndexEntry, ftptResourceKvp.Value);
@@ -1677,6 +1682,7 @@ public partial class MainWindow : RendererMainWindow
                 gameObjectKvp.Value.SavePresets();
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(gameObjectKvp.Key).ResourceIndexEntry, gameObjectKvp.Value.CatalogResource);
             }
+            */
             foreach (var geometryResourceKvp in PreloadedData.GEOMs)
             {
                 var stream = new MemoryStream();
@@ -1688,6 +1694,7 @@ public partial class MainWindow : RendererMainWindow
                     CurrentPackage.DeleteResource(evaluated.ResourceIndexEntry);
                 }
             }
+            /*
             foreach (var liteResourceKvp in PreloadedData.LITEs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(liteResourceKvp.Key).ResourceIndexEntry, liteResourceKvp.Value);
@@ -1700,6 +1707,7 @@ public partial class MainWindow : RendererMainWindow
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(modlResourceKvp.Key).ResourceIndexEntry, modlResourceKvp.Value);
             }
+            */
             foreach (var vpxyResourceKvp in PreloadedData.VPXYs)
             {
                 CurrentPackage.ReplaceResource(CurrentPackage.EvaluateResourceKey(vpxyResourceKvp.Key).ResourceIndexEntry, vpxyResourceKvp.Value);
