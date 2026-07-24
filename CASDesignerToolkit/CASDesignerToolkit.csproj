@@ -394,7 +394,6 @@
     <ProjectReference Include="..\Destrospean.zoeoeBorrowed\Destrospean.zoeoeBorrowed.csproj">
       <Project>{BBC006B1-F627-47D2-B616-9C1D5C7F5C03}</Project>
       <Name>Destrospean.zoeoeBorrowed</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Destrospean.Updates\Destrospean.Updates.csproj">
       <Project>{05ED9D73-E007-4B3C-AF08-D9689CF7398C}</Project>
