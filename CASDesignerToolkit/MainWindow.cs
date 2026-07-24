@@ -1116,16 +1116,7 @@ public partial class MainWindow : RendererMainWindow
                 PreloadedData.CASParts[key].Dispose();
                 PreloadedData.CASParts.Remove(key);
             }
-            foreach (var key in new List<string>(PreloadedData.GameObjects.Keys))
-            {
-                PreloadedData.GameObjects[key].Dispose();
-                PreloadedData.GameObjects.Remove(key);
-            }
-            PreloadedData.FTPTs.Clear();
             PreloadedData.GEOMs.Clear();
-            PreloadedData.LITEs.Clear();
-            PreloadedData.MLODs.Clear();
-            PreloadedData.MODLs.Clear();
             PreloadedData.VPXYs.Clear();
             GlobalState.Materials.Clear();
             GlobalState.DeleteTextures();
@@ -1266,10 +1257,6 @@ public partial class MainWindow : RendererMainWindow
             {
                 AddCASTableObjectWidgets(casPart);
             }
-            foreach (var gameObject in PreloadedData.GameObjects.Values)
-            {
-                AddCASTableObjectWidgets(gameObject);
-            }
             ResourceTreeView.Selection.SelectPath(new TreePath("0"));
         }
         catch (Exception ex)
@@ -1293,10 +1280,6 @@ public partial class MainWindow : RendererMainWindow
                 foreach (var casPartKvp in PreloadedData.CASParts)
                 {
                     casPartKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
-                }
-                foreach (var gameObjectKvp in PreloadedData.GameObjects)
-                {
-                    gameObjectKvp.Value.AllPresets.ForEach(x => x.RegenerateTexture());
                 }
                 NextState = NextStateOptions.UnsavedChanges;
             }
