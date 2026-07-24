@@ -164,7 +164,6 @@
     </Reference>
     <Reference Include="s3pi.MeshChunks">
       <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
