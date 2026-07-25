@@ -127,7 +127,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
             }
         }
 
-        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, System.Drawing.Bitmap skinMultiplier, System.Drawing.Bitmap[] ambientAndSpecularMapTextures, object material, SimBase.LoadTextureDelegate loadTextureCallback)
+        public static void LoadMeshOnMainThread(object volume, Preset currentPreset, System.Drawing.Bitmap presetTexture, System.Drawing.Bitmap[] ambientAndSpecularMapTextures, object material, SimBase.LoadTextureDelegate loadTextureCallback)
         {
             var materialCast = (Material)material;
             var volumeCast = (Volume)volume;
