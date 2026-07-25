@@ -400,27 +400,27 @@ namespace Destrospean.CmarNYCBorrowed
             var bitmapData = skinToneImage.LockBits(rectangle, ImageLockMode.ReadWrite, skinToneImage.PixelFormat);
             var ptr = bitmapData.Stride > 0 ? bitmapData.Scan0 : bitmapData.Scan0 + bitmapData.Stride * (skinToneImage.Height - 1);
             var byteCount = Math.Abs(bitmapData.Stride) * skinToneImage.Height;
-            var detail = new byte[byteCount];
-            Marshal.Copy(ptr, detail, 0, byteCount);
+            var byteArray = new byte[byteCount];
+            Marshal.Copy(ptr, byteArray, 0, byteCount);
             //float contrast = 1.25f,
             //midpoint = .75f;
-            for (var i = 0; i < detail.Length; i += 4)
+            for (var i = 0; i < byteArray.Length; i += 4)
             {
                 for (var j = 0; j < 3; j++)
                 {
-                    var temp = (float)detail[i + j] / byte.MaxValue;
+                    var temp = (float)byteArray[i + j] / byte.MaxValue;
                     temp = temp * color[j] * byte.MaxValue;
                     temp = temp < 0 ? 0 : temp > byte.MaxValue ? byte.MaxValue : temp;
-                    detail[i + j] = (byte)temp;
+                    byteArray[i + j] = (byte)temp;
                 }
                 int columnCount,
                 rowCount = Math.DivRem(i >> 2, skinToneImage.Width, out columnCount);
                 if (rowCount > 665 && rowCount < 842 && columnCount < 85)
                 {
-                    detail[i + 3] = 0;
+                    byteArray[i + 3] = 0;
                 }
             }
-            Marshal.Copy(detail, 0, ptr, byteCount);
+            Marshal.Copy(byteArray, 0, ptr, byteCount);
             skinToneImage.UnlockBits(bitmapData);
             return skinToneImage;
         }
