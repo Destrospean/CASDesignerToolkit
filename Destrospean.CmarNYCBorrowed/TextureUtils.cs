@@ -240,7 +240,7 @@ namespace Destrospean.CmarNYCBorrowed
             return patternImage;
         }
 
-        public static Bitmap GetSkinTone(this IPackage package, Tone tone, AgeGender age, AgeGender gender, PartType partType, Bitmap colorRamp, float colorSlider, float cutnessSlider, float cleavageSlider, GetTextureDelegate getTextureCallback)
+        public static Bitmap GetSkinToneImage(this IPackage package, Tone tone, AgeGender age, AgeGender gender, PartType partType, Bitmap colorRamp, float colorSlider, float cutnessSlider, float cleavageSlider, GetTextureDelegate getTextureCallback)
         {
             if (tone == null)
             {
@@ -335,20 +335,20 @@ namespace Destrospean.CmarNYCBorrowed
                 };
             */
             var skinSet = tone.GetSkinSet(Species.Human, age, gender, partType);
-            var details = package.GetTexture(skinSet.LightLink, getTextureCallback, 1024, 1024);
-            using (var graphics = Graphics.FromImage(details))
+            var skinToneImage = package.GetTexture(skinSet.LightLink, getTextureCallback, 1024, 1024);
+            using (var graphics = Graphics.FromImage(skinToneImage))
             {
                 var darkTexture = package.GetTexture(skinSet.DarkLink, getTextureCallback, 1024, 1024);
                 alphaMatrix[3][3] = colorSlider;
                 var colorMatrix = new ColorMatrix(alphaMatrix);
                 var attributes = new ImageAttributes();
                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                graphics.DrawImage(darkTexture, new Rectangle(0, 0, details.Width, details.Height), 0, 0, darkTexture.Width, darkTexture.Height, GraphicsUnit.Pixel, attributes);
+                graphics.DrawImage(darkTexture, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, darkTexture.Width, darkTexture.Height, GraphicsUnit.Pixel, attributes);
                 darkTexture.Dispose();
                 var overlay = package.GetTexture(skinSet.OverlayLink, getTextureCallback, 1024, 1024);
                 if (overlay != null)
                 {
-                    graphics.DrawImage(overlay, new Rectangle(0, 0, details.Width, details.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel);
+                    graphics.DrawImage(overlay, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel);
                     overlay.Dispose();
                 }
                 /*
@@ -386,7 +386,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
             if (colorRamp == null)
             {
-                return details;
+                return skinToneImage;
             }
             var skinColor = colorRamp.GetPixel(colorRamp.Width >> 1, (int)(colorRamp.Height * colorSlider));
             float[] color =
@@ -396,10 +396,10 @@ namespace Destrospean.CmarNYCBorrowed
                     (float)skinColor.R / byte.MaxValue,
                     1
                 };
-            var rectangle = new Rectangle(0, 0, details.Width, details.Height);
-            var bitmapData = details.LockBits(rectangle, ImageLockMode.ReadWrite, details.PixelFormat);
-            var ptr = bitmapData.Stride > 0 ? bitmapData.Scan0 : bitmapData.Scan0 + bitmapData.Stride * (details.Height - 1);
-            var byteCount = Math.Abs(bitmapData.Stride) * details.Height;
+            var rectangle = new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height);
+            var bitmapData = skinToneImage.LockBits(rectangle, ImageLockMode.ReadWrite, skinToneImage.PixelFormat);
+            var ptr = bitmapData.Stride > 0 ? bitmapData.Scan0 : bitmapData.Scan0 + bitmapData.Stride * (skinToneImage.Height - 1);
+            var byteCount = Math.Abs(bitmapData.Stride) * skinToneImage.Height;
             var detail = new byte[byteCount];
             Marshal.Copy(ptr, detail, 0, byteCount);
             //float contrast = 1.25f,
@@ -414,15 +414,15 @@ namespace Destrospean.CmarNYCBorrowed
                     detail[i + j] = (byte)temp;
                 }
                 int columnCount,
-                rowCount = Math.DivRem(i >> 2, details.Width, out columnCount);
+                rowCount = Math.DivRem(i >> 2, skinToneImage.Width, out columnCount);
                 if (rowCount > 665 && rowCount < 842 && columnCount < 85)
                 {
                     detail[i + 3] = 0;
                 }
             }
             Marshal.Copy(detail, 0, ptr, byteCount);
-            details.UnlockBits(bitmapData);
-            return details;
+            skinToneImage.UnlockBits(bitmapData);
+            return skinToneImage;
         }
 
         public static Bitmap GetTexture(this IPackage package, string key, GetTextureDelegate getTextureCallback, int[] dimensions = null)
