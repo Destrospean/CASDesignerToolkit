@@ -396,8 +396,8 @@ namespace Destrospean.CmarNYCBorrowed
                     (float)skinColor.R / byte.MaxValue,
                     1
                 };
-            var rect = new Rectangle(0, 0, details.Width, details.Height);
-            var bitmapData = details.LockBits(rect, ImageLockMode.ReadWrite, details.PixelFormat);
+            var rectangle = new Rectangle(0, 0, details.Width, details.Height);
+            var bitmapData = details.LockBits(rectangle, ImageLockMode.ReadWrite, details.PixelFormat);
             var ptr = bitmapData.Stride > 0 ? bitmapData.Scan0 : bitmapData.Scan0 + bitmapData.Stride * (details.Height - 1);
             var byteCount = Math.Abs(bitmapData.Stride) * details.Height;
             var detail = new byte[byteCount];
