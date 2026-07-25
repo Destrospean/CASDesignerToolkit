@@ -501,8 +501,7 @@ namespace Destrospean.CmarNYCBorrowed
         public void Write(BinaryWriter writer)
         {
             writer.Write(mVersion);
-            var ageGenderLength = mVersion == 4 ? 28 : 36;
-            mTGIOffset = 8 + mShaderCount * 17 + 12 + mAgeGenderSets.Count * ageGenderLength + 1;
+            mTGIOffset = 8 + mShaderCount * 17 + 12 + mAgeGenderSets.Count * (mVersion == 4 ? 28 : 36) + 1;
             writer.Write(mTGIOffset);
             mTGISize = mTGIList.Count * 16 + 4;
             writer.Write(mTGISize);
