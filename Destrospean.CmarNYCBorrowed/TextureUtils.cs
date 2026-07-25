@@ -100,49 +100,29 @@ namespace Destrospean.CmarNYCBorrowed
             blueArray = null,
             finalArray = new byte[Math.Abs(bitmapData0.Stride) * patternImage.Height],
             greenArray = null;
-#if WIN32
-            var ptr = new IntPtr(bitmapData0.Scan0.ToInt32() + (bitmapData0.Stride > 0 ? 0 : bitmapData0.Stride * (patternImage.Height - 1)));
-#else
-            var ptr = new IntPtr(bitmapData0.Scan0.ToInt64() + (bitmapData0.Stride > 0 ? 0 : bitmapData0.Stride * (patternImage.Height - 1)));
-#endif
+            var ptr = bitmapData0.Scan0 + (bitmapData0.Stride > 0 ? 0 : bitmapData0.Stride * (patternImage.Height - 1));
             Marshal.Copy(ptr, finalArray, 0, finalArray.Length);
             if (background != null)
             {
-#if WIN32
-                Marshal.Copy(new IntPtr(bitmapData1.Scan0.ToInt32() + (bitmapData1.Stride > 0 ? 0 : bitmapData1.Stride * (background.Height - 1))), backArray, 0, backArray.Length);
-#else
-                Marshal.Copy(new IntPtr(bitmapData1.Scan0.ToInt64() + (bitmapData1.Stride > 0 ? 0 : bitmapData1.Stride * (background.Height - 1))), backArray, 0, backArray.Length);
-#endif
+                Marshal.Copy(bitmapData1.Scan0 + (bitmapData1.Stride > 0 ? 0 : bitmapData1.Stride * (background.Height - 1)), backArray, 0, backArray.Length);
             }
             if (pattern.ChannelsEnabled != null && pattern.ChannelsEnabled.Length > 0 && pattern.ChannelsEnabled[0] && patternBack[0] != null)
             {
                 bitmapData2 = patternBack[0].LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, patternBack[0].PixelFormat);
                 greenArray = new byte[Math.Abs(bitmapData2.Stride) * patternBack[0].Height];
-#if WIN32
-                Marshal.Copy(new IntPtr(bitmapData2.Scan0.ToInt32() + (bitmapData2.Stride > 0 ? 0 : bitmapData2.Stride * (patternBack[0].Height - 1))), greenArray, 0, greenArray.Length);
-#else
-                Marshal.Copy(new IntPtr(bitmapData2.Scan0.ToInt64() + (bitmapData2.Stride > 0 ? 0 : bitmapData2.Stride * (patternBack[0].Height - 1))), greenArray, 0, greenArray.Length);
-#endif
+                Marshal.Copy(bitmapData2.Scan0 + (bitmapData2.Stride > 0 ? 0 : bitmapData2.Stride * (patternBack[0].Height - 1)), greenArray, 0, greenArray.Length);
             }
             if (pattern.ChannelsEnabled != null && pattern.ChannelsEnabled.Length > 1 && pattern.ChannelsEnabled[1] && patternBack[1] != null)
             {
                 bitmapData3 = patternBack[1].LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, patternBack[1].PixelFormat);
                 blueArray = new byte[Math.Abs(bitmapData3.Stride) * patternBack[1].Height];
-#if WIN32
-                Marshal.Copy(new IntPtr(bitmapData3.Scan0.ToInt32() + (bitmapData3.Stride > 0 ? 0 : bitmapData3.Stride * (patternBack[1].Height - 1))), blueArray, 0, blueArray.Length);
-#else
-                Marshal.Copy(new IntPtr(bitmapData3.Scan0.ToInt64() + (bitmapData3.Stride > 0 ? 0 : bitmapData3.Stride * (patternBack[1].Height - 1))), blueArray, 0, blueArray.Length);
-#endif
+                Marshal.Copy(bitmapData3.Scan0 + (bitmapData3.Stride > 0 ? 0 : bitmapData3.Stride * (patternBack[1].Height - 1)), blueArray, 0, blueArray.Length);
             }
             if (pattern.ChannelsEnabled != null && pattern.ChannelsEnabled.Length > 2 && pattern.ChannelsEnabled[2] && patternBack[2] != null)
             {
                 bitmapData4 = patternBack[2].LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, patternBack[2].PixelFormat);
                 alphaArray = new byte[Math.Abs(bitmapData4.Stride) * patternBack[2].Height];
-#if WIN32
-                Marshal.Copy(new IntPtr(bitmapData4.Scan0.ToInt32() + (bitmapData4.Stride > 0 ? 0 : bitmapData4.Stride * (patternBack[2].Height - 1))), alphaArray, 0, alphaArray.Length);
-#else
-                Marshal.Copy(new IntPtr(bitmapData4.Scan0.ToInt64() + (bitmapData4.Stride > 0 ? 0 : bitmapData4.Stride * (patternBack[2].Height - 1))), alphaArray, 0, alphaArray.Length);
-#endif
+                Marshal.Copy(bitmapData4.Scan0 + (bitmapData4.Stride > 0 ? 0 : bitmapData4.Stride * (patternBack[2].Height - 1)), alphaArray, 0, alphaArray.Length);
             }
             HSVColor alphaChannel = pattern.HSV == null || pattern.HSV.Length < 3 ? new HSVColor(0, 0, 0) : new HSVColor(pattern.HSV[2][0] * 360, pattern.HSV[2][1], pattern.HSV[2][2]),
             backChannel = pattern.HSVBG == null ? new HSVColor(0, 0, 0) : new HSVColor(pattern.HSVBG[0] * 360, pattern.HSVBG[1], pattern.HSVBG[2]),
@@ -255,13 +235,194 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 textureArray[i + 3] = byte.MaxValue;
             }
-#if WIN32
-            Marshal.Copy(textureArray, 0, new IntPtr(bitmapData.Scan0.ToInt32() + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (patternImage.Height - 1))), byteCount);
-#else
-            Marshal.Copy(textureArray, 0, new IntPtr(bitmapData.Scan0.ToInt64() + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (patternImage.Height - 1))), byteCount);
-#endif
+            Marshal.Copy(textureArray, 0, bitmapData.Scan0 + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (patternImage.Height - 1)), byteCount);
             patternImage.UnlockBits(bitmapData);
             return patternImage;
+        }
+
+        public static Bitmap GetSkinTone(this IPackage package, Tone tone, AgeGender age, AgeGender gender, PartType partType, Bitmap colorRamp, float colorSlider, float cutnessSlider, float cleavageSlider, GetTextureDelegate getTextureCallback)
+        {
+            if (tone == null)
+            {
+                return null;
+            }
+            float[][] alphaMatrix =
+                {
+                    new float[]
+                    {
+                        1,
+                        0,
+                        0,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        1,
+                        0,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        0,
+                        1,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        0,
+                        0,
+                        1,
+                        0
+                    },
+                    new float[]
+                    { 
+                        0,
+                        0,
+                        0,
+                        0,
+                        1
+                    }
+                };
+            /*
+            redMatrix =
+                {
+                    new[]
+                    {
+                        1.05f,
+                        0,
+                        0,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        1,
+                        0,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        0,
+                        1,
+                        0,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        0,
+                        0,
+                        1,
+                        0
+                    },
+                    new float[]
+                    {
+                        0,
+                        0,
+                        0,
+                        0,
+                        1
+                    }
+                };
+            */
+            var skinSet = tone.GetSkinSet(Species.Human, age, gender, partType);
+            var details = package.GetTexture(skinSet.LightLink, getTextureCallback, 1024, 1024);
+            using (var graphics = Graphics.FromImage(details))
+            {
+                var darkTexture = package.GetTexture(skinSet.DarkLink, getTextureCallback, 1024, 1024);
+                alphaMatrix[3][3] = colorSlider;
+                var colorMatrix = new ColorMatrix(alphaMatrix);
+                var attributes = new ImageAttributes();
+                attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                graphics.DrawImage(darkTexture, new Rectangle(0, 0, details.Width, details.Height), 0, 0, darkTexture.Width, darkTexture.Height, GraphicsUnit.Pixel, attributes);
+                darkTexture.Dispose();
+                var overlay = package.GetTexture(skinSet.OverlayLink, getTextureCallback, 1024, 1024);
+                if (overlay != null)
+                {
+                    graphics.DrawImage(overlay, new Rectangle(0, 0, details.Width, details.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel);
+                    overlay.Dispose();
+                }
+                /*
+                if (age > AgeGender.Child)
+                {
+                    var cut = package.GetTexture(skinSet.CutnessLink, getTextureCallback, 1024, 1024);
+                    if (cut != null)
+                    {
+                        alphaMatrix[3][3] = cutnessSlider;
+                        colorMatrix = new ColorMatrix(alphaMatrix);
+                        attributes = new ImageAttributes();
+                        attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                        graphics.DrawImage(cut, new Rectangle(0, 0, details.Width, details.Height), 0, 0, cut.Width, cut.Height, GraphicsUnit.Pixel, attributes);
+                        cut.Dispose();
+                    }
+                    if ((gender & AgeGender.Female) > 0)
+                    {
+                        var cleavage = package.GetTexture(skinSet.CleavageLink, getTextureCallback, 1024, 1024);
+                        if (cleavage != null)
+                        {
+                            alphaMatrix[3][3] = cleavageSlider;
+                            colorMatrix = new ColorMatrix(alphaMatrix);
+                            attributes = new ImageAttributes();
+                            attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                            graphics.DrawImage(cleavage, new Rectangle(0, 0, details.Width, details.Height), 0, 0, cleavage.Width, cleavage.Height, GraphicsUnit.Pixel, attributes);
+                            cleavage.Dispose();
+                        }
+                    }
+                }
+                colorMatrix = new ColorMatrix(redMatrix);
+                attributes = new ImageAttributes();
+                attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                graphics.DrawImage(details, new Rectangle(0, 0, details.Width, details.Height), 0, 0, details.Width, details.Height, GraphicsUnit.Pixel, attributes);
+                */
+            }
+            if (colorRamp == null)
+            {
+                return details;
+            }
+            var skinColor = colorRamp.GetPixel(colorRamp.Width >> 1, (int)(colorRamp.Height * colorSlider));
+            float[] color =
+                {
+                    (float)skinColor.B / byte.MaxValue,
+                    (float)skinColor.G / byte.MaxValue,
+                    (float)skinColor.R / byte.MaxValue,
+                    1
+                };
+            var rect = new Rectangle(0, 0, details.Width, details.Height);
+            var bitmapData = details.LockBits(rect, ImageLockMode.ReadWrite, details.PixelFormat);
+            var ptr = bitmapData.Stride > 0 ? bitmapData.Scan0 : bitmapData.Scan0 + bitmapData.Stride * (details.Height - 1);
+            var byteCount = Math.Abs(bitmapData.Stride) * details.Height;
+            var detail = new byte[byteCount];
+            Marshal.Copy(ptr, detail, 0, byteCount);
+            //float contrast = 1.25f,
+            //midpoint = .75f;
+            for (var i = 0; i < detail.Length; i += 4)
+            {
+                for (var j = 0; j < 3; j++)
+                {
+                    var temp = (float)detail[i + j] / byte.MaxValue;
+                    temp = temp * color[j] * byte.MaxValue;
+                    temp = temp < 0 ? 0 : temp > byte.MaxValue ? byte.MaxValue : temp;
+                    detail[i + j] = (byte)temp;
+                }
+                int columnCount,
+                rowCount = Math.DivRem(i >> 2, details.Width, out columnCount);
+                if (rowCount > 665 && rowCount < 842 && columnCount < 85)
+                {
+                    detail[i + 3] = 0;
+                }
+            }
+            Marshal.Copy(detail, 0, ptr, byteCount);
+            details.UnlockBits(bitmapData);
+            return details;
         }
 
         public static Bitmap GetTexture(this IPackage package, string key, GetTextureDelegate getTextureCallback, int[] dimensions = null)
@@ -307,6 +468,15 @@ namespace Destrospean.CmarNYCBorrowed
                 });
         }
 
+        public static Bitmap GetTexture(this IPackage package, TGI tgi, GetTextureDelegate getTextureCallback, int width, int height)
+        {
+            return package.GetTexture(new ResourceKey(tgi.Type, tgi.Group, tgi.Instance).ReverseEvaluateResourceKey(), getTextureCallback, new[]
+                {
+                    width,
+                    height
+                });
+        }
+
         public static uint[] GetTextureARGBArray(this IPackage package, string key, GetTextureDelegate getTextureCallback, int[] dimensions = null)
         {
             var image = package.GetTexture(key, getTextureCallback, dimensions);
@@ -343,11 +513,7 @@ namespace Destrospean.CmarNYCBorrowed
             var bitmapData = multiplierCopy.LockBits(rectangle, ImageLockMode.ReadWrite, multiplierCopy.PixelFormat);
             var byteCount = Math.Abs(bitmapData.Stride) * multiplierCopy.Height;
             var multiplierArray = new byte[byteCount];
-#if WIN32
-            var ptr = new IntPtr(bitmapData.Scan0.ToInt32() + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (multiplierCopy.Height - 1)));
-#else
-            var ptr = new IntPtr(bitmapData.Scan0.ToInt64() + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (multiplierCopy.Height - 1)));
-#endif
+            var ptr = bitmapData.Scan0 + (bitmapData.Stride > 0 ? 0 : bitmapData.Stride * (multiplierCopy.Height - 1));
             Marshal.Copy(ptr, multiplierArray, 0, byteCount);
             for (var i = 0; i < byteCount; i += 4)
             {
@@ -372,13 +538,6 @@ namespace Destrospean.CmarNYCBorrowed
                             {
                                 var temp = gray * rgba[2 - k];
                                 temp = temp < 0 ? 0 : temp > 1 ? 1 : temp;
-                                /*
-                                if (k == 0 || !overlay)
-                                {
-                                    multiplierArray[i + k] = (byte)(temp * byte.MaxValue);
-                                    continue;
-                                }
-                                */
                                 multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
                             }
                             continue;
@@ -404,13 +563,6 @@ namespace Destrospean.CmarNYCBorrowed
                             {
                                 var temp = gray * rgba[2 - k];
                                 temp = temp < 0 ? 0 : temp > 1 ? 1 : temp;
-                                /*
-                                if (k == 0 || !overlay)
-                                {
-                                    multiplierArray[i + k] = (byte)(temp * byte.MaxValue);
-                                    continue;
-                                }
-                                */
                                 multiplierArray[i + k] = (byte)((blend * temp + (1 - blend) * multiplierArray[i + k] * kInverseByteMax) * byte.MaxValue);
                             }
                         }

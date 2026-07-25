@@ -428,6 +428,16 @@ namespace Destrospean.CmarNYCBorrowed
         VertexID
     }
 
+    [System.Flags]
+    public enum PartType : uint
+    {
+        Hair = 1,
+        Scalp,
+        Face = 4,
+        Body = 8,
+        Accessory = 16,
+    }
+
     public enum Shader : uint
     {
         additive = 0x5AF16731,
