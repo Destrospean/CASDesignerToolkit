@@ -20,50 +20,30 @@ namespace Destrospean.Common
         {
             get
             {
-                var specifier = "af";
-                var bodyCASP = CASParts[ClothingType.Body] ?? CASParts[ClothingType.Bottom] ?? CASParts[ClothingType.Top];
-                if (bodyCASP != null)
+                var agePrefix = "a";
+                var bodyCASPart = CASParts[ClothingType.Body] ?? CASParts[ClothingType.Bottom] ?? CASParts[ClothingType.Top];
+                if (bodyCASPart != null)
                 {
-                    specifier = "";
-                    switch (bodyCASP.AdjustedAge)
+                    switch (bodyCASPart.AdjustedAge)
                     {
                         case AgeGender.Baby:
-                            specifier = "b";
+                            agePrefix = "b";
                             break;
                         case AgeGender.Toddler:
-                            specifier = "p";
+                            agePrefix = "p";
                             break;
                         case AgeGender.Child:
-                            specifier = "c";
-                            break;
-                        case AgeGender.Teen:
-                            specifier = "t";
+                            agePrefix = "c";
                             break;
                         case AgeGender.Elder:
-                            specifier = "e";
+                            agePrefix = "e";
                             break;
                         default:
-                            specifier = "a";
+                            agePrefix = "a";
                             break;
                     }
-                    if (bodyCASP.AdjustedAge <= AgeGender.Child)
-                    {
-                        specifier += "u";
-                    }
-                    else
-                    {
-                        switch (bodyCASP.CASPartResource.AgeGender.Gender)
-                        {
-                            case GenderFlags.Male:
-                                specifier += "m";
-                                break;
-                            default:
-                                specifier += "f";
-                                break;
-                        }
-                    }
                 }
-                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(specifier + "Body_m").ToString("X16"), Complate.GetTextureCallback)?.Clone() ?? new Bitmap(1024, 1024);
+                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(agePrefix + (bodyCASPart.AdjustedAge < AgeGender.Teen ? "u" : bodyCASPart.CASPartResource.AgeGender.Gender == GenderFlags.Male ? "m" : "f") + "Body_m").ToString("X16"), Complate.GetTextureCallback, 1024, 1024)?.Clone() ?? new Bitmap(1024, 1024);
             }
         }
 
@@ -94,6 +74,37 @@ namespace Destrospean.Common
             }
         }
 
+        public Bitmap FaceMultiplier
+        {
+            get
+            {
+                var agePrefix = "a";
+                var faceCASPart = CASParts[ClothingType.Face];
+                if (faceCASPart != null)
+                {
+                    switch (faceCASPart.CASPartResource.AgeGender.Age)
+                    {
+                        case AgeFlags.Toddler:
+                            agePrefix = "p";
+                            break;
+                        case AgeFlags.Child:
+                            agePrefix = "c";
+                            break;
+                        case AgeFlags.YoungAdult:
+                            agePrefix = "y";
+                            break;
+                        case AgeFlags.Elder:
+                            agePrefix = "e";
+                            break;
+                        default:
+                            agePrefix = "a";
+                            break;
+                    }
+                }
+                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(agePrefix + (faceCASPart.AdjustedAge < AgeGender.Teen ? "u" : faceCASPart.CASPartResource.AgeGender.Gender == GenderFlags.Male ? "m" : "f") + "Face_m").ToString("X16"), Complate.GetTextureCallback, 1024, 1024)?.Clone() ?? new Bitmap(1024, 1024);
+            }
+        }
+
         public float Fat = 0,
         Fit = 0,
         Special = 0,
@@ -121,6 +132,34 @@ namespace Destrospean.Common
         ShowMaternityPartsOnly = false;
 
         public delegate bool PresetXmlElementPredicate(CASPartPreset preset, System.Xml.XmlElement xmlElement);
+
+        public Bitmap ScalpMultiplier
+        {
+            get
+            {
+                var agePrefix = "a";
+                var scalpCASPart = CASParts[ClothingType.Scalp];
+                if (scalpCASPart != null)
+                {
+                    switch (scalpCASPart.AdjustedAge)
+                    {
+                        case AgeGender.Toddler:
+                            agePrefix = "p";
+                            break;
+                        case AgeGender.Child:
+                            agePrefix = "c";
+                            break;
+                        case AgeGender.Elder:
+                            agePrefix = "e";
+                            break;
+                        default:
+                            agePrefix = "a";
+                            break;
+                    }
+                }
+                return (Bitmap)CurrentCASPart.ParentPackage.GetTexture("key:00B2D882:00000000:" + System.Security.Cryptography.FNV64.GetHash(agePrefix + (scalpCASPart.AdjustedAge < AgeGender.Teen ? "u" : scalpCASPart.CASPartResource.AgeGender.Gender == GenderFlags.Male ? "m" : "f") + "Scalp_m").ToString("X16"), Complate.GetTextureCallback, 1024, 1024)?.Clone() ?? new Bitmap(1024, 1024);
+            }
+        }
 
         public float[] SkinColor =
             {
@@ -429,15 +468,7 @@ namespace Destrospean.Common
 
         public void SetCASPart(ClothingType clothingType, string key)
         {
-            s3pi.Interfaces.IPackage package;
-            if (CurrentCASPart == null)
-            {
-                package = s3pi.Package.Package.NewPackage(0);
-            }
-            else
-            {
-                package = CurrentCASPart.ParentPackage;
-            }
+            var package = CurrentCASPart?.ParentPackage ?? s3pi.Package.Package.NewPackage(0);
             if (PreloadedData.CASParts.ContainsKey(key))
             {
                 mCASParts[clothingType] = PreloadedData.CASParts[key];
@@ -454,15 +485,7 @@ namespace Destrospean.Common
 
         public void SetCASPartOverride(ClothingType clothingType, string key)
         {
-            s3pi.Interfaces.IPackage package;
-            if (CurrentCASPart == null)
-            {
-                package = s3pi.Package.Package.NewPackage(0);
-            }
-            else
-            {
-                package = CurrentCASPart.ParentPackage;
-            }
+            var package = CurrentCASPart?.ParentPackage ?? s3pi.Package.Package.NewPackage(0);
             if (PreloadedData.CASParts.ContainsKey(key))
             {
                 CASPartOverrides[clothingType] = PreloadedData.CASParts[key];
