@@ -181,7 +181,7 @@ namespace Destrospean.CmarNYCBorrowed
 
             public override string ToString()
             {
-                return mAgeGenderSpecies.ToString("X8") + ", " + mPartType + ": " + mSpecularIndex + ", " + mDarkIndex + ", " + mLightIndex + ", " + mNormalIndex + ", " + mOverlayIndex + ", " + mCutnessIndex + ", " + mCleavageIndex;
+                return Age + ", " + Gender + ", " + Species + ", " + PartType + ": " + mSpecularIndex + ", " + mDarkIndex + ", " + mLightIndex + ", " + mNormalIndex + ", " + mOverlayIndex + ", " + mCutnessIndex + ", " + mCleavageIndex;
             }
 
             public void Write(BinaryWriter writer, int version)
@@ -473,13 +473,13 @@ namespace Destrospean.CmarNYCBorrowed
         {
             foreach (var set in mAgeGenderSets)
             {
-                if (partType == set.PartType && (((uint)species & set.AgeGenderSpecies) > 0 || species == Species.Human && set.Species == 0) && ((uint)age & set.AgeGenderSpecies) > 0 && ((uint)gender & set.AgeGenderSpecies) > 0)
+                if (partType == set.PartType && ((species & set.Species) > 0 || species == Species.Human && set.Species == 0) && (age & set.Age) > 0 && (gender & set.Gender) > 0)
                 {
-                    var indexes = set.TextureIndices;
-                    var tgis = new TGI[indexes.Length];
-                    for (var i = 0; i < indexes.Length; i++)
+                    var indices = set.TextureIndices;
+                    var tgis = new TGI[indices.Length];
+                    for (var i = 0; i < indices.Length; i++)
                     {
-                        tgis[i] = indexes[i] < 0 ? null : mTGIList[indexes[i]];
+                        tgis[i] = indices[i] < 0 ? null : mTGIList[indices[i]];
                     }
                     return new SkinSet(set.PartType, tgis);
                 }

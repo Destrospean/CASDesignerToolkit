@@ -288,8 +288,7 @@ namespace Destrospean.CmarNYCBorrowed
                         0,
                         1
                     }
-                };
-            /*
+                },
             redMatrix =
                 {
                     new[]
@@ -333,7 +332,6 @@ namespace Destrospean.CmarNYCBorrowed
                         1
                     }
                 };
-            */
             var skinSet = tone.GetSkinSet(Species.Human, age, gender, partType);
             var skinToneImage = package.GetTexture(skinSet.LightKey, getTextureCallback, 1024, 1024);
             using (var graphics = Graphics.FromImage(skinToneImage))
@@ -351,7 +349,6 @@ namespace Destrospean.CmarNYCBorrowed
                     graphics.DrawImage(overlay, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel);
                     overlay.Dispose();
                 }
-                /*
                 if (age > AgeGender.Child)
                 {
                     var cut = package.GetTexture(skinSet.CutnessKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
@@ -382,13 +379,13 @@ namespace Destrospean.CmarNYCBorrowed
                 attributes = new ImageAttributes();
                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                 graphics.DrawImage(skinToneImage, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, skinToneImage.Width, skinToneImage.Height, GraphicsUnit.Pixel, attributes);
-                */
             }
+            colorRamp = colorRamp ?? package.GetTexture(tone.ToneRampKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
             if (colorRamp == null)
             {
                 return skinToneImage;
             }
-            var skinColor = colorRamp.GetPixel(colorRamp.Width >> 1, (int)(colorRamp.Height * colorSlider));
+            var skinColor = colorRamp.GetPixel(colorRamp.Width >> 1, (int)((colorRamp.Height - 1) * colorSlider));
             float[] color =
                 {
                     (float)skinColor.B / byte.MaxValue,
