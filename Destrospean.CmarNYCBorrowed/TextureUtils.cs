@@ -335,17 +335,17 @@ namespace Destrospean.CmarNYCBorrowed
                 };
             */
             var skinSet = tone.GetSkinSet(Species.Human, age, gender, partType);
-            var skinToneImage = package.GetTexture(skinSet.LightLink, getTextureCallback, 1024, 1024);
+            var skinToneImage = package.GetTexture(skinSet.LightKey, getTextureCallback, 1024, 1024);
             using (var graphics = Graphics.FromImage(skinToneImage))
             {
-                var darkTexture = package.GetTexture(skinSet.DarkLink, getTextureCallback, 1024, 1024);
+                var darkTexture = package.GetTexture(skinSet.DarkKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
                 alphaMatrix[3][3] = colorSlider;
                 var colorMatrix = new ColorMatrix(alphaMatrix);
                 var attributes = new ImageAttributes();
                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                 graphics.DrawImage(darkTexture, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, darkTexture.Width, darkTexture.Height, GraphicsUnit.Pixel, attributes);
                 darkTexture.Dispose();
-                var overlay = package.GetTexture(skinSet.OverlayLink, getTextureCallback, 1024, 1024);
+                var overlay = package.GetTexture(skinSet.OverlayKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
                 if (overlay != null)
                 {
                     graphics.DrawImage(overlay, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, overlay.Width, overlay.Height, GraphicsUnit.Pixel);
@@ -354,26 +354,26 @@ namespace Destrospean.CmarNYCBorrowed
                 /*
                 if (age > AgeGender.Child)
                 {
-                    var cut = package.GetTexture(skinSet.CutnessLink, getTextureCallback, 1024, 1024);
+                    var cut = package.GetTexture(skinSet.CutnessKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
                     if (cut != null)
                     {
                         alphaMatrix[3][3] = cutnessSlider;
                         colorMatrix = new ColorMatrix(alphaMatrix);
                         attributes = new ImageAttributes();
                         attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                        graphics.DrawImage(cut, new Rectangle(0, 0, details.Width, details.Height), 0, 0, cut.Width, cut.Height, GraphicsUnit.Pixel, attributes);
+                        graphics.DrawImage(cut, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, cut.Width, cut.Height, GraphicsUnit.Pixel, attributes);
                         cut.Dispose();
                     }
                     if ((gender & AgeGender.Female) > 0)
                     {
-                        var cleavage = package.GetTexture(skinSet.CleavageLink, getTextureCallback, 1024, 1024);
+                        var cleavage = package.GetTexture(skinSet.CleavageKey, getTextureCallback, skinToneImage.Width, skinToneImage.Height);
                         if (cleavage != null)
                         {
                             alphaMatrix[3][3] = cleavageSlider;
                             colorMatrix = new ColorMatrix(alphaMatrix);
                             attributes = new ImageAttributes();
                             attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                            graphics.DrawImage(cleavage, new Rectangle(0, 0, details.Width, details.Height), 0, 0, cleavage.Width, cleavage.Height, GraphicsUnit.Pixel, attributes);
+                            graphics.DrawImage(cleavage, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, cleavage.Width, cleavage.Height, GraphicsUnit.Pixel, attributes);
                             cleavage.Dispose();
                         }
                     }
@@ -381,7 +381,7 @@ namespace Destrospean.CmarNYCBorrowed
                 colorMatrix = new ColorMatrix(redMatrix);
                 attributes = new ImageAttributes();
                 attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                graphics.DrawImage(details, new Rectangle(0, 0, details.Width, details.Height), 0, 0, details.Width, details.Height, GraphicsUnit.Pixel, attributes);
+                graphics.DrawImage(skinToneImage, new Rectangle(0, 0, skinToneImage.Width, skinToneImage.Height), 0, 0, skinToneImage.Width, skinToneImage.Height, GraphicsUnit.Pixel, attributes);
                 */
             }
             if (colorRamp == null)

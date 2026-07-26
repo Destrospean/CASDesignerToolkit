@@ -75,9 +75,10 @@
     <Compile Include="Xmods\Triangle.cs" />
     <Compile Include="Xmods\Vector2.cs" />
     <Compile Include="Xmods\Vector3.cs" />
-    <Compile Include="Xmods\VPXY.cs" />
     <Compile Include="Xmods\WSO.cs" />
     <Compile Include="Xmods\Tone.cs" />
+    <Compile Include="Xmods\VPXY.cs" />
+    <Compile Include="Xmods\STPR.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

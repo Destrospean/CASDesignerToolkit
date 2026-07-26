@@ -75,7 +75,7 @@ namespace Destrospean.CmarNYCBorrowed
             }
         }
 
-        public TGI ToneRampLink
+        public TGI ToneRampKey
         {
             get
             {
@@ -133,7 +133,15 @@ namespace Destrospean.CmarNYCBorrowed
                 }
             }
 
-            public int[] SkinLinks
+            public Species Species
+            {
+                get
+                {
+                    return (Species)(mAgeGenderSpecies & 0xF00);
+                }
+            }
+
+            public int[] TextureIndices
             {
                 get
                 {
@@ -147,14 +155,6 @@ namespace Destrospean.CmarNYCBorrowed
                         mCutnessIndex,
                         mCleavageIndex
                     };
-                }
-            }
-
-            public Species Species
-            {
-                get
-                {
-                    return (Species)(mAgeGenderSpecies & 0xF00);
                 }
             }
 
@@ -310,35 +310,35 @@ namespace Destrospean.CmarNYCBorrowed
 
         public class SkinSet : IComparable<SkinSet>
         {
-            public TGI CleavageLink, CutnessLink, DarkLink, LightLink, NormalsLink, OverlayLink, SpecularLink;
+            public TGI CleavageKey, CutnessKey, DarkKey, LightKey, NormalsKey, OverlayKey, SpecularKey;
 
             public PartType PartType;
 
             /// <summary>
             /// Returns dark, cutness, and cleavage in that order
             /// </summary>
-            public TGI[] SliderLinks
+            public TGI[] SliderKeys
             {
                 get
                 {
                     return new TGI[]
                     {
-                        DarkLink,
-                        CutnessLink,
-                        CleavageLink
+                        DarkKey,
+                        CutnessKey,
+                        CleavageKey
                     };
                 }
             }
 
-            public SkinSet(PartType partType, TGI[] links)
+            public SkinSet(PartType partType, TGI[] keys)
             {
-                SpecularLink = links[0];
-                DarkLink = links[1];
-                LightLink = links[2];
-                NormalsLink = links[3];
-                OverlayLink = links[4];
-                CutnessLink = links[5];
-                CleavageLink = links[6];
+                SpecularKey = keys[0];
+                DarkKey = keys[1];
+                LightKey = keys[2];
+                NormalsKey = keys[3];
+                OverlayKey = keys[4];
+                CutnessKey = keys[5];
+                CleavageKey = keys[6];
             }
 
             public int CompareTo(SkinSet other)
@@ -475,7 +475,7 @@ namespace Destrospean.CmarNYCBorrowed
             {
                 if (partType == set.PartType && (((uint)species & set.AgeGenderSpecies) > 0 || species == Species.Human && set.Species == 0) && ((uint)age & set.AgeGenderSpecies) > 0 && ((uint)gender & set.AgeGenderSpecies) > 0)
                 {
-                    var indexes = set.SkinLinks;
+                    var indexes = set.TextureIndices;
                     var tgis = new TGI[indexes.Length];
                     for (var i = 0; i < indexes.Length; i++)
                     {
