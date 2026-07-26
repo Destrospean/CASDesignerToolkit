@@ -27,11 +27,11 @@ namespace Destrospean.DestrospeanCASPEditor
             private set;
         }
 
-        public ChooseObjectDialog(Window parent, IPackage package, CASPartResource.ClothingType clothingType, CASPart[] casParts) : this("Choose CAS Part", parent, package, clothingType, casParts)
+        public ChooseObjectDialog(Window parent, IPackage package, CASPartResource.ClothingType clothingType, Dictionary<string, string>[] casParts) : this("Choose CAS Part", parent, package, clothingType, casParts)
         {
         }
 
-        public ChooseObjectDialog(string title, Window parent, IPackage package, CASPartResource.ClothingType clothingType, CASPart[] casParts) : base(title, parent, DialogFlags.Modal)
+        public ChooseObjectDialog(string title, Window parent, IPackage package, CASPartResource.ClothingType clothingType, Dictionary<string, string>[] casParts) : base(title, parent, DialogFlags.Modal)
         {
             Build();
             IconView.ColumnSpacing = ColumnSpacing;
@@ -46,7 +46,7 @@ namespace Destrospean.DestrospeanCASPEditor
             var uncachedCASPartExists = false;
             foreach (var casPartLookupKvp in CASPart.CASPartLookupCache)
             {
-                if ((CASPartResource.ClothingType)Enum.Parse(typeof(CASPartResource.ClothingType), casPartLookupKvp.Value["Clothing"]) != clothingType || Array.Exists(casParts, x => x != null && x.CASPartResource.Clothing != clothingType && ((x.CASPartResource.AgeGender.Age & (CASPartResource.AgeFlags)Enum.Parse(typeof(CASPartResource.AgeFlags), casPartLookupKvp.Value["Age"])) == 0 || (x.CASPartResource.AgeGender.Gender & (CASPartResource.GenderFlags)Enum.Parse(typeof(CASPartResource.GenderFlags), casPartLookupKvp.Value["Gender"])) == 0 || (CASPart.GetAdjustedSpecies(x.CASPartResource.AgeGender.Species) & CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)Enum.Parse(typeof(CASPartResource.SpeciesType), casPartLookupKvp.Value["Species"]))) == 0)))
+                if ((CASPartResource.ClothingType)Enum.Parse(typeof(CASPartResource.ClothingType), casPartLookupKvp.Value["Clothing"]) != clothingType || Array.Exists(casParts, x => x != null && x["Clothing"] != clothingType.ToString() && (((CASPartResource.AgeFlags)Enum.Parse(typeof(CASPartResource.AgeFlags), x["Age"]) & (CASPartResource.AgeFlags)Enum.Parse(typeof(CASPartResource.AgeFlags), casPartLookupKvp.Value["Age"])) == 0 || ((CASPartResource.GenderFlags)Enum.Parse(typeof(CASPartResource.GenderFlags), x["Gender"]) & (CASPartResource.GenderFlags)Enum.Parse(typeof(CASPartResource.GenderFlags), casPartLookupKvp.Value["Gender"])) == 0 || (CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)Enum.Parse(typeof(CASPartResource.SpeciesType), x["Species"])) & CASPart.GetAdjustedSpecies((CASPartResource.SpeciesType)Enum.Parse(typeof(CASPartResource.SpeciesType), casPartLookupKvp.Value["Species"]))) == 0)))
                 {
                     continue;
                 }
@@ -93,10 +93,10 @@ namespace Destrospean.DestrospeanCASPEditor
             IconView.PixbufColumn = 1;
             IconView.TooltipColumn = 0;
             IconView.SelectionChanged += (sender, e) => OKButton.Sensitive = IconView.SelectedItems.Length > 0;
-            var casPartIndex = Array.FindIndex(casParts, x => x.CASPartResource.Clothing == clothingType);
+            var casPartIndex = Array.FindIndex(casParts, x => x["Clothing"] == clothingType.ToString());
             if (casPartIndex > -1)
             {
-                var index = names.FindIndex(x => x == casParts[casPartIndex].CASPartResource.Unknown1);
+                var index = names.FindIndex(x => x == casParts[casPartIndex]["Unknown1"]);
                 IconView.SelectPath(new TreePath((index > -1 ? index : 0).ToString()));
             }
             else
