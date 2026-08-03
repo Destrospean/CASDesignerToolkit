@@ -1041,7 +1041,7 @@ public partial class MainWindow : RendererMainWindow
                 exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
                 exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
                 /*
-               importMLODAction.Activated += (sender, e) =>
+                importMLODAction.Activated += (sender, e) =>
                     {
                         var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
                         var fileFilter = new FileFilter

@@ -59,16 +59,7 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                         }
                     }
                     var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].Resource;
-                    MATD matd = null;
-                    try
-                    {
-                        matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : new MATD(0, (sender, e) =>
-                            {
-                            }, mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock.Stream);
-                    }
-                    catch
-                    {
-                    }
+                    var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                     Material material;
                     if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
                     {

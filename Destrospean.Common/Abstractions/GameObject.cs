@@ -445,9 +445,7 @@ namespace Destrospean.Common.Abstractions
             {
                 return;
             }
-            foreach (var entry in new s3pi.GenericRCOLResource.VPXY(0, (sender, e) =>
-                {
-                }, vpxyResource.ChunkEntries[0].RCOLBlock.Stream).Entries)
+            foreach (var entry in ((s3pi.GenericRCOLResource.VPXY)vpxyResource.ChunkEntries[0].RCOLBlock).Entries)
             {
                 var entry01 = entry as s3pi.GenericRCOLResource.VPXY.Entry01;
                 if (entry01 == null)
@@ -476,9 +474,7 @@ namespace Destrospean.Common.Abstractions
                         {
                             if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Public)
                             {
-                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, modlKey, modlResource, new MLOD(0, (sender, e) =>
-                                    {
-                                    }, modlResource.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock.Stream)));
+                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, modlKey, modlResource, (MLOD)modlResource.ChunkEntries[lodEntry.ModelLodIndex.TGIBlockIndex].RCOLBlock));
                                 continue;
                             }
                             if (lodEntry.ModelLodIndex.RefType == GenericRCOLResource.ReferenceType.Delayed)
@@ -491,9 +487,7 @@ namespace Destrospean.Common.Abstractions
                                     mlodResources.Add(mlodKey, new GenericRCOLResource(0, ((APackage)ParentPackage).GetResource(mlodResourceIndexEntry)));
                                     mlodResource = mlodResources[mlodKey];
                                 }
-                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, mlodKey, mlodResource, new MLOD(0, (sender, e) =>
-                                    {
-                                    }, mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock.Stream)));
+                                LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, mlodKey, mlodResource, (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock));
                                 continue;
                             }
                             break;

@@ -400,16 +400,7 @@ namespace Destrospean.DestrospeanCASPEditor
             {
                 var mainWindow = MainWindowBase.Singleton;
                 var mlodResource = (GenericRCOLResource)lodData.Resource;
-                MATD matd = null;
-                try
-                {
-                    matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : new MATD(0, (sender, e) =>
-                        {
-                        }, mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock.Stream);
-                }
-                catch
-                {
-                }
+                var matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 var shaders = new List<string>();
                 foreach (var shader in Enum.GetNames(typeof(Shader)))
                 {
