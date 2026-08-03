@@ -106,8 +106,8 @@ namespace Destrospean.Common.Abstractions
                 var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
                 if (i == lod || lod == -1)
                 {
-                    var temp = "_lod" + i.ToString() + "-" + (geomTGIList.Count + 1).ToString();
-                    var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount.ToString() + temp));
+                    var temp = "_lod" + i + "-" + (geomTGIList.Count + 1);
+                    var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount + temp));
                     var geomStream = new MemoryStream();
                     var geom = geometryResources[new ResourceKey(geomTGIList[geomTGIList.Count - 1].Type, geomTGIList[geomTGIList.Count - 1].Group, geomTGIList[geomTGIList.Count - 1].Instance).ReverseEvaluateResourceKey()];
                     geom.Write(new BinaryWriter(geomStream));

@@ -716,7 +716,7 @@ public partial class MainWindow : RendererMainWindow
                             child.Destroy();
                             child.Dispose();
                         }
-                        BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex + 1);
+                        BuildLODNotebook(casPart, selectedLODIndex, casPart.LODs[selectedLODIndex].Count - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
@@ -870,14 +870,12 @@ public partial class MainWindow : RendererMainWindow
                         ShowTabs = false
                     };
                 var actionGroup = new ActionGroup("Default");
-                Gtk.Action //addMeshGroupAction = new Gtk.Action("AddMeshGroupAction", "Add Group", null, Stock.Add),
-                /*
+                Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
                 deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
                     {
                         Sensitive = lodKvp.Value.MeshGroups.Count > 1
                     },
-                exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
-                */
+                //exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
                 exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
                 exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
                 //importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
@@ -886,11 +884,9 @@ public partial class MainWindow : RendererMainWindow
                 actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
                 actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
-                /*
-                actionGroup.Add(addMeshGroupAction);
+                actionGroup.Add(cloneMeshGroupAction);
                 actionGroup.Add(deleteMeshGroupAction);
-                actionGroup.Add(exportMLODAction);
-                */
+                //actionGroup.Add(exportMLODAction);
                 actionGroup.Add(exportOBJAction);
                 actionGroup.Add(exportWSOAction);
                 //actionGroup.Add(importMLODAction);
@@ -912,9 +908,9 @@ public partial class MainWindow : RendererMainWindow
                                     <menuitem name='ExportOBJAction' action='ExportOBJAction'/>
                                     <menuitem name='ExportWSOAction' action='ExportWSOAction'/>
                                 </menu>
-                                <!-- separator / -->
-                                <!-- menuitem name='AddMeshGroupAction' action='AddMeshGroupAction'/ -->
-                                <!-- menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/ -->
+                                <separator />
+                                <menuitem name='CloneMeshGroupAction' action='CloneMeshGroupAction'/>
+                                <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                             </menu>
                         </menubar>
                     </ui>");
@@ -1009,18 +1005,17 @@ public partial class MainWindow : RendererMainWindow
                             throw;
                         }
                     };
-                /*
-                addMeshGroupAction.Activated += (sender, e) =>
+                cloneMeshGroupAction.Activated += (sender, e) =>
                     {
                         int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
                         selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.AddMeshGroup(lodKvp.Key, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        gameObject.CloneMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         foreach (var child in ResourcePropertyNotebook.Children)
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex + 1);
+                        BuildLODNotebook(gameObject, selectedLODIndex, gameObject.LODs[(meshExpImp.ModelBlocks.LODId)selectedLODIndex].MeshGroups.Count - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
@@ -1036,8 +1031,7 @@ public partial class MainWindow : RendererMainWindow
                         BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
-                exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
-                */
+                //exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
                 exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
                 exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
                 /*

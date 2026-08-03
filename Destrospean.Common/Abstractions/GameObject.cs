@@ -124,74 +124,34 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void AddMeshGroup(LODId lod, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void CloneMeshGroup(LODId lod, int groupIndex, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            /*
-            var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(CASPartResource.TGIBlocks[CASPartResource.VPXYIndexes[0]]);
-            var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
-            GenericRCOLResource vpxyResource;
-            if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+            var lodData = LODs[lod];
+            lodData.CloneMeshGroup(groupIndex);
+            ParentPackage.ReplaceResource(ParentPackage.EvaluateResourceKey(lodData.ResourceKey).ResourceIndexEntry, lodData.Resource);
+            if (lodData.MLODChunk is MLOD)
             {
-                vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
-                vpxyResource = vpxyResources[vpxyKey];
+                mlodResources[lodData.ResourceKey] = (GenericRCOLResource)lodData.Resource;
             }
-            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
-            var geomTGIs = new TGI[4][];
-            for (var i = 0; i < geomTGIs.GetLength(0); i++)
+            else
             {
-                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
-                if (i == lod || lod == -1)
-                {
-                    var temp = "_lod" + i.ToString() + "-" + (geomTGIList.Count + 1).ToString();
-                    var newGEOMTGI = new TGI(ResourceUtils.GetResourceType("GEOM"), geomTGIList[geomTGIList.Count - 1].Group, System.Security.Cryptography.FNV64.GetHash(CASPartResource.Unknown1 + temp + Environment.UserName + Environment.TickCount.ToString() + temp));
-                    var geomStream = new MemoryStream();
-                    var geom = geometryResources[new ResourceKey(geomTGIList[geomTGIList.Count - 1].Type, geomTGIList[geomTGIList.Count - 1].Group, geomTGIList[geomTGIList.Count - 1].Instance).ReverseEvaluateResourceKey()];
-                    geom.Write(new BinaryWriter(geomStream));
-                    var newGEOMResourceIndexEntry = ParentPackage.AddResource(new ResourceKey(newGEOMTGI.Type, newGEOMTGI.Group, newGEOMTGI.Instance), geomStream, true);
-                    geometryResources.Add(newGEOMResourceIndexEntry.ReverseEvaluateResourceKey(), new GEOM(new BinaryReader(geomStream)));
-                    geomTGIList.Add(newGEOMTGI);
-                }
-                geomTGIs[i] = geomTGIList.ToArray();
+                modlResources[lodData.ResourceKey] = (GenericRCOLResource)lodData.Resource;
             }
-            var vpxyStream = new MemoryStream();
-            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
-            vpxyResource = new GenericRCOLResource(0, vpxyStream);
-            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
-            vpxyResources[vpxyKey] = vpxyResource;
-            */
         }
 
         public void DeleteMeshGroup(LODId lod, int groupIndex, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            /*
-            var vpxyResourceIndexEntry = ParentPackage.GetResourceIndexEntry(CASPartResource.TGIBlocks[CASPartResource.VPXYIndexes[0]]);
-            var vpxyKey = vpxyResourceIndexEntry.ReverseEvaluateResourceKey();
-            GenericRCOLResource vpxyResource;
-            if (!vpxyResources.TryGetValue(vpxyKey, out vpxyResource))
+            var lodData = LODs[lod];
+            lodData.DeleteMeshGroup(groupIndex);
+            ParentPackage.ReplaceResource(ParentPackage.EvaluateResourceKey(lodData.ResourceKey).ResourceIndexEntry, lodData.Resource);
+            if (lodData.MLODChunk is MLOD)
             {
-                vpxyResources.Add(vpxyKey, (GenericRCOLResource)WrapperDealer.GetResource(0, ParentPackage, vpxyResourceIndexEntry));
-                vpxyResource = vpxyResources[vpxyKey];
+                mlodResources[lodData.ResourceKey] = (GenericRCOLResource)lodData.Resource;
             }
-            var vpxy = new CmarNYCBorrowed.VPXY(new BinaryReader(vpxyResource.Stream));
-            var geomTGIs = new TGI[4][];
-            for (var i = 0; i < geomTGIs.GetLength(0); i++)
+            else
             {
-                var geomTGIList = new List<TGI>(vpxy.GetMeshLinks(i));
-                if (i == lod || lod == -1)
-                {
-                    var geomKey = new ResourceKey(geomTGIList[groupIndex].Type, geomTGIList[groupIndex].Group, geomTGIList[groupIndex].Instance).ReverseEvaluateResourceKey();
-                    ParentPackage.DeleteResource(ParentPackage.EvaluateResourceKey(geomKey).ResourceIndexEntry);
-                    geometryResources.Remove(geomKey);
-                    geomTGIList.RemoveAt(groupIndex);
-                }
-                geomTGIs[i] = geomTGIList.ToArray();
+                modlResources[lodData.ResourceKey] = (GenericRCOLResource)lodData.Resource;
             }
-            var vpxyStream = new MemoryStream();
-            new CmarNYCBorrowed.VPXY(new TGI(vpxyResourceIndexEntry.ResourceType, vpxyResourceIndexEntry.ResourceGroup, vpxyResourceIndexEntry.Instance), vpxy.BondLinks, geomTGIs).Write(new BinaryWriter(vpxyStream));
-            vpxyResource = new GenericRCOLResource(0, vpxyStream);
-            ParentPackage.ReplaceResource(vpxyResourceIndexEntry, vpxyResource);
-            vpxyResources[vpxyKey] = vpxyResource;
-            */
         }
 
         public override void Dispose()

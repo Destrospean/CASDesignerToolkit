@@ -20,7 +20,12 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 {
                     return;
                 }
-                var lodId = new List<LODId>(gameObject.LODs.Keys)[lodIndex];
+                var adjustedLODIndex = lodIndex < gameObject.LODs.Count ? lodIndex : gameObject.LODs.Count - 1;
+                if (adjustedLODIndex < 0)
+                {
+                    return;
+                }
+                var lodId = new List<LODId>(gameObject.LODs.Keys)[adjustedLODIndex];
                 foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
                 {
                     if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
