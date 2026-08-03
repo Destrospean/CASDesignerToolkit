@@ -7,6 +7,8 @@ namespace Destrospean.zoeoeBorrowed
     {
         public MATD DirectMATD;
 
+        public string ID;
+
         public IBUF IndexBuffer;
 
         public MTST MaterialSet;
@@ -39,6 +41,7 @@ namespace Destrospean.zoeoeBorrowed
 
         public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
         {
+            ID = System.Guid.NewGuid().ToString();
             DirectMATD = directMATD;
             IndexBuffer = indexBuffer;
             MaterialSet = null;
@@ -51,6 +54,7 @@ namespace Destrospean.zoeoeBorrowed
 
         public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
         {
+            ID = System.Guid.NewGuid().ToString();
             DirectMATD = null;
             IndexBuffer = indexBuffer;
             MaterialSet = materialSet;
