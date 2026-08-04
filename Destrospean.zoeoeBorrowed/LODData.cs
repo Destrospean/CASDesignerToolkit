@@ -119,7 +119,6 @@ namespace Destrospean.zoeoeBorrowed
             var mtstEntryMap = new Dictionary<string, Dictionary<MTST.Entry, TGIBlock>>();
             foreach (var meshGroup in MeshGroups)
             {
-                var material = resource.ChunkEntries[meshGroup.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks];
                 chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferences, TGIBlock>
                 {
                     {
@@ -128,7 +127,7 @@ namespace Destrospean.zoeoeBorrowed
                     },
                     {
                         ChunkReferences.MaterialIndex,
-                        material.TGIBlock
+                        resource.ChunkEntries[meshGroup.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     },
                     {
                         ChunkReferences.SkinControllerIndex,
