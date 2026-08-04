@@ -65,6 +65,31 @@ namespace Destrospean.zoeoeBorrowed
             VertexFormat = vertexFormat;
         }
 
+        public static bool operator ==(MeshGroupData a, MeshGroupData b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(MeshGroupData a, MeshGroupData b)
+        {
+            return !a.Equals(b);
+        }
+
+        public override bool Equals(object other)
+        {
+            return Equals((MeshGroupData)other);
+        }
+
+        public bool Equals(MeshGroupData other)
+        {
+            return ID == other.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public bool HasFlag(MeshFlags flag)
         {
             return (MeshGroup.Flags & flag) != 0;

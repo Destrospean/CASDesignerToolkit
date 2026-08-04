@@ -15,7 +15,7 @@ namespace Destrospean.zoeoeBorrowed
 
         public string ResourceKey;
 
-        enum ChunkReferenceIndices
+        enum ChunkReferences
         {
             IndexBufferIndex,
             MaterialIndex,
@@ -115,31 +115,31 @@ namespace Destrospean.zoeoeBorrowed
         public void DeleteMeshGroup(int groupIndex)
         {
             var resource = (GenericRCOLResource)Resource;
-            var chunkReferenceMap = new Dictionary<string, Dictionary<ChunkReferenceIndices, TGIBlock>>();
+            var chunkReferenceMap = new Dictionary<string, Dictionary<ChunkReferences, TGIBlock>>();
             var mtstEntryMap = new Dictionary<string, Dictionary<MTST.Entry, TGIBlock>>();
             foreach (var meshGroup in MeshGroups)
             {
                 var material = resource.ChunkEntries[meshGroup.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks];
-                chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferenceIndices, TGIBlock>
+                chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferences, TGIBlock>
                 {
                     {
-                        ChunkReferenceIndices.IndexBufferIndex,
+                        ChunkReferences.IndexBufferIndex,
                         resource.ChunkEntries[meshGroup.MeshGroup.IndexBufferIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     },
                     {
-                        ChunkReferenceIndices.MaterialIndex,
+                        ChunkReferences.MaterialIndex,
                         material.TGIBlock
                     },
                     {
-                        ChunkReferenceIndices.SkinControllerIndex,
+                        ChunkReferences.SkinControllerIndex,
                         resource.ChunkEntries[meshGroup.MeshGroup.SkinControllerIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     },
                     {
-                        ChunkReferenceIndices.VertexBufferIndex,
+                        ChunkReferences.VertexBufferIndex,
                         resource.ChunkEntries[meshGroup.MeshGroup.VertexBufferIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     },
                     {
-                        ChunkReferenceIndices.VertexFormatIndex,
+                        ChunkReferences.VertexFormatIndex,
                         resource.ChunkEntries[meshGroup.MeshGroup.VertexFormatIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     }
                 };
@@ -153,27 +153,39 @@ namespace Destrospean.zoeoeBorrowed
                 }
             }
             var chunkEntryIndices = new List<int>();
-            foreach (var name in System.Enum.GetNames(typeof(ChunkReferenceIndices)))
+            foreach (var name in System.Enum.GetNames(typeof(ChunkReferences)))
             {
-                var id = MeshGroups[groupIndex].ID;
-                var index = ((GenericRCOLResource.ChunkReference)MeshGroups[groupIndex].MeshGroup.GetType().GetProperty(name).GetValue(MeshGroups[groupIndex].MeshGroup)).TGIBlockIndex;
-                if (!MeshGroups.Exists(x => x.ID != id && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
+                var meshGroup = MeshGroups[groupIndex];
+                var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(name).GetValue(meshGroup.MeshGroup)).TGIBlockIndex;
+                if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
                 {
                     chunkEntryIndices.Add(index + resource.PublicChunks);
                 }
             }
-            chunkEntryIndices.Sort((a, b) => b.CompareTo(a));
-            foreach (var chunkEntryIndex in chunkEntryIndices)
+            if (MeshGroups[groupIndex].DirectMATD == null)
             {
-                resource.ChunkEntries.RemoveAt(chunkEntryIndex);
+                var meshGroup = MeshGroups[groupIndex];
+                foreach (var tgiBlock in mtstEntryMap[meshGroup.ID].Values)
+                {
+                    var index = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(tgiBlock));
+                    if (index > -1 && !MeshGroups.Exists(x => x != meshGroup && x.DirectMATD == null && ((MTST)resource.ChunkEntries[x.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock).Entries.Exists(y => y.Index.TGIBlockIndex == index - resource.PublicChunks)))
+                    {
+                        chunkEntryIndices.Add(index);
+                    }
+                }
+            }
+            chunkEntryIndices.Sort((a, b) => b.CompareTo(a));
+            foreach (var i in chunkEntryIndices)
+            {
+                resource.ChunkEntries.RemoveAt(i);
             }
             MeshGroups.RemoveAt(groupIndex);
             MLODChunk.Meshes.RemoveAt(groupIndex);
             foreach (var meshGroup in MeshGroups)
             {
-                foreach (ChunkReferenceIndices chunkReferenceIndex in System.Enum.GetValues(typeof(ChunkReferenceIndices)))
+                foreach (ChunkReferences chunkReference in System.Enum.GetValues(typeof(ChunkReferences)))
                 {
-                    ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReferenceIndex.ToString()).GetValue(meshGroup.MeshGroup)).TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][chunkReferenceIndex])) - resource.PublicChunks;
+                    ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup)).TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][chunkReference])) - resource.PublicChunks;
                 }
                 if (meshGroup.DirectMATD == null)
                 {
