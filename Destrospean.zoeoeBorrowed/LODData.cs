@@ -152,14 +152,14 @@ namespace Destrospean.zoeoeBorrowed
                     }
                 }
             }
-            var chunkEntryIndices = new List<int>();
+            var chunkEntryIndicesToRemove = new List<int>();
             foreach (var name in System.Enum.GetNames(typeof(ChunkReferences)))
             {
                 var meshGroup = MeshGroups[groupIndex];
                 var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(name).GetValue(meshGroup.MeshGroup)).TGIBlockIndex;
                 if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
                 {
-                    chunkEntryIndices.Add(index + resource.PublicChunks);
+                    chunkEntryIndicesToRemove.Add(index + resource.PublicChunks);
                 }
             }
             if (MeshGroups[groupIndex].DirectMATD == null)
@@ -170,14 +170,14 @@ namespace Destrospean.zoeoeBorrowed
                     var index = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(tgiBlock));
                     if (index > -1 && !MeshGroups.Exists(x => x != meshGroup && x.DirectMATD == null && ((MTST)resource.ChunkEntries[x.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock).Entries.Exists(y => y.Index.TGIBlockIndex == index - resource.PublicChunks)))
                     {
-                        chunkEntryIndices.Add(index);
+                        chunkEntryIndicesToRemove.Add(index);
                     }
                 }
             }
-            chunkEntryIndices.Sort((a, b) => b.CompareTo(a));
-            foreach (var i in chunkEntryIndices)
+            chunkEntryIndicesToRemove.Sort((a, b) => b.CompareTo(a));
+            foreach (var index in chunkEntryIndicesToRemove)
             {
-                resource.ChunkEntries.RemoveAt(i);
+                resource.ChunkEntries.RemoveAt(index);
             }
             MeshGroups.RemoveAt(groupIndex);
             MLODChunk.Meshes.RemoveAt(groupIndex);
