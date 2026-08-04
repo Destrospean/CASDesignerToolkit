@@ -119,7 +119,9 @@ namespace Destrospean.Common.Abstractions
             {
                 foreach (var name in preset.Patterns[i].PropertyNames)
                 {
-                    preset.Patterns[i][name] = casPartPreset.Patterns[i][name];
+                    preset.Patterns[i].SetValue(name, casPartPreset.Patterns[i][name], () =>
+                        {
+                        });
                 }
             }
         }
