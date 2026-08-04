@@ -152,12 +152,12 @@ namespace Destrospean.zoeoeBorrowed
                     }
                 }
             }
-            var groupID = MeshGroups[groupIndex].ID;
             var indices = new List<int>();
             foreach (var name in System.Enum.GetNames(typeof(ChunkReferenceIndices)))
             {
+                var id = MeshGroups[groupIndex].ID;
                 var index = ((GenericRCOLResource.ChunkReference)typeof(MLOD.Mesh).GetProperty(name).GetValue(MeshGroups[groupIndex].MeshGroup)).TGIBlockIndex;
-                if (!MeshGroups.Exists(x => x.ID != groupID && ((GenericRCOLResource.ChunkReference)typeof(MLOD.Mesh).GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
+                if (!MeshGroups.Exists(x => x.ID != id && ((GenericRCOLResource.ChunkReference)typeof(MLOD.Mesh).GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
                 {
                     indices.Add(index + resource.PublicChunks);
                 }
