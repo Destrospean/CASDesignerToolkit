@@ -134,11 +134,11 @@ namespace Destrospean.zoeoeBorrowed
                 }
             }
             var chunkEntryIndicesToRemove = new List<int>();
-            foreach (var chunkReferencePropertyName in System.Enum.GetNames(typeof(ChunkReferences)))
+            foreach (var chunkReferenceName in System.Enum.GetNames(typeof(ChunkReferences)))
             {
                 var meshGroup = MeshGroups[groupIndex];
-                var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReferencePropertyName).GetValue(meshGroup.MeshGroup)).TGIBlockIndex;
-                if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(chunkReferencePropertyName).GetValue(x.MeshGroup)).TGIBlockIndex == index))
+                var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(meshGroup.MeshGroup)).TGIBlockIndex;
+                if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(x.MeshGroup)).TGIBlockIndex == index))
                 {
                     chunkEntryIndicesToRemove.Add(index + resource.PublicChunks);
                 }
