@@ -143,7 +143,7 @@ namespace Destrospean.zoeoeBorrowed
                         resource.ChunkEntries[meshGroup.MeshGroup.VertexFormatIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
                     }
                 };
-                if (meshGroup.MaterialSet != null)
+                if (meshGroup.DirectMATD == null)
                 {
                     mtstEntryMap[meshGroup.ID] = new Dictionary<MTST.Entry, TGIBlock>();
                     foreach (var entry in meshGroup.MaterialSet.Entries)
@@ -176,7 +176,7 @@ namespace Destrospean.zoeoeBorrowed
                 meshGroup.MeshGroup.SkinControllerIndex.TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][ChunkReferenceIndices.SkinControllerIndex])) - resource.PublicChunks;
                 meshGroup.MeshGroup.VertexBufferIndex.TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][ChunkReferenceIndices.VertexBufferIndex])) - resource.PublicChunks;
                 meshGroup.MeshGroup.VertexFormatIndex.TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][ChunkReferenceIndices.VertexFormatIndex])) - resource.PublicChunks;
-                if (meshGroup.MaterialSet != null)
+                if (meshGroup.DirectMATD == null)
                 {
                     foreach (var entry in ((MTST)resource.ChunkEntries[meshGroup.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].RCOLBlock).Entries)
                     {
