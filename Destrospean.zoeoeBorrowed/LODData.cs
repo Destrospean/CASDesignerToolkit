@@ -112,7 +112,7 @@ namespace Destrospean.zoeoeBorrowed
             }
             var uvScales = (float[])meshGroup.UVScales.Clone();
             MLODChunk.Meshes.Add(mesh);
-            MeshGroups.Add(meshGroup.MaterialSet == null ? new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, material?.RCOLBlock as MATD ?? meshGroup.DirectMATD, mesh, (SKIN)skinController.RCOLBlock, uvScales) : new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, material?.RCOLBlock as MTST ?? meshGroup.MaterialSet, mesh, (SKIN)skinController.RCOLBlock, uvScales));
+            MeshGroups.Add(meshGroup.MaterialSet == null ? new MeshGroupData(vertexFormat.RCOLBlock as VRTF, vertexBuffer.RCOLBlock as VBUF, indexBuffer.RCOLBlock as IBUF, material?.RCOLBlock as MATD ?? meshGroup.DirectMATD, mesh, skinController.RCOLBlock as SKIN, uvScales) : new MeshGroupData(vertexFormat.RCOLBlock as VRTF, vertexBuffer.RCOLBlock as VBUF, indexBuffer.RCOLBlock as IBUF, material?.RCOLBlock as MTST ?? meshGroup.MaterialSet, mesh, skinController.RCOLBlock as SKIN, uvScales));
         }
 
         public void DeleteMeshGroup(int groupIndex)
