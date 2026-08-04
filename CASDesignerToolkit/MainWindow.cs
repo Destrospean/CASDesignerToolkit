@@ -871,6 +871,7 @@ public partial class MainWindow : RendererMainWindow
                     };
                 var actionGroup = new ActionGroup("Default");
                 Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
+                cloneMeshGroupShareMaterialAction = new Gtk.Action("CloneMeshGroupShareMaterialAction", "Clone Group (Share Material)", null, Stock.Add),
                 deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
                     {
                         Sensitive = lodKvp.Value.MeshGroups.Count > 1
@@ -885,6 +886,7 @@ public partial class MainWindow : RendererMainWindow
                 actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
                 actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
                 actionGroup.Add(cloneMeshGroupAction);
+                actionGroup.Add(cloneMeshGroupShareMaterialAction);
                 actionGroup.Add(deleteMeshGroupAction);
                 //actionGroup.Add(exportMLODAction);
                 actionGroup.Add(exportOBJAction);
@@ -910,6 +912,7 @@ public partial class MainWindow : RendererMainWindow
                                 </menu>
                                 <separator />
                                 <menuitem name='CloneMeshGroupAction' action='CloneMeshGroupAction'/>
+                                <menuitem name='CloneMeshGroupShareMaterialAction' action='CloneMeshGroupShareMaterialAction'/>
                                 <menuitem name='DeleteMeshGroupAction' action='DeleteMeshGroupAction'/>
                             </menu>
                         </menubar>
@@ -939,6 +942,19 @@ public partial class MainWindow : RendererMainWindow
                         pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
                         nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
                         prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
+                    };
+                Action<bool> cloneMeshGroup = (shareMaterial) =>
+                    {
+                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                        gameObject.CloneMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs, shareMaterial);
+                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        foreach (var child in ResourcePropertyNotebook.Children)
+                        {
+                            ResourcePropertyNotebook.Remove(child);
+                        }
+                        BuildLODNotebook(gameObject, selectedLODIndex, gameObject.LODs[(meshExpImp.ModelBlocks.LODId)selectedLODIndex].MeshGroups.Count - 1);
+                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 Action<MeshFileType> exportMeshGroup = (meshFileType) =>
                     {
@@ -1005,19 +1021,8 @@ public partial class MainWindow : RendererMainWindow
                             throw;
                         }
                     };
-                cloneMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.CloneMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, gameObject.LODs[(meshExpImp.ModelBlocks.LODId)selectedLODIndex].MeshGroups.Count - 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
+                cloneMeshGroupAction.Activated += (sender, e) => cloneMeshGroup(false);
+                cloneMeshGroupShareMaterialAction.Activated += (sender, e) => cloneMeshGroup(true);
                 deleteMeshGroupAction.Activated += (sender, e) =>
                     {
                         int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,

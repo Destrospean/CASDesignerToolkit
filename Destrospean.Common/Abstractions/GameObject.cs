@@ -126,10 +126,10 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public void CloneMeshGroup(LODId lod, int groupIndex, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
+        public void CloneMeshGroup(LODId lod, int groupIndex, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources, bool shareMaterial = false)
         {
             var lodData = LODs[lod];
-            lodData.CloneMeshGroup(groupIndex);
+            lodData.CloneMeshGroup(groupIndex, shareMaterial);
             ParentPackage.ReplaceResource(ParentPackage.EvaluateResourceKey(lodData.ResourceKey).ResourceIndexEntry, lodData.Resource);
             if (lodData.MLODChunk is MLOD)
             {

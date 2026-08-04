@@ -65,7 +65,7 @@ namespace Destrospean.zoeoeBorrowed
             }
         }
 
-        public void CloneMeshGroup(int groupIndex)
+        public void CloneMeshGroup(int groupIndex, bool shareMaterial = false)
         {
             var resource = (GenericRCOLResource)Resource;
             var meshGroup = MeshGroups[groupIndex];
@@ -75,7 +75,7 @@ namespace Destrospean.zoeoeBorrowed
             GenericRCOLResource.ChunkEntry indexBuffer = (GenericRCOLResource.ChunkEntry)resource.ChunkEntries[mesh.IndexBufferIndex.TGIBlockIndex + resource.PublicChunks].Clone((sender, e) =>
                 {
                 }),
-            material = (GenericRCOLResource.ChunkEntry)resource.ChunkEntries[mesh.MaterialIndex.TGIBlockIndex + resource.PublicChunks].Clone((sender, e) =>
+            material = shareMaterial ? null : (GenericRCOLResource.ChunkEntry)resource.ChunkEntries[mesh.MaterialIndex.TGIBlockIndex + resource.PublicChunks].Clone((sender, e) =>
                 {
                 }),
             skinController = (GenericRCOLResource.ChunkEntry)resource.ChunkEntries[mesh.SkinControllerIndex.TGIBlockIndex + resource.PublicChunks].Clone((sender, e) =>
@@ -89,15 +89,18 @@ namespace Destrospean.zoeoeBorrowed
                 });
             mesh.IndexBufferIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
             resource.ChunkEntries.Add(indexBuffer);
-            mesh.MaterialIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
-            resource.ChunkEntries.Add(material);
+            if (!shareMaterial)
+            {
+                mesh.MaterialIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
+                resource.ChunkEntries.Add(material);
+            }
             mesh.SkinControllerIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
             resource.ChunkEntries.Add(skinController);
             mesh.VertexBufferIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
             resource.ChunkEntries.Add(vertexBuffer);
             mesh.VertexFormatIndex.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
             resource.ChunkEntries.Add(vertexFormat);
-            if (meshGroup.DirectMATD == null)
+            if (!shareMaterial && meshGroup.DirectMATD == null)
             {
                 foreach (var entry in ((MTST)material.RCOLBlock).Entries)
                 {
@@ -109,7 +112,7 @@ namespace Destrospean.zoeoeBorrowed
             }
             var uvScales = (float[])meshGroup.UVScales.Clone();
             MLODChunk.Meshes.Add(mesh);
-            MeshGroups.Add(meshGroup.MaterialSet == null ? new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, (MATD)material.RCOLBlock, mesh, (SKIN)skinController.RCOLBlock, uvScales) : new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, (MTST)material.RCOLBlock, mesh, (SKIN)skinController.RCOLBlock, uvScales));
+            MeshGroups.Add(meshGroup.MaterialSet == null ? new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, material?.RCOLBlock as MATD ?? meshGroup.DirectMATD, mesh, (SKIN)skinController.RCOLBlock, uvScales) : new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, material?.RCOLBlock as MTST ?? meshGroup.MaterialSet, mesh, (SKIN)skinController.RCOLBlock, uvScales));
         }
 
         public void DeleteMeshGroup(int groupIndex)
