@@ -152,20 +152,20 @@ namespace Destrospean.zoeoeBorrowed
                     }
                 }
             }
-            var indices = new List<int>();
+            var chunkEntryIndices = new List<int>();
             foreach (var name in System.Enum.GetNames(typeof(ChunkReferenceIndices)))
             {
                 var id = MeshGroups[groupIndex].ID;
                 var index = ((GenericRCOLResource.ChunkReference)typeof(MLOD.Mesh).GetProperty(name).GetValue(MeshGroups[groupIndex].MeshGroup)).TGIBlockIndex;
                 if (!MeshGroups.Exists(x => x.ID != id && ((GenericRCOLResource.ChunkReference)typeof(MLOD.Mesh).GetProperty(name).GetValue(x.MeshGroup)).TGIBlockIndex == index))
                 {
-                    indices.Add(index + resource.PublicChunks);
+                    chunkEntryIndices.Add(index + resource.PublicChunks);
                 }
             }
-            indices.Sort((a, b) => b.CompareTo(a));
-            foreach (var index in indices)
+            chunkEntryIndices.Sort((a, b) => b.CompareTo(a));
+            foreach (var chunkEntryIndex in chunkEntryIndices)
             {
-                resource.ChunkEntries.RemoveAt(index);
+                resource.ChunkEntries.RemoveAt(chunkEntryIndex);
             }
             MeshGroups.RemoveAt(groupIndex);
             MLODChunk.Meshes.RemoveAt(groupIndex);
