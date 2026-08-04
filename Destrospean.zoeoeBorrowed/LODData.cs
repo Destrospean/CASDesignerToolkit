@@ -119,29 +119,11 @@ namespace Destrospean.zoeoeBorrowed
             var mtstEntryMap = new Dictionary<string, Dictionary<MTST.Entry, TGIBlock>>();
             foreach (var meshGroup in MeshGroups)
             {
-                chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferences, TGIBlock>
+                chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferences, TGIBlock>();
+                foreach (ChunkReferences chunkReference in System.Enum.GetValues(typeof(ChunkReferences)))
                 {
-                    {
-                        ChunkReferences.IndexBufferIndex,
-                        resource.ChunkEntries[meshGroup.MeshGroup.IndexBufferIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
-                    },
-                    {
-                        ChunkReferences.MaterialIndex,
-                        resource.ChunkEntries[meshGroup.MeshGroup.MaterialIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
-                    },
-                    {
-                        ChunkReferences.SkinControllerIndex,
-                        resource.ChunkEntries[meshGroup.MeshGroup.SkinControllerIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
-                    },
-                    {
-                        ChunkReferences.VertexBufferIndex,
-                        resource.ChunkEntries[meshGroup.MeshGroup.VertexBufferIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
-                    },
-                    {
-                        ChunkReferences.VertexFormatIndex,
-                        resource.ChunkEntries[meshGroup.MeshGroup.VertexFormatIndex.TGIBlockIndex + resource.PublicChunks].TGIBlock
-                    }
-                };
+                    chunkReferenceMap[meshGroup.ID][chunkReference] = resource.ChunkEntries[((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup)).TGIBlockIndex + resource.PublicChunks].TGIBlock;
+                }
                 if (meshGroup.DirectMATD == null)
                 {
                     mtstEntryMap[meshGroup.ID] = new Dictionary<MTST.Entry, TGIBlock>();
