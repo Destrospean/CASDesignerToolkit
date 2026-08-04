@@ -55,10 +55,10 @@ namespace Destrospean.zoeoeBorrowed
             }
         }
 
-        public void CloneMeshGroup(int index)
+        public void CloneMeshGroup(int groupIndex)
         {
             var resource = (GenericRCOLResource)Resource;
-            var meshGroup = MeshGroups[index];
+            var meshGroup = MeshGroups[groupIndex];
             var mesh = (MLOD.Mesh)meshGroup.MeshGroup.Clone((sender, e) =>
                 {
                 });
@@ -91,18 +91,18 @@ namespace Destrospean.zoeoeBorrowed
             {
                 foreach (var entry in ((MTST)material.RCOLBlock).Entries)
                 {
-                    entry.Index.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks;
                     resource.ChunkEntries.Add((GenericRCOLResource.ChunkEntry)resource.ChunkEntries[entry.Index.TGIBlockIndex + resource.PublicChunks].Clone((sender, e) =>
                         {
                         }));
+                    entry.Index.TGIBlockIndex = resource.ChunkEntries.Count - resource.PublicChunks - 1;
                 }
             }
             var uvScales = (float[])meshGroup.UVScales.Clone();
             MLODChunk.Meshes.Add(mesh);
-            MeshGroups.Add(meshGroup.DirectMATD == null ? new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, meshGroup.MaterialSet, mesh, (SKIN)skinController.RCOLBlock, uvScales) : new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, (MATD)material.RCOLBlock, mesh, (SKIN)skinController.RCOLBlock, uvScales));
+            MeshGroups.Add(meshGroup.DirectMATD == null ? new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, (MTST)material.RCOLBlock, mesh, (SKIN)skinController.RCOLBlock, uvScales) : new MeshGroupData((VRTF)vertexFormat.RCOLBlock, (VBUF)vertexBuffer.RCOLBlock, (IBUF)indexBuffer.RCOLBlock, (MATD)material.RCOLBlock, mesh, (SKIN)skinController.RCOLBlock, uvScales));
         }
 
-        public void DeleteMeshGroup(int index)
+        public void DeleteMeshGroup(int groupIndex)
         {
             /*
             var resource = (GenericRCOLResource)Resource;
@@ -116,7 +116,7 @@ namespace Destrospean.zoeoeBorrowed
                     case "SkinControllerIndex":
                     case "VertexBufferIndex":
                     case "VertexFormatIndex":
-                        var chunkReference = property.GetValue(MeshGroups[index].MeshGroup) as GenericRCOLResource.ChunkReference;
+                        var chunkReference = property.GetValue(MeshGroups[groupIndex].MeshGroup) as GenericRCOLResource.ChunkReference;
                         if (chunkReference != null)
                         {
                             indices.Add(chunkReference.TGIBlockIndex + resource.PublicChunks);
@@ -158,13 +158,13 @@ namespace Destrospean.zoeoeBorrowed
                     }
                 }
             }
-            foreach (var i in indices)
+            foreach (var index in indices)
             {
-                resource.ChunkEntries.RemoveAt(i);
+                resource.ChunkEntries.RemoveAt(index);
             }
             */
-            MeshGroups.RemoveAt(index);
-            MLODChunk.Meshes.RemoveAt(index);
+            MeshGroups.RemoveAt(groupIndex);
+            MLODChunk.Meshes.RemoveAt(groupIndex);
             /*
             foreach (var meshGroup in MeshGroups)
             {
