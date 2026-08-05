@@ -452,7 +452,12 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                         complateTable.Attach(addPatternButton, 0, 2, 0, 1);
                         complateTable.NRows++;
                     }
-                    subNotebook.ReorderTabs((a, b) => string.Compare(a, b) == 1 && b != "Logo" || a == "Logo" ? 1 : 0);
+                    subNotebook.ReorderTabs((a, b) =>
+                        {
+                            string labelA = subNotebook.GetTabLabelText(a),
+                            labelB = subNotebook.GetTabLabelText(b);
+                            return string.Compare(labelA, labelB) == 1 && labelB != "Logo" || labelA == "Logo" ? 1 : 0;
+                        });
                     AddPropertiesToTable(complateTable, complate);
                 }
                 ShowAll();

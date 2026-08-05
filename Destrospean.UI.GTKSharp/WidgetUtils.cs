@@ -18,7 +18,7 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public static class WidgetUtils
     {
-        public delegate int Comparison(string a, string b);
+        public delegate int Comparison<A, B>(A a, B b);
 
         public static uint DefaultTableColumnSpacing
         {
@@ -813,7 +813,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 }, propertyHolder, propertyPathComponents);
         }
 
-        public static void ReorderTabs(this Notebook notebook, Comparison comparison)
+        public static void ReorderTabs(this Notebook notebook, Comparison<Widget, Widget> comparison)
         {
             bool swapped;
             for (var i = 0; i < notebook.NPages - 1; i++)
@@ -821,7 +821,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 swapped = false;
                 for (var j = 0; j < notebook.NPages - i - 1; j++)
                 {
-                    switch (comparison(notebook.GetTabLabelText(notebook.GetNthPage(j)), notebook.GetTabLabelText(notebook.GetNthPage(j + 1))))
+                    switch (comparison(notebook.GetNthPage(j), notebook.GetNthPage(j + 1)))
                     {
                         case -1:
                             notebook.ReorderChild(notebook.GetNthPage(j + 1), j);
