@@ -3387,7 +3387,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 */
                 Console.WriteLine("This OBJ mesh has no UV mapping.");
-                obj.UVArray = new OBJ.UV[1]
+                obj.UVArray = new OBJ.UV[]
                     {
                         new OBJ.UV()
                     };
@@ -3518,8 +3518,10 @@ namespace Destrospean.CmarNYCBorrowed
                 if (isMorph[i])
                 {
                     geoms[i].mTGICount = 1;
-                    geoms[i].mTGIs = new TGI[1];
-                    geoms[i].mTGIs[0] = new TGI(0, 0, 0);
+                    geoms[i].mTGIs = new TGI[]
+                        {
+                            new TGI(0, 0, 0)
+                        };
                 }
                 else
                 {

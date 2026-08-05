@@ -868,7 +868,10 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in gameObject.LODs)
             {
-                var meshGroupNotebook = new Notebook();
+                var meshGroupNotebook = new Notebook
+                    {
+                        ShowTabs = false
+                    };
                 var actionGroup = new ActionGroup("Default");
                 Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
                 cloneMeshGroupShareMaterialAction = new Gtk.Action("CloneMeshGroupShareMaterialAction", "Clone Group (Share Material)", null, Stock.Add),
@@ -1090,10 +1093,11 @@ public partial class MainWindow : RendererMainWindow
                     }
                     else
                     {
-                        meshGroupNotebook.ShowTabs = false;
                         meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
                     }
                 }
+                nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+                prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
                 meshGroupNotebook.CurrentPage = 0;
                 if (lodKvp.Key.Equals(new List<meshExpImp.ModelBlocks.LODId>(gameObject.LODs.Keys)[startLODPageIndex]))
                 {
