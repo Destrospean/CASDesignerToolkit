@@ -953,7 +953,7 @@ public partial class MainWindow : RendererMainWindow
                         {
                             ResourcePropertyNotebook.Remove(child);
                         }
-                        BuildLODNotebook(gameObject, selectedLODIndex, gameObject.LODs[(meshExpImp.ModelBlocks.LODId)selectedLODIndex].MeshGroups.Count - 1);
+                        BuildLODNotebook(gameObject, selectedLODIndex, new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[selectedLODIndex].MeshGroups.Count - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 Action<MeshFileType> exportMeshGroup = (meshFileType) =>
