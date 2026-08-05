@@ -7592,7 +7592,7 @@ namespace Destrospean.CmarNYCBorrowed
                     {
                         SetPosition(i, head.GetPosition(j));
                         SetNormal(i, head.GetNormal(j));
-                        SetTagValue(i, GetTagValue(i) & 0xFFFFFF00 | 0x00000063);
+                        SetTagValue(i, GetTagValue(i) & 0xFFFFFF00 | 0x63);
                     }
                 }
             }
