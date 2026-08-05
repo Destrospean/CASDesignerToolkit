@@ -821,12 +821,16 @@ namespace Destrospean.DestrospeanCASPEditor
                 swapped = false;
                 for (var j = 0; j < notebook.NPages - i - 1; j++)
                 {
-                    string a = notebook.GetTabLabelText(notebook.GetNthPage(j)),
-                    b = notebook.GetTabLabelText(notebook.GetNthPage(j + 1));
-                    if (comparison(a, b) == 1)
+                    switch (comparison(notebook.GetTabLabelText(notebook.GetNthPage(j)), notebook.GetTabLabelText(notebook.GetNthPage(j + 1))))
                     {
-                        notebook.ReorderChild(notebook.GetNthPage(j), j + 1);
-                        swapped = true;
+                        case -1:
+                            notebook.ReorderChild(notebook.GetNthPage(j + 1), j);
+                            swapped = true;
+                            break;
+                        case 1:
+                            notebook.ReorderChild(notebook.GetNthPage(j), j + 1);
+                            swapped = true;
+                            break;
                     }
                 }
                 if (!swapped)
