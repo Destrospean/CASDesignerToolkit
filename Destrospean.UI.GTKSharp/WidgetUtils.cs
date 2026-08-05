@@ -17,6 +17,8 @@ namespace Destrospean.DestrospeanCASPEditor
 {
     public static class WidgetUtils
     {
+        public delegate int Comparison(string a, string b);
+
         public static uint DefaultTableColumnSpacing
         {
             get
@@ -69,7 +71,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, string label, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback)
         {
             try
             {
@@ -79,7 +81,7 @@ namespace Destrospean.DestrospeanCASPEditor
                         ColumnSpacing = DefaultTableColumnSpacing
                     };
                 scrolledWindow.AddWithViewport(table);
-                notebook.AppendPage(scrolledWindow, new Label("MLOD " + (notebook.NPages + pageIndexOffset).ToString()));
+                notebook.AppendPage(scrolledWindow, new Label(label));
                 table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget, updateUICallback);
                 table.SizeAllocated += (o, args) =>
                     {
@@ -808,6 +810,29 @@ namespace Destrospean.DestrospeanCASPEditor
             return GetEnumPropertyCheckButtonsInNewFrame(label, () =>
                 {
                 }, propertyHolder, propertyPathComponents);
+        }
+
+        public static void ReorderTabs(this Notebook notebook, Comparison comparison)
+        {
+            bool swapped;
+            for (var i = 0; i < notebook.NPages - 1; i++)
+            {
+                swapped = false;
+                for (var j = 0; j < notebook.NPages - i - 1; j++)
+                {
+                    string a = notebook.GetTabLabelText(notebook.GetNthPage(j)),
+                    b = notebook.GetTabLabelText(notebook.GetNthPage(j + 1));
+                    if (comparison(a, b) == 1)
+                    {
+                        notebook.ReorderChild(notebook.GetNthPage(j), j + 1);
+                        swapped = true;
+                    }
+                }
+                if (!swapped)
+                {
+                    break;
+                }
+            }
         }
 
         public static void RescaleAndReposition(this Gtk.Window self, Gtk.Window parent)

@@ -868,10 +868,7 @@ public partial class MainWindow : RendererMainWindow
             ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
             foreach (var lodKvp in gameObject.LODs)
             {
-                var meshGroupNotebook = new Notebook
-                    {
-                        ShowTabs = false
-                    };
+                var meshGroupNotebook = new Notebook();
                 var actionGroup = new ActionGroup("Default");
                 Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
                 cloneMeshGroupShareMaterialAction = new Gtk.Action("CloneMeshGroupShareMaterialAction", "Clone Group (Share Material)", null, Stock.Add),
@@ -1080,8 +1077,26 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook));
-                if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
+                foreach (var meshGroup in lodKvp.Value.MeshGroups)
+                {
+                    if (meshGroup.DirectMATD == null)
+                    {
+                        var materialStateNotebook = new Notebook();
+                        foreach (var materialState in meshGroup.MaterialSet.Entries)
+                        {
+                            materialStateNotebook.AddProperties(materialState.MaterialState.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)materialState.MaterialState, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
+                            materialStateNotebook.ReorderTabs((a, b) => a != "Default" || b == "Default" ? 1 : 0);
+                        }
+                        meshGroupNotebook.Add(materialStateNotebook);
+                    }
+                    else
+                    {
+                        meshGroupNotebook.ShowTabs = false;
+                        meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
+                    }
+                }
+                meshGroupNotebook.CurrentPage = 0;
+                if (lodKvp.Key.Equals(new List<meshExpImp.ModelBlocks.LODId>(gameObject.LODs.Keys)[startLODPageIndex]))
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
                     meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
