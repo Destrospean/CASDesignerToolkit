@@ -261,7 +261,6 @@ namespace Destrospean.Common.Abstractions
 
         public void ImportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, UpdateUIDelegate updateUICallback, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var mlod = (MLOD)((GenericRCOLResource)LODs[lod].Resource).ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock;
             using (var fileStream = File.OpenRead(filename))
             {
                 switch (meshFileType)
@@ -336,8 +335,8 @@ namespace Destrospean.Common.Abstractions
                                 {
                                     faceIndices.AddRange(face);
                                 }
-                                meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, faceIndices.ToArray());
-                                meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                                meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, faceIndices.ToArray());
+                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
                             }
                             break;
                         }
@@ -379,8 +378,8 @@ namespace Destrospean.Common.Abstractions
                                                 }
                                         };
                                 }
-                                meshGroup.IndexBuffer.SetIndices(mlod, meshGroup.MeshGroup, indices);
-                                meshGroup.VertexBuffer.SetVertices(mlod, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                                meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, indices);
+                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
                             }
                             break;
                         }
