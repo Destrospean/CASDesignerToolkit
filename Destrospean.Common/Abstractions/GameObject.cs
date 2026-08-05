@@ -50,7 +50,7 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
-        public new delegate void UpdateUIDelegate(Common.Abstractions.GameObject gameObject, int lodIndex, int groupIndex, uint materialState);
+        public new delegate void UpdateUIDelegate(GameObject gameObject, int lodIndex, int groupIndex, uint materialState);
 
         public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
