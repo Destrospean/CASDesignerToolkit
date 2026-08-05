@@ -50,6 +50,8 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
+        public new delegate void UpdateUIDelegate(Common.Abstractions.GameObject gameObject, int lodIndex, int groupIndex, uint materialState);
+
         public GameObject(IPackage package, IResourceIndexEntry resourceIndexEntry, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources) : base(package, resourceIndexEntry)
         {
             CatalogResource = new PackageResourceIndexEntryTuple(package, resourceIndexEntry).GetResource<CatalogResource.CatalogResource>();
@@ -385,7 +387,7 @@ namespace Destrospean.Common.Abstractions
                         }
                 }
                 LoadLODs(mlodResources, modlResources, vpxyResources);
-                updateUICallback(this, new List<LODId>(LODs.Keys).IndexOf(lod), groupIndex);
+                updateUICallback(this, new List<LODId>(LODs.Keys).IndexOf(lod), groupIndex, (uint)MTST.State.Default);
             }
         }
 

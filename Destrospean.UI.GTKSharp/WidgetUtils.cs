@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Destrospean;
 using Destrospean.CmarNYCBorrowed;
 using Destrospean.Common;
+using Destrospean.Common.Abstractions;
 using Destrospean.DestrospeanCASPEditor.Widgets;
 using Destrospean.Graphics.OpenGL;
 using Destrospean.S3PIExtensions;
@@ -39,9 +40,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public delegate void UpdateUIDelegate(Common.Abstractions.GameObject gameObject, int lodIndex, int groupIndex, uint materialState);
-
-        public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
             try
             {
@@ -73,7 +72,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, string label, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, UpdateUIDelegate updateUICallback)
+        public static void AddProperties(this Notebook notebook, string label, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Preset preset, Gtk.Image imageWidget, GameObject.UpdateUIDelegate updateUICallback)
         {
             try
             {
@@ -105,7 +104,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
+        public static void AddProperties(this Table table, IPackage package, GEOM geometryResource, Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
         {
             try
             {
@@ -398,14 +397,14 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget, UpdateUIDelegate updateUICallback)
+        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget, GameObject.UpdateUIDelegate updateUICallback)
         {
             try
             {
                 var mainWindow = MainWindowBase.Singleton;
                 System.Destrospean.Action updateUI = () =>
                     {
-                        var gameObject = (Common.Abstractions.GameObject)preset.CASTableObject;
+                        var gameObject = (GameObject)preset.CASTableObject;
                         updateUICallback(gameObject, new List<LODData>(gameObject.LODs.Values).IndexOf(lodData), lodData.MeshGroups.IndexOf(meshGroupData), materialState);
                     };
                 var mlodResource = (GenericRCOLResource)lodData.Resource;
