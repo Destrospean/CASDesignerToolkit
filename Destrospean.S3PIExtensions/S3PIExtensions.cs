@@ -443,9 +443,9 @@ namespace Destrospean.S3PIExtensions
             catch
             {
             }
-            try
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                try
                 {
                     if (assembly.GetName().Name == "s3pi.CASPartResource")
                     {
@@ -454,9 +454,9 @@ namespace Destrospean.S3PIExtensions
                         goto FinalSteps;
                     }
                 }
-            }
-            catch
-            {
+                catch
+                {
+                }
             }
             try
             {
@@ -472,9 +472,9 @@ namespace Destrospean.S3PIExtensions
             catch
             {
             }
-            try
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                try
                 {
                     if (assembly.GetName().Name == "s3pi.TxtcResource")
                     {
@@ -483,9 +483,9 @@ namespace Destrospean.S3PIExtensions
                         goto FinalSteps;
                     }
                 }
-            }
-            catch
-            {
+                catch
+                {
+                }
             }
             try
             {
