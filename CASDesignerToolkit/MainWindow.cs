@@ -1084,10 +1084,7 @@ public partial class MainWindow : RendererMainWindow
                         var materialStateNotebook = new Notebook();
                         var materialStates = meshGroup.MaterialSet.Entries.ConvertAll(x => x.MaterialState);
                         materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
-                        foreach (var materialState in materialStates)
-                        {
-                            materialStateNotebook.AddProperties(materialState.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)materialState, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
-                        }
+                        materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook));
                         materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
                         meshGroupNotebook.Add(materialStateNotebook);
                     }
