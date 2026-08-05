@@ -544,6 +544,10 @@ namespace Destrospean.Common.Abstractions
                         ScalpTexture = drawsOnScalp ? scalpDiffuseMap : null;
                         return texture;
                     }
+                    catch (System.Threading.ThreadAbortException)
+                    {
+                        return null;
+                    }
                     catch (System.Exception ex)
                     {
                         System.Destrospean.Logger.WriteError(ex);
