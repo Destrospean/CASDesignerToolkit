@@ -55,7 +55,7 @@ public partial class MainWindow : RendererMainWindow
                 GlobalState.CurrentLODIndex = ResourcePropertyNotebook.CurrentPage;
                 if (mLoadMeshesThread != null)
                 {
-                    lock (Complate.Lock)
+                    lock (TextureUtils.Lock)
                     {
                         mLoadMeshesThread.Abort();
                     }
