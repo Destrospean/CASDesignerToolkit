@@ -852,7 +852,7 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0)
+    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0, uint startMaterialState = (uint)MTST.State.Default)
     {
         try
         {
@@ -1082,11 +1082,13 @@ public partial class MainWindow : RendererMainWindow
                     if (meshGroup.DirectMATD == null)
                     {
                         var materialStateNotebook = new Notebook();
-                        foreach (var materialState in meshGroup.MaterialSet.Entries)
+                        var materialStates = meshGroup.MaterialSet.Entries.ConvertAll(x => x.MaterialState);
+                        materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
+                        foreach (var materialState in materialStates)
                         {
-                            materialStateNotebook.AddProperties(materialState.MaterialState.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)materialState.MaterialState, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
-                            materialStateNotebook.ReorderTabs((a, b) => a != "Default" || b == "Default" ? 1 : 0);
+                            materialStateNotebook.AddProperties(materialState.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)materialState, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
                         }
+                        materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
                         meshGroupNotebook.Add(materialStateNotebook);
                     }
                     else
@@ -1243,7 +1245,7 @@ public partial class MainWindow : RendererMainWindow
             })).Start();
     }
 
-    void RefreshLODNotebook(CASTableObject castableObject, int lodIndex, int groupIndex)
+    void RefreshLODNotebook(CASTableObject casPart, int lodIndex, int groupIndex)
     {
         foreach (var child in ResourcePropertyNotebook.Children)
         {
@@ -1251,15 +1253,19 @@ public partial class MainWindow : RendererMainWindow
             child.Destroy();
             child.Dispose();
         }
-        var casPart = castableObject as CASPart;
-        if (casPart == null)
+        BuildLODNotebook((CASPart)casPart, lodIndex, groupIndex);
+        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+    }
+
+    void RefreshLODNotebook(CASTableObject gameObject, int lodIndex, int groupIndex, uint materialState)
+    {
+        foreach (var child in ResourcePropertyNotebook.Children)
         {
-            BuildLODNotebook((GameObject)castableObject, lodIndex, groupIndex);
+            ResourcePropertyNotebook.Remove(child);
+            child.Destroy();
+            child.Dispose();
         }
-        else
-        {
-            BuildLODNotebook(casPart, lodIndex, groupIndex);
-        }
+        BuildLODNotebook((GameObject)gameObject, lodIndex, groupIndex, materialState);
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
     }
 

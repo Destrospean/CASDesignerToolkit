@@ -39,6 +39,8 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
+        public delegate void UpdateUIDelegate(Common.Abstractions.GameObject gameObject, int lodIndex, int groupIndex, uint materialState);
+
         public static void AddProperties(this Notebook notebook, IPackage package, GEOM geometryResource, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
         {
             try
@@ -71,7 +73,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, string label, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback)
+        public static void AddProperties(this Notebook notebook, string label, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, UpdateUIDelegate updateUICallback)
         {
             try
             {
@@ -396,7 +398,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback)
+        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget, UpdateUIDelegate updateUICallback)
         {
             try
             {
@@ -404,7 +406,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 System.Destrospean.Action updateUI = () =>
                     {
                         var gameObject = (Common.Abstractions.GameObject)preset.CASTableObject;
-                        updateUICallback(gameObject, new List<LODData>(gameObject.LODs.Values).IndexOf(lodData), lodData.MeshGroups.IndexOf(meshGroupData));
+                        updateUICallback(gameObject, new List<LODData>(gameObject.LODs.Values).IndexOf(lodData), lodData.MeshGroups.IndexOf(meshGroupData), materialState);
                     };
                 var mlodResource = (GenericRCOLResource)lodData.Resource;
                 var matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
