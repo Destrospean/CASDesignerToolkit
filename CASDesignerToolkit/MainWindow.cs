@@ -55,7 +55,10 @@ public partial class MainWindow : RendererMainWindow
                 GlobalState.CurrentLODIndex = ResourcePropertyNotebook.CurrentPage;
                 if (mLoadMeshesThread != null)
                 {
-                    mLoadMeshesThread.Abort();
+                    lock (TextureUtils.Lock)
+                    {
+                        mLoadMeshesThread.Abort();
+                    }
                 }
                 (mLoadMeshesThread = new Thread(() =>
                     {
@@ -687,7 +690,7 @@ public partial class MainWindow : RendererMainWindow
                             child.Destroy();
                             child.Dispose();
                         }
-                        BuildLODNotebook(casPart, selectedLODIndex, selectedMeshGroupIndex + 1);
+                        BuildLODNotebook(casPart, selectedLODIndex, casPart.LODs[selectedLODIndex].Count - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
