@@ -69,7 +69,7 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Notebook notebook, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, int pageIndexOffset = 0)
+        public static void AddProperties(this Notebook notebook, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback, int pageIndexOffset = 0)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace Destrospean.DestrospeanCASPEditor
                     };
                 scrolledWindow.AddWithViewport(table);
                 notebook.AppendPage(scrolledWindow, new Label("MLOD " + (notebook.NPages + pageIndexOffset).ToString()));
-                table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
+                table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget, updateUICallback);
                 table.SizeAllocated += (o, args) =>
                     {
                         var maxHeight = 0;
@@ -394,11 +394,16 @@ namespace Destrospean.DestrospeanCASPEditor
             }
         }
 
-        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget)
+        public static void AddProperties(this Table table, IPackage package, LODData lodData, MeshGroupData meshGroupData, uint materialState, Common.Abstractions.Preset preset, ScrolledWindow scrolledWindow, Gtk.Image imageWidget, Common.Abstractions.CASTableObject.UpdateUIDelegate updateUICallback)
         {
             try
             {
                 var mainWindow = MainWindowBase.Singleton;
+                System.Destrospean.Action updateUI = () =>
+                    {
+                        var gameObject = (Common.Abstractions.GameObject)preset.CASTableObject;
+                        updateUICallback(gameObject, new List<LODData>(gameObject.LODs.Values).IndexOf(lodData), lodData.MeshGroups.IndexOf(meshGroupData));
+                    };
                 var mlodResource = (GenericRCOLResource)lodData.Resource;
                 var matd = mlodResource == null ? null : meshGroupData.MaterialSet == null ? meshGroupData.DirectMATD : mlodResource.ChunkEntries[meshGroupData.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
                 var shaders = new List<string>();
@@ -416,7 +421,7 @@ namespace Destrospean.DestrospeanCASPEditor
                 shaderComboBox.Changed += (sender, e) =>
                     {
                         matd.Shader = (ShaderType)Enum.Parse(typeof(Shader), shaderComboBox.ActiveText.Split(' ')[0]);
-                        mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                        updateUI();
                     };
                 table.Attach(new Label("Shader")
                     {
@@ -435,7 +440,7 @@ namespace Destrospean.DestrospeanCASPEditor
                         spinButton.ValueChanged += (sender, e) =>
                             {
                                 elementFloat.Data = (float)spinButton.Value;
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         valueWidget = spinButton;
                         goto AttachLabelAndValueWidget;
@@ -452,12 +457,12 @@ namespace Destrospean.DestrospeanCASPEditor
                         spinButtons[0].ValueChanged += (sender, e) =>
                             {
                                 elementFloat2.Data0 = (float)spinButtons[0].Value;
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         spinButtons[1].ValueChanged += (sender, e) =>
                             {
                                 elementFloat2.Data1 = (float)spinButtons[1].Value;
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         foreach (var spinButton in spinButtons)
                         {
@@ -487,7 +492,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                 Material material;
                                 if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
-                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    updateUI();
                                     return;
                                 }
                                 lock (GlobalState.Lock)
@@ -507,7 +512,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                             break;
                                     }
                                 }
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         valueWidget = colorButton;
                         goto AttachLabelAndValueWidget;
@@ -536,7 +541,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                 Material material;
                                 if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
-                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    updateUI();
                                     return;
                                 }
                                 lock (GlobalState.Lock)
@@ -556,7 +561,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                             break;
                                     }
                                 }
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         valueWidget = colorButton;
                         goto AttachLabelAndValueWidget;
@@ -568,7 +573,7 @@ namespace Destrospean.DestrospeanCASPEditor
                         spinButton.ValueChanged += (sender, e) =>
                             {
                                 elementInt.Data = spinButton.ValueAsInt;
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         valueWidget = spinButton;
                         goto AttachLabelAndValueWidget;
@@ -597,7 +602,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                 Material material;
                                 if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
-                                    mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                    updateUI();
                                     return;
                                 }
                                 lock (GlobalState.Lock)
@@ -618,7 +623,7 @@ namespace Destrospean.DestrospeanCASPEditor
                                             break;
                                     }
                                 }
-                                mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                                updateUI();
                             };
                         valueWidget = comboBox;
                     }
@@ -634,9 +639,9 @@ namespace Destrospean.DestrospeanCASPEditor
                             {
                                 table.Remove(child);
                             }
-                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
+                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget, updateUICallback);
                             table.ShowAll();
-                            mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                            updateUI();
                         };
                     var labelHBox = new HBox(false, 6);
                     labelHBox.PackStart(new Label(element.Field.ToString())
@@ -672,10 +677,10 @@ namespace Destrospean.DestrospeanCASPEditor
                             var element = addMaterialPropertyDialog.DataType == typeof(ElementTextureRef) ? new ElementTextureRef(0, null) : (ShaderData)Activator.CreateInstance(addMaterialPropertyDialog.DataType, 0, null);
                             element.Field = (FieldType)addMaterialPropertyDialog.Field;
                             matd.Mtnf.SData.Add(element);
-                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget);
+                            table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget, updateUICallback);
                             table.ShowAll();
                             scrolledWindow.Vadjustment.Value = scrolledWindow.Vadjustment.Upper;
-                            mainWindow.NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                            updateUI();
                         }
                         addMaterialPropertyDialog.Destroy();
                         addMaterialPropertyDialog.Dispose();

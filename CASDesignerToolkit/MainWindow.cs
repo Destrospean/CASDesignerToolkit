@@ -55,7 +55,10 @@ public partial class MainWindow : RendererMainWindow
                 GlobalState.CurrentLODIndex = ResourcePropertyNotebook.CurrentPage;
                 if (mLoadMeshesThread != null)
                 {
-                    mLoadMeshesThread.Abort();
+                    lock (Complate.Lock)
+                    {
+                        mLoadMeshesThread.Abort();
+                    }
                 }
                 (mLoadMeshesThread = new Thread(() =>
                     {
@@ -1077,7 +1080,7 @@ public partial class MainWindow : RendererMainWindow
                 lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
                 lodPageVBox.ShowAll();
                 ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image));
+                lodKvp.Value.MeshGroups.ForEach(x => meshGroupNotebook.AddProperties(CurrentPackage, lodKvp.Value, x, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook));
                 if (lodKvp.Value.Equals(new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[startLODPageIndex]))
                 {
                     ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
