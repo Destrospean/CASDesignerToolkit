@@ -1277,7 +1277,6 @@ public partial class MainWindow : RendererMainWindow
             {
                 CurrentPackage.DeleteResource(resourceIndexEntry);
                 var tempResourceIndexEntry = CurrentPackage.AddResource(fileChooserDialog.Filename, resourceIndexEntry, true);
-                CurrentPackage.ResolveResourceType(tempResourceIndexEntry);
                 ResourceUtils.MissingResourceKeys.Add(tempResourceIndexEntry.ReverseEvaluateResourceKey());
                 RefreshWidgets(false);
                 foreach (var casPartKvp in PreloadedData.CASParts)
@@ -1541,7 +1540,7 @@ public partial class MainWindow : RendererMainWindow
         {
             try
             {
-                CurrentPackage.ResolveResourceType(CurrentPackage.AddResource(fileChooserDialog.Filename));
+                CurrentPackage.AddResource(fileChooserDialog.Filename);
                 RefreshWidgets(false);
                 NextState = NextStateOptions.UnsavedChanges;
             }

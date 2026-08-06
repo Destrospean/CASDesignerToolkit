@@ -52,8 +52,9 @@ namespace Destrospean.DestrospeanCASPEditor
                 squareCanvasImage.Dispose();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Destrospean.Logger.WriteError(ex);
                 return false;
             }
         }
