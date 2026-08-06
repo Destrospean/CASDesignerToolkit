@@ -477,6 +477,17 @@ namespace Destrospean.DestrospeanCASPEditor
                     var elementFloat3 = element as ElementFloat3;
                     if (elementFloat3 != null)
                     {
+                        if (element.Field.ToString().Contains("Scale") || element.Field.ToString().Contains("Selector"))
+                        {
+                            var spinButton = new SpinButton(new Adjustment(elementFloat3.Data0, float.MinValue, float.MaxValue, 1, 10, 0), 0, 10);
+                            spinButton.ValueChanged += (sender, e) =>
+                                {
+                                    elementFloat3.Data0 = elementFloat3.Data1 = elementFloat3.Data2 = (float)spinButton.Value;
+                                    updateUI();
+                                };
+                            valueWidget = spinButton;
+                            goto AttachLabelAndValueWidget;
+                        }
                         var colorButton = new ColorButton
                             {
                                 Color = new Color
