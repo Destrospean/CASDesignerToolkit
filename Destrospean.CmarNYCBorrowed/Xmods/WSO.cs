@@ -2294,12 +2294,12 @@ namespace Destrospean.CmarNYCBorrowed
 
         public bool ValidBones(int meshGroupIndex, int vertexSequenceNumber)
         {
-            var boneAssignents = mMeshes[meshGroupIndex].Vertices[vertexSequenceNumber].BoneAssignments;
+            var boneAssignments = mMeshes[meshGroupIndex].Vertices[vertexSequenceNumber].BoneAssignments;
             var boneWeights = mMeshes[meshGroupIndex].Vertices[vertexSequenceNumber].BoneWeights;
             var totalWeight = 0f;
             for (var i = 0; i < 4; i++)
             {
-                if (boneWeights[i] > 0 && (boneAssignents[i] < 0 || boneAssignents[i] >= BoneCount))
+                if (boneWeights[i] > 0 && (boneAssignments[i] < 0 || boneAssignments[i] >= BoneCount))
                 {
                     return false;
                 }

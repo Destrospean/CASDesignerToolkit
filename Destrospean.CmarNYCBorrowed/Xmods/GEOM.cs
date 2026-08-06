@@ -2245,11 +2245,11 @@ namespace Destrospean.CmarNYCBorrowed
             float[] normalDeltas = null,
             positionDeltas = null;
             for (var i = section2StartIndex; i < section2StartIndex + bgeo.GetSection2Count(bgeoSection1EntryNumber, lod); i++)
-            {                                                           //navigate list of flags and offsets in section 2
+            {                                                           // Navigate list of flags and offsets in section 2
                 var section2 = bgeo.GetSection2(i);
-                if (section2.HasPosition || section2.HasNormals)        //check flags for whether position data/normals data is present
+                if (section2.HasPosition || section2.HasNormals)        // Check flags for whether position data/normals data is present
                 {
-                    section3Index = section3Index + section2.Offset;    //position to section 3 index
+                    section3Index = section3Index + section2.Offset;    // Position to section 3 index
                     var advance = 0;
                     positionDeltas = new float[]
                         {
@@ -2263,16 +2263,16 @@ namespace Destrospean.CmarNYCBorrowed
                             0,
                             0
                         };
-                    if (section2.HasPosition)                           //read position data if present
+                    if (section2.HasPosition)                           // Read position data if present
                     {
                         positionDeltas = bgeo.GetSection3(section3Index);
                         advance = 1;
                     }
-                    if (section2.HasNormals)                            //normal data follows if present
+                    if (section2.HasNormals)                            // Normal data follows if present
                     {
                         normalDeltas = bgeo.GetSection3(section3Index + advance);
                     }
-                    for (var j = 0; j < VertexCount; j++)               //search mesh for all vertices with matching vertex ID
+                    for (var j = 0; j < VertexCount; j++)               // Search mesh for all vertices with matching vertex ID
                     {
                         if (mVertexIDs != null && mVertexIDs[j] == currentVertexID)
                         {
@@ -2988,7 +2988,7 @@ namespace Destrospean.CmarNYCBorrowed
 
         public bool CalculateTangents(bool showError = true)
         {
-            //Code adapted from NOAA_Julien on Unity forums (and adapted again by Destrospean from CmarNYC's adaptation)
+            // Code adapted from NOAA_Julien on Unity forums (and adapted again by Destrospean from CmarNYC's adaptation)
             var triangles = new int[FaceCount * 3];
             for (var i = 0; i < FaceCount; i++)
             {
@@ -3387,7 +3387,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 */
                 Console.WriteLine("This OBJ mesh has no UV mapping.");
-                obj.UVArray = new OBJ.UV[1]
+                obj.UVArray = new[]
                     {
                         new OBJ.UV()
                     };
@@ -3518,8 +3518,10 @@ namespace Destrospean.CmarNYCBorrowed
                 if (isMorph[i])
                 {
                     geoms[i].mTGICount = 1;
-                    geoms[i].mTGIs = new TGI[1];
-                    geoms[i].mTGIs[0] = new TGI(0, 0, 0);
+                    geoms[i].mTGIs = new[]
+                        {
+                            new TGI(0, 0, 0)
+                        };
                 }
                 else
                 {
@@ -3573,8 +3575,10 @@ namespace Destrospean.CmarNYCBorrowed
                             }
                             break;
                         case 3:
-                            geoms[i].mUVs = new UV[1][];
-                            geoms[i].mUVs[0] = new UV[vertices.Count];
+                            geoms[i].mUVs = new UV[][]
+                                {
+                                    new UV[vertices.Count]
+                                };
                             for (var k = 0; k < vertices.Count; k++)
                             {
                                 geoms[i].mUVs[0][k] = new UV(obj.UVArray[vertices[k][1] - 1].Coordinates, true);
@@ -7590,7 +7594,7 @@ namespace Destrospean.CmarNYCBorrowed
                     {
                         SetPosition(i, head.GetPosition(j));
                         SetNormal(i, head.GetNormal(j));
-                        SetTagValue(i, GetTagValue(i) & 0xFFFFFF00 | 0x00000063);
+                        SetTagValue(i, GetTagValue(i) & 0xFFFFFF00 | 0x63);
                     }
                 }
             }
@@ -7649,9 +7653,11 @@ namespace Destrospean.CmarNYCBorrowed
                 {
                     temp[i] = new UV();
                 }
-                var newUV = new UV[2][];
-                newUV[0] = mUVs[0];
-                newUV[1] = temp;
+                var newUV = new UV[][]
+                    {
+                        mUVs[0],
+                        temp
+                    };
                 mUVs = newUV;
             }
             if (HasUVSet(2))
@@ -7662,9 +7668,11 @@ namespace Destrospean.CmarNYCBorrowed
                 Array.Copy(mVertexFormats, uv + 1, newFormat, uv, mVertexFormats.Length - uv - 1);
                 mVertexFormats = newFormat;
                 mFaceCount--;
-                var newUV = new UV[2][];
-                newUV[0] = mUVs[0];
-                newUV[1] = mUVs[1];
+                var newUV = new UV[][]
+                    {
+                        mUVs[0],
+                        mUVs[1]
+                    };
                 mUVs = newUV;
             }
             if (!HasNormals)
