@@ -195,7 +195,7 @@ namespace Destrospean.Common.Abstractions
                         var vertices = new List<OBJ.Vertex>();
                         foreach (var meshGroup in LODs[lod].MeshGroups)
                         {
-                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && groupIndex != LODs[lod].MeshGroups.IndexOf(meshGroup))
                             {
                                 continue;
                             }
@@ -246,7 +246,7 @@ namespace Destrospean.Common.Abstractions
                         var groups = new List<WSO.MeshGroup>();
                         foreach (var meshGroup in LODs[lod].MeshGroups)
                         {
-                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && groupIndex != LODs[lod].MeshGroups.IndexOf(meshGroup))
                             {
                                 continue;
                             }

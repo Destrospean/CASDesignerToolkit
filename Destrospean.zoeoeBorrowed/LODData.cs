@@ -41,9 +41,9 @@ namespace Destrospean.zoeoeBorrowed
                 var matd = mtst == null ? materialIndexBlock as MATD : resource.ChunkEntries[mtst.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + resource.PublicChunks].RCOLBlock as MATD;
                 float[] uvScales =
                     {   
-                        -1,
-                        -1,
-                        -1
+                        3.051851E-05f,
+                        3.051851E-05f,
+                        3.051851E-05f
                     };
                 if (matd != null)
                 {
