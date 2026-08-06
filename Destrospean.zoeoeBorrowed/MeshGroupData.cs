@@ -15,6 +15,8 @@ namespace Destrospean.zoeoeBorrowed
 
         public MLOD.Mesh MeshGroup;
 
+        public GenericRCOLResource ParentResource;
+
         public int PrimitiveCount
         {
             get
@@ -25,7 +27,32 @@ namespace Destrospean.zoeoeBorrowed
 
         public SKIN SkinController;
 
-        public float[] UVScales;
+        public float[] UVScales
+        {
+            get
+            {
+                var matd = DirectMATD ?? (MATD)ParentResource.ChunkEntries[MaterialSet.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + ParentResource.PublicChunks].RCOLBlock;
+                foreach (var element in matd.Mtnf.SData)
+                {
+                    if (element.Field == FieldType.UVScales)
+                    {
+                        var elementFloat3 = ((ElementFloat3)element);
+                        return new[]
+                        {
+                            elementFloat3.Data0,
+                            elementFloat3.Data1,
+                            elementFloat3.Data2
+                        };
+                    }
+                }
+                return new[]
+                {   
+                    3.051851E-05f,
+                    3.051851E-05f,
+                    3.051851E-05f
+                };
+            }
+        }
 
         public VBUF VertexBuffer;
 
@@ -39,28 +66,28 @@ namespace Destrospean.zoeoeBorrowed
 
         public VRTF VertexFormat;
 
-        public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
+        public MeshGroupData(GenericRCOLResource parentResource, VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController)
         {
             ID = System.Guid.NewGuid().ToString();
             DirectMATD = directMATD;
             IndexBuffer = indexBuffer;
             MaterialSet = null;
             MeshGroup = mesh;
+            ParentResource = parentResource;
             SkinController = skinController;
-            UVScales = uvScales;
             VertexBuffer = vertexBuffer;
             VertexFormat = vertexFormat;
         }
 
-        public MeshGroupData(VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController, float[] uvScales)
+        public MeshGroupData(GenericRCOLResource parentResource, VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController)
         {
             ID = System.Guid.NewGuid().ToString();
             DirectMATD = null;
             IndexBuffer = indexBuffer;
             MaterialSet = materialSet;
             MeshGroup = mesh;
+            ParentResource = parentResource;
             SkinController = skinController;
-            UVScales = uvScales;
             VertexBuffer = vertexBuffer;
             VertexFormat = vertexFormat;
         }
