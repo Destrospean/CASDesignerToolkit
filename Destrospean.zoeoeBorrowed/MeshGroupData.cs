@@ -31,8 +31,7 @@ namespace Destrospean.zoeoeBorrowed
         {
             get
             {
-                var matd = DirectMATD ?? (MATD)ParentResource.ChunkEntries[MaterialSet.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + ParentResource.PublicChunks].RCOLBlock;
-                foreach (var element in matd.Mtnf.SData)
+                foreach (var element in (DirectMATD ?? (MATD)ParentResource.ChunkEntries[MaterialSet.Entries.Find(x => x.MaterialState == MTST.State.Default).Index.TGIBlockIndex + ParentResource.PublicChunks].RCOLBlock).Mtnf.SData)
                 {
                     if (element.Field == FieldType.UVScales)
                     {
