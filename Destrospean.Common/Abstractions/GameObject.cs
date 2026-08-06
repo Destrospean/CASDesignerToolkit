@@ -170,29 +170,78 @@ namespace Destrospean.Common.Abstractions
 
         public void ExportMeshGroup(LODId lod, int groupIndex, MeshFileType meshFileType, string filename, Dictionary<string, GenericRCOLResource> mlodResources, Dictionary<string, GenericRCOLResource> modlResources, Dictionary<string, GenericRCOLResource> vpxyResources)
         {
-            var extension = "";
             switch (meshFileType)
             {
                 case MeshFileType.MLOD:
-                    extension = ".lod";
-                    if (filename.ToLowerInvariant().EndsWith(extension))
+                    if (filename.ToLowerInvariant().EndsWith(".lod"))
                     {
                         filename.Remove(filename.LastIndexOf('.'));
                     }
-                    using (var fileStream = File.Create(filename + extension))
+                    using (var fileStream = File.Create(filename + ".lod"))
                     {
                         new BinaryWriter(fileStream).Write(LODs[lod].Resource.AsBytes);
                     }
                     break;
                 case MeshFileType.OBJ:
-                    extension = ".obj";
-                    goto case MeshFileType.WSO;
-                case MeshFileType.WSO:
-                    if (string.IsNullOrEmpty(extension))
+                    if (filename.ToLowerInvariant().EndsWith(".obj"))
                     {
-                        extension = ".wso";
+                        filename.Remove(filename.LastIndexOf('.'));
                     }
-                    using (var fileStream = File.Create(filename + (filename.ToLowerInvariant().EndsWith(extension) ? "" : extension)))
+                    using (var fileStream = File.Create(filename + ".obj"))
+                    {
+                        var groups = new List<OBJ.Group>();
+                        var normals = new List<OBJ.Normal>();
+                        var textureCoordinates = new List<OBJ.UV>();
+                        var vertices = new List<OBJ.Vertex>();
+                        foreach (var meshGroup in LODs[lod].MeshGroups)
+                        {
+                            if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster) || groupIndex > -1 && !meshGroup.Equals(LODs[lod].MeshGroups[groupIndex]))
+                            {
+                                continue;
+                            }
+                            foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
+                            {
+                                if (vertex.Normal != null)
+                                {
+                                    normals.Add(new OBJ.Normal(vertex.Normal));
+                                }
+                                if (vertex.Position != null)
+                                {
+                                    vertices.Add(new OBJ.Vertex(vertex.Position));
+                                }
+                                if (vertex.UV != null)
+                                {
+                                    textureCoordinates.Add(new OBJ.UV(vertex.UV[0], true));
+                                }
+                            }
+                            var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
+                            var group = new OBJ.Group("group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0));
+                            for (var i = 0; i < indices.Length; i += 3)
+                            {
+                                group.AddFace(new OBJ.Face(new[]
+                                    {
+                                        indices[i],
+                                        indices[i + 1],
+                                        indices[i + 2]
+                                    }, 1, OBJ.MeshType.Base));
+                            }
+                            groups.Add(group);
+                        }
+                        new OBJ
+                        {
+                            GroupArray = groups.ToArray(),
+                            NormalArray = normals.ToArray(),
+                            UVArray = textureCoordinates.ToArray(),
+                            VertexArray = vertices.ToArray()
+                        }.Write(new StreamWriter(fileStream));
+                        break;
+                    }
+                case MeshFileType.WSO:
+                    if (filename.ToLowerInvariant().EndsWith(".wso"))
+                    {
+                        filename.Remove(filename.LastIndexOf('.'));
+                    }
+                    using (var fileStream = File.Create(filename + ".wso"))
                     {
                         var groups = new List<WSO.MeshGroup>();
                         foreach (var meshGroup in LODs[lod].MeshGroups)
@@ -227,18 +276,9 @@ namespace Destrospean.Common.Abstractions
                             }
                             groups.Add(new WSO.MeshGroup(meshGroup.VertexCount, extendedVertices.ToArray(), indices.Length / 3, facePoints.ToArray(), 0, "group_" + (groupIndex == -1 ? LODs[lod].MeshGroups.IndexOf(meshGroup) : 0)));
                         }
-                        var wso = new WSO(LODs[lod].Resource, CurrentRig, groups.ToArray());
-                        switch (meshFileType)
-                        {
-                            case MeshFileType.OBJ:
-                                new OBJ(wso).Write(new StreamWriter(fileStream));
-                                break;
-                            case MeshFileType.WSO:
-                                wso.Write(new BinaryWriter(fileStream));
-                                break;
-                        }
+                        new WSO(LODs[lod].Resource, CurrentRig, groups.ToArray()).Write(new BinaryWriter(fileStream));
+                        break;
                     }
-                    break;
             }
         }
 
@@ -306,31 +346,28 @@ namespace Destrospean.Common.Abstractions
                                     faces.Add(temp);
                                 }
                                 var vertices = new meshExpImp.ModelBlocks.Vertex[vertexIndices.Count];
-                                for (var j = 0; j < faces.Count; j++)
+                                for (var j = 0; j < vertexIndices.Count; j++)
                                 {
-                                    for (var k = 0; k < 3; k++)
-                                    {
-                                        var vertexIndex = vertexIndices[faces[j][k]];
-                                        vertices[faces[j][k]] = new meshExpImp.ModelBlocks.Vertex
-                                            {
-                                                Normal = new[]
+                                    var vertexIndex = vertexIndices[j];
+                                    vertices[j] = new meshExpImp.ModelBlocks.Vertex
+                                        {
+                                            Normal = new[]
+                                                {
+                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[0],
+                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[1],
+                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[2],
+                                                    0 // Needed because of a bug with S3PI where the last value is truncated
+                                                },
+                                            Position = obj.VertexArray[vertexIndex[0] - 1].Coordinates,
+                                            UV = new float[][]
+                                                {
+                                                    new[]
                                                     {
-                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[0],
-                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[1],
-                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[2],
-                                                        0 // Needed because of a bug with S3PI where the last value is truncated
-                                                    },
-                                                Position = obj.VertexArray[vertexIndex[0] - 1].Coordinates,
-                                                UV = new float[][]
-                                                    {
-                                                        new[]
-                                                        {
-                                                            obj.UVArray[vertexIndex[1] - 1].Coordinates[0],
-                                                            1 - obj.UVArray[vertexIndex[1] - 1].Coordinates[1]
-                                                        }
+                                                        obj.UVArray[vertexIndex[1] - 1].Coordinates[0],
+                                                        1 - obj.UVArray[vertexIndex[1] - 1].Coordinates[1]
                                                     }
-                                            };
-                                    }
+                                                }
+                                        };
                                 }
                                 var faceIndices = new List<int>();
                                 foreach (var face in faces)
@@ -338,7 +375,7 @@ namespace Destrospean.Common.Abstractions
                                     faceIndices.AddRange(face);
                                 }
                                 meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, faceIndices.ToArray());
-                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                             }
                             break;
                         }
@@ -381,7 +418,7 @@ namespace Destrospean.Common.Abstractions
                                         };
                                 }
                                 meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, indices);
-                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat, vertices, meshGroup.UVScales);
+                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                             }
                             break;
                         }
