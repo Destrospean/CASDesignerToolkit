@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using s3pi.Extensions;
 using s3pi.Filetable;
 using s3pi.Interfaces;
@@ -35,11 +36,11 @@ namespace Destrospean.S3PIExtensions
 
         public readonly IResourceIndexEntry ResourceIndexEntry;
 
-        public System.IO.MemoryStream Stream
+        public MemoryStream Stream
         {
             get
             {
-                return (System.IO.MemoryStream)((APackage)Package).GetResource(ResourceIndexEntry);
+                return (MemoryStream)((APackage)Package).GetResource(ResourceIndexEntry);
             }
         }
 
@@ -271,7 +272,13 @@ namespace Destrospean.S3PIExtensions
 
         public static IResourceIndexEntry AddResource(this IPackage package, string filename, IResourceKey resourceKey = null, bool rejectDups = true)
         {
-            return package.AddResource(resourceKey ?? new ResourceKey(0, 0, System.Security.Cryptography.FNV64.GetHash(Guid.NewGuid().ToString())), System.IO.File.OpenRead(filename), rejectDups);
+            var stream = new MemoryStream();
+            using (var fileStream = File.OpenRead(filename))
+            {
+                fileStream.CopyTo(stream);
+            }
+            stream.Position = 0;
+            return package.AddResource(resourceKey ?? new ResourceKey(GetResourceType(GetResourceTypeTag(stream)), 0, System.Security.Cryptography.FNV64.GetHash(Guid.NewGuid().ToString())), stream, rejectDups);
         }
 
         public static void ClearGamePackages()
@@ -402,9 +409,8 @@ namespace Destrospean.S3PIExtensions
             return ExtList.Ext[resourceKey.ResourceType][0];
         }
 
-        public static void ResolveResourceType(this IPackage package, IResourceIndexEntry resourceIndexEntry)
+        public static string GetResourceTypeTag(Stream stream)
         {
-            var stream = ((APackage)package).GetResource(resourceIndexEntry);
             string tag = null;
             try
             {
@@ -496,10 +502,8 @@ namespace Destrospean.S3PIExtensions
             {
             }
             FinalSteps:
-            if (!string.IsNullOrEmpty(tag))
-            {
-                resourceIndexEntry.ResourceType = GetResourceType(tag);
-            }
+            stream.Position = 0;
+            return tag;
         }
 
         public static string ReverseEvaluateResourceKey(this IResourceKey resourceKey)
