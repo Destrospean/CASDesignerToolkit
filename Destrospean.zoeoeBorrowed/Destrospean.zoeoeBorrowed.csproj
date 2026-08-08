@@ -27,26 +27,6 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="s3pi.MeshChunks">
-      <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.GenericRCOLResource">
-      <HintPath>..\libs\s3pi.GenericRCOLResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.RCOLChunks">
-      <HintPath>..\libs\s3pi.RCOLChunks.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Custom">
-      <HintPath>..\libs\System.Custom.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.Interfaces">
-      <HintPath>..\libs\s3pi.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -55,4 +35,31 @@
     <Compile Include="MeshGroupData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\GenericRCOLResource\GenericRCOLResource.csproj">
+      <Project>{47693A2A-1F86-47CA-A170-CC0C195A53B7}</Project>
+      <Name>GenericRCOLResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Interfaces\Interfaces.csproj">
+      <Project>{51023BD2-9139-438D-B794-95E5EC023537}</Project>
+      <Name>Interfaces</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\s3piRCOLChunks\s3piRCOLChunks.csproj">
+      <Project>{F2E30D04-82C7-487F-B9E8-E8BABB1C94E1}</Project>
+      <Name>s3piRCOLChunks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\MeshChunks\MeshChunks.csproj">
+      <Project>{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}</Project>
+      <Name>MeshChunks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\CS System Classes\CS System Classes.csproj">
+      <Project>{00200E76-C245-42A7-B567-5C30EDBCE977}</Project>
+      <Name>CS System Classes</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

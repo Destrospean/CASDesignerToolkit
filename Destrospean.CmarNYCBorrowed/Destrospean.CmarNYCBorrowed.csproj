@@ -28,28 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="s3pi.Interfaces">
-      <HintPath>..\libs\s3pi.Interfaces.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Custom">
-      <HintPath>..\libs\System.Custom.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="s3pi.RCOLChunks">
-      <HintPath>..\libs\s3pi.RCOLChunks.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.GenericRCOLResource">
-      <HintPath>..\libs\s3pi.GenericRCOLResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.MeshChunks">
-      <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,6 +70,41 @@
     <ProjectReference Include="..\System.Destrospean\System.Destrospean.csproj">
       <Project>{3FAF89EA-38D9-42C1-B3F4-75EAED40570A}</Project>
       <Name>System.Destrospean</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Interfaces\Interfaces.csproj">
+      <Project>{51023BD2-9139-438D-B794-95E5EC023537}</Project>
+      <Name>Interfaces</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Package\Package.csproj">
+      <Project>{9D8BB6F7-373E-4FBC-B5E8-9709B4CE9A37}</Project>
+      <Name>Package</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Settings\Settings.csproj">
+      <Project>{374F37CF-1F27-4613-96FD-9B956A3D82B1}</Project>
+      <Name>Settings</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\s3piRCOLChunks\s3piRCOLChunks.csproj">
+      <Project>{F2E30D04-82C7-487F-B9E8-E8BABB1C94E1}</Project>
+      <Name>s3piRCOLChunks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\MeshChunks\MeshChunks.csproj">
+      <Project>{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}</Project>
+      <Name>MeshChunks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\CS System Classes\CS System Classes.csproj">
+      <Project>{00200E76-C245-42A7-B567-5C30EDBCE977}</Project>
+      <Name>CS System Classes</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\GenericRCOLResource\GenericRCOLResource.csproj">
+      <Project>{47693A2A-1F86-47CA-A170-CC0C195A53B7}</Project>
+      <Name>GenericRCOLResource</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
