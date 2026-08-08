@@ -34,7 +34,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\libs\BouncyCastle.Crypto.dll</HintPath>
+      <HintPath>..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -49,5 +49,8 @@
       <Name>System.Destrospean</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
