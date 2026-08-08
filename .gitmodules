@@ -1,0 +1,3 @@
+[submodule "sims3-package-interface"]
+	path = sims3-package-interface
+	url = git@github.com:Destrospean/sims3-package-interface.git
