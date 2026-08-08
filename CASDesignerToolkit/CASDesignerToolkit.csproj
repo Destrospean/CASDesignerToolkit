@@ -46,101 +46,6 @@
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="s3pi.CASPartResource">
-      <HintPath>..\libs\s3pi.CASPartResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.Package">
-      <HintPath>..\libs\s3pi.Package.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.CatalogResource">
-      <HintPath>..\libs\s3pi.CatalogResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.ObjKeyResource">
-      <HintPath>..\libs\s3pi.ObjKeyResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.Filetable">
-      <HintPath>..\libs\s3pi.Filetable.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.ComplateResource">
-      <HintPath>..\libs\s3pi.ComplateResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.Controls">
-      <HintPath>..\libs\s3pi.Controls.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.CustomForms">
-      <HintPath>..\libs\s3pi.CustomForms.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.DefaultResource">
-      <HintPath>..\libs\s3pi.DefaultResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.Extensions">
-      <HintPath>..\libs\s3pi.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.GenericRCOLResource">
-      <HintPath>..\libs\s3pi.GenericRCOLResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.Helpers">
-      <HintPath>..\libs\s3pi.Helpers.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.Interfaces">
-      <HintPath>..\libs\s3pi.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.Settings">
-      <HintPath>..\libs\s3pi.Settings.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.ModularResource">
-      <HintPath>..\libs\s3pi.ModularResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.RCOLChunks">
-      <HintPath>..\libs\s3pi.RCOLChunks.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.ImageResource">
-      <HintPath>..\libs\s3pi.ImageResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.JazzResource">
-      <HintPath>..\libs\s3pi.JazzResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.NameMapResource">
-      <HintPath>..\libs\s3pi.NameMapResource.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.NGMPHashMapResource">
-      <HintPath>..\libs\s3pi.NGMPHashMapResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.RigResource">
-      <HintPath>..\libs\s3pi.RigResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.ScriptResource">
-      <HintPath>..\libs\s3pi.ScriptResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.StblResource">
-      <HintPath>..\libs\s3pi.StblResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.TextResource">
-      <HintPath>..\libs\s3pi.TextResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.TxtcResource">
-      <HintPath>..\libs\s3pi.TxtcResource.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="s3pi.UserCAStPreset">
-      <HintPath>..\libs\s3pi.UserCAStPreset.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Custom">
-      <HintPath>..\libs\System.Custom.dll</HintPath>
-    </Reference>
     <Reference Include="GDImageLibrary">
       <HintPath>..\libs\GDImageLibrary.dll</HintPath>
     </Reference>
@@ -161,9 +66,6 @@
     </Reference>
     <Reference Include="TeximpNet">
       <HintPath>..\libs\TeximpNet.dll</HintPath>
-    </Reference>
-    <Reference Include="s3pi.MeshChunks">
-      <HintPath>..\libs\s3pi.MeshChunks.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
@@ -406,6 +308,80 @@
     <ProjectReference Include="..\CASDTKUpdater\CASDTKUpdater.csproj">
       <Project>{0FDDBF11-11B3-452D-AAB3-11F6B9EAC7C7}</Project>
       <Name>CASDTKUpdater</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\CASPartResource\CASPartResource.csproj">
+      <Project>{38D21F02-C139-43C8-8B74-D84E22B89F50}</Project>
+      <Name>CASPartResource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\CatalogResource\CatalogResource.csproj">
+      <Project>{0E257AB5-B560-462B-8B6C-631A90380D9E}</Project>
+      <Name>CatalogResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ComplateResource\ComplateResource.csproj">
+      <Project>{513B8C1F-2BE4-46D6-B95D-836A1F36855E}</Project>
+      <Name>ComplateResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\DefaultResource\DefaultResource.csproj">
+      <Project>{06330E2B-9F3F-4A45-8B47-11795F5100FB}</Project>
+      <Name>DefaultResource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\CS System Classes\CS System Classes.csproj">
+      <Project>{00200E76-C245-42A7-B567-5C30EDBCE977}</Project>
+      <Name>CS System Classes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Extras\Extensions\Extensions.csproj">
+      <Project>{9B4C57BA-E09F-4439-98B4-B9B535A4ABF6}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Extras\Filetable\Filetable.csproj">
+      <Project>{FEAA8674-9363-4BC7-B016-7BE984A2D185}</Project>
+      <Name>Filetable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\GenericRCOLResource\GenericRCOLResource.csproj">
+      <Project>{47693A2A-1F86-47CA-A170-CC0C195A53B7}</Project>
+      <Name>GenericRCOLResource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Interfaces\Interfaces.csproj">
+      <Project>{51023BD2-9139-438D-B794-95E5EC023537}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\MeshChunks\MeshChunks.csproj">
+      <Project>{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}</Project>
+      <Name>MeshChunks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ModularResource\ModularResource.csproj">
+      <Project>{4C8EEE00-88BB-4A22-BEB2-68245D98CB78}</Project>
+      <Name>ModularResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\NameMapResource\NameMapResource.csproj">
+      <Project>{5B43F245-AB0D-49FA-BC1E-1168103C7522}</Project>
+      <Name>NameMapResource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Settings\Settings.csproj">
+      <Project>{374F37CF-1F27-4613-96FD-9B956A3D82B1}</Project>
+      <Name>Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\s3piRCOLChunks\s3piRCOLChunks.csproj">
+      <Project>{F2E30D04-82C7-487F-B9E8-E8BABB1C94E1}</Project>
+      <Name>s3piRCOLChunks</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi\Package\Package.csproj">
+      <Project>{9D8BB6F7-373E-4FBC-B5E8-9709B4CE9A37}</Project>
+      <Name>Package</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ObjKeyResource\ObjKeyResource.csproj">
+      <Project>{C0297A33-3628-46E9-9324-408A72E2E922}</Project>
+      <Name>ObjKeyResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\TxtcResource\TxtcResource.csproj">
+      <Project>{264DE8C9-33D0-451E-9067-8BA0CF2BFACE}</Project>
+      <Name>TxtcResource</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>
