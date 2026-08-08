@@ -22,21 +22,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Docker image
       run: docker pull ghcr.io/${{env.IMAGE_NAME}}:master
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-    - uses: actions/checkout@v4
-=======
->>>>>>> Stashed changes
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         submodules: 'recursive' # Fetch all submodules recursively
-<<<<<<< Updated upstream
-        token: ${{ secrets.DEPENDENCY_GITHUB_TOKEN }} # Required if submodules are PRIVATE
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
     - name: Build from Docker image
       run: IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:master tools/build.sh
     - name: Bundle Windows i386 version from Docker image
