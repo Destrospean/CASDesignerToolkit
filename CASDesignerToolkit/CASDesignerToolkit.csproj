@@ -92,7 +92,7 @@
       <HintPath>..\packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath>..\packages\Interop.IWshRuntimeLibrary.1.0.1\lib\net45\Interop.IWshRuntimeLibrary.dll</HintPath>
+      <HintPath>..\libs\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
