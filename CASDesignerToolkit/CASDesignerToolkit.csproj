@@ -316,7 +316,6 @@
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\CatalogResource\CatalogResource.csproj">
       <Project>{0E257AB5-B560-462B-8B6C-631A90380D9E}</Project>
       <Name>CatalogResource</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ComplateResource\ComplateResource.csproj">
       <Project>{513B8C1F-2BE4-46D6-B95D-836A1F36855E}</Project>
@@ -350,7 +349,6 @@
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\MeshChunks\MeshChunks.csproj">
       <Project>{B1E4D2EC-5027-4F44-8C46-A0485DFF7060}</Project>
       <Name>MeshChunks</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ModularResource\ModularResource.csproj">
       <Project>{4C8EEE00-88BB-4A22-BEB2-68245D98CB78}</Project>
@@ -376,7 +374,6 @@
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\ObjKeyResource\ObjKeyResource.csproj">
       <Project>{C0297A33-3628-46E9-9324-408A72E2E922}</Project>
       <Name>ObjKeyResource</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\sims3-package-interface\s3pi\s3pi Wrappers\TxtcResource\TxtcResource.csproj">
       <Project>{264DE8C9-33D0-451E-9067-8BA0CF2BFACE}</Project>
