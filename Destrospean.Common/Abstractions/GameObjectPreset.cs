@@ -42,6 +42,16 @@ namespace Destrospean.Common.Abstractions
                         var stencilsTiling = new List<CatalogResource.CatalogResource.TC05_XY>();
                         foreach (var propertyTypedKvp in PropertiesTyped)
                         {
+                            if (propertyTypedKvp.Key.ToLowerInvariant() == "multiplier")
+                            {
+                                multiplier = ParentPackage.GetTexture(MaterialBlock.ParentTGIBlocks[((CatalogResource.CatalogResource.TC03_TGIIndex)(Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage))).TGIIndex].ReverseEvaluateResourceKey(), GetTextureCallback);
+                                width = multiplier.Width;
+                                height = multiplier.Height;
+                                break;
+                            }
+                        }
+                        foreach (var propertyTypedKvp in PropertiesTyped)
+                        {
                             var key = propertyTypedKvp.Key.ToLowerInvariant();
                             var value = Properties.ContainsKey(propertyTypedKvp.Key) ? Properties[propertyTypedKvp.Key] : GameObjectPreset.CreateComplateOverrideInstance(propertyTypedKvp.Key, propertyTypedKvp.Value.DefaultValue, propertyTypedKvp.Value.Type, MaterialBlock, ParentPackage);
                             if (key.StartsWith("stencil"))
