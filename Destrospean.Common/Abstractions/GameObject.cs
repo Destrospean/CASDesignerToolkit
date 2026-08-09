@@ -314,14 +314,14 @@ namespace Destrospean.Common.Abstractions
                             for (var i = 0; i < obj.GroupCount; i++)
                             {
                                 var group = obj.GroupArray[i];
-                                if (i >= LODs[lod].MeshGroups.Count || groupIndex > -1 && groupIndex != i)
+                                if (i >= LODs[lod].MeshGroups.Count)
                                 {
                                     continue;
                                 }
-                                var meshGroup = LODs[lod].MeshGroups[i + indexOffset];
+                                var meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i + indexOffset : groupIndex];
                                 if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
                                 {
-                                    meshGroup = LODs[lod].MeshGroups[i + ++indexOffset];
+                                    meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i + ++indexOffset : groupIndex];
                                 }
                                 List<int[]> faces = new List<int[]>(),
                                 vertexIndices = new List<int[]>();
@@ -386,14 +386,14 @@ namespace Destrospean.Common.Abstractions
                             for (var i = 0; i < wso.MeshCount; i++)
                             {
                                 var group = wso.GetMesh(i);
-                                if (i >= LODs[lod].MeshGroups.Count || groupIndex > -1 && groupIndex != i)
+                                if (i >= LODs[lod].MeshGroups.Count)
                                 {
                                     continue;
                                 }
-                                var meshGroup = LODs[lod].MeshGroups[i + indexOffset];
+                                var meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i + indexOffset : groupIndex];
                                 if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
                                 {
-                                    meshGroup = LODs[lod].MeshGroups[i + ++indexOffset];
+                                    meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i + ++indexOffset : groupIndex];
                                 }
                                 var vertices = new meshExpImp.ModelBlocks.Vertex[group.VertexCount];
                                 var indices = new int[group.FacePointCount];
