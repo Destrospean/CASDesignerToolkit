@@ -102,7 +102,7 @@ namespace Destrospean.zoeoeBorrowed
                 chunkReferenceMap[meshGroup.ID] = new Dictionary<ChunkReferences, TGIBlock>();
                 foreach (ChunkReferences chunkReference in System.Enum.GetValues(typeof(ChunkReferences)))
                 {
-                    chunkReferenceMap[meshGroup.ID][chunkReference] = resource.ChunkEntries[((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup)).TGIBlockIndex + resource.PublicChunks].TGIBlock;
+                    chunkReferenceMap[meshGroup.ID][chunkReference] = resource.ChunkEntries[((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup, null)).TGIBlockIndex + resource.PublicChunks].TGIBlock;
                 }
                 if (meshGroup.DirectMATD == null)
                 {
@@ -117,8 +117,8 @@ namespace Destrospean.zoeoeBorrowed
             foreach (var chunkReferenceName in System.Enum.GetNames(typeof(ChunkReferences)))
             {
                 var meshGroup = MeshGroups[groupIndex];
-                var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(meshGroup.MeshGroup)).TGIBlockIndex;
-                if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(x.MeshGroup)).TGIBlockIndex == index))
+                var index = ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(meshGroup.MeshGroup, null)).TGIBlockIndex;
+                if (!MeshGroups.Exists(x => x != meshGroup && ((GenericRCOLResource.ChunkReference)x.MeshGroup.GetType().GetProperty(chunkReferenceName).GetValue(x.MeshGroup, null)).TGIBlockIndex == index))
                 {
                     chunkEntryIndicesToRemove.Add(index + resource.PublicChunks);
                 }
@@ -146,7 +146,7 @@ namespace Destrospean.zoeoeBorrowed
             {
                 foreach (ChunkReferences chunkReference in System.Enum.GetValues(typeof(ChunkReferences)))
                 {
-                    ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup)).TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][chunkReference])) - resource.PublicChunks;
+                    ((GenericRCOLResource.ChunkReference)meshGroup.MeshGroup.GetType().GetProperty(chunkReference.ToString()).GetValue(meshGroup.MeshGroup, null)).TGIBlockIndex = resource.ChunkEntries.FindIndex(x => x.TGIBlock.Equals(chunkReferenceMap[meshGroup.ID][chunkReference])) - resource.PublicChunks;
                 }
                 if (meshGroup.DirectMATD == null)
                 {
