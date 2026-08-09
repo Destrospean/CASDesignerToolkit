@@ -115,7 +115,8 @@ namespace Destrospean.Common.Abstractions
                                 1
                             },
                         tipColor = null;
-                        bool drawsOnFace = false, drawsOnScalp = false;
+                        bool drawsOnFace = false,
+                        drawsOnScalp = false;
                         int height = 1024,
                         width = 1024;
                         List<Bitmap> logos = new List<Bitmap>(),
