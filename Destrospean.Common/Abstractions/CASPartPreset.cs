@@ -131,7 +131,7 @@ namespace Destrospean.Common.Abstractions
                         stencilsRotation = new List<float>();
                         foreach (var propertyXmlNodeKvp in PropertiesXmlNodes)
                         {
-                            if (propertyXmlNodeKvp.Key.ToLowerInvariant() == "multiplier")
+                            if (PropertiesTyped.ContainsKey(propertyXmlNodeKvp.Key) && propertyXmlNodeKvp.Key.ToLowerInvariant() == "multiplier")
                             {
                                 multiplier = ParentPackage.GetTexture(propertyXmlNodeKvp.Value.Attributes["value"].Value, GetTextureCallback);
                                 width = multiplier.Width;
