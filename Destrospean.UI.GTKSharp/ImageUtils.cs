@@ -41,14 +41,13 @@ namespace Destrospean.DestrospeanCASPEditor
             try
             {
                 var preloadVariables = new PreloadVariables(package, resourceIndexEntry, imageWidget);
-                preloadedImages[preloadVariables.ResourceKey] = preloadVariables.Image;
-                var imageCopy = (Bitmap)preloadVariables.Image.Clone();
-                var squareCanvasImage = imageCopy.GetInSquareCanvas();
+                preloadedImages[preloadVariables.ResourceKey] = new Bitmap(preloadVariables.Image, 1024, 1024);
+                var squareCanvasImage = preloadVariables.Image.GetInSquareCanvas();
                 preloadedImagePixbufs[preloadVariables.ResourceKey] = new List<Pixbuf>
                     {
                         squareCanvasImage.ToPixbuf()
                     };
-                imageCopy.Dispose();
+                preloadVariables.Image.Dispose();
                 squareCanvasImage.Dispose();
                 return true;
             }
