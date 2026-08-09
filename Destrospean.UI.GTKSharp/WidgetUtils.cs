@@ -284,7 +284,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             break;
                         case MeshFormatDataType.Uint:
                             alignment.Xscale = 1;
-                            var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)field[0]].Type, geometryResource.TGIList[(uint)field[0]].Group, geometryResource.TGIList[(uint)field[0]].Instance).ReverseEvaluateResourceKey(), preset, imageWidget);
+                            var comboBox = ImageResourceComboBox.CreateInstance(package, new ResourceKey(geometryResource.TGIList[(uint)field[0]].Type, geometryResource.TGIList[(uint)field[0]].Group, geometryResource.TGIList[(uint)field[0]].Instance).ReverseEvaluateResourceKey(), preset, imageWidget, true);
                             var comboBoxLastActive = comboBox.Active;
                             comboBox.Changed += (sender, e) =>
                                 {

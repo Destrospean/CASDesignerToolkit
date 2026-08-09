@@ -100,7 +100,7 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
 
         public static ImageResourceComboBox CreateInstance(s3pi.Interfaces.IPackage package, string currentValue, Preset preset, Gtk.Image imageWidget, bool excludeTXTCs = false)
         {
-            var entries = package.FindAll(x => "_IMGTXTC".Substring(0, preset is CASPartPreset || excludeTXTCs ? 4 : 8).Contains(x.GetResourceTypeTag())).ConvertAll(x =>
+            var entries = package.FindAll(x => "_IMGTXTC".Substring(0, excludeTXTCs ? 4 : 8).Contains(x.GetResourceTypeTag())).ConvertAll(x =>
                 {
                     var key = x.ReverseEvaluateResourceKey();
                     switch (x.GetResourceTypeTag())
