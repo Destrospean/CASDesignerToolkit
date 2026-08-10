@@ -1089,6 +1089,7 @@ public partial class MainWindow : RendererMainWindow
                         materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
                         materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)materialStateNotebook.CurrentPageWidget).Vadjustment.Value)));
                         materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
+                        meshGroupNotebook.Add(materialStateNotebook);
                         GLib.Timeout.Add(100, () =>
                             {
                                 var adjustment = (materialStateNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
@@ -1098,7 +1099,6 @@ public partial class MainWindow : RendererMainWindow
                                 }
                                 return false;
                             });
-                        meshGroupNotebook.Add(materialStateNotebook);
                     }
                     else
                     {
