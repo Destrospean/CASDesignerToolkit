@@ -1900,7 +1900,7 @@ namespace Destrospean.CmarNYCBorrowed
                 var startIndex = 0;
                 for (var j = 0; j < baseMesh.VertexCount; j++)
                 {
-                    var index = Array.IndexOf<int>(oldMorphVertexIDs, baseMesh.GetVertex(j).VertexID, startIndex);
+                    var index = Array.IndexOf(oldMorphVertexIDs, baseMesh.GetVertex(j).VertexID, startIndex);
                     if (index > -1)
                     {
                         newMorphVertices[j] = oldMorphVertices[index];
@@ -1908,7 +1908,7 @@ namespace Destrospean.CmarNYCBorrowed
                     }
                     else
                     {
-                        index = Array.IndexOf<int>(oldMorphVertexIDs, baseMesh.GetVertex(j).VertexID);
+                        index = Array.IndexOf(oldMorphVertexIDs, baseMesh.GetVertex(j).VertexID);
                         if (index > -1)
                         {
                             newMorphVertices[j] = oldMorphVertices[index];
@@ -2310,13 +2310,13 @@ namespace Destrospean.CmarNYCBorrowed
 
         public bool VertexIDSearch(int vertexID, int[] vertexIDArray, int startIndex, out int foundIndex)
         {
-            var index = Array.IndexOf<int>(vertexIDArray, vertexID, startIndex);
+            var index = Array.IndexOf(vertexIDArray, vertexID, startIndex);
             if (index > -1)
             {
                 foundIndex = index;
                 return true;
             }
-            index = Array.IndexOf<int>(vertexIDArray, vertexID);
+            index = Array.IndexOf(vertexIDArray, vertexID);
             if (index > -1)
             {
                 foundIndex = index;
