@@ -44,11 +44,12 @@ namespace Destrospean.zoeoeBorrowed
                         };
                     }
                 }
+                var defaultScalar = 1f / short.MaxValue;
                 return new[]
                 {   
-                    3.051851E-05f,
-                    3.051851E-05f,
-                    3.051851E-05f
+                    defaultScalar,
+                    defaultScalar,
+                    defaultScalar
                 };
             }
         }
