@@ -726,7 +726,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 VertexCount = baseMesh.VertexCount;
                 Vertices = new Vertex[VertexCount];
-                var index = Array.IndexOf<uint>(baseMesh.BoneHashList, 1468550073);
+                var index = Array.IndexOf(baseMesh.BoneHashList, 1468550073);
                 if (index < 0)
                 {
                     index = baseMesh.BoneHashList.Length;
@@ -795,7 +795,7 @@ namespace Destrospean.CmarNYCBorrowed
                 }
                 VertexCount = baseMesh.VertexCount;
                 Vertices = new Vertex[VertexCount];
-                var index = Array.IndexOf<uint>(baseMesh.BoneHashList, 1468550073);
+                var index = Array.IndexOf(baseMesh.BoneHashList, 1468550073);
                 if (index < 0)
                 {
                     index = baseMesh.BoneHashList.Length;
