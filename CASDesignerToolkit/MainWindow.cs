@@ -852,7 +852,7 @@ public partial class MainWindow : RendererMainWindow
         }
     }
 
-    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0, uint startMaterialState = (uint)MTST.State.Default)
+    void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0, uint startMaterialState = (uint)MTST.State.Default, double verticalScroll = 0)
     {
         try
         {
@@ -1087,13 +1087,31 @@ public partial class MainWindow : RendererMainWindow
                         var materialStateNotebook = new Notebook();
                         var materialStates = meshGroup.MaterialSet.Entries.ConvertAll(x => x.MaterialState);
                         materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
-                        materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook));
+                        materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)materialStateNotebook.CurrentPageWidget).Vadjustment.Value)));
                         materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
+                        GLib.Timeout.Add(100, () =>
+                            {
+                                var adjustment = (materialStateNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
+                                if (adjustment != null)
+                                {
+                                    adjustment.Value = verticalScroll;
+                                }
+                                return false;
+                            });
                         meshGroupNotebook.Add(materialStateNotebook);
                     }
                     else
                     {
-                        meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, RefreshLODNotebook);
+                        meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)meshGroupNotebook.CurrentPageWidget).Vadjustment.Value));
+                        GLib.Timeout.Add(100, () =>
+                            {
+                                var adjustment = (meshGroupNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
+                                if (adjustment != null)
+                                {
+                                    adjustment.Value = verticalScroll;
+                                }
+                                return false;
+                            });
                     }
                 }
                 nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
@@ -1260,13 +1278,18 @@ public partial class MainWindow : RendererMainWindow
 
     void RefreshLODNotebook(CASTableObject gameObject, int lodIndex, int groupIndex, uint materialState)
     {
+        RefreshLODNotebook(gameObject, lodIndex, groupIndex, materialState, 0);
+    }
+
+    void RefreshLODNotebook(CASTableObject gameObject, int lodIndex, int groupIndex, uint materialState, double verticalScroll)
+    {
         foreach (var child in ResourcePropertyNotebook.Children)
         {
             ResourcePropertyNotebook.Remove(child);
             child.Destroy();
             child.Dispose();
         }
-        BuildLODNotebook((GameObject)gameObject, lodIndex, groupIndex, materialState);
+        BuildLODNotebook((GameObject)gameObject, lodIndex, groupIndex, materialState, verticalScroll);
         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
     }
 

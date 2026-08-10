@@ -30,6 +30,14 @@ namespace Destrospean.DestrospeanCASPEditor
 
         public static int DefaultTableColumnSpacingBase = 6, SmallImageSizeBase = 16;
 
+        public static Widget GLWidget
+        {
+            get
+            {
+                return Array.Exists(AppDomain.CurrentDomain.GetAssemblies(), x => x.GetName().Name == "GLWidget") ? MainWindowBase.Singleton.GetType().GetProperty("GLWidget")?.GetValue(MainWindowBase.Singleton, null) as Widget : null;
+            }
+        }
+
         public static float Scale, WineScaleDenominator;
 
         public static int SmallImageSize
@@ -616,6 +624,8 @@ namespace Destrospean.DestrospeanCASPEditor
                                 Material material;
                                 if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material))
                                 {
+                                    imageWidget.Clear();
+                                    GLWidget?.Show();
                                     updateUI();
                                     return;
                                 }
@@ -637,6 +647,8 @@ namespace Destrospean.DestrospeanCASPEditor
                                             break;
                                     }
                                 }
+                                imageWidget.Clear();
+                                GLWidget?.Show();
                                 updateUI();
                             };
                         valueWidget = comboBox;

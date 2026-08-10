@@ -5,14 +5,6 @@ using s3pi.Extensions;
 using s3pi.Filetable;
 using s3pi.Interfaces;
 
-namespace System.Runtime.CompilerServices
-{
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Assembly)]
-    public sealed class ExtensionAttribute : Attribute
-    {
-    }
-}
-
 namespace Destrospean.S3PIExtensions
 {
     public class AttributeNotFoundException : Exception

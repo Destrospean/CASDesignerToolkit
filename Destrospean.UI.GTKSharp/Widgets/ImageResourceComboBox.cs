@@ -48,33 +48,18 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
             protected override void Render(Drawable window, Widget widget, Rectangle backgroundArea, Rectangle cellArea, Rectangle exposeArea, CellRendererState state)
             {
                 System.Collections.Generic.List<Pixbuf> pixbufs;
-                Widget glWidget = null;
-                if (System.Array.Exists(System.AppDomain.CurrentDomain.GetAssemblies(), x => x.GetName().Name == "GLWidget"))
-                {
-                    var propertyInfo = MainWindowBase.Singleton.GetType().GetProperty("GLWidget");
-                    if (propertyInfo != null)
-                    {
-                        glWidget = propertyInfo.GetValue(MainWindowBase.Singleton, null) as Widget;
-                    }
-                }
                 if (mComboBox.PopupShown && state.HasFlag(CellRendererState.Prelit) && (ImageUtils.PreloadedGameImagePixbufs.TryGetValue(Text, out pixbufs) || ImageUtils.PreloadedImagePixbufs.TryGetValue(Text, out pixbufs)))
                 {
                     mImage.Pixbuf = pixbufs[0];
                     mCurrentImageResourceKey = Text;
-                    if (glWidget != null)
-                    {
-                        glWidget.Hide();
-                    }
+                    WidgetUtils.GLWidget?.Hide();
                     MainWindowBase.Singleton.DrawImage();
                 }
                 else if (mCurrentImageResourceKey == Text)
                 {
                     mImage.Clear();
                     mCurrentImageResourceKey = null;
-                    if (glWidget != null)
-                    {
-                        glWidget.Show();
-                    }
+                    WidgetUtils.GLWidget?.Show();
                 }
                 base.Render(window, widget, backgroundArea, cellArea, exposeArea, state);
             }
