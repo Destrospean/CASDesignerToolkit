@@ -28,97 +28,102 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                 var lodId = new List<LODId>(gameObject.LODs.Keys)[adjustedLODIndex];
                 foreach (var meshGroup in gameObject.LODs[lodId].MeshGroups)
                 {
-                    if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
+                    lock (meshGroup.Lock)
                     {
-                        continue;
-                    }
-                    List<Vector3> colors = new List<Vector3>(),
-                    normals = new List<Vector3>(),
-                    vertices = new List<Vector3>();
-                    var faces = new List<int[]>();
-                    var indices = meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup);
-                    var textureCoordinates = new List<Vector2>();
-                    for (var i = 0; i < indices.Length; i += 3)
-                    {
-                        faces.Add(new[]
+                        if (meshGroup.VertexFormat == null && meshGroup.HasFlag(MeshFlags.ShadowCaster))
+                        {
+                            continue;
+                        }
+                        MLOD.GeometryState geoState = meshGroup.MeshGroup.GeometryStates.Count <= meshGroup.CurrentGeoStateIndex || meshGroup.CurrentGeoStateIndex == -1 ? null : meshGroup.MeshGroup.GeometryStates[meshGroup.CurrentGeoStateIndex];
+                        List<Vector3> colors = new List<Vector3>(),
+                        normals = new List<Vector3>(),
+                        vertices = new List<Vector3>();
+                        var faces = new List<int[]>();
+                        var indices = geoState == null ? meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup) : meshGroup.IndexBuffer.GetIndices(meshGroup.MeshGroup, geoState);
+                        var textureCoordinates = new List<Vector2>();
+                        for (var i = 0; i < indices.Length; i += 3)
+                        {
+                            faces.Add(new[]
+                                {
+                                    indices[i],
+                                    indices[i + 1],
+                                    indices[i + 2]
+                                });
+                        }
+                        foreach (var vertex in (geoState == null ? meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales) : meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), geoState, meshGroup.UVScales)))
+                        {
+                            colors.Add(vertex.Color == null ? Vector3.One : new Vector3(vertex.Color[0], vertex.Color[1], vertex.Color[2]));
+                            if (vertex.Normal != null)
                             {
-                                indices[i],
-                                indices[i + 1],
-                                indices[i + 2]
-                            });
-                    }
-                    foreach (var vertex in meshGroup.VertexBuffer.GetVertices(meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), meshGroup.UVScales))
-                    {
-                        colors.Add(vertex.Color == null ? Vector3.One : new Vector3(vertex.Color[0], vertex.Color[1], vertex.Color[2]));
-                        if (vertex.Normal != null)
-                        {
-                            normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
-                        }
-                        if (vertex.UV != null)
-                        {
-                            textureCoordinates.Add(new Vector2(vertex.UV[0][0], vertex.UV[0][1]));
-                        }
-                        if (vertex.Position != null)
-                        {
-                            vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
-                        }
-                    }
-                    var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].Resource;
-                    var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
-                    Material material;
-                    if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
-                    {
-                        var materialColors = new Dictionary<FieldType, Vector3>();
-                        var materialMaps = new Dictionary<FieldType, string>();
-                        foreach (var element in matd.Mtnf.SData)
-                        {
-                            var elementFloat3 = element as ElementFloat3;
-                            if (elementFloat3 != null)
-                            {
-                                materialColors[element.Field] = new Vector3(elementFloat3.Data0, elementFloat3.Data1, elementFloat3.Data2);
-                                continue;
+                                normals.Add(new Vector3(vertex.Normal[0], vertex.Normal[1], vertex.Normal[2]));
                             }
-                            var elementTextureRef = element as ElementTextureRef;
-                            if (elementTextureRef != null)
+                            if (vertex.Position != null)
                             {
-                                materialMaps[element.Field] = mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey();
+                                vertices.Add(new Vector3(vertex.Position[0], vertex.Position[1], vertex.Position[2]));
+                            }
+                            if (vertex.UV != null)
+                            {
+                                textureCoordinates.Add(new Vector2(vertex.UV[0][0], vertex.UV[0][1]));
                             }
                         }
-                        Vector3 color;
-                        string map;
-                        material = new Material
+                        var mlodResource = (GenericRCOLResource)gameObject.LODs[lodId].Resource;
+                        var matd = mlodResource == null ? null : meshGroup.MaterialSet == null ? meshGroup.DirectMATD : mlodResource.ChunkEntries[meshGroup.MaterialSet.Entries.Find(x => (uint)x.MaterialState == materialState).Index.TGIBlockIndex + mlodResource.PublicChunks].RCOLBlock as MATD;
+                        Material material;
+                        if (!GlobalState.Materials.TryGetValue(matd.MaterialNameHash.ToString(), out material) && matd != null)
+                        {
+                            var materialColors = new Dictionary<FieldType, Vector3>();
+                            var materialMaps = new Dictionary<FieldType, string>();
+                            foreach (var element in matd.Mtnf.SData)
                             {
+                                var elementFloat3 = element as ElementFloat3;
+                                if (elementFloat3 != null)
+                                {
+                                    materialColors[element.Field] = new Vector3(elementFloat3.Data0, elementFloat3.Data1, elementFloat3.Data2);
+                                    continue;
+                                }
+                                var elementTextureRef = element as ElementTextureRef;
+                                if (elementTextureRef != null)
+                                {
+                                    materialMaps[element.Field] = mlodResource.Resources[elementTextureRef.Data.TGIBlockIndex].ReverseEvaluateResourceKey();
+                                }
+                            }
+                            Vector3 color;
+                            string map;
+                            material = new Material
+                                {
 #pragma warning disable 0618
-                                AmbientColor = materialColors.TryGetValue(FieldType.Ambient, out color) ? color : Vector3.One,
+                                    AmbientColor = materialColors.TryGetValue(FieldType.Ambient, out color) ? color : Vector3.One,
 #pragma warning restore 0618
-                                AmbientMap = materialMaps.TryGetValue(FieldType.AmbientOcclusionMap, out map) ? map : "",
-                                DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
-                                DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
-                                HasTransparency = true,
-                                NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
-                                Shader = meshGroup.HasFlag(MeshFlags.DropShadow) || matd.IsVideoSurface ? "textured" : "",
-                                SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
-                                SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
-                            };
-                        GlobalState.Materials[matd.MaterialNameHash.ToString()] = material;
-                    }
-                    if (meshGroup.HasFlag(MeshFlags.DropShadow))
-                    {
-                        continue;
-                    }
-                    var currentPreset = gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[presetIndex];
-                    loadMeshOnMainThreadCallback(new Volume
+                                    AmbientMap = materialMaps.TryGetValue(FieldType.AmbientOcclusionMap, out map) ? map : "",
+                                    DiffuseColor = materialColors.TryGetValue(FieldType.Diffuse, out color) ? color : Vector3.One,
+                                    DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
+                                    HasTransparency = true,
+                                    NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
+                                    Shader = meshGroup.HasFlag(MeshFlags.DropShadow) || matd.IsVideoSurface ? "textured" : "",
+                                    SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
+                                    SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
+                                };
+                            GlobalState.Materials[matd.MaterialNameHash.ToString()] = material;
+                        }
+                        if (meshGroup.HasFlag(MeshFlags.DropShadow))
                         {
-                            ColorData = colors.ToArray(),
-                            Faces = faces,
-                            Key = matd.MaterialNameHash.ToString(),
-                            LODIndex = lodIndex,
-                            Material = material,
-                            Normals = normals.ToArray(),
-                            Object = gameObject,
-                            TextureCoordinates = textureCoordinates.ToArray(),
-                            Vertices = vertices.ToArray()
-                        }, currentPreset, (System.Drawing.Bitmap)currentPreset?.Texture.Clone(), null, material, loadTextureCallback);
+                            continue;
+                        }
+                        var currentPreset = gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[presetIndex];
+                        loadMeshOnMainThreadCallback(new Volume
+                            {
+                                ColorData = colors.ToArray(),
+                                Faces = faces,
+                                Key = matd.MaterialNameHash.ToString(),
+                                LODIndex = lodIndex,
+                                Material = material,
+                                Normals = normals.ToArray(),
+                                Object = gameObject,
+                                TextureCoordinates = textureCoordinates.ToArray(),
+                                Vertices = vertices.ToArray()
+                            }, currentPreset, (System.Drawing.Bitmap)currentPreset?.Texture.Clone(), null, material, loadTextureCallback);
+
+                    }
                 }
             }
         }

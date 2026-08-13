@@ -294,60 +294,63 @@ namespace Destrospean.Common.Abstractions
                             {
                                 var group = obj.GroupArray[i];
                                 var meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i : groupIndex];
-                                List<int[]> faces = new List<int[]>(),
-                                vertexIndices = new List<int[]>();
-                                foreach (var face in group.Faces)
+                                lock (meshGroup.Lock)
                                 {
-                                    var temp = new int[3];
-                                    int j = 0,
-                                    vertexIndex = 0;
-                                    foreach (var facePoint in face.FacePoints)
+                                    List<int[]> faces = new List<int[]>(),
+                                    vertexIndices = new List<int[]>();
+                                    foreach (var face in group.Faces)
                                     {
-                                        if (!obj.TryGetVertexIndex(facePoint, vertexIndices, out vertexIndex, false))
+                                        var temp = new int[3];
+                                        int j = 0,
+                                        vertexIndex = 0;
+                                        foreach (var facePoint in face.FacePoints)
                                         {
-                                            temp[j] = vertexIndices.Count;
-                                            vertexIndices.Add(facePoint);
+                                            if (!obj.TryGetVertexIndex(facePoint, vertexIndices, out vertexIndex, false))
+                                            {
+                                                temp[j] = vertexIndices.Count;
+                                                vertexIndices.Add(facePoint);
+                                            }
+                                            else
+                                            {
+                                                temp[j] = vertexIndex;
+                                            }
+                                            j++;
                                         }
-                                        else
-                                        {
-                                            temp[j] = vertexIndex;
-                                        }
-                                        j++;
+                                        faces.Add(temp);
                                     }
-                                    faces.Add(temp);
-                                }
-                                var vertices = new meshExpImp.ModelBlocks.Vertex[vertexIndices.Count];
-                                for (var j = 0; j < vertexIndices.Count; j++)
-                                {
-                                    var vertexIndex = vertexIndices[j];
-                                    var vertexFormat = meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup);
-                                    vertices[j] = new meshExpImp.ModelBlocks.Vertex
-                                        {
-                                            Normal = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Normal) == null ? null : new[]
-                                                {
-                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[0],
-                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[1],
-                                                    obj.NormalArray[vertexIndex[2] - 1].Coordinates[2],
-                                                    0 // Needed because of a bug with S3PI where the last value is truncated
-                                                },
-                                            Position = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Position) == null ? null : obj.VertexArray[vertexIndex[0] - 1].Coordinates,
-                                            UV = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.UV) == null ? null : new[]
-                                                {
-                                                    new[]
+                                    var vertices = new meshExpImp.ModelBlocks.Vertex[vertexIndices.Count];
+                                    for (var j = 0; j < vertexIndices.Count; j++)
+                                    {
+                                        var vertexIndex = vertexIndices[j];
+                                        var vertexFormat = meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup);
+                                        vertices[j] = new meshExpImp.ModelBlocks.Vertex
+                                            {
+                                                Normal = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Normal) == null ? null : new[]
                                                     {
-                                                        obj.UVArray[vertexIndex[1] - 1].Coordinates[0],
-                                                        1 - obj.UVArray[vertexIndex[1] - 1].Coordinates[1]
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[0],
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[1],
+                                                        obj.NormalArray[vertexIndex[2] - 1].Coordinates[2],
+                                                        0 // Needed because of a bug with S3PI where the last value is truncated
+                                                    },
+                                                Position = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Position) == null ? null : obj.VertexArray[vertexIndex[0] - 1].Coordinates,
+                                                UV = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.UV) == null ? null : new[]
+                                                    {
+                                                        new[]
+                                                        {
+                                                            obj.UVArray[vertexIndex[1] - 1].Coordinates[0],
+                                                            1 - obj.UVArray[vertexIndex[1] - 1].Coordinates[1]
+                                                        }
                                                     }
-                                                }
-                                        };
+                                            };
+                                    }
+                                    var faceIndices = new List<int>();
+                                    foreach (var face in faces)
+                                    {
+                                        faceIndices.AddRange(face);
+                                    }
+                                    meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, faceIndices.ToArray());
+                                    meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                                 }
-                                var faceIndices = new List<int>();
-                                foreach (var face in faces)
-                                {
-                                    faceIndices.AddRange(face);
-                                }
-                                meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, faceIndices.ToArray());
-                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                             }
                             break;
                         }
@@ -358,31 +361,34 @@ namespace Destrospean.Common.Abstractions
                             {
                                 var group = wso.GetMesh(i);
                                 var meshGroup = LODs[lod].MeshGroups[groupIndex == -1 ? i  : groupIndex];
-                                var vertices = new meshExpImp.ModelBlocks.Vertex[group.VertexCount];
-                                var indices = new int[group.FacePointCount];
-                                for (var j = 0; j < indices.Length; j++)
+                                lock (meshGroup.Lock)
                                 {
-                                    var facePoint = group.GetFacePoint(j);
-                                    indices[j] = facePoint.VertexIndex;
-                                    var vertexFormat = meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup);
-                                    vertices[facePoint.VertexIndex] = new meshExpImp.ModelBlocks.Vertex
-                                        {
-                                            Normal = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Normal) == null ? null : new[]
-                                                {
-                                                    facePoint.Normals[0],
-                                                    facePoint.Normals[1],
-                                                    facePoint.Normals[2],
-                                                    0 // Needed because of a bug with S3PI where the last value is truncated
-                                                },
-                                            Position = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Position) == null ? null : group.GetVertex(facePoint.VertexIndex).Position,
-                                            UV = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.UV) == null ? null : new[]
-                                                {
-                                                    facePoint.UVs
-                                                }
-                                        };
+                                    var vertices = new meshExpImp.ModelBlocks.Vertex[group.VertexCount];
+                                    var indices = new int[group.FacePointCount];
+                                    for (var j = 0; j < indices.Length; j++)
+                                    {
+                                        var facePoint = group.GetFacePoint(j);
+                                        indices[j] = facePoint.VertexIndex;
+                                        var vertexFormat = meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup);
+                                        vertices[facePoint.VertexIndex] = new meshExpImp.ModelBlocks.Vertex
+                                            {
+                                                Normal = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Normal) == null ? null : new[]
+                                                    {
+                                                        facePoint.Normals[0],
+                                                        facePoint.Normals[1],
+                                                        facePoint.Normals[2],
+                                                        0 // Needed because of a bug with S3PI where the last value is truncated
+                                                    },
+                                                Position = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.Position) == null ? null : group.GetVertex(facePoint.VertexIndex).Position,
+                                                UV = vertexFormat.Layouts.FirstOrDefault(x => x.Usage == VRTF.ElementUsage.UV) == null ? null : new[]
+                                                    {
+                                                        facePoint.UVs
+                                                    }
+                                            };
+                                    }
+                                    meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, indices);
+                                    meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                                 }
-                                meshGroup.IndexBuffer.SetIndices(LODs[lod].MLODChunk, meshGroup.MeshGroup, indices);
-                                meshGroup.VertexBuffer.SetVertices(LODs[lod].MLODChunk, meshGroup.MeshGroup, meshGroup.VertexFormat ?? VRTF.CreateDefaultForMesh(meshGroup.MeshGroup), vertices, meshGroup.UVScales);
                             }
                             break;
                         }
@@ -433,6 +439,11 @@ namespace Destrospean.Common.Abstractions
                             modlResources.Add(modlKey, new GenericRCOLResource(0, ((APackage)ParentPackage).GetResource(modlResourceIndexEntry)));
                             modlResource = modlResources[modlKey];
                         }
+                        var lodGeoStateIndices = new Dictionary<LODId, int[]>();
+                        foreach (var lodKvp in LODs)
+                        {
+                            lodGeoStateIndices[lodKvp.Key] = lodKvp.Value.MeshGroups.ConvertAll(x => x.CurrentGeoStateIndex).ToArray();
+                        }
                         LODs.Clear();
                         foreach (var lodEntry in ((MODL)modlResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MODL").RCOLBlock).Entries)
                         {
@@ -452,6 +463,11 @@ namespace Destrospean.Common.Abstractions
                                     mlodResource = mlodResources[mlodKey];
                                 }
                                 LODs.Add(lodEntry.Id, new LODData(lodEntry.Id, mlodKey, mlodResource, (MLOD)mlodResource.ChunkEntries.Find(x => x.RCOLBlock.Tag == "MLOD").RCOLBlock));
+                                for (var i = 0; i < LODs[lodEntry.Id].MeshGroups.Count; i++)
+                                {
+                                    int[] geoStateIndices;
+                                    LODs[lodEntry.Id].MeshGroups[i].CurrentGeoStateIndex = lodGeoStateIndices.TryGetValue(lodEntry.Id, out geoStateIndices) && i < geoStateIndices.Length ? geoStateIndices[i] : 0;
+                                }
                                 continue;
                             }
                             break;

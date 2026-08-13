@@ -3,13 +3,15 @@ using s3pi.GenericRCOLResource;
 
 namespace Destrospean.zoeoeBorrowed
 {
-    public struct MeshGroupData
+    public class MeshGroupData
     {
         public MATD DirectMATD;
 
-        public string ID;
+        public int CurrentGeoStateIndex = 0;
 
         public IBUF IndexBuffer;
+
+        public object Lock = new object();
 
         public MTST MaterialSet;
 
@@ -68,10 +70,8 @@ namespace Destrospean.zoeoeBorrowed
 
         public MeshGroupData(GenericRCOLResource parentResource, VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MATD directMATD, MLOD.Mesh mesh, SKIN skinController)
         {
-            ID = System.Guid.NewGuid().ToString();
             DirectMATD = directMATD;
             IndexBuffer = indexBuffer;
-            MaterialSet = null;
             MeshGroup = mesh;
             ParentResource = parentResource;
             SkinController = skinController;
@@ -81,8 +81,6 @@ namespace Destrospean.zoeoeBorrowed
 
         public MeshGroupData(GenericRCOLResource parentResource, VRTF vertexFormat, VBUF vertexBuffer, IBUF indexBuffer, MTST materialSet, MLOD.Mesh mesh, SKIN skinController)
         {
-            ID = System.Guid.NewGuid().ToString();
-            DirectMATD = null;
             IndexBuffer = indexBuffer;
             MaterialSet = materialSet;
             MeshGroup = mesh;
@@ -90,31 +88,6 @@ namespace Destrospean.zoeoeBorrowed
             SkinController = skinController;
             VertexBuffer = vertexBuffer;
             VertexFormat = vertexFormat;
-        }
-
-        public static bool operator ==(MeshGroupData a, MeshGroupData b)
-        {
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(MeshGroupData a, MeshGroupData b)
-        {
-            return !a.Equals(b);
-        }
-
-        public override bool Equals(object other)
-        {
-            return Equals((MeshGroupData)other);
-        }
-
-        public bool Equals(MeshGroupData other)
-        {
-            return ID == other.ID;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
 
         public bool HasFlag(MeshFlags flag)

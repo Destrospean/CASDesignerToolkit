@@ -854,52 +854,51 @@ public partial class MainWindow : RendererMainWindow
 
     void BuildLODNotebook(GameObject gameObject, int startLODPageIndex = 0, int startMeshGroupPageIndex = 0, uint startMaterialState = (uint)MTST.State.Default, double verticalScroll = 0)
     {
-        try
+        if (gameObject == null)
         {
-            if (gameObject == null)
-            {
-                return;
-            }
-            if (mResourcePropertyNotebookSwitchPageHandler != null)
-            {
-                ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
-            }
-            mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
-            ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
-            foreach (var lodKvp in gameObject.LODs)
-            {
-                var meshGroupNotebook = new Notebook
-                    {
-                        ShowTabs = false
-                    };
-                var actionGroup = new ActionGroup("Default");
-                Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
-                cloneMeshGroupShareMaterialAction = new Gtk.Action("CloneMeshGroupShareMaterialAction", "Clone Group (Share Material)", null, Stock.Add),
-                deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
-                    {
-                        Sensitive = lodKvp.Value.MeshGroups.Count > 1
-                    },
-                //exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
-                exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
-                exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
-                //importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
-                importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
-                importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
-                actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
-                actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
-                actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
-                actionGroup.Add(cloneMeshGroupAction);
-                actionGroup.Add(cloneMeshGroupShareMaterialAction);
-                actionGroup.Add(deleteMeshGroupAction);
-                //actionGroup.Add(exportMLODAction);
-                actionGroup.Add(exportOBJAction);
-                actionGroup.Add(exportWSOAction);
-                //actionGroup.Add(importMLODAction);
-                actionGroup.Add(importOBJAction);
-                actionGroup.Add(importWSOAction);
-                var uiManager = new UIManager();
-                uiManager.InsertActionGroup(actionGroup, 0);
-                uiManager.AddUiFromString(@"
+            return;
+        }
+        if (mResourcePropertyNotebookSwitchPageHandler != null)
+        {
+            ResourcePropertyNotebook.SwitchPage -= mResourcePropertyNotebookSwitchPageHandler;
+        }
+        mResourcePropertyNotebookSwitchPageHandler = (o, args) => NextState = NextStateOptions.UpdateModels;
+        ResourcePropertyNotebook.SwitchPage += mResourcePropertyNotebookSwitchPageHandler;
+        foreach (var lodKvp in gameObject.LODs)
+        {
+            var meshGroupNotebook = new Notebook
+                {
+                    ShowTabs = false
+                };
+            var currentMeshGroup = lodKvp.Value.MeshGroups[meshGroupNotebook.CurrentPage == -1 ? 0 : meshGroupNotebook.CurrentPage];
+            var actionGroup = new ActionGroup("Default");
+            Gtk.Action cloneMeshGroupAction = new Gtk.Action("CloneMeshGroupAction", "Clone Group", null, Stock.Add),
+            cloneMeshGroupShareMaterialAction = new Gtk.Action("CloneMeshGroupShareMaterialAction", "Clone Group (Share Material)", null, Stock.Add),
+            deleteMeshGroupAction = new Gtk.Action("DeleteMeshGroupAction", "Delete Group", null, Stock.Delete)
+                {
+                    Sensitive = lodKvp.Value.MeshGroups.Count > 1
+                },
+            //exportMLODAction = new Gtk.Action("ExportMLODAction", "Export MLOD", null, Stock.SaveAs),
+            exportOBJAction = new Gtk.Action("ExportOBJAction", "Export OBJ", null, Stock.SaveAs),
+            exportWSOAction = new Gtk.Action("ExportWSOAction", "Export WSO", null, Stock.SaveAs),
+            //importMLODAction = new Gtk.Action("ImportMLODAction", "Import MLOD", null, Stock.Directory),
+            importOBJAction = new Gtk.Action("ImportOBJAction", "Import OBJ", null, Stock.Directory),
+            importWSOAction = new Gtk.Action("ImportWSOAction", "Import WSO", null, Stock.Directory);
+            actionGroup.Add(new Gtk.Action("ExportAction", "Export", null, Stock.SaveAs));
+            actionGroup.Add(new Gtk.Action("ImportAction", "Import", null, Stock.Directory));
+            actionGroup.Add(new Gtk.Action("OptionsAction", "Options"));
+            actionGroup.Add(cloneMeshGroupAction);
+            actionGroup.Add(cloneMeshGroupShareMaterialAction);
+            actionGroup.Add(deleteMeshGroupAction);
+            //actionGroup.Add(exportMLODAction);
+            actionGroup.Add(exportOBJAction);
+            actionGroup.Add(exportWSOAction);
+            //actionGroup.Add(importMLODAction);
+            actionGroup.Add(importOBJAction);
+            actionGroup.Add(importWSOAction);
+            var uiManager = new UIManager();
+            uiManager.InsertActionGroup(actionGroup, 0);
+            uiManager.AddUiFromString(@"
                     <ui>
                         <menubar name='MLODPropertiesMenuBar'>
                             <menu name='OptionsAction' action='OptionsAction'>
@@ -920,214 +919,247 @@ public partial class MainWindow : RendererMainWindow
                             </menu>
                         </menubar>
                     </ui>");
-                var menuBar = (MenuBar)uiManager.GetWidget("/MLODPropertiesMenuBar");
-                menuBar.PackDirection = PackDirection.Rtl;
-                Button nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
+            var menuBar = (MenuBar)uiManager.GetWidget("/MLODPropertiesMenuBar");
+            menuBar.PackDirection = PackDirection.Rtl;
+            Button geoStateNextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
+                {
+                    Xalign = .5f
+                }),
+            geoStatePrevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
+                {
+                    Xalign = .5f
+                }),
+            nextButton = new Button(new Arrow(ArrowType.Right, ShadowType.None)
+                {
+                    Xalign = .5f
+                }),
+            prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
+                {
+                    Xalign = .5f
+                });
+            Label geoStateIndexLabel = new Label
+                {
+                    Text = currentMeshGroup.CurrentGeoStateIndex.ToString(),
+                    Xalign = .5f
+                },
+            pageIndexLabel = new Label
+                {
+                    Xalign = .5f
+                };
+            geoStateNextButton.Clicked += (sender, e) =>
+                {
+                    geoStateIndexLabel.Text = (++currentMeshGroup.CurrentGeoStateIndex).ToString();
+                    geoStateNextButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex < currentMeshGroup.MeshGroup.GeometryStates.Count - 1;
+                    geoStatePrevButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex > 0;
+                    NextState = NextStateOptions.UpdateModels;
+                };
+            geoStatePrevButton.Clicked += (sender, e) =>
+                {
+                    geoStateIndexLabel.Text = (--currentMeshGroup.CurrentGeoStateIndex).ToString();
+                    geoStateNextButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex < currentMeshGroup.MeshGroup.GeometryStates.Count - 1;
+                    geoStatePrevButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex > 0;
+                    NextState = NextStateOptions.UpdateModels;
+                };
+            nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
+            prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
+            Alignment geoStateNextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            geoStatePrevButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
+            prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
+            geoStateNextButtonAlignment.Add(geoStateNextButton);
+            geoStatePrevButtonAlignment.Add(geoStatePrevButton);
+            nextButtonAlignment.Add(nextButton);
+            prevButtonAlignment.Add(prevButton);
+            meshGroupNotebook.SwitchPage += (o, args) =>
+                {
+                    currentMeshGroup = lodKvp.Value.MeshGroups[meshGroupNotebook.CurrentPage == -1 ? 0 : meshGroupNotebook.CurrentPage];
+                    geoStateIndexLabel.Text = currentMeshGroup.CurrentGeoStateIndex.ToString();
+                    pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
+                    geoStateNextButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex < currentMeshGroup.MeshGroup.GeometryStates.Count - 1;
+                    geoStatePrevButton.Sensitive = currentMeshGroup.CurrentGeoStateIndex > 0;
+                    nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+                    prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
+                    NextState = NextStateOptions.UpdateModels;
+                };
+            Action<bool> cloneMeshGroup = (shareMaterial) =>
+                {
+                    int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                    selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                    gameObject.CloneMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs, shareMaterial);
+                    gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                    foreach (var child in ResourcePropertyNotebook.Children)
                     {
-                        Xalign = .5f
-                    }),
-                prevButton = new Button(new Arrow(ArrowType.Left, ShadowType.None)
+                        ResourcePropertyNotebook.Remove(child);
+                    }
+                    BuildLODNotebook(gameObject, selectedLODIndex, new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[selectedLODIndex].MeshGroups.Count - 1);
+                    NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                };
+            Action<MeshFileType> exportMeshGroup = (meshFileType) =>
+                {
+                    try
                     {
-                        Xalign = .5f
-                    });
-                var pageIndexLabel = new Label
-                    {
-                        Xalign = .5f
-                    };
-                nextButton.Clicked += (sender, e) => meshGroupNotebook.NextPage();
-                prevButton.Clicked += (sender, e) => meshGroupNotebook.PrevPage();
-                Alignment nextButtonAlignment = new Alignment(.5f, .5f, 0, 0),
-                prevButtonAlignment = new Alignment(.5f, .5f, 0, 0);
-                nextButtonAlignment.Add(nextButton);
-                prevButtonAlignment.Add(prevButton);
-                meshGroupNotebook.SwitchPage += (o, args) =>
-                    {
-                        pageIndexLabel.Text = meshGroupNotebook.CurrentPage.ToString();
-                        nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
-                        prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
-                    };
-                Action<bool> cloneMeshGroup = (shareMaterial) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.CloneMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs, shareMaterial);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
+                        switch (meshFileType)
                         {
-                            ResourcePropertyNotebook.Remove(child);
+                            case MeshFileType.MLOD:
+                            case MeshFileType.OBJ:
+                            case MeshFileType.WSO:
+                                break;
+                            default:
+                                return;
                         }
-                        BuildLODNotebook(gameObject, selectedLODIndex, new List<Destrospean.zoeoeBorrowed.LODData>(gameObject.LODs.Values)[selectedLODIndex].MeshGroups.Count - 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                Action<MeshFileType> exportMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.MLOD:
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = FileTypes.GetName(meshFileType)
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.WriteError(ex);
-                            throw;
-                        }
-                    },
-                importMeshGroup = (meshFileType) =>
-                    {
-                        try
-                        {
-                            switch (meshFileType)
-                            {
-                                case MeshFileType.OBJ:
-                                case MeshFileType.WSO:
-                                    break;
-                                default:
-                                    return;
-                            }
-                            var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
-                            var fileFilter = new FileFilter
-                                {
-                                    Name = FileTypes.GetName(meshFileType)
-                                };
-                            fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
-                            fileChooserDialog.AddFilter(fileFilter);
-                            if (fileChooserDialog.Run() == (int)ResponseType.Accept)
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            fileChooserDialog.Destroy();
-                            fileChooserDialog.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.WriteError(ex);
-                            throw;
-                        }
-                    };
-                cloneMeshGroupAction.Activated += (sender, e) => cloneMeshGroup(false);
-                cloneMeshGroupShareMaterialAction.Activated += (sender, e) => cloneMeshGroup(true);
-                deleteMeshGroupAction.Activated += (sender, e) =>
-                    {
-                        int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
-                        selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
-                        gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                        foreach (var child in ResourcePropertyNotebook.Children)
-                        {
-                            ResourcePropertyNotebook.Remove(child);
-                        }
-                        BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
-                        NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
-                    };
-                //exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
-                exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
-                exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
-                /*
-                importMLODAction.Activated += (sender, e) =>
-                    {
-                        var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                        var fileChooserDialog = new FileChooserDialog("Export " + meshFileType.ToString(), this, FileChooserAction.Save, "Cancel", ResponseType.Cancel, "Save", ResponseType.Accept);
                         var fileFilter = new FileFilter
                             {
-                                Name = FileTypes.MLOD
+                                Name = FileTypes.GetName(meshFileType)
                             };
-                        fileFilter.AddPattern("*.lod");
+                        fileFilter.AddPattern(meshFileType == MeshFileType.MLOD ? "*.lod" : meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
                         fileChooserDialog.AddFilter(fileFilter);
                         if (fileChooserDialog.Run() == (int)ResponseType.Accept)
                         {
-                            try
-                            {
-                                gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.WriteError(ex);
-                                throw;
-                            }
+                            gameObject.ExportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
                         }
                         fileChooserDialog.Destroy();
                         fileChooserDialog.Dispose();
-                    };
-                */
-                importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
-                importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
-                var meshGroupPageButtonHBox = new HBox(false, 0);
-                meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
-                meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
-                meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
-                var lodPageVBox = new VBox(false, 0);
-                lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
-                lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
-                lodPageVBox.ShowAll();
-                ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
-                foreach (var meshGroup in lodKvp.Value.MeshGroups)
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteError(ex);
+                        throw;
+                    }
+                },
+            importMeshGroup = (meshFileType) =>
                 {
-                    if (meshGroup.DirectMATD == null)
+                    try
                     {
-                        var materialStateNotebook = new Notebook();
-                        var materialStates = meshGroup.MaterialSet.Entries.ConvertAll(x => x.MaterialState);
-                        materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
-                        materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)materialStateNotebook.CurrentPageWidget).Vadjustment.Value)));
-                        materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
-                        meshGroupNotebook.Add(materialStateNotebook);
-                        GLib.Timeout.Add(100, () =>
+                        switch (meshFileType)
+                        {
+                            case MeshFileType.OBJ:
+                            case MeshFileType.WSO:
+                                break;
+                            default:
+                                return;
+                        }
+                        var fileChooserDialog = new FileChooserDialog("Import " + meshFileType.ToString(), this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                        var fileFilter = new FileFilter
                             {
-                                var adjustment = (materialStateNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
-                                if (adjustment != null)
-                                {
-                                    adjustment.Value = verticalScroll;
-                                }
-                                return false;
-                            });
+                                Name = FileTypes.GetName(meshFileType)
+                            };
+                        fileFilter.AddPattern(meshFileType == MeshFileType.OBJ ? "*.obj" : meshFileType == MeshFileType.WSO ? "*.wso" : null);
+                        fileChooserDialog.AddFilter(fileFilter);
+                        if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                        {
+                            gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, meshFileType, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        }
+                        fileChooserDialog.Destroy();
+                        fileChooserDialog.Dispose();
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)meshGroupNotebook.CurrentPageWidget).Vadjustment.Value));
-                        GLib.Timeout.Add(100, () =>
-                            {
-                                var adjustment = (meshGroupNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
-                                if (adjustment != null)
-                                {
-                                    adjustment.Value = verticalScroll;
-                                }
-                                return false;
-                            });
+                        Logger.WriteError(ex);
+                        throw;
                     }
+                };
+            cloneMeshGroupAction.Activated += (sender, e) => cloneMeshGroup(false);
+            cloneMeshGroupShareMaterialAction.Activated += (sender, e) => cloneMeshGroup(true);
+            deleteMeshGroupAction.Activated += (sender, e) =>
+                {
+                    int selectedLODIndex = ResourcePropertyNotebook.CurrentPage,
+                    selectedMeshGroupIndex = meshGroupNotebook.CurrentPage;
+                    gameObject.DeleteMeshGroup(lodKvp.Key, selectedMeshGroupIndex, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                    gameObject.LoadLODs(PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                    foreach (var child in ResourcePropertyNotebook.Children)
+                    {
+                        ResourcePropertyNotebook.Remove(child);
+                    }
+                    BuildLODNotebook(gameObject, selectedLODIndex, selectedMeshGroupIndex == 0 ? 0 : selectedMeshGroupIndex - 1);
+                    NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
+                };
+            //exportMLODAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.MLOD);
+            exportOBJAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.OBJ);
+            exportWSOAction.Activated += (sender, e) => exportMeshGroup(MeshFileType.WSO);
+            /*
+            importMLODAction.Activated += (sender, e) =>
+                {
+                    var fileChooserDialog = new FileChooserDialog("Import MLOD", this, FileChooserAction.Open, "Cancel", ResponseType.Cancel, "Open", ResponseType.Accept);
+                    var fileFilter = new FileFilter
+                        {
+                            Name = FileTypes.MLOD
+                        };
+                    fileFilter.AddPattern("*.lod");
+                    fileChooserDialog.AddFilter(fileFilter);
+                    if (fileChooserDialog.Run() == (int)ResponseType.Accept)
+                    {
+                        try
+                        {
+                            gameObject.ImportMeshGroup(lodKvp.Key, meshGroupNotebook.CurrentPage, fileChooserDialog.Filename, RefreshLODNotebook, PreloadedData.MLODs, PreloadedData.MODLs, PreloadedData.VPXYs);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteError(ex);
+                            throw;
+                        }
+                    }
+                    fileChooserDialog.Destroy();
+                    fileChooserDialog.Dispose();
+                };
+            */
+            importOBJAction.Activated += (sender, e) => importMeshGroup(MeshFileType.OBJ);
+            importWSOAction.Activated += (sender, e) => importMeshGroup(MeshFileType.WSO);
+            var meshGroupPageButtonHBox = new HBox(false, 0);
+            meshGroupPageButtonHBox.PackEnd(menuBar, true, true, 4);
+            meshGroupPageButtonHBox.PackStart(prevButtonAlignment, false, true, 4);
+            meshGroupPageButtonHBox.PackStart(pageIndexLabel, false, true, 4);
+            meshGroupPageButtonHBox.PackStart(nextButtonAlignment, false, true, 4);
+            meshGroupPageButtonHBox.PackStart(geoStatePrevButtonAlignment, false, true, 4);
+            meshGroupPageButtonHBox.PackStart(geoStateIndexLabel, false, true, 4);
+            meshGroupPageButtonHBox.PackStart(geoStateNextButtonAlignment, false, true, 4);
+            var lodPageVBox = new VBox(false, 0);
+            lodPageVBox.PackStart(meshGroupPageButtonHBox, false, true, 0);
+            lodPageVBox.PackStart(meshGroupNotebook, true, true, 0);
+            lodPageVBox.ShowAll();
+            ResourcePropertyNotebook.AppendPage(lodPageVBox, new Label(lodKvp.Key.ToString()));
+            foreach (var meshGroup in lodKvp.Value.MeshGroups)
+            {
+                if (meshGroup.DirectMATD == null)
+                {
+                    var materialStateNotebook = new Notebook();
+                    var materialStates = meshGroup.MaterialSet.Entries.ConvertAll(x => x.MaterialState);
+                    materialStates.Sort((a, b) => a != MTST.State.Default || b == MTST.State.Default ? 1 : 0);
+                    materialStates.ForEach(x => materialStateNotebook.AddProperties(x.ToString(), CurrentPackage, lodKvp.Value, meshGroup, (uint)x, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)materialStateNotebook.CurrentPageWidget).Vadjustment.Value)));
+                    materialStateNotebook.CurrentPage = materialStates.IndexOf((MTST.State)startMaterialState);
+                    meshGroupNotebook.Add(materialStateNotebook);
+                    GLib.Timeout.Add(100, () =>
+                        {
+                            var adjustment = (materialStateNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
+                            if (adjustment != null)
+                            {
+                                adjustment.Value = verticalScroll;
+                            }
+                            return false;
+                        });
                 }
-                nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
-                prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
-                meshGroupNotebook.CurrentPage = 0;
-                if (lodKvp.Key.Equals(new List<meshExpImp.ModelBlocks.LODId>(gameObject.LODs.Keys)[startLODPageIndex]))
+                else
                 {
-                    ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
-                    meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
+                    meshGroupNotebook.AddProperties("", CurrentPackage, lodKvp.Value, meshGroup, (uint)MTST.State.Default, gameObject.AllPresets.Count == 0 ? null : gameObject.AllPresets[mPresetNotebook.CurrentPage == -1 ? 0 : mPresetNotebook.CurrentPage], Image, (a, b, c, d) => RefreshLODNotebook(a, b, c, d, ((ScrolledWindow)meshGroupNotebook.CurrentPageWidget).Vadjustment.Value));
+                    GLib.Timeout.Add(100, () =>
+                        {
+                            var adjustment = (meshGroupNotebook?.CurrentPageWidget as ScrolledWindow)?.Vadjustment;
+                            if (adjustment != null)
+                            {
+                                adjustment.Value = verticalScroll;
+                            }
+                            return false;
+                        });
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Logger.WriteError(ex);
-            throw;
+            nextButton.Sensitive = meshGroupNotebook.CurrentPage < meshGroupNotebook.NPages - 1;
+            prevButton.Sensitive = meshGroupNotebook.CurrentPage > 0;
+            meshGroupNotebook.CurrentPage = 0;
+            if (lodKvp.Key.Equals(new List<meshExpImp.ModelBlocks.LODId>(gameObject.LODs.Keys)[startLODPageIndex]))
+            {
+                ResourcePropertyNotebook.CurrentPage = startLODPageIndex;
+                meshGroupNotebook.CurrentPage = startMeshGroupPageIndex;
+            }
         }
     }
 
