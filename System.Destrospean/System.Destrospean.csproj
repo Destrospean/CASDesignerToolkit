@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>System.Destrospean</RootNamespace>
     <AssemblyName>System.Destrospean</AssemblyName>
-    <UseMSBuildEngine>False</UseMSBuildEngine>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>

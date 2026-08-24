@@ -700,7 +700,7 @@ namespace Destrospean.DestrospeanCASPEditor
                             {
                                 table.Remove(child);
                             }
-                            var element = addMaterialPropertyDialog.DataType == typeof(ElementTextureRef) ? new ElementTextureRef(0, null) : (ShaderData)Activator.CreateInstance(addMaterialPropertyDialog.DataType, 0, null);
+                            var element = addMaterialPropertyDialog.DataType == typeof(ElementTextureRef) ? new ElementTextureRef(0, null, (FieldType)addMaterialPropertyDialog.Field, new GenericRCOLResource.ChunkReference(0, null, (uint)mlodResource.PublicChunks)) : (ShaderData)Activator.CreateInstance(addMaterialPropertyDialog.DataType, 0, null);
                             element.Field = (FieldType)addMaterialPropertyDialog.Field;
                             matd.Mtnf.SData.Add(element);
                             table.AddProperties(package, lodData, meshGroupData, materialState, preset, scrolledWindow, imageWidget, updateUICallback);

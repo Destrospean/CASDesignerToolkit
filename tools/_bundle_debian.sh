@@ -8,7 +8,7 @@ cd ../../../tools
 cp $RELEASE_DIR/Acknowledgements.txt CASDesignerToolkit
 cp $RELEASE_DIR/ealayer3 CASDesignerToolkit
 cp $RELEASE_DIR/GameFolders.xml CASDesignerToolkit
-cp $RELEASE_DIR/LICENSE.md CASDesignerToolkit
+cp $RELEASE_DIR/gpl-3.0.txt CASDesignerToolkit
 #cp $RELEASE_DIR/s3pi*.dll CASDesignerToolkit
 cp $RELEASE_DIR/*License.txt CASDesignerToolkit
 cp $RELEASE_DIR/*.sh CASDesignerToolkit
