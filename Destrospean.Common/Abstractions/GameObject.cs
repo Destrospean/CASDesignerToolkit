@@ -488,7 +488,7 @@ namespace Destrospean.Common.Abstractions
                 for (var i = 0; i < Presets.Count; i++)
                 {
                     var material = materials.Find(x => x.MaterialBlock == ((GameObjectPreset)Presets[i]).MaterialBlock);
-                    material.Unknown1 = (uint)i + 1;
+                    material.Unknown3 = (uint)i + 1;
                     materialsReordered.Add(material);
                 }
                 materials.Clear();
