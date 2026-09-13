@@ -198,9 +198,9 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                             {
                                 alignment.Xscale = 0;
                                 var shortName = propertyName.Substring(9);
-                                float baseH = float.Parse(complate["Base H " + shortName]),
-                                baseS = float.Parse(complate["Base S " + shortName]),
-                                baseV = float.Parse(complate["Base V " + shortName]); 
+                                float baseH = float.Parse(complate["Base H " + shortName], CultureInfo.InvariantCulture),
+                                baseS = float.Parse(complate["Base S " + shortName], CultureInfo.InvariantCulture),
+                                baseV = float.Parse(complate["Base V " + shortName], CultureInfo.InvariantCulture); 
                                 var hsv = Array.ConvertAll(value.Split(','), x => float.Parse(x, CultureInfo.InvariantCulture));
                                 var rgb = new CmarNYCBorrowed.HSVColor((baseH + hsv[0]) * 360, baseS + hsv[1], baseV + hsv[2]).ToRGB();
                                 var hsvColorButton = new ColorButton
@@ -223,13 +223,13 @@ namespace Destrospean.DestrospeanCASPEditor.Widgets
                                             }, x => x.ToString("F4", CultureInfo.InvariantCulture))), () =>
                                             {
                                             });
-                                        complate.SetValue("H " + shortName, (newHSV.Hue / 360 - baseH).ToString(), () =>
+                                        complate.SetValue("H " + shortName, (newHSV.Hue / 360 - baseH).ToString("F4", CultureInfo.InvariantCulture), () =>
                                             {
                                             });
-                                        complate.SetValue("S " + shortName, (newHSV.Saturation - baseS).ToString(), () =>
+                                        complate.SetValue("S " + shortName, (newHSV.Saturation - baseS).ToString("F4", CultureInfo.InvariantCulture), () =>
                                             {
                                             });
-                                        complate["V " + shortName] = (newHSV.Value - baseV).ToString();
+                                        complate["V " + shortName] = (newHSV.Value - baseV).ToString("F4", CultureInfo.InvariantCulture);
                                     };
                                 valueWidget = hsvColorButton;
                                 break;
