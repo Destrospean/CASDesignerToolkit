@@ -27,11 +27,43 @@ namespace Destrospean.Common.Abstractions
             }
         }
 
+        public string FaceAmbientMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).FaceAmbientMap;
+            }
+        }
+
+        public string FaceSpecularMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).FaceSpecularMap;
+            }
+        }
+
         public Bitmap FaceTexture
         {
             get
             {
                 return ((PresetInternal)mInternal).FaceTexture;
+            }
+        }
+
+        public string ScalpAmbientMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).ScalpAmbientMap;
+            }
+        }
+
+        public string ScalpSpecularMap
+        {
+            get
+            {
+                return ((PresetInternal)mInternal).ScalpSpecularMap;
             }
         }
 
@@ -81,7 +113,7 @@ namespace Destrospean.Common.Abstractions
 
         protected class PresetInternal : PresetInternalBase
         {
-            public string BodyAmbientMap, BodySpecularMap, SkinAmbientMap, SkinSpecularMap;
+            public string BodyAmbientMap, BodySpecularMap, FaceAmbientMap, FaceSpecularMap, ScalpAmbientMap, ScalpSpecularMap, SkinAmbientMap, SkinSpecularMap;
 
             public XmlNode ComplateXmlNode
             {
@@ -230,6 +262,9 @@ namespace Destrospean.Common.Abstractions
                                         break;
                                     case "face ambient":
                                         goto case "ambient";
+                                    case "face ao":
+                                        FaceAmbientMap = value;
+                                        break;
                                     case "face control map":
                                         faceControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
                                         break;
@@ -240,6 +275,9 @@ namespace Destrospean.Common.Abstractions
                                         goto case "overlay";
                                     case "face specular":
                                         goto case "specular";
+                                    case "face specular map":
+                                        FaceSpecularMap = value;
+                                        break;
                                     case "highlight color":
                                         highlightColor = ParseCommaSeparatedValues(value);
                                         break;
@@ -255,11 +293,17 @@ namespace Destrospean.Common.Abstractions
                                     case "root color":
                                         rootColor = ParseCommaSeparatedValues(value);
                                         break;
+                                    case "scalp ao":
+                                        ScalpAmbientMap = value;
+                                        break;
                                     case "scalp control map":
                                         scalpControlMapArray = ParentPackage.GetTextureARGBArray(value, GetTextureCallback, width, height);
                                         break;
                                     case "scalp diffuse map":
                                         scalpDiffuseMap = ParentPackage.GetTexture(value, GetTextureCallback, width, height);
+                                        break;
+                                    case "scalp specular map":
+                                        ScalpSpecularMap = value;
                                         break;
                                     case "skin ambient":
                                         SkinAmbientMap = value;

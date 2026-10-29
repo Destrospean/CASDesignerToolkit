@@ -204,7 +204,7 @@ namespace Destrospean.Common
                     graphics.DrawImage(CurrentCASPart.ParentPackage.GetSkinToneImage(new Tone(new BinaryReader(CurrentCASPart.ParentPackage.EvaluateResourceKey(new ResourceKey(SkinTonePreset.SkinToneKey.Type, SkinTonePreset.SkinToneKey.Group, SkinTonePreset.SkinToneKey.Instance).ReverseEvaluateResourceKey()).Stream)), (AgeGender)casPart.CASPartResource.AgeGender.Age, (AgeGender)((uint)casPart.CASPartResource.AgeGender.Gender << 12), PartType.Body, null, SkinDarkness, 0, 0, Complate.GetTextureCallback), 0, 0);
                     foreach (var preset in GetCASPartPresetsWithXmlElement(presetIndex, (preset, element) => element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && (element.GetAttribute("value") ?? "").ToLowerInvariant() == "body"))
                     {
-                        graphics.DrawImage(preset.Texture, 0, 0);
+                        graphics.DrawImage(preset.Texture ?? new Bitmap(1024, 1024), 0, 0);
                     }
                 }
                 return mStackedBodyTexture;
@@ -225,6 +225,7 @@ namespace Destrospean.Common
                     bool drawsOnFace;
                     foreach (var preset in GetCASPartPresetsWithXmlElement(0, (preset, element) => element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && ((element.GetAttribute("value") ?? "").ToLowerInvariant() == "face" || (element.GetAttribute("value") ?? "").ToLowerInvariant() == "hair" && bool.TryParse(preset["DrawsOnFace"], out drawsOnFace) && drawsOnFace)))
                     {
+                        _ = preset.Texture;
                         graphics.DrawImage(preset.FaceTexture ?? preset.Texture ?? new Bitmap(1024, 1024), 0, 0);
                     }
                 }
@@ -246,6 +247,7 @@ namespace Destrospean.Common
                     bool drawsOnScalp;
                     foreach (var preset in GetCASPartPresetsWithXmlElement(0, (preset, element) => element.Name.ToLowerInvariant() == "value" && (element.GetAttribute("key") ?? "").ToLowerInvariant() == "parttype" && ((element.GetAttribute("value") ?? "").ToLowerInvariant() == "scalp" || (element.GetAttribute("value") ?? "").ToLowerInvariant() == "hair" && bool.TryParse(preset["DrawsOnScalp"], out drawsOnScalp) && drawsOnScalp)))
                     {
+                        _ = preset.Texture;
                         graphics.DrawImage(preset.ScalpTexture ?? preset.Texture ?? new Bitmap(1024, 1024), 0, 0);
                     }
                 }

@@ -294,20 +294,20 @@ namespace Destrospean.Graphics.OpenGL.Sims3
                                 DiffuseMap = materialMaps.TryGetValue(FieldType.DiffuseMap, out map) ? map : "",
                                 HasTransparency = hasTransparency,
                                 NormalMap = materialMaps.TryGetValue(FieldType.NormalMap, out map) ? map : "",
-                                SpecularColor = materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
+                                SpecularColor = casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Face || casPart.CASPartResource.Clothing == CASPartResource.ClothingType.Scalp ? Vector3.Zero : materialColors.TryGetValue(FieldType.Specular, out color) ? color : Vector3.One,
                                 SpecularMap = materialMaps.TryGetValue(FieldType.SpecularMap, out map) ? map : ""
                             };
                         GlobalState.Materials[geomAndKey.Key] = material;
                     }
                     var currentPreset = casPart.AllPresets[casPart == CurrentCASPart ? presetIndex : 0];
                     string ambientMap = currentPreset.AmbientMap ?? material.AmbientMap,
-                    specularMap = currentPreset.SpecularMap ?? material.SpecularMap,
                     skinAmbientMap = ((CASPartPreset)currentPreset).SkinAmbientMap ?? material.AmbientMap,
-                    skinSpecularMap = ((CASPartPreset)currentPreset).SkinSpecularMap ?? material.SpecularMap;
+                    skinSpecularMap = ((CASPartPreset)currentPreset).SkinSpecularMap ?? material.SpecularMap,
+                    specularMap = currentPreset.SpecularMap ?? material.SpecularMap;
                     Bitmap ambientMapImage = null,
-                    specularMapImage = null,
                     skinAmbientMapImage = null,
-                    skinSpecularMapImage = null;
+                    skinSpecularMapImage = null,
+                    specularMapImage = null;
                     if (!string.IsNullOrEmpty(ambientMap))
                     {
                         ambientMapImage = (Bitmap)CurrentCASPart.ParentPackage.GetTexture(ambientMap, Complate.GetTextureCallback)?.Clone();
