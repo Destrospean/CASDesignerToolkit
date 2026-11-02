@@ -6,7 +6,7 @@ namespace Destrospean.DestrospeanCASPEditor
 	{
 		private global::Gtk.Table MainTable;
 		
-		private global::Gtk.ComboBox CategoryComboBox;
+		private global::Gtk.ComboBoxEntry CategoryComboBox;
 		
 		private global::Gtk.Label CategoryLabel;
 		
@@ -39,7 +39,7 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.MainTable.RowSpacing = ((uint)(6));
 			this.MainTable.ColumnSpacing = ((uint)(6));
 			// Container child MainTable.Gtk.Table+TableChild
-			this.CategoryComboBox = global::Gtk.ComboBox.NewText ();
+			this.CategoryComboBox = global::Gtk.ComboBoxEntry.NewText ();
 			this.CategoryComboBox.Name = "CategoryComboBox";
 			this.MainTable.Add (this.CategoryComboBox);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.MainTable [this.CategoryComboBox]));

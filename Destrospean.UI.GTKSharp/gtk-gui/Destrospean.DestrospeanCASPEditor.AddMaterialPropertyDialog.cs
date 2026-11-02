@@ -8,11 +8,11 @@ namespace Destrospean.DestrospeanCASPEditor
 		
 		private global::Gtk.Table ComboBoxTable;
 		
-		private global::Gtk.ComboBox DataTypeComboBox;
+		private global::Gtk.ComboBoxEntry DataTypeComboBox;
 		
 		private global::Gtk.Label DataTypeLabel;
 		
-		private global::Gtk.ComboBox FieldComboBox;
+		private global::Gtk.ComboBoxEntry FieldComboBox;
 		
 		private global::Gtk.Label FieldLabel;
 		
@@ -40,9 +40,9 @@ namespace Destrospean.DestrospeanCASPEditor
 			this.ComboBoxTable = new global::Gtk.Table (((uint)(2)), ((uint)(2)), false);
 			this.ComboBoxTable.Name = "ComboBoxTable";
 			this.ComboBoxTable.RowSpacing = ((uint)(6));
-			this.ComboBoxTable.ColumnSpacing = ((uint)(6));
+			this.ComboBoxTable.ColumnSpacing = ((uint)(18));
 			// Container child ComboBoxTable.Gtk.Table+TableChild
-			this.DataTypeComboBox = global::Gtk.ComboBox.NewText ();
+			this.DataTypeComboBox = global::Gtk.ComboBoxEntry.NewText ();
 			this.DataTypeComboBox.Name = "DataTypeComboBox";
 			this.ComboBoxTable.Add (this.DataTypeComboBox);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.ComboBoxTable [this.DataTypeComboBox]));
@@ -60,9 +60,10 @@ namespace Destrospean.DestrospeanCASPEditor
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.ComboBoxTable [this.DataTypeLabel]));
 			w3.TopAttach = ((uint)(1));
 			w3.BottomAttach = ((uint)(2));
+			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child ComboBoxTable.Gtk.Table+TableChild
-			this.FieldComboBox = global::Gtk.ComboBox.NewText ();
+			this.FieldComboBox = global::Gtk.ComboBoxEntry.NewText ();
 			this.FieldComboBox.Name = "FieldComboBox";
 			this.ComboBoxTable.Add (this.FieldComboBox);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.ComboBoxTable [this.FieldComboBox]));
