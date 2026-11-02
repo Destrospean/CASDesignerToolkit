@@ -58,6 +58,7 @@ namespace Destrospean.DestrospeanCASPEditor
             DataTypeComboBox.Model = dataTypeListStore;
             DataTypeComboBox.Active = 0;
             DataTypeComboBox.PackStart(dataTypeCell, true);
+            DataTypeComboBox.Entry.IsEditable = false;
             fields.Remove("None");
             fields.Sort();
             fields.Insert(0, "None");
@@ -65,11 +66,12 @@ namespace Destrospean.DestrospeanCASPEditor
             FieldComboBox.Model = fieldListStore;
             FieldComboBox.Active = 0;
             FieldComboBox.PackStart(fieldCell, true);
+            FieldComboBox.Entry.IsEditable = false;
             Response += (o, args) =>
                 {
                     if (args.ResponseId == ResponseType.Ok)
                     {
-                        switch (dataTypes[DataTypeComboBox.Active])
+                        switch (dataTypes[FieldComboBox.Active])
                         {
                             case "ElementFloat":
                                 ValueType = CmarNYCBorrowed.MeshFormatDataType.Float;

@@ -159,6 +159,7 @@ namespace Destrospean.DestrospeanCASPEditor
             CategoryComboBox.Model = categoryListStore;
             CategoryComboBox.PackStart(categoryCell, true);
             CategoryComboBox.Active = 0;
+            CategoryComboBox.Entry.IsEditable = false;
             CategoryComboBox.Changed += (sender, e) => setPatternKeysAndPaths(CategoryComboBox.Active);
             PatternIconView.Model = patternListStore;
             PatternIconView.PixbufColumn = 1;

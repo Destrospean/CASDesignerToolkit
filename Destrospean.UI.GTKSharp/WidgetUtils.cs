@@ -122,10 +122,11 @@ namespace Destrospean.DestrospeanCASPEditor
                 }
                 shaders.Sort();
                 var shaderComboBoxAlignment = new Alignment(0, .5f, 1, 0);
-                var shaderComboBox = new ComboBox(shaders.ToArray())
+                var shaderComboBox = new ComboBoxEntry(shaders.ToArray())
                     {
                         Active = shaders.IndexOf(string.Format("{0} ({1})", (Shader)geometryResource.ShaderHash, (uint)geometryResource.ShaderHash))
                     };
+                shaderComboBox.Entry.IsEditable = false;
                 shaderComboBoxAlignment.Add(shaderComboBox);
                 shaderComboBox.Changed += (sender, e) =>
                     {
@@ -417,10 +418,11 @@ namespace Destrospean.DestrospeanCASPEditor
                 }
                 shaders.Sort();
                 var shaderComboBoxAlignment = new Alignment(0, .5f, 1, 0);
-                var shaderComboBox = new ComboBox(shaders.ToArray())
+                var shaderComboBox = new ComboBoxEntry(shaders.ToArray())
                     {
                         Active = shaders.IndexOf(string.Format("{0} ({1})", (Shader)matd.Shader, (uint)matd.Shader))
                     };
+                shaderComboBox.Entry.IsEditable = false;
                 shaderComboBoxAlignment.Add(shaderComboBox);
                 shaderComboBox.Changed += (sender, e) =>
                     {
