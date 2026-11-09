@@ -690,7 +690,7 @@ public partial class MainWindow : RendererMainWindow
                             child.Destroy();
                             child.Dispose();
                         }
-                        BuildLODNotebook(casPart, selectedLODIndex, casPart.LODs[selectedLODIndex].Count - 1);
+                        BuildLODNotebook(casPart, selectedLODIndex, casPart.LODs[new List<int>(casPart.LODs.Keys)[selectedLODIndex]].Count - 1);
                         NextState = NextStateOptions.UnsavedChangesAndUpdateModels;
                     };
                 deleteMeshGroupAction.Activated += (sender, e) =>
